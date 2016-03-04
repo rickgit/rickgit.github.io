@@ -1,6 +1,6 @@
 #ArrayMap分析
 
-@(源码分析)[ArrayMap][Android]
+@(源码分析)[ArrayMap|Android]
 
 **ArrayMap**效率比HashMap高，将从以下几点分析
 
