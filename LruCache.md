@@ -4,7 +4,7 @@
 
 @(源码分析)[LruCache|Android]
 
-**LruCache，将从以下几点分析
+**LruCache**，将从以下几点分析
 
 - **LruCache创建及初始化**
 - **存储键值对**
@@ -42,7 +42,34 @@ LruCache包含个构造函数，接下来只分析构造函数。
         this.map = new LinkedHashMap<K, V>(0, 0.75f, true);
     }
 ```
-维护的是一个LinkedHashMap, 
+维护的是一个LinkedHashMap,LinkedHashMap有两个链表组成
+1. LinkedHashMap内部类Entry的before,after，构成 **双向链表** 
+```java
+    private static class Entry<K,V> extends HashMap.Entry<K,V> {
+        // These fields comprise the doubly linked list used for iteration.
+        Entry<K,V> before, after;
+```
+
+2. 继承于HashMap.Entry的next。HashMap由数组链表组成，next维护的是hash冲突后元素的顺序
+```java
+    static class Entry<K,V> implements Map.Entry<K,V> {
+        final K key;
+        V value;
+        Entry<K,V> next;
+        int hash;
+```
+
+accessOrder如果为true，LinkedHashMap每次get方法调用Entry对象后重新加到Header前面，即双向链表尾部。
+```java
+        void recordAccess(HashMap<K,V> m) {
+            LinkedHashMap<K,V> lm = (LinkedHashMap<K,V>)m;
+            if (lm.accessOrder) {
+                lm.modCount++;
+                remove();//移除双向链表
+                addBefore(lm.header);//添加到双向链表尾部
+            }
+        }
+```
 
 ##存储键值对
 ```java
@@ -71,7 +98,7 @@ LruCache包含个构造函数，接下来只分析构造函数。
 ```
 - safeSizeOf方法是判断当前对象的size必须大于0，否则抛异常
 - entryRemoved模板方法，需要重写，做该对象相应的处理
-- trimToSize方法移除不常使用的对象，
+- trimToSize方法移除不常使用的对象
 
 ##移除键值对
 remove开始分析
