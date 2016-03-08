@@ -98,7 +98,7 @@ accessOrder如果为true，LinkedHashMap每次get方法调用Entry对象后重�
 ```
 - safeSizeOf方法是判断当前对象的size必须大于0，否则抛异常
 - entryRemoved模板方法，需要重写，做该对象相应的处理
-- trimToSize方法移除不常使用的对象
+- trimToSize方法移除不常使用的对象，根据双向链表的eldest方法
 
 ##移除键值对
 remove开始分析
