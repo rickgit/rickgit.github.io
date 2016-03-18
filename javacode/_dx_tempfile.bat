@@ -1,0 +1,1 @@
+dx --dump --debug "%1" > TempFile_dx.java

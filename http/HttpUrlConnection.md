@@ -7,8 +7,8 @@
  
 
 - **创建及初始化**
-- **connection** 
-
+- **URL.openConnection** 
+- **getResponseCode** 
 ---------------------
 
 [TOC]
@@ -16,4 +16,4 @@
 ##创建及初始化
 
 
-##connection
+##openConnection
