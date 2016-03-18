@@ -2,7 +2,7 @@
 
 > A cache that holds strong references to a limited number of values. Each time a value is accessed, it is moved to the head of a queue. When a value is added to a full cache, the value at the end of that queue is evicted and may become eligible for garbage collection.
 
-@(源码分析)[LruCache|Android]
+@(源码分析)[LruCache|Android|双向链表]
 
 **LruCache**，将从以下几点分析
 
