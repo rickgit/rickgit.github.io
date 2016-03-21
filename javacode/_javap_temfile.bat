@@ -1,1 +1,6 @@
-javap -v "%1" > TempFile_javap.java
+set fileFullName="%1"
+javac %fileFullName%
+
+set classFullName=%fileFullName:.java=.class%
+javap -v -p %classFullName% > TempFile_javap.java
+## pause
