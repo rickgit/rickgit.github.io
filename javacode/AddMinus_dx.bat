@@ -1,1 +1,0 @@
-dx --dump --debug AddMinus.class > AddMinus_dx.java

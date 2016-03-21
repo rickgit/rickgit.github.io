@@ -1,6 +1,6 @@
 Classfile /H:/workspace/ws-github/rickgit.github.io/javacode/AddMinus.class
   Last modified 2016-3-21; size 286 bytes
-  MD5 checksum 499c6b79ec4ed5730875bc9fcd62956a
+  MD5 checksum 14b3afa9e2144a3840d7bd7aa0ee95b8
   Compiled from "AddMinus.java"
 public class AddMinus
   SourceFile: "AddMinus.java"
@@ -26,8 +26,8 @@ Constant pool:
   #16 = Utf8               AddMinus
   #17 = Utf8               java/lang/Object
 {
-  private int money;
-    flags: ACC_PRIVATE
+  private volatile int money;
+    flags: ACC_PRIVATE, ACC_VOLATILE
 
   public AddMinus();
     flags: ACC_PUBLIC
