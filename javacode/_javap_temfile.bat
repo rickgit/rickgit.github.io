@@ -3,4 +3,4 @@ javac %fileFullName%
 
 set classFullName=%fileFullName:.java=.class%
 javap -v -p %classFullName% > TempFile_javap.java
-## pause
+pause

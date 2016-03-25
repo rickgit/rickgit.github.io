@@ -1,5 +1,5 @@
 public class AddMinus{
-	private   int money;
+	private volatile int money;
 
 	// public void Add(){
  //        long l = System.currentTimeMillis();

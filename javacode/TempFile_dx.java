@@ -1,109 +1,86 @@
-reading H:\workspace\ws-github\rickgit.github.io\javacode\AddMinus.class...
+reading H:\workspace\ws-github\rickgit.github.io\javacode\JsObjectName.class...
 begin classfile
 magic: cafebabe
 minor_version: 0000
 major_version: 0033
-constant_pool_count: 0012
+constant_pool_count: 0015
 
 constant_pool:
-  0001: method{java.lang.Object.<init>:()V}
-  0002: field{AddMinus.money:I}
-  0003: type{AddMinus}
-  0004: type{java.lang.Object}
-  0005: utf8{"money"}
-  0006: utf8{"I"}
-  0007: utf8{"<init>"}
-  0008: utf8{"()V"}
-  0009: utf8{"Code"}
-  000a: utf8{"LineNumberTable"}
-  000b: utf8{"minus"}
-  000c: utf8{"SourceFile"}
-  000d: utf8{"AddMinus.java"}
-  000e: nat{<init>:()V}
-  000f: nat{money:I}
-  0010: utf8{"AddMinus"}
-  0011: utf8{"java/lang/Object"}
+  0001: type{JsObjectName}
+  0002: type{java.lang.Object}
+  0003: type{java.lang.annotation.Annotation}
+  0004: utf8{"name"}
+  0005: utf8{"()Ljava/lang/String;"}
+  0006: utf8{"AnnotationDefault"}
+  0007: utf8{"android"}
+  0008: utf8{"SourceFile"}
+  0009: utf8{"JsObjectName.java"}
+  000a: utf8{"RuntimeVisibleAnnotations"}
+  000b: utf8{"Ljava/lang/annotation/Target;"}
+  000c: utf8{"value"}
+  000d: utf8{"Ljava/lang/annotation/ElementType;"}
+  000e: utf8{"TYPE"}
+  000f: utf8{"Ljava/lang/annotation/Retention;"}
+  0010: utf8{"Ljava/lang/annotation/RetentionPolicy;"}
+  0011: utf8{"RUNTIME"}
+  0012: utf8{"JsObjectName"}
+  0013: utf8{"java/lang/Object"}
+  0014: utf8{"java/lang/annotation/Annotation"}
 end constant_pool
-access_flags: public|super
-this_class: type{AddMinus}
+access_flags: public|interface|abstract|annotation
+this_class: type{JsObjectName}
 super_class: type{java.lang.Object}
-interfaces_count: 0000
-fields_count: 0001
-
-fields[0]:
-  access_flags: private
-  name: money
-  descriptor: I
-  attributes_count: 0000
-end fields[0]
-methods_count: 0002
+interfaces_count: 0001
+interfaces:
+  type{java.lang.annotation.Annotation}
+fields_count: 0000
+methods_count: 0001
 
 methods[0]:
-  access_flags: public
-  name: <init>
-  descriptor: ()V
+  access_flags: public|abstract
+  name: name
+  descriptor: ()Ljava/lang/String;
   attributes_count: 0001
   
   attributes[0]:
-    name: Code
-    length: 0000001d
-    max_stack: 0001
-    max_locals: 0001
-    code_length: 00000005
-    0000: aload_0 // 00
-    0001: invokespecial method{java.lang.Object.<init>:()V}
-    0004: return
-    exception_table_length: 0000
-    attributes_count: 0001
-    
-    attributes[0]:
-      name: LineNumberTable
-      length: 00000006
-      line_number_table_length: 0001
-      0000 1
-    end attributes[0]
+    name: AnnotationDefault
+    length: 00000003
+    tag: "s"
+    constant_value: "android"
   end attributes[0]
 end methods[0]
-
-methods[1]:
-  access_flags: public
-  name: minus
-  descriptor: ()V
-  attributes_count: 0001
-  
-  attributes[0]:
-    name: Code
-    length: 0000002c
-    max_stack: 0004
-    max_locals: 0001
-    code_length: 00000010
-    0000: aload_0 // 00
-    0001: aload_0 // 00
-    0002: dup
-    0003: getfield field{AddMinus.money:I}
-    0006: iconst_1 // #+01
-    0007: iadd
-    0008: dup_x1
-    0009: putfield field{AddMinus.money:I}
-    000c: putfield field{AddMinus.money:I}
-    000f: return
-    exception_table_length: 0000
-    attributes_count: 0001
-    
-    attributes[0]:
-      name: LineNumberTable
-      length: 0000000a
-      line_number_table_length: 0002
-      0000 12
-      000f 18
-    end attributes[0]
-  end attributes[0]
-end methods[1]
-attributes_count: 0001
+attributes_count: 0002
 
 attributes[0]:
   name: SourceFile
   length: 00000002
-  source: string{"AddMinus.java"}
+  source: string{"JsObjectName.java"}
 end attributes[0]
+
+attributes[1]:
+  name: RuntimeVisibleAnnotations
+  length: 0000001b
+  num_annotations: 0002
+  annotations[0]:
+    type: java.lang.annotation.Target
+    num_elements: 1
+    elements[0]:
+      element_name: value
+      value: 
+        tag: "["
+        num_values: 1
+        element_value[0]:
+          tag: "e"
+          type_name: Ljava/lang/annotation/ElementType;
+          const_name: TYPE
+  annotations[1]:
+    type: java.lang.annotation.Retention
+    num_elements: 1
+    elements[0]:
+      element_name: value
+      value: 
+        tag: "e"
+        type_name: Ljava/lang/annotation/RetentionPolicy;
+        const_name: RUNTIME
+end attributes[1]
 end classfile
