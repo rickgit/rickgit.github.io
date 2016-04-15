@@ -30,3 +30,9 @@
 public interface JsObjectName extends java.lang.annotation.Annotation
 ```
 2. 注解的值被编译成抽象方法 *public abstract java.lang.String name()*
+
+
+##synchronized
+**synchronized**
+- 同步方法 编译成flags: ACC_PUBLIC, ACC_STATIC, ACC_SYNCHRONIZED
+- 同步方法 编译成 monitorenter，monitorexit
