@@ -1,5 +1,5 @@
 Classfile /H:/workspace/ws-github/rickgit.github.io/javacode/JsObjectName.class
-  Last modified 2016-3-25; size 452 bytes
+  Last modified 2016-3-31; size 452 bytes
   MD5 checksum 1adf71224500b047c982cea10f3f4f8b
   Compiled from "JsObjectName.java"
 public interface JsObjectName extends java.lang.annotation.Annotation

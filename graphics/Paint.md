@@ -135,6 +135,65 @@ StrokeCap类型有三种
         final int nativeInt;
     }
 ```
----------------------
+##RectF
+```java
+public class RectF implements Parcelable {
+    public float left;
+    public float top;
+    public float right;
+    public float bottom;
+    ...
+    ...
+    ...
+}
+```
+intersect碰撞检测方法，判断两个矩形是否有交集
 
- 
+##Color 
+除了定影r,g,b，还定义了 hsb的转换。
+- HSB与HSV相同
+- HSV(Hue, Saturation, Value)是根据颜色的直观特性由A. R. Smith在1978年创建的一种颜色空间, 也称六角锥体模型(Hexcone Model)。
+
+##BitmapFactory
+- 内部类 Option
+
+[Option的相关属性](BitmapFactory#Option.png)
+
+最终生成的Bitmap都是用本地方法
+```c
+    private static native Bitmap nativeDecodeStream(InputStream is, byte[] storage,
+            Rect padding, Options opts);
+    private static native Bitmap nativeDecodeFileDescriptor(FileDescriptor fd,
+            Rect padding, Options opts);
+    private static native Bitmap nativeDecodeAsset(long nativeAsset, Rect padding, Options opts);
+    private static native Bitmap nativeDecodeByteArray(byte[] data, int offset,
+            int length, Options opts);
+    private static native boolean nativeIsSeekable(FileDescriptor fd);
+```
+本地方法在文件 frameworks/base/core/jni/android/graphics/BitmapFactory.cpp中。
+```c
+static jobject nativeDecodeStream(JNIEnv* env, jobject clazz, jobject is, jbyteArray storage,
+        jobject padding, jobject options) {
+
+    jobject bitmap = NULL;
+    SkAutoTUnref<SkStream> stream(CreateJavaInputStreamAdaptor(env, is, storage));
+
+    if (stream.get()) {
+        SkAutoTUnref<SkStreamRewindable> bufferedStream(
+                SkFrontBufferedStream::Create(stream, BYTES_TO_BUFFER));
+        SkASSERT(bufferedStream.get() != NULL);
+        bitmap = doDecode(env, bufferedStream, padding, options);
+    }
+    return bitmap;
+}
+```
+可以看出bitmap由skia解码，先转化为SkStream对象，在获取SkStreamRewindable，最终转化为java bitmap
+
+##Bitmap
+Bitmap没有共有(public)构造方法，只能通过BitmapFactory获取。<br/>
+包含三个内部类
+- android.graphics.Bitmap.Config 
+图片质量配置，本地文件在SkBitmap.h
+- android.graphics.Bitmap.CompressFormat bitmap的压缩格式，其中WEBP需要api14
+- android.graphics.Bitmap.BitmapFinalizer 回收内存Bitmap
+
