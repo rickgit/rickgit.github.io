@@ -1,6 +1,6 @@
 #Android ThreadPoolExecutor分析
 
-> 
+> 进程是资源管理的最小单位，线程是程序执行的最小单位。最初的进程定义都包含程序、资源及其执行三部分，其中程序通常指代码，资源在操作系统层面上通常包括内存资源、IO资源、信号处理等部分，而程序的执行通常理解为执行上下文，包括对cpu的占用，后来发展为线程。在线程概念出现以前，为了减小进程切换的开销，操作系统设计者逐渐修正进程的概念，逐渐允许将进程所占有的资源从其主体剥离出来，允许某些进程共享一部分资源，例如文件、信号，数据内存，甚至代码，这就发展出轻量进程的概念。[Linux 线程实现机制分析-杨沙洲 ](http://www.ibm.com/developerworks/cn/linux/kernel/l-thread/)
 
 @(源码分析)[Executors|ArrayDeque|LinkedBlockingQueue|SynchronousQueue|DelayedWorkQueue|Android]
 
