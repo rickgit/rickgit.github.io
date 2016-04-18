@@ -42,7 +42,7 @@ ArrayMap包含三个构造函数，接下来只分析无参构造函数。
 
 构造方法初始化字段 ，mHashes和mArray组成堆，所以索引快了
 - *mHashes* 存储key的hash值，默认是ContainerHelpers.EMPTY_INTS，空的int数组
-- *mArray*  存储对象key和value的值，value的索引是key的加1，默认是ContainerHelpers.EMPTY_OBJECTS，空的数组
+- *mArray*  存储对象key和value的值，value的索引值是key的加1，默认是ContainerHelpers.EMPTY_OBJECTS，空的数组
 - *mSize* 设置为0,改值是mHashes长度的大小
 
 可以看出无参构造方法，默认不预先分配内存。
@@ -105,8 +105,21 @@ allocArrays根据要分配的大小，分3种情况处理
 ##存储键值对
 android.support.v4.util.SimpleArrayMap#put调用indexOfNull获取一个没用过的index(key的hash一样，mArray数组里面key的值一样，
 根据hash值的一倍寻找存储的值，解决Hash冲突的和Hashmap一样。
-- 找到index,返回就的值。
-- 找不到index，重新分配mHashes的大小，下面的代码可以看出分配的规则
+- key为null时
+```
+ 	int indexOfNull()
+```
+查找为使用二分法查找的hash 为null后,左右查找hash为null,并且mArray为null的位置。其中Key为null,hash值为0；
+- key不为null
+
+```
+    int indexOf(Object key, int hash) 
+```
+查找key的哈希值为为 *hash*时，*hash*在mHash的位置。
+
+- 找到hash的index,覆盖旧的值，返回现在的值。
+- 直接设置hash,key,value的值
+	- 找不到index且mhash大小已经不够，重新分配mHash大小，扩容为原来大小的两倍。
 ```
             final int n = mSize >= (BASE_SIZE*2) ? (mSize+(mSize>>1))
                     : (mSize >= BASE_SIZE ? (BASE_SIZE*2) : BASE_SIZE);
@@ -115,7 +128,8 @@ android.support.v4.util.SimpleArrayMap#put调用indexOfNull获取一个没用过
 ```
  freeArrays(ohashes, oarray, mSize);
 ```
-重新分配内存是用新的数组，所以就的mHashes，mArray数组需要释放
+重新分配内存是用新的数组，如果hash大小是4或8，就先缓存，再将mHashes，mArray数组需要释放
+
 
 ##移除键值对
 从android.util.ArrayMap#remove开始分析
@@ -135,12 +149,19 @@ indexOfKey方法，调用indexOfNull方法和indexOf上文已经提及，就不�
         return key == null ? indexOfNull() : indexOf(key, key.hashCode());
     }
 ```
+移除一个value，
+- mHash太大，减小mhash大小，需要进行分段拷贝mHash,mArray。
+```
+mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3
+```
+- 没满足上面的条件，mHash直接置为null，不调整数组大小
+
 ##清理容器
 - clear 清除mArray数据，并缓存mBaseCache或mTwiceBaseCache
 ```
     public void clear() {
         if (mSize > 0) {
-            freeArrays(mHashes, mArray, mSize);
+            freeArrays(mHashes, mArray, mSize); //详见上面的代码分析。
             mHashes = EmptyArray.INT;
             mArray = EmptyArray.OBJECT;
             mSize = 0;
@@ -148,7 +169,7 @@ indexOfKey方法，调用indexOfNull方法和indexOf上文已经提及，就不�
     }
 
 ```
-- erase 清除mArray数据，没缓存
+- erase 清除mArray数据，没清空mHash
 ```
     public void erase() {
         if (mSize > 0) {
