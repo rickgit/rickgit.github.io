@@ -22,6 +22,8 @@ http://blog.csdn.net/mhmyqn/article/details/47342577
 
 ### getParameterTypes
 
+### getModifiers() & Modifier.PUBLIC
+
 
 
 
