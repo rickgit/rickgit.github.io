@@ -52,6 +52,25 @@
 ####	Curry
 curry 过的闭包使得实现计算的函数模式出奇得容易
 ###	XML and JSON processing
+> [processing-xml](http://groovy-lang.org/processing-xml.html)
+###1. Parsing XML
+###2. GPath
+###3. Creating XML
+###4. Manipulating XML
+
+
+1. JsonSlurper
+```
+def jsonSlurper = new JsonSlurper()
+def object = jsonSlurper.parseText('{ "name": "John Doe" } /* some comment */')
+
+```
+2. JsonOutput
+```
+def json = JsonOutput.toJson([name: 'John Doe', age: 42])
+
+assert json == '{"name":"John Doe","age":42}'
+```
 ###	String interpolation
 ###	AST (Abstract Syntax Tree) Transformation
 
@@ -60,7 +79,32 @@ curry 过的闭包使得实现计算的函数模式出奇得容易
 - Immutable AST Macro;
 - Newify transformation;
 
+
+
 ###	Traits
+### Groovy and HTTP
+- httpbuilder
+httpBuilder需要添加依赖库
+[httpbuilder jar and dependence](https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder/0.7.1)
+
+
+```
+//保存文本
+String html = 'http://localhost:8081/groovy-http'.toURL().text
+
+
+//下载
+def url = 'http://www.google.com/images/logo.gif'
+def file = new File('c://google_logo.gif').newOutputStream()
+file << new URL(url).openStream()
+file.close()
+[代码来源](http://groovy-almanac.org/save-url-to-file/)
+```
+
+
+
+###
+
 
 ##gradle
 google 搜索[android gradle dsl](http://google.github.io/android-gradle-dsl/current/)
