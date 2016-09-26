@@ -20,3 +20,28 @@ dimension是一个包含单位（dp、dip、sp、pt、px、mm、in）的尺寸�
 ##complexToDimension方法
 -- android.content.res.Resources#getDimension
 -- android.view.animation.ScaleAnimation#resolveScale
+
+
+
+由下面的数据可以看出data数组是以6个为一组。
+```
+
+    private boolean getValueAt(int index, TypedValue outValue) {
+        final int[] data = mData;
+        final int type = data[index+AssetManager.STYLE_TYPE];
+        if (type == TypedValue.TYPE_NULL) {
+            return false;
+        }
+        outValue.type = type;
+        outValue.data = data[index+AssetManager.STYLE_DATA];
+        outValue.assetCookie = data[index+AssetManager.STYLE_ASSET_COOKIE];
+        outValue.resourceId = data[index+AssetManager.STYLE_RESOURCE_ID];
+        outValue.changingConfigurations = data[index+AssetManager.STYLE_CHANGING_CONFIGURATIONS];
+        outValue.density = data[index+AssetManager.STYLE_DENSITY];
+        outValue.string = (type == TypedValue.TYPE_STRING) ? loadStringValueAt(index) : null;
+        return true;
+    }
+//data数组
+//[AssetManager.STYLE_TYPE][AssetManager.STYLE_DATA][AssetManager.STYLE_ASSET_COOKIE][AssetManager.STYLE_RESOURCE_ID][AssetManager.STYLE_CHANGING_CONFIGURATIONS][index+AssetManager.STYLE_DENSITY]
+//[AssetManager.STYLE_TYPE][AssetManager.STYLE_DATA][AssetManager.STYLE_ASSET_COOKIE][AssetManager.STYLE_RESOURCE_ID][AssetManager.STYLE_CHANGING_CONFIGURATIONS][index+AssetManager.STYLE_DENSITY]
+```
