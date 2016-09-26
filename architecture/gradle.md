@@ -110,6 +110,7 @@ file.close()
 google 搜索[android gradle dsl](http://google.github.io/android-gradle-dsl/current/)
 
 ##task
+**C:/Users/Haibin/.gradle/wrapper/dists/gradle-2.10-all/a4w5fzrkeut1ox71xslb49gst/gradle-2.10/src/core/org/gradle/api/Task.java**
 第一个脚本
 ```gradle 
 
