@@ -1,0 +1,141 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+skinparam shadowing false
+
+class init_c {
+	
+
+}
+
+
+note top of init_c
+
+1.首先Bootloader引导程序启动完Linux内核后，
+会加载各种驱动和数据结构，
+当有了驱动以后，开始启动Android系统，
+同时会加载用户级别的第一个进程init(system\core\init.c),
+该进程会首先加载一个init.rc配置文件
+
+
+end note
+
+class init_rc{
+	
+
+}
+note top of init_rc
+init.rc配置文件会进行很多的配置，
+创建很多的文件夹及文件，
+然后初始化一些Android驱动器，
+之后该配置文件最重要的一个任务就是启动一个Zygote(孵化器)进程，
+此进程是Android系统的一个母进程，
+用来启动Android的其他服务进程
+end note
+
+
+
+class app_process{
+	
+}
+
+note top of app_process
+Zygote会执行一个app_process可执行文件，
+在这个文件中首先添加了Android运行时环境，
+在Android运行时中调用了ZygoteInit.java，
+这就从c++代码跳到了java代码
+end note
+
+class ZygoteInit {
+
+}
+
+note left of ZygoteInit
+在ZytofeInit.java代码中首先设置了Java虚拟机的堆内存空间，
+然后启动一个类加载器加载Android启动依赖的类比如Activity等四大组件，
+dialog等UI的类，然后分出一个子进程启动SystemServer系统服务
+end note
+
+class SystemServer {
+	static void android_server_SystemServer_init1()
+	public static final void init2()
+}
+note top of SystemServer
+在SystemServer.java代码中有两个方法
+init1()启动Native世界，
+init2()启动Android的Framework世界
+end note
+
+class com_android_server_SystemServer_cpp {
+	int system_init();
+
+}
+note top of com_android_server_SystemServer_cpp
+SystemServer首先调用init1()方法加载JNI库，
+启动Native世界。
+init1通过System.loadLibrary("android-servers")加载一个类库文件，
+其对应的源码文件为com_android_server_SystemServer.cpp 
+其C++代码如下，在该类库中转调了system_init()
+end note
+
+
+class System_init_cpp{
+	int system_init();
+}
+note left of System_init_cpp
+System_init方法在System_init.cpp中实现，
+它首先启动系统的硬件服务，比如Audio、Camera等，
+启动完硬件服务后它又通过Android运行时环境调用了
+SystemServer中的init2()方法，
+init2()方法启动Framework世界
+end note
+
+class ServerThread {
+	
+}
+note top of ServerThread
+init2()启动的线程ServerThread中的的run方法中
+通过一个Looper开启了Android中的各种服务比如LightService，
+PowerManagerService，BatteryService，WindowManagerService等，
+并将服务添加到ServiceManager中去管理
+end note
+
+class ActivityManagerService {
+	public void systemReady(final Runnable goingCallback)
+}
+note left of ActivityManagerService
+	启动完各种服务后，调用ActivityManagerService.systemReady方法,
+	打开Android系统的第一个Activity
+	<pre>
+		mMainStack.resumeTopActivityLocked(null);
+	</pre>
+
+end note
+
+
+class ActivityStack{
+	
+	 final boolean resumeTopActivityLocked(ActivityRecord prev)
+}
+note left of ActivityStack
+
+	ActivityStack的resumeTopActivityLocked方法启动home界面
+
+end note
+
+
+init_c --> init_rc
+init_rc --> app_process
+app_process --> ZygoteInit
+ZygoteInit --> SystemServer
+SystemServer --> com_android_server_SystemServer_cpp
+com_android_server_SystemServer_cpp --> System_init_cpp
+System_init_cpp --> SystemServer
+SystemServer --> ServerThread
+ServerThread --> ActivityManagerService
+ActivityManagerService --> ActivityStack
+
+
+@enduml
