@@ -1,0 +1,52 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class ApplicationThread {
+	scheduleLaunchActivity()
+	
+}
+
+class ActivityThread{
+
+	Instrumentation mInstrumentation;
+
+	+ {static} void main(String[] args)
+	handleLaunchActivity()
+}
+
+class PhoneWindow extends Window{
+	
+}
+class Window{
+	
+}
+interface Callback{
+	
+}
+class Activity implements Callback{
+	
+}
+
+
+class ContextImpl {
+	+ Object getSystemService(String name) {}
+}
+
+class SystemServiceRegistry {
+	public static Object getSystemService(ContextImpl ctx, String name)
+}
+class Instrumentation{
+	
+}
+
+ApplicationThread --+ ActivityThread
+ApplicationThread <-- ActivityThread
+Window +-- Callback
+window <-- Activity
+
+
+@enduml
