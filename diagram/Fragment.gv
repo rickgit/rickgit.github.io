@@ -1,0 +1,120 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class ActivityThread {
+	void performLaunchActivity()
+}
+class Instrumentation{
+	newActivity()
+	callActivityOnCreate(activity, r.state);//调用activity的perforCreate方法
+}
+class Activity{
+	FragmentController mFragments = FragmentController.createController(new HostCallbacks());
+	performCreate(icicle);
+	onCreate(icicle);
+	performCreateCommon();
+}
+class FragmentController {
+
+	- final FragmentHostCallback mHost;
+
+	createController(new HostCallbacks());
+	attachHost()
+	public void dispatchCreate()//mHost.mFragmentManager.dispatchCreate();
+
+}
+class FragmentContainer {
+	
+}
+class FragmentHostCallback extends FragmentContainer{
+	final FragmentManagerImpl mFragmentManager = new FragmentManagerImpl();
+}
+
+abstract class FragmentManager {
+	
+}
+
+class FragmentManagerImpl extends FragmentManager{
+	
+	FragmentHostCallback mHost;
+	 ArrayList<Runnable> mPendingActions
+	 Runnable mExecCommit
+
+	ArrayList<Fragment> mActive;
+	ArrayList<Fragment> mAdded;
+
+	attachController()
+	+ void dispatchCreate() 
+	void moveToState(int newState, boolean always)
+	+ FragmentTransaction beginTransaction() 
+	+ void enqueueAction(Runnable action, boolean allowStateLoss)
+	+ boolean execPendingActions()
+
+	+ void addFragment(Fragment fragment, boolean moveToStateNow)
+}
+note top of FragmentManagerImpl
+mPendingActions是BackStackRecord的集合，
+因为BackStackRecord继承Runnable。
+mExecCommit只执行execPendingActions方法.
+Fragment 类的生命周期在这个类中调用
+end note 
+
+class Fragment{
+    {static} final int INITIALIZING = 0;     // Not yet created.
+    {static} final int CREATED = 1;          // Created.
+    {static} final int ACTIVITY_CREATED = 2; // The activity has finished its creation.
+    {static} final int STOPPED = 3;          // Fully created, not started.
+    {static} final int STARTED = 4;          // Created and started, not resumed.
+    {static} final int RESUMED = 5;          // Created started and resumed.
+
+	FragmentManagerImpl mFragmentManager 
+	FragmentHostCallback mHost;
+
+	void performActivityCreated(Bundle savedInstanceState)
+	onActivityCreated(savedInstanceState);
+}
+note top of Fragment
+mHost是在FragmentManaqgerImpl moveToState()方法，
+把该类的属性mHost赋值给Fragment
+
+endnote
+
+class BackStackRecord extends FragmentTransaction implements Runnable{
+	final FragmentManagerImpl mManager;
+	+ FragmentTransaction replace(int containerViewId, Fragment fragment)
+	- void doAddOp(int containerViewId, Fragment fragment, String tag, int opcmd)
+	+ int commit()
+	int commitInternal(boolean allowStateLoss)
+	+ void run()
+}
+class Op {
+}
+note top of Op
+双向链表
+end note 
+
+Activity <.. ActivityThread
+
+
+Instrumentation <--* ActivityThread
+
+Activity <.. Instrumentation
+
+FragmentController <-- Activity
+FragmentHostCallback <-- FragmentController
+
+HostCallbacks --+ Activity
+FragmentHostCallback <|-- HostCallbacks
+
+FragmentHostCallback <--FragmentManagerImpl 
+FragmentManagerImpl <-- FragmentHostCallback
+BackStackRecord <.. FragmentManagerImpl
+FragmentManagerImpl <-- BackStackRecord
+FragmentManagerImpl <-- Fragment
+FragmentHostCallback <-- Fragment
+Op --+ BackStackRecord
+@enduml
