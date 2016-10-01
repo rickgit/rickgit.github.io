@@ -1,0 +1,50 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class AsyncTask {
+    - final WorkerRunnable<Params, Result> mWorker;
+	- final FutureTask<Result> mFuture;
+	+ static final Executor SERIAL_EXECUTOR = new SerialExecutor();
+
+}
+
+
+
+note left of AsyncTask
+
+public abstract class AsyncTask<Params, Progress, Result> {
+
+end note
+
+class WorkerRunnable implements Callable {
+	
+}
+
+
+note left of WorkerRunnable
+
+private static abstract class WorkerRunnable<Params, Result> implements Callable<Result>
+
+end note
+
+class SerialExecutor implements Executor {
+	
+}
+
+
+class InternalHandler extends Handler {
+	
+	
+}
+
+WorkerRunnable <-- AsyncTask
+WorkerRunnable --+ AsyncTask
+SerialExecutor <-- AsyncTask
+SerialExecutor --+ AsyncTask
+InternalHandler <-- AsyncTask
+InternalHandler --+ AsyncTask
+
+@enduml
