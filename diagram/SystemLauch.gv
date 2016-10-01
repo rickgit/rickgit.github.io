@@ -12,6 +12,8 @@ class init_c {
 
 
 note top of init_c
+http://www.cnblogs.com/rocomp/p/5001639.html
+init进程 –> Zygote进程 –> SystemServer进程 –>各种应用进程
 
 1.首先Bootloader引导程序启动完Linux内核后，
 会加载各种驱动和数据结构，
@@ -46,27 +48,75 @@ Zygote会执行一个app_process可执行文件，
 在这个文件中首先添加了Android运行时环境，
 在Android运行时中调用了ZygoteInit.java，
 这就从c++代码跳到了java代码
+
+
 end note
 
 class ZygoteInit {
-
+	+ {static} void main(String argv[])
+	- static void registerZygoteSocket(String socketName)
+	static void preload()
+	/**
+	** Zygote fork出SystemServer进程
+	**/
+	- static boolean startSystemServer(String abiList, String socketName)
 }
 
 note left of ZygoteInit
 在ZytofeInit.java代码中首先设置了Java虚拟机的堆内存空间，
 然后启动一个类加载器加载Android启动依赖的类比如Activity等四大组件，
-dialog等UI的类，然后分出一个子进程启动SystemServer系统服务
+dialog等UI的类，然后分出一个子进程启动SystemServer系统服务.
+
+android系统中进程之间通讯的方式是Binder，
+但是有一个例外是SystemService进程与Zygote进程之间是通过Socket的方式进行通讯的
+
+preloadClasses()用于初始化Zygote中需要的class类； 
+preloadResources()用于初始化系统资源； 
+preloadOpenGL()用于初始化OpenGL； 
+preloadSharedLibraries()用于初始化系统libraries； 
+preloadTextResources()用于初始化文字资源； 
+prepareWebViewInZygote()用于初始化webview;
 end note
 
+class Zygote{
+	private static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
+	public static int forkSystemServer()
+	native private static int nativeForkSystemServer()
+}
+class ZygoteHooks {
+	
+}
+
 class SystemServer {
-	static void android_server_SystemServer_init1()
-	public static final void init2()
+	private ActivityManagerService mActivityManagerService;
+	private PackageManagerService mPackageManagerService;
+
+	+ {static}  void main(String[] args)
+
+	private void startBootstrapServices()
+	private void startCoreServices()
+	private void startOtherServices()
 }
 note top of SystemServer
 在SystemServer.java代码中有两个方法
-init1()启动Native世界，
-init2()启动Android的Framework世界
+
+startBootstrapServices() 主要用于启动系统Boot级服务 
+startCoreServices() 主要用于启动系统核心的服务 
+startOtherServices() 主要用于启动一些非紧要或者是非需要及时启动的服务
+
+
 end note
+
+
+class SystemServiceManager {
+	- final ArrayList<SystemService> mServices = new ArrayList<SystemService>();
+}
+note right of SystemServiceManager
+
+SystemServer进程主要是用来构建系统各种service服务的，
+而SystemServiceManager就是这些服务的管理对象。
+end note
+
 
 class com_android_server_SystemServer_cpp {
 	int system_init();
@@ -103,27 +153,32 @@ PowerManagerService，BatteryService，WindowManagerService等，
 end note
 
 class ActivityManagerService {
-	public void systemReady(final Runnable goingCallback)
+	final ActivityStarter mActivityStarter;
+
+
+	+ void systemReady(final Runnable goingCallback)
+	# boolean startHomeActivityLocked(int userId, String reason)
+	# Intent getHomeIntent()
 }
 note left of ActivityManagerService
 	启动完各种服务后，调用ActivityManagerService.systemReady方法,
 	打开Android系统的第一个Activity
 	<pre>
-		mMainStack.resumeTopActivityLocked(null);
+		 mActivityStarter.startHomeActivityLocked(intent, aInfo, reason);
 	</pre>
 
 end note
-
-
-class ActivityStack{
-	
-	 final boolean resumeTopActivityLocked(ActivityRecord prev)
+class ActivityStarter {
+	void startHomeActivityLocked(Intent intent, ActivityInfo aInfo, String reason)
+	final void scheduleResumeTopActivities()
 }
-note left of ActivityStack
 
-	ActivityStack的resumeTopActivityLocked方法启动home界面
+class ActivityStackSupervisor{
+	final void scheduleResumeTopActivities()
 
-end note
+}
+
+ 
 
 
 init_c --> init_rc
@@ -135,7 +190,91 @@ com_android_server_SystemServer_cpp --> System_init_cpp
 System_init_cpp --> SystemServer
 SystemServer --> ServerThread
 ServerThread --> ActivityManagerService
-ActivityManagerService --> ActivityStack
+ActivityManagerService --> ActivityStarter
+ActivityStarter --> ActivityStackSupervisor
+ZygoteInit ..> Zygote
+Zygote ..> ZygoteHooks
+SystemServer --> SystemServiceManager
+SystemServiceManager --> SystemServer
+
+
+abstract class SystemService{
+	
+}
+class Installer extends SystemService{
+	- final InstallerConnection mInstaller;
+	
+}
+class InstallerConnection {
+	public void waitForConnection()
+}
+note right of InstallerConnection
+
+不断的通过ping命令连接Zygote进程
+（SystemServer和Zygote进程通过socket方式通讯，其他进程通过Binder方式通讯）
+end note
+
+
+class ActivityManagerService extends ActivityManagerNative{
+	
+}
+note right of ActivityManagerService
+为其设置SysServiceManager和Installer。
+ActivityManagerService是系统中一个非常重要的服务，
+Activity，service，Broadcast，contentProvider都需要通过其余系统交互。
+end note
+
+
+class Lifecycle extends SystemService{
+	private final ActivityManagerService mService;
+}
+
+class PowerManagerService extends SystemService{
+	
+}
+note right of PowerManagerService
+PowerManagerService主要用于计算系统中和Power相关的计算，
+然后决策系统应该如何反应。
+同时协调Power如何与系统其它模块的交互，
+比如没有用户活动时，屏幕变暗等等。
+end note
+class LightsService extends SystemService{
+	
+}
+
+note right of LightsService
+手机中关于闪光灯，LED等相关的服务
+end note
+
+class DisplayManagerService extends SystemService{
+	
+}
+
+class PackageManagerService extends IPackageManager.Stub{
+	public static PackageManagerService main()
+
+}
+note right of PackageManagerService
+apk文件的安装，解析，删除，卸载等等操作。
+
+end note
+SystemServer ..> Installer
+
+Installer --> InstallerConnection
+
+Lifecycle --+ ActivityManagerService
+SystemServer --> ActivityManagerService
+Lifecycle --> ActivityManagerService
+SystemServer --> PowerManagerService
+SystemServer ..> LightsService
+SystemServer --> DisplayManagerService
+
+SystemServer --> PackageManagerService
+
+
+
+
+
 
 
 @enduml
