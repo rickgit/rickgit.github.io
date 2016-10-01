@@ -1,0 +1,71 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class Looper {
+	static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
+	
+	MessageQueue mQueue
+}
+
+class MessageQueue {
+	
+}
+class Handler {
+	Looper mLooper
+
+	public void dispatchMessage(Message msg) 
+}
+class Message {
+	Handler target
+	MessageQueue mQueue
+}
+class Thread {
+}
+
+
+
+MessageQueue <-- Looper
+Looper <-- Handler
+Handler <-- Message
+MessageQueue <-left- Message
+Thread <.left. Looper
+
+
+class HandlerThread extends Thread {
+	 Looper mLooper;
+}
+note left of HandlerThread 
+
+final Handler mHandler = new Handler(mHandlerThread.getLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+        Log.i("tag", "接收到消息：" + msg.obj.toString());
+    }
+};
+
+不需要这个looper线程的时候需要手动停止掉；
+
+end note
+Looper <-- HandlerThread
+
+abstract class IntentService extends Service {
+	- volatile Looper mServiceLooper;
+	- volatile ServiceHandler mServiceHandler;
+}
+
+class ServiceHandler extends Handler  {
+	
+}
+
+Looper <-- IntentService
+ServiceHandler <-- IntentService
+ServiceHandler --+ IntentService
+HandlerThread <.. IntentService
+
+
+
+@enduml

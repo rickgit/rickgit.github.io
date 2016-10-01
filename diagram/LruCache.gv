@@ -1,0 +1,24 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class LruCache {
+    private final LinkedHashMap<K, V> map;
+
+    /** Size of this cache in units. Not necessarily the number of elements. */
+    private int size;
+    private int maxSize;
+
+    private int putCount;
+    private int createCount;
+    private int evictionCount;
+    private int hitCount;
+    private int missCount;
+
+
+    protected int sizeOf(String key, Bitmap bitmap)
+}
+
+@enduml
