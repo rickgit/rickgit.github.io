@@ -1,0 +1,50 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class SystemServer {
+	startBootstrapServices()
+}
+
+class PackageManagerService{
+	ArrayMap mPackages
+	Settings mSettings
+	scanDirTracedLI()
+	- void scanDirLI()
+	scanPackageTracedLI()
+	scanPackageDirtyLI()
+}
+note right of PackageManagerService
+创建了一个PackageManagerService对象，
+并将这个对象添加到ServierManager中为其他组件提供服务
+
+ArrayMap <String, PackageParser.Package> mPackages
+
+
+解析Manifest流程：
+Zygote进程 –> SystemServer进程 –> 
+PackgeManagerService服务 –> scanDirLI方法 –> 
+scanPackageLI方法 –> PackageParser.parserPackage方法；
+end note
+
+interface IPackageManager
+
+class PackagerParser {
+	Package parsePackage()
+	Package parseMonolithicPackage()
+	Package parseBaseApk()
+}
+
+
+SystemServer .up.> PackageManagerService
+PackageManagerService -up-|> Stub
+Stub -right-+IPackageManager
+ServierManager --> PackageManagerService
+PackageManagerService ..> ServierManager
+PackageManagerService ..> PackagerParser
+PackagerParser +-- Package
+PackageManagerService --> Settings
+
+@enduml
