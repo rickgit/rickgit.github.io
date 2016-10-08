@@ -1,0 +1,66 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+skinparam shadowing false
+
+
+class Activity{
+	public void startActivityForResult()
+}
+
+class Instrumentation {
+	execStartActivity()
+}
+
+class ActivityManagerService {
+	ActivityStackSupervisor mStackSupervisor
+	ActivityStarter mActivityStarter
+	startActivity()
+	startActivityAsUser()
+	startProcessLocked()
+}
+
+
+class ActivityStarter{
+	 ActivityStackSupervisor mSupervisor
+	 ActivityStack mTargetStack;
+	 ActivityManagerService mService
+	 startActivityMayWait()
+	 startActivityLocked()
+	 startActivityUnchecked()
+}
+class ActivityStack{
+	ActivityStackSupervisor mSupervisor
+	startActivityLocked()
+	resumeTopActivityInnerLocked()
+}
+class ActivityStackSupervisor {
+	 ActivityStack mFocusedStack
+	 startSpecificActivityLocked()
+}
+
+class ActivityManagerNative{
+	getDefault()
+}
+
+class Process{
+	start()
+}
+
+ActivityManagerNative <|-- ActivityManagerService
+
+Activity -->Instrumentation
+Activity ..>ActivityManagerNative
+Binder <|-- ActivityManagerNative
+
+IBinder <|.. Binder
+ActivityManagerService --> ActivityStarter
+ActivityStarter --> ActivityStackSupervisor
+ActivityStarter --> ActivityStack
+ActivityStarter --> ActivityManagerService
+ActivityStack --> ActivityStackSupervisor
+ActivityManagerService ..> Process
+
+@enduml
