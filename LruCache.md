@@ -132,3 +132,6 @@ remove开始分析
     }
 
 ``` 
+
+##类图
+[LruCache plantuml](https://raw.githubusercontent.com/rickgit/rickgit.github.io/master/diagram/LruCache.plantuml.txt)
