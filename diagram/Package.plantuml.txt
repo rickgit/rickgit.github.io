@@ -47,4 +47,25 @@ PackageManagerService ..> PackagerParser
 PackagerParser +-- Package
 PackageManagerService --> Settings
 
+
+class PackageInstallerActivity{
+	 processPackageUri()
+	 initiateInstall();
+	 startInstallConfirm()
+	 startInstall()
+}
+note right of PackageInstallerActivity
+
+https://github.com/android/platform_packages_apps_packageinstaller
+/blob/master/src/com/android/packageinstaller/PackageInstallerActivity.java
+end note
+
+class PackageUtil{
+	getPackageInfo()
+}
+
+PackageInstallerActivity ..> PackageUtil
+PackageUtil ..> PackagerParser
+PackageInstallerActivity ..> InstallAppProgress
+InstallAppProgress -up-|> Activity
 @enduml
