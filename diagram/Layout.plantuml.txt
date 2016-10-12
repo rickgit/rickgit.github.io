@@ -1,0 +1,112 @@
+'布局加载和绘制
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+class ActivityThread{
+	' 布局加载流程
+	performLaunchActivity()
+	' 布局显示流程，r.activity.makeVisible()
+	handleResumeActivity
+}
+
+class Activity {
+	Window mWindow
+	WindowManager mWindowManager
+	' 初始化了一些Activity的成员变量，主要是mWindow对象
+	attach()
+
+	onCreate()
+
+	getWindowManager();
+}
+class PhoneWindow extends Window{
+	DecorView mDector
+
+	WindowManager mWindowManager
+
+	setConentView()
+	installerDector()
+	generateDector()
+	
+
+	getWindowManager();
+}
+class Instrumentation{
+	callActivityOnCreate()
+}
+class LayoutInflater{
+	inflater()
+}
+
+
+class WindowManagerImpl extends WindowManager{
+	WindowManagerGlobal mGlobal
+	
+	addView()
+
+	
+}
+class WindowManager extends ViewManager{
+	
+}
+class WindowManagerGlobal {
+	addView()
+	requestLayout()
+}
+class ViewRootImpl {
+
+	DecorView mView
+
+	Runnable mTraversalRunnable
+	setView()
+	requestLayout()
+	checkThread()
+
+	scheduleTraversals()
+	void doTraversal()
+	' 调用了performMeasure，performLayout，performDraw三个方法，
+	' 这几个方法主要用于测量View组件的大小，测量View组件的位置，绘制View组件
+	performTraversals()
+	performMeasure()
+	performLayout()
+	layoutChildren()
+}
+note right of ViewRootImpl
+具体更新View的管理类
+end note
+
+class TraversalRunnable implements Runnable{
+	
+}
+
+class View{
+	setMeasuredDimension()
+	setMeasuredDimensionRaw()
+}
+
+
+ActivityThread ..>Activity
+Activity -->PhoneWindow
+
+ActivityThread --> Instrumentation
+
+DecorView --|>FrameLayout
+FrameLayout --|>ViewGroup
+ViewGroup --|>View
+
+Activity -->WindowManagerImpl 
+PhoneWindow -->DecorView
+WindowManagerImpl -->WindowManagerGlobal 
+
+WindowManagerGlobal ..>ViewRootImpl
+
+ViewRootImpl -->TraversalRunnable
+ViewRootImpl +--TraversalRunnable
+
+DecorView <-- ViewRootImpl 
+
+
+
+@enduml

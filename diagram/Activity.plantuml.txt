@@ -7,7 +7,9 @@ skinparam style strictuml
 
 class ApplicationThread {
 	scheduleLaunchActivity()
-	
+	schedulePauseActivity()
+	#销毁2 执行当前Activity的onPause方法
+	schedulePauseActivity() 
 }
 
 class ActivityThread{
@@ -15,8 +17,21 @@ class ActivityThread{
 	Instrumentation mInstrumentation;
 
 	+ {static} void main(String[] args)
+	#6 该方法的Looper.myQueue().addIdleHandler(new Idler());启动执行前一个activity的onStop方法
 	handleLaunchActivity()
+	performPauseActivity()
+
+	# ActivityManagerNative调用ActivityManagerService对象
+	attach()
+
+	#销毁4 调用了Looper.myQueue().addIdleHandler(new Idler())，执行栈顶Activity的销毁操作
+	#执行onstop和ondestroy
+	handleResumeActivity()
+
 }
+note right of ActivityThread
+attach()通过Binder机制调用了ActivityManagerService的attachApplication
+end note
 
 class PhoneWindow extends Window{
 	
@@ -28,7 +43,8 @@ interface Callback{
 	
 }
 class Activity implements Callback{
-	
+	startActivityForResult()
+	performPause()
 }
 
 
@@ -40,13 +56,110 @@ class SystemServiceRegistry {
 	public static Object getSystemService(ContextImpl ctx, String name)
 }
 class Instrumentation{
+	execStartActivity()
+	callActivityOnPause()
+
+}
+ 
+class ActivityManagerService extends ActivityManagerNative{
+	ActivityStack
+	startActivityAsUser()
+	startActivityMayWait()
+	startActivityUncheckedLocked()
+	activityPaused()
+
+	#4 启动activity所属的进程
+	startProcessLocked()
+
+	attachApplication()
+	#5 启动activity
+	attachApplicationLocked()
+}
+interface IActivityManager extends IInterface {
 	
 }
+class ActivityManagerNative extends IActivityManager{
+	IActivityManager getDefault()
+}
+note right of ActivityManagerNative 
+getDefault返回的是ActivityManagerProxy对象
+ActivityManagerNative与ActivityManagerProxy相当于一个Binder的客户端
+而ActivityManagerService相当于Binder的服务端
+end note
+class ActivityManagerProxy extends IActivityManager{
+	- IBinder mRemote;
+	startActivity()
+	activityPaused()
+}
+note right of ActivityManagerProxy
+
+该类位于ActivityManagerNative.java文件中
+end note
+class ActivityStarter{
+	 ActivityStackSupervisor mSupervisor
+	 ActivityStack mTargetStack;
+	 ActivityManagerService mService
+
+	 #2 ActivityManagerService接收启动Activity的请求
+	 startActivity()
+	 startActivityMayWait()
+	 startActivityLocked()
+	 startActivityUnchecked()
+}
+class ActivityStack{
+	ActivityStackSupervisor mSupervisor
+	ActivityRecord mResumedActivity
+	startActivityLocked()
+	#销毁3 执行上一个activity的onResume方法
+	resumeTopActivityUncheckedLocked()
+	resumeTopActivityInnerLocked()
+
+	#3 执行栈顶activity的onpause方法
+	startPausingLocked()
+	activityPausedLocked()
+	completePauseLocked()
+}
+class ActivityStackSupervisor {
+	 ActivityStack mFocusedStack
+	 startSpecificActivityLocked()
+	 scheduleResumeTopActivities()
+	 boolean resumeFocusedStackTopActivityLocked(ActivityStack targetStack, ActivityRecord target, ActivityOptions targetOptions)
+}
+class ActivityRecord{
+	ProcessRecord app;
+	ActivityStack getStackLocked();
+}
+class ProcessRecord {
+	IApplicationThread thread
+}
+class Process{
+	startViaZygote()
+	zygoteSendArgsAndGetResult()
+}
+
+
+
 
 ApplicationThread --+ ActivityThread
 ApplicationThread <-- ActivityThread
+IApplicationThread <|.. ApplicationThread
 Window +-- Callback
-window <-- Activity
+Window <-- Activity
+Activity -->Instrumentation
+ActivityThread -->Instrumentation
+Instrumentation ..>ActivityManagerNative
 
+ActivityManagerService --> ActivityStarter
+ActivityStarter --> ActivityStackSupervisor
+ActivityStarter --> ActivityStack
+ActivityStarter --> ActivityManagerService
+ActivityStack --> ActivityStackSupervisor
+
+ActivityStack --> ActivityRecord
+ActivityStack <.. ActivityRecord
+ActivityRecord --> ProcessRecord
+ProcessRecord --> IApplicationThread
+Process ..>ActivityThread
+ActivityThread ..>ActivityManagerService
 
 @enduml
