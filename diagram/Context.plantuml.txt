@@ -1,0 +1,79 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class ActivityThread{
+
+	Instrumentation mInstrumentation;
+	#Application Context的创建过程
+	+ {static} void main(String[] args)
+
+	attach()
+
+	# ApplicationThread的bindApplication方法最终执行到这里
+	# 通过反射机制创建了Instrumentation对象
+	# 调用了LockedApk.makeApplication方法创建了Application对象
+	handleBindApplication()
+
+	#Acitivty中的Context创建流程
+	performLaunchActivity()
+	createBaseContextForActivity()
+
+}
+note right of ActivityThread
+应用进程启动 –> 创建Instrumentation –> 创建Application对象 –> 创建Application相关的ContextImpl对象；
+
+end note
+
+class ActivityManagerService extends ActivityManagerNative{
+	attachApplication()
+}
+interface IActivityManager extends IInterface {
+	
+}
+class ActivityManagerNative extends IActivityManager{
+	# 返回的是ActivityManagerService
+	IActivityManager getDefault()
+}
+
+class ApplicationThread extends ApplicationThreadNative{
+	bindApplication()
+}
+note right of ApplicationThread
+# 该类在ActivityThread.java文件中 
+end note
+
+class LoadedApk{
+	#以反射的机制创建了Application对象，并创建了一个ContextImpl对象，并将Application与ContextImpl建立关联
+	makeApplication()
+}
+
+class Instrumentation{
+ 
+	onCreate()
+	#调用application的oncreate方法
+	callApplicationOnCreate()
+}
+
+class ContextImpl{
+	setOuterContext()
+}
+class Activity{
+	#attachBaseContext方法，让Activity持有了ContextImpl的引用，
+	attach()
+	attachBaseContext()
+}
+
+ActivityThread ..> ActivityManagerService
+ActivityManagerService ..> ApplicationThread
+ApplicationThreadNative ..|> IApplicationThread
+ApplicationThreadNative --|> Bind
+
+ActivityThread ..>LoadedApk
+ActivityThread -->Instrumentation
+ContextImpl --> Activity
+Activity --> ContextImpl
+LoadedApk ..> ContextImpl
+@enduml

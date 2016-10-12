@@ -1,0 +1,38 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class Activity{
+	Window mWindow
+	dispatchTouchEvent()
+	onUserInteraction()
+}
+
+class PhoneWinodw extends Window{
+	DecorView mDecor
+	superDispatchTouchEvent()
+}
+
+class DecorView extends FrameLayout implements RootViewSurfaceTaker{
+	
+}
+class FrameLayout extends ViewGroup{
+	public boolean onInterceptTouchEvent(MotionEvent ev)
+}
+
+class ViewGroup extends View{
+	public boolean onInterceptTouchEvent(MotionEvent ev)
+	
+}
+class View{
+	dispatchTouchEvent()
+	onFilterTouchEventForSecurity(event)
+
+}
+
+Activity -->PhoneWinodw
+PhoneWinodw -->DecorView
+
+@enduml
