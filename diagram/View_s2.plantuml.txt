@@ -1,0 +1,41 @@
+﻿@startuml
+
+skinparam monochrome true
+'skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+ 
+
+'ActivityThread->WindowManager详细序列图
+
+ActivityThread->WindowManagerImpl :1 addView
+activate WindowManagerImpl
+
+WindowManagerImpl->WindowManagerGlobal :2 addView
+activate WindowManagerGlobal
+deactivate WindowManagerImpl
+
+WindowManagerImpl ->ViewRootImpl :3 new 
+activate ViewRootImpl
+
+WindowManagerImpl <-- ViewRootImpl :4 return
+deactivate ViewRootImpl
+
+WindowManagerImpl ->ViewRootImpl :5 setView
+activate ViewRootImpl
+deactivate WindowManagerImpl
+
+ViewRootImpl->ViewRootImpl :6 requestLayout
+activate ViewRootImpl
+
+ViewRootImpl->Choreographer :7 post(TraversalRunnable)
+activate Choreographer
+deactivate ViewRootImpl
+deactivate Choreographer
+
+ViewRootImpl->Session :8 addToDisplay
+activate Session
+deactivate ViewRootImpl
+
+deactivate Session
+@enduml
