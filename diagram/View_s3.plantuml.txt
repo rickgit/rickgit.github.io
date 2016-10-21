@@ -1,0 +1,78 @@
+﻿@startuml
+
+skinparam monochrome true
+'skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+ 
+
+'ActivityThread->WindowManager详细序列图
+
+/'ActivityThread->WindowManagerImpl :1 addView
+activate WindowManagerImpl
+
+WindowManagerImpl->WindowManagerGlobal :2 addView
+activate WindowManagerGlobal
+deactivate WindowManagerImpl
+
+WindowManagerImpl ->ViewRootImpl :3 new 
+activate ViewRootImpl
+
+WindowManagerImpl <-- ViewRootImpl :4 return
+deactivate ViewRootImpl
+
+WindowManagerImpl ->ViewRootImpl :5 setView
+activate ViewRootImpl
+deactivate WindowManagerImpl
+
+ViewRootImpl->ViewRootImpl :6 requestLayout
+activate ViewRootImpl
+
+ViewRootImpl->Choreographer :7 post(TraversalRunnable)
+activate Choreographer
+deactivate ViewRootImpl
+deactivate Choreographer'/
+
+ViewRootImpl->Session :1:finishDrawing
+activate Session
+ 
+Session->WMS :2:finishDrawingWindow
+activate WMS
+deactivate Session
+
+WMS->WMS :3:requestTraversalLocked
+deactivate WMS
+
+
+WMS->WMS.H :4 :DO_TRAVERSAL
+activate WMS
+activate WMS.H
+deactivate WMS
+
+WMS<--WMS.H :5 :performLayoutAndPlaceSurfacesLocked
+deactivate WMS.H
+activate WMS
+
+WMS<--WMS :6 :handleAppTransitionReadyLocked
+deactivate WMS
+
+WMS-->AppWindowToken :7 :updateReportedVisibilityLocked
+activate WMS
+activate AppWindowToken
+deactivate WMS
+
+WMS<--AppWindowToken :8 :REPORT_APPLICATION_TOKEN_DRAWN
+activate WMS
+deactivate AppWindowToken
+
+
+WMS->"ActivityRecord.Tocken" :9:windowsDrawn
+activate ActivityRecord.Tocken
+deactivate WMS
+
+
+"ActivityRecord.Tocken"->ActivityRecord :10:reportLauchTimeLocked
+activate ActivityRecord
+deactivate "ActivityRecord.Tocken"
+
+@enduml
