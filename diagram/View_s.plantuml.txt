@@ -1,0 +1,35 @@
+﻿@startuml
+
+skinparam monochrome true
+'skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+ActivityStack->ApplicationThread :1 scheduleResumeActivity
+activate ApplicationThread
+
+ApplicationThread->H :2 RESUME_ACTIVITY
+activate H
+deactivate ApplicationThread
+
+H -> ActivityThread :3 handleResumeActivity
+activate ActivityThread
+deactivate H
+
+ActivityThread ->ActivityThread :4 performResumeActivity
+activate ActivityThread
+
+ActivityThread ->Activity :5 performResume
+activate Activity
+deactivate ActivityThread
+
+Activity-->ActivityThread :6 return
+deactivate Activity
+
+ActivityThread->WindowManager :7 addView
+activate WindowManager
+deactivate ActivityThread
+ 
+
+
+@enduml
