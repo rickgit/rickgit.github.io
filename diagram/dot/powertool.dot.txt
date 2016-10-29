@@ -1,0 +1,59 @@
+digraph G {
+  	rankdir=LR;
+	layout="fdp"//
+	node[shape=box]
+	"Additional Learning"->{Unicode,Endianness,"Unix command line tools","unix-based code editor",
+	"Information theory","Hamming Code","Entropy","Cryptography",Compression,Networking,
+	"Design patterns","Messaging","Serialization","Queueing Systems","FFT","Bloom Filter"}
+
+	"Unix command line tools"->{ 
+		bash,
+		cat, 
+		grep,
+		sed,
+		awk,
+		curl,
+		sort,
+		tr,
+		uniq,
+		strace,
+		tcpdump
+	}
+	curl-> wget
+
+	"unix-based code editor"->{Emacs , vi}
+	vi->vim
+
+	 "Information theory"->{"Markov processes"}
+
+	Networking->{ "Khan Academy",
+		"UDP/TCP",
+		"TCP/IP",
+		"OSI",
+		"HTTP",
+		"HTTPS",
+		"SSL/TLS",
+		"HTTP 2.0"
+	}
+
+	"Design patterns"
+	"Design patterns"->{ 
+		strategy,
+		singleton,
+		adapter,
+		prototype,
+		decorator,
+		visitor,
+		factory, "abstract factory",
+		facade,
+		observer,
+		proxy,
+		delegate,
+		command,
+		state,
+		memento,
+		iterator,
+		composite,
+		flyweight}
+ 
+}
