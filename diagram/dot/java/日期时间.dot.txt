@@ -1,0 +1,21 @@
+digraph G{
+	java日期和时间->{UTC,时间戳,类}
+	UTC->协调世界时（毫秒）->{由原子钟提供,国际原子时（纳秒）,格林尼治时间（GMT，已淘汰淘汰）,网络时间协议}
+	网络时间协议->"UTC+8"->"中国大陆\l中国香港\l中国澳门\l中国台湾\l"
+	时间戳->"1970年1月1号，格林尼时间。所以同样的时间戳，\l不同时区显示是不同的数据,东八区new Date(0)是早上八点"
+
+
+	由原子钟提供->{世界上第一个原子钟是由美国国家物理实验室的埃森和帕里}->"1956年，摩尔登公司生产出了第一个原子钟"
+	由原子钟提供->"UTC由法国巴黎国际地球自转事务中央局决定调整。原子钟放在美国科罗拉州博尔德市。"
+	类->{Date,Calendar,DateFormat}
+	DateFormat->SimpleDateFormat
+	Calendar->GregorianCalendar
+	Date[shape=record,label=" { Date|boolean after(Date when)|  boolean before(Date when)
+}"]
+
+	Date->"new Date(0) is January 1, 1970 in UTC.时区是在UTC+0上"
+	SimpleDateFormat[shape=record,label=" { SimpleDateFormat| public void setTimeZone(TimeZone zone)}"]
+	Calendar[shape=record,label=" { Calendar|  public static Calendar getInstance(TimeZone zone)| public void setTimeZone(TimeZone value)}"]
+
+	
+}
