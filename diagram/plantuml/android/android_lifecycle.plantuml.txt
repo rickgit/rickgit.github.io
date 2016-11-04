@@ -1,0 +1,22 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+created :setContentView()
+started:visible
+paused: partial visible
+stoped :hidden
+
+[*] -up->created :onCreate
+created-up->started : onStart
+started -up->resumed:onResume
+resumed -down->paused :onPause
+paused -down->resumed: onResume
+paused -down->stoped :onstop
+stoped -down->[*] :onDestroy
+stoped -left->started :onRestart
+
+
+@enduml
