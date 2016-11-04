@@ -1,0 +1,24 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+participant "jdk8/jdk/src/share/bin/main.c" as main 
+participant "jdk8/jdk/src/share/bin/java.c" as java 
+participant "jdk8/jdk/src/solaris/bin/java_md_common.c" as java_md_common 
+participant "jdk8/jdk/src/share/bin/jli_util.c" as jli_util 
+
+participant "jdk8/jdk/src/solaris/bin/java_md_solinux.c" as java_md_solinux
+
+
+main->java :main()
+java->java_md_common:InitLauncher()
+java_md_common->jli_util :JLI_SetTraceLauncher()
+jli_util->jli_util :JLI_SetTraceLauncher()
+main->java_md_solinux:CreateExecutionEnvironment()
+
+
+
+@enduml
+

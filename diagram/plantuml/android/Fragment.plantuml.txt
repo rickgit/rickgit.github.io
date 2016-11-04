@@ -10,7 +10,8 @@ class ActivityThread {
 }
 class Instrumentation{
 	newActivity()
-	callActivityOnCreate(activity, r.state);//调用activity的perforCreate方法
+	' 调用activity的perforCreate方法
+	callActivityOnCreate(activity, r.state);
 }
 class Activity{
 	FragmentController mFragments = FragmentController.createController(new HostCallbacks());
@@ -117,4 +118,5 @@ FragmentManagerImpl <-- BackStackRecord
 FragmentManagerImpl <-- Fragment
 FragmentHostCallback <-- Fragment
 Op --+ BackStackRecord
+
 @enduml

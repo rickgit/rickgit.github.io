@@ -1,0 +1,62 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class AnimatedGifEncoder {
+	
+}
+note left of AnimatedGifEncoder
+gif_encoder
+end note 
+
+AnimatedGifEncoder ..>NeuQuant
+AnimatedGifEncoder ..>LZWEncoder
+
+
+
+interface GifDecoder{
+	
+}
+
+interface BitmapProvider{
+	
+}
+
+note left of StandardGifDecoder
+gif_decoder
+end note
+
+StandardGifDecoder -->GifHeader
+GifHeader-->GifFrame
+
+StandardGifDecoder -->GifHeaderParser
+GifHeaderParser ..>ByteBuffer
+ByteArrayBuffer --|>ByteBuffer
+ByteBuffer ..>ByteArrayBuffer
+
+StandardGifDecoder .up.|>GifDecoder
+GifDecoder +--BitmapProvider
+
+note left of DiskLruCache
+DiskLruCache
+end note
+DiskLruCache +--DiskLruCacheThreadFactory
+DiskLruCache +--Editor
+DiskLruCache +--Entry
+DiskLruCache +--Value
+
+Editor -->Entry
+DiskLruCache -->BufferedWriter
+
+BufferedWriter -up-|>Writer 
+
+DiskLruCache .up.>StrictLineReader
+
+
+
+
+
+@enduml
