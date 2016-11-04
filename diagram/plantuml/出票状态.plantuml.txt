@@ -1,0 +1,62 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+actor 使用者 as user
+participant "期号1" as A
+participant "期号2" as B
+participant "最后期号" as C
+
+
+user->user:  案例一
+user->A :  --\n待支付
+activate A
+A ->user :  已失效\n支付失败
+deactivate A
+
+
+user->user:  案例一
+user->A :  --\n待支付 
+activate A
+A->A :--\n正在追号
+
+'A->A :  ￥100\n正在追号
+
+
+A->B :￥100\n正在追号
+deactivate A
+activate B
+
+B->B :  已中奖\n正在追号
+
+B->C :  ￥200\n正在追号
+deactivate B
+activate C
+
+C->C :  已中奖\n追号结束
+C->user :  ￥200\n追号结束
+deactivate C
+
+'===============================
+actor 使用者 as loser
+participant "期号1" as h
+participant "期号2" as i
+participant "最后期号" as j
+
+loser->loser:  案例一
+loser->h :  --\n待支付 
+activate h
+h->h :--\n正在追号
+
+
+h->i :￥100\n正在追号
+deactivate h
+activate i
+
+
+
+@enduml
+

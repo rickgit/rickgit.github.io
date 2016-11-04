@@ -1,0 +1,24 @@
+digraph G{
+	GNU开源组织->调试工具->GDB->{"gdb -tui excutableFile",l,回车,break,info,r,focus,n,c,p,bt,finish,q,bt,thread}
+	l->"l命令相当于list，从第一行开始例出原码"
+	回车->直接回车表示，重复上一次命令
+	break->{"break 16","break func"}
+	info->{"info break","info args","info source","info line","info locals","info threads","info stack"}
+	r->"运行程序，run命令简写"
+	n->"单条语句执行，next命令简写。"
+	c->"继续运行程序，continue命令简写。"
+	p->"打印变量i的值，print命令简写。"
+	bt->"查看函数堆栈。"
+	finish->"退出函数。"
+	q->"退出gdb"
+    bt->"栈的调用信息全部显示出来。"
+    bt->"bt full"
+    thread->"thread threadName"
+    "gdb -tui excutableFile"->{focus,layout,winheight}
+    //TUI模式下有四个窗口，命令窗口，源代码窗口，汇编代码窗口，寄存器窗口
+    //focus切换焦点到窗口下， layout修改布局,winheight 调整各窗口高度,space缩放
+    focus->{cmd,src,asm,reg}
+    winheight->"winheight src +5"
+
+
+}
