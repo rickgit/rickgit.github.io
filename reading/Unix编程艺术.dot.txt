@@ -1,0 +1,11 @@
+digraph G{
+
+	ESR[shape=record,label=" Eric S.Raymond"]
+	Unix编程艺术(TAOUP)->作者->ESR
+	//哲学，编程艺术，技术文化
+	Unix编程艺术(TAOUP)->章节->{哲学,}
+	哲学->{文化,生命力,Unix之得,哲学基础}
+	Unix之得->{开源软件,跨平台可移植性和开发标准,开源社区,灵活性,hack}
+	跨平台可移植性和开发标准->POSIX
+
+}

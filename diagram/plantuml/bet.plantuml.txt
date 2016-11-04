@@ -1,0 +1,21 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class X115GpcCenterUI{
+	
+}
+
+
+X115GpcCenterUI -up-> X115BaseFragment
+
+
+X115BaseFragment -up-> X115LottmatFragment
+
+X115PTSubView -up-|>X115LottmatFragment
+X115DTSubView -up-|>X115LottmatFragment
+X115Q2ZXSubView -up-|>X115LottmatFragment
+X115Q3ZXSubView -up-|>X115LottmatFragment
+@enduml
