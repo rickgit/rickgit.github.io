@@ -1,0 +1,22 @@
+digraph G{
+	OpenGrok->下载安装->"http://opengrok.github.io/OpenGrok/ "
+	OpenGrok->启动tomcat
+	OpenGrok->"Exuberant Ctags"->"sudo apt-get install exuberant-ctags"
+	OpenGrok->环境变量
+	/*
+关联tomcat和opengrok
+
+export JAVA_HOME=/opt/java 
+export OPENGROK_TOMCAT_BASE=/opt/tomcat/ 
+export OPENGROK_APP_SERVER=Tomcat 
+export OPENGROK_INSTANCE_BASE=/opt/opengrok-0.12.1 
+export LANG=zh_CN.gb2312  (可选，但中文编码与源代码不一致会产生乱码) 
+
+
+	*/
+
+	OpenGrok->配置源代码目录->"opengrok-0.12.1/bin/OpenGrok \n 找到 SRC_ROOT 配置， 将值设为源代码目录"
+
+	OpenGrok->建立索引->"./opengrok-0.12.1/bin/OpenGrok deploy"
+	OpenGrok->索引源代码->"./opengrok-0.12.1/bin/OpenGrok index"
+}
