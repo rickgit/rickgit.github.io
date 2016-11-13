@@ -96,11 +96,197 @@ item
                       |                          |
                       +--------------------------+
 
-
-
-
-//PullToRefreshView 拦截事件和处理事件
 //
+
+                        +----------------+
+                        |  RelativeLayout|
+                        +-------+--------+
+                                |
+      +-------------------------+----------------------------+
+      |                                                      |
+      |                                               +------+-------+
+      |                                               |  FrameLayout |
+      |                                               +------+-------+
+      |                                                      |
+      |                                               +------+-------+
+      |                                               |PullToRefresh +---------> 下 拉 控 件
+      |                                               +------+-------+
+      |                                                      |                                                                   上 拉 加 载
+      |                 +------------------------------------+---------------------------------+                                     ^
+      |                 |                                                                      |                                     |
++-----+-------+   +-----+-------+                                                  +-----------+--------+                            |
+| Title Layout|   |LinearLayout |                                                  |   ViewPager        |                            |
+|             |   |             |                                                  |                    |                            |
++-----+-------+   +----+--------+                                                  +-----------+--------+                            |
+      |                |                                                                       |                                     |
+      |                |                                                                       |                                     |
+      |                |                         +-------------------------------------------------------------------------------+   |
+      |                |                         |                                             |                                 |   |
+      |                |                         |                                             |                                 |   |
+      |                |                         ^                                             ^                                 |   |
+      |                |                  +------+-----------+                        +--------+-----------+              +------+---+--+
+      |                |                  |   ListView       |                        |   ListView         |              |   ListView  |
+      |                |                  |                  |                        |                    |              |             |
+      |                v                  +------------------+                        +--------------------+              +-------------+
+      v           个 人 信 息
+     标 题 栏
+
+
+
+
+//PullToRefreshView 拦截事件和处理事件，下拉刷新数据和上拉固定tab
+//viewpager 切换listview
+//listview 滑动listview,上拉加载更多数据
+
+//移动控件的方法1.setlayout 界面重新布局后，控件会重置。
+//2.设置margin topMargin为负值，则方向向上
+//3.setscroll listview设置这个值没用。
+//4.onTouch获取初始getRawX()可能获取不到，要在onInterceptTouchEvent获取
+//5.***********熟悉onInterceptTouchEvent执行的内容
+
+//onInterceptTouchEvent不能拦截Event.Down事件,不然没有点击事件
+
+
+//修改量的定义.修改量范畴定义，边界判断
+
+//定义 :newMarginTop=(lastDownMarginTop+deltaY)
+// deltaY=lastTouchRawY-lastDownRawY
+//lastMarginTop∈[-245dp,0]
+//拦截事件
+//边界判断,点击和移动的边界判断， 1.lastMarginTop=245,判断deltaY是否向下移动. 2.其他地方移动到245dp不做处理
+//区间(-245dp,0)判断，1,newMarginTop 属于这个区间，则拦截。
+//边界判断,lastMarginTop==0 则需要判断是否向上移动，有则拦截
+
+//移动处理
+//边界判断 如果newMarginTop属于区间(-245dp,0),拦截并设置新的marginTop
+//如果newMarginTop<-245dp，则需要设置为-245dp
+//如果newMarginTop>0，则需要设置为0dp
+
+//用户信息栏事件拦截
+//PullToRefreshView onTouch拦截down事件
+
+
+//体验优化
+//快滑动优化
+// VelocityTracker  达到一定速度才认为是在滑动。
+//每次移动都加入移动位置,直达抬起时候，VeloctivyTracker计算速度
+//Scroller类 OverScroller类，computeScrollOffset 方法 ，自动滑动
+//自动滑动到边界
+// mScroller.startScroll(int startX, int startY, int dx, int dy) //使用默认完成时间250ms 第二个参数是偏移量
+
+//ViewConfiguration视图配置
+4.主页
+       a 上下滑动，名片区不能顺畅收起，放下。
+       b tab切换没反应
+       c viewpager切换
+
+
+
+
+
+//RecyclerView替换
+//Android6.0 org.apache.http.util.EncodingUtils等相关类被移除
+/*
+@Depret
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
+*/
+//Android lib记得用provided v4,v7,加载包时候，不能用source的jar包
+
+
+//*** 没数据处理
+   +--------------------------+
+   |                          |
+   |                          |
+   |   +-------------------+  |
+   |   |                   |  |
+   |   |                   |  |
+   |   |                   |  |
+   |   |   图          片  |  |
+   |   |                   |  |
+   |   |                   |  |
+   |   |                   |  |
+   |   +-------------------+  |
+   |                          |
+   |                          |
+   |                          |
+   |    +-----------------+   |
+   |    |     文     字   |   |
+   |    |                 |   |
+   |    +-----------------+   |
+   |                          |
+   |                          |
+   |                          |
+   |                          |
+   +--------------------------+
+EmptyView 
+包含方法（显示，点击）
+不希望外部调用的缘由方法
+@Deprecated
+
+自定义控件注释
+1 ascii图示
+2 使用方法
+
+//** 上拉下拉刷新
+
+1 头部刷新数据，底部加载数据，刷新完成
+
+
+//** glide圆角，editText控件
+
+
+//editText控件
+listview editText聚焦不了。
+在对应的ListView中添加Android:descendantFocusability="beforeDescendants"
+在AndroidManifest.xml对应的Activity里加android:windowSoftInputMode="adjustPan"
+
+
+//singleLine弃用 改为maxLine
+
+我的推荐 他的推荐
+投注栏   彩种移动到用户名上
+
+
+问题
+1.首页 已投数据显示错误
+2.首页 推荐内容显示一行
+3.首页 头像进入跟投主页
+4.主页 连红标签
+
+//=============================================
+
+√1.主页，关注 空白区 调到关注页面
+2.关注页面 网络错误（冰鑫没改）
+*3.主页 没有跟投数据，没有跟投明细图标。无法确定是否有跟投数据
+4.主页
+       a 上下滑动，名片区不能顺畅收起，放下。尝试用动画,post setMargin解决
+       b tab切换没反应。滑动距离限制
+       c viewpager切换。滑动切换
+
+listview 下拉
+
+
+*5.userId改为long型。全部要修改
+√6.主页 文本自动换行
+7.关注按钮只有3中状态，关注，已关注，相互关注，没有取消关注（刘驭）
+√ 8.中奖纪录文字和图标去掉 
+9.3个tab 标注图标设计
+10.赢家主页关注按钮没效果
+11.是否实名，是否设置支付密码
+
+12.首页的简介的文案
+
+
+
 
 
 
