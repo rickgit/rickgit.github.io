@@ -1,0 +1,254 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'JavaFX 8 Instroduction by Example
+class Application{
+	main()
+	launch()'在main方法直接调用launch，launch会调用start方法
+	start(Stage primaryStage)
+}
+'加载fxml布局文件
+class FXMLLoader{
+	load()
+}
+
+class Stage{
+	setTitle()'设置应用的Title
+	setScrene(Scene scene)'设置屏幕
+	show()'显示
+	addEventHandler()
+}
+'scaling, transforms, translations, and effects.
+abstract class Node{
+	
+}
+abstract class Parent{
+	getChildren()
+}
+
+Application ..>Stage
+Stage -->Scene
+Scene -->Parent
+Parent --|>Node
+Control --|>Parent
+
+/'
+#打包javafx
+javafxpackager -createjar -appclass helloworldmain.HelloWorldMain -srcdir . -outdir out
+-outfile helloworld.jar -v
+
+##解释 
+-createjar -- Creates a JavaFX JAR executable application.
+
+-appclass helloworldmain.HelloWorldMain Specifies the fully qualified name of the class containing the main() method.
+
+-srcdir . The top-level location of the parent directory holding the compiled classes (current directory).
+
+-outdir out  The destination where the packaged jar file will be created.
+
+-outfile helloworld.jar Description Specifies the name of the executable jar file.
+
+-v --  Allows verbose displays logging information when executing javafxpackager.
+
+
+
+'/
+
+
+class Line{
+	setStroke()
+	setStrokeWidth()
+	setStrokeLineCap()
+}
+
+Group -->Parent
+Shape -->Node
+Line -->Shape
+
+
+'Chapter 2 Painting Colors
+Color --|>Paint
+Stop --|>Paint
+RadialGradient --|>Paint
+LinearGradient --|>Paint
+
+
+
+class Text{
+	setFont()
+	setEffect()
+}
+class Font{
+	getFamilies()
+	getFontNames()
+}
+
+
+
+Text --|> Shape
+Text -->Effect
+DropShadow --|>Effect
+Text -->Font
+
+
+
+'chapter 4 Layouts and UI Controls
+class FlowPane{
+	setPrefHeight()
+}
+class GridPane{
+	setHalignment()
+}
+class ColumnConstraints{
+	double minWidth,prefWidth,maxWidth;
+	'因为HBox是水平布局，子节点的宽度不会跟随父类一起扩展，当父类扩大时，水平方向则有空白，若想要其子节点随父类扩展而扩展则调用该方法。设置子节点水平方向动填充父节点，可以同时设置多个自己点自动扩充。  
+	setHgrow()
+
+	'设置是否自动填充高度，为false则其子节点可以设置自己的高度
+	setFillHeight()
+	'空间水平右对齐
+	setHalignment()
+}
+Region --|>Parent
+Pane --|>Region
+HBox--|>Region
+VBox--|>Region
+FlowPane--|>Region
+BorderPane--|>Region
+GridPane--|>Region
+GridPane -->RowConstraints
+GridPane -->ColumnConstraints
+ColumnConstraints -->Priority
+Rectangle--|>Shape
+/'
+                      +----------------+--------------------------+---------+----+
+                      |Logo|Title      |                          | Min|Max | Close
+                      |    |           |                          |    |    |    |
+             +-+      +----+---+-------+--------------------------+----+----+----+
+             |        | Banner | Banner                                          |       BorderPane Top
+             |        | Logo   | Text                                            +----->
+             |        |        |                                                 |       Banner use FlowPane
+             |        +--------+-------------------------------------------------+
+             |        |                                                          |
+             |        |                    +----------------------------------+  |
+BorderPane   |        |      First Name    |                                  |  |
+          <--+        |      Label         +----------------------------------+  |
+             |        |                                                          |
+             |        |                    +----------------------------------+  +-----> BorderPane center
+             |        |      Last Name     |                                  |  |
+             |        |      Label         +----------------------------------+  |       content use GridPane Layout
+             |        |                                                          |
+             |        |                                            +----------+  |
+             |        |                                            | Submit   |  |
+             |        |                                            +----------+  |
+             +-+      +----------------------------------------------------------+
+
+'/
+
+'UI control menu
+
+class MenuBar{
+	getMenus()	
+}
+class Menu{
+	getItems()
+	'快捷热点
+	setMnemonicParsing()
+	'快捷键 new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN)
+	setAccelerator()
+}
+class MenuItem{
+	setOnAction()
+}
+MenuBar --|>Control
+Menu --|>MenuItem
+MenuItem ..|>EventTarget
+CheckMenuItem --|>MenuItem
+RadioMenuItem --|>MenuItem
+CustomMenuItem --|>MenuItem
+SeparatorMenuItem --|>MenuItem
+MenuItem -->EventHandler
+
+RadioMenuItem -->ToggleGroup
+MenuItem ->KeyCodeCombination
+
+class Platform{
+	exit()
+}
+
+'Context Menus,上下文菜单，右键菜单
+class ContextMenu{
+	
+}
+
+/'
+
+                      +----------------+--------------------------+---------+----+
+                      |Logo|Title      |                          | Min|Max | Close
+                      |    |           |                          |    |    |    |
+             +-+      +-----------------------------------------------------+----+
+             |        | +----------------------------------------------+         |       BorderPane Top
+             |        | |File  ||Help || Other Menu or  MenuItem       |         +----->
+             |        | +----------------------------------------------+         |       MenuBar
+             |        +----------------------------------------------------------+
+             |        |                                                          |
+             |        |                    +----------------------------------+  |
+BorderPane   |        |      First Name    |                                  |  |
+          <--+        |      Label         +----------------------------------+  |
+             |        |                                                          |
+             |        |                    +----------------------------------+  +-----> BorderPane center
+             |        |      Last Name     |                                  |  |
+             |        |      Label         +----------------------------------+  |       content use GridPane Layout
+             |        |                                                          |
+             |        |                                            +----------+  |
+             |        |                                            | Submit   |  |
+             |        |                                            +----------+  |
+             +-+      +----------------------------------------------------------+
+
+
+
+'/
+
+
+
+ListView --|>Control
+TableView --|>Control
+
+
+'展示后台正在处理数据
+
+class ProgressIndicator{
+	progressProperty()
+}
+class DoubleProperty{
+	bind()
+	unbind()
+}
+'javafx.concurent.Task
+Task{
+	progressProperty()
+	messageProperty()
+}
+ProgressBar --|>ProgressIndicator
+ProgressIndicator--|>Control
+ProgressIndicator --|>Control
+ProgressIndicator-->DoubleProperty
+Task --|>FutureTask
+
+
+Button --|>ButtonBase
+ButtonBase --|>Labeled
+Labeled --|>Control
+
+
+'第五章 Graphics with JavaFX，介绍Image和ImageVIew，动画
+
+'第六章 定制UI
+
+'第十二章 手势
+
+
+@enduml
