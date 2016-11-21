@@ -1,0 +1,7 @@
+digraph G {
+	{
+        node [shape=plaintext]
+        past -> 1940 -> 1950 ->1960 ->1970
+    }
+    {rank=same;"1940";"a";"b"}
+}

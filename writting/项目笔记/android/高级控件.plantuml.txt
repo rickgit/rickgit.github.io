@@ -1,0 +1,21 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class LayoutManager{
+	
+}
+
+class StaggeredGridLayoutManager{
+	
+}
+
+StaggeredGridLayoutManager --|> LayoutManager
+LinearLayoutManager --|> LayoutManager
+GridLayoutManager --|> LinearLayoutManager
+
+
+
+@enduml

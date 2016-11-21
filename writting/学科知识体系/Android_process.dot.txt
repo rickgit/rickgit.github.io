@@ -1,0 +1,35 @@
+digraph G {
+	compound=true;
+	subgraph cluster0{
+		 rankdir = LR;
+		label="system_server";
+		subgraph cluster00{
+			label="Binder Client";
+			ApplicationThreadProxy_0;
+		}
+
+		subgraph cluster01{
+			label="Binder Server";
+			ApplicationManagerService;
+		}
+		ApplicationThreadProxy_0->ApplicationManagerService[ltail=cluster00,lhead=cluster01,arrowhead=none]
+	}
+
+	subgraph cluster1{
+		//rankdir = LR;
+		rankdir = TB;
+		label="App process";
+		subgraph cluster10{
+			label="Binder Server";
+			ApplicationThread;
+		}
+
+		subgraph cluster11{
+			label="Binder Client";
+			ApplicationManagerProxy_1;
+		}
+	}
+
+	start ->ApplicationThreadProxy_0[lhead=cluster0]
+	start ->ApplicationManagerProxy_1[lhead=cluster1]
+}
