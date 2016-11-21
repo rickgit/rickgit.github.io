@@ -1,0 +1,55 @@
+digraph G {
+	compound=true;
+	subgraph cluster0{
+		 rankdir = LR;
+		label="打包流程";
+		cluster0step1[shape=record,label=" 修改插件代码的版本号(versionName)"]
+		cluster0step2[shape=record,label=" Manifest，因为后台根据这个类型解析、gradle.properties考虑去掉"]
+		cluster0step1->cluster0step2
+		cluster0step2->cluster1step1[ltail=cluster00,lhead=cluster01,arrowhead=none]
+	}
+
+	subgraph cluster1{
+		//rankdir = LR;
+		rankdir = TB;
+		label="发布流程";
+		cluster1step1[shape=record,label=" 后台打包"]
+		cluster1step2[shape=record,label=" 后台发布"]
+		cluster1step3[shape=record,label=" 后台添加特殊渠道"]
+		cluster1step4[shape=record,label=" 后台添加去掉特殊渠道"]
+		cluster1step5[shape=record,label=" 进入测试"]
+ 		cluster1step6[shape=record,label=" 下载插件，放到host"]
+ 		cluster1step7[shape=record,label=" 修改host版本，变动为等待发布状态"]
+ 		cluster1step8[shape=record,label=" 修改host为发布状态"]
+
+ 		cluster1step1->cluster1step2
+ 		cluster1step2->cluster1step3
+ 		cluster1step3->cluster1step4
+ 		cluster1step4->cluster1step7
+ 		
+ 		cluster1step1->cluster1step6
+ 		cluster1step6->cluster1step8
+
+ 		cluster1step7->cluster1step8
+
+ 		
+ 		cluster1step8->cluster1step5
+
+
+
+ 		cluster1step6->cluster2step1[ltail=cluster00,lhead=cluster01,arrowhead=none]
+	}
+
+	subgraph cluster2{
+		//rankdir = LR;
+		rankdir = TB;
+		label="host打包流程";
+		cluster2step1[shape=record,label=" 修改gradle.properties的版本号，修改AppConfig.java的版本号"]
+		cluster2step2[shape=record,label=" 修改AppConfig.java的open环境"]
+		cluster2step3[shape=record,label=" 打渠道包"]
+
+		cluster2step1->cluster2step2
+ 		cluster2step2->cluster2step3
+	}
+
+}

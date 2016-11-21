@@ -1,0 +1,4 @@
+digraph G{
+	//http://www.hjenglish.com/fr/p185394/
+	元音[label=" { i, y, u}, { e, "]
+}
