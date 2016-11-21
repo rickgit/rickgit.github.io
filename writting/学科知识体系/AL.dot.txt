@@ -1,0 +1,7 @@
+digraph G {
+	AI->ML->{ANN,GA}
+	ANN->DL
+
+
+	ML->"https://github.com/songrotek/Deep-Learning-Papers-Reading-Roadmap"
+}

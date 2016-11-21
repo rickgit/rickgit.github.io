@@ -1,0 +1,6 @@
+digraph G{
+	高级控件->SwipeRefreshLayout->{"SwipeRefreshLayout-直线","SwipeRefreshLayout-Dialog"}
+	"SwipeRefreshLayout-直线"->BakedBezierInterpolator
+	SwipeRefreshLayout->setLayoutManager
+	
+}

@@ -1,0 +1,88 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+/'
++-----------------------------------+
+|               Activity            |
+|  +-----------------------------+  |
+|  |       Phone Window          |  |
+|  |   +---------------------+   |  |
+|  |   |     DecorView       |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  |TitleView +---------------->+ActionBarContainer+--->+ ActionBar |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  | Content  | |  |   |  |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |   View   +---------------->+ FrameLayout      |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   +---------------------+   |  |
+|  |                             |  |
+|  +-----------------------------+  |
++-----------------------------------+
+
+
+
+
+
+'/
+
+
+'布局
+class MeasureSpec{
+	UNSPECIFIED '不指定大小测量模式，通常情况下在绘制自定义View时才会用到 未指定模式,父类不指定子布局的宽高
+	EXACTLY '精确值模式，属性设置为精确数值或者match_parent时，系统使用的是EXACTLY模式，在不指定确切宽高时，按照父布局进行宽高设置
+	AT_MOST '最大值模式，属性设置为wrap_content时，系统使用的是AT_MOST模式.至多模式,子类宽高最多达到父类指定宽高，较为少用
+}
+'事件只有在
+class MotionEvent{
+	int ACTION_DOWN
+	int ACTION_MOVE
+	int ACTION_UP
+	int ACTION_CANCEL
+	getRawY();
+
+	
+}
+class View{
+	invalidate()'把之前的旧的view从主UI线程队列中pop掉
+	postInvalidate() '在工作者线程中被调用
+	animate()
+}
+
+class Scroller{
+	abortAnimation();'禁止滑动
+}
+
+class OverScroller{
+	abortAnimation();'禁止滑动
+}
+
+class ViewConfiguration{
+	
+}
+
+
+class LinearInterpolator{
+	
+}
+class CollapsingToolbarLayout{
+	
+}
+
+Interpolator <.. LinearInterpolator
+Interpolator <.. AccelerateInterpolator
+
+@enduml

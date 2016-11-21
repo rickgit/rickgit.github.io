@@ -37,8 +37,14 @@ Control --|>Parent
 
 /'
 #打包javafx
-javafxpackager -createjar -appclass helloworldmain.HelloWorldMain -srcdir . -outdir out
--outfile helloworld.jar -v
+javafxpackager -createjar -appclass helloworldmain.HelloWorldMain -srcdir . -outdir out -outfile helloworld.jar -v
+javafxpackager -deploy -native -outdir packages -outfile  Tree -srcdir dist -srcfiles JavaFx.jar -appclass application.Main -name "Tree" -title "Tree"
+
+ -outfile 输出文件
+ -srcfiles 项目打包的jar
+ -appclass 项目的入口类名
+ -name exe的名字
+ -title 应用标题
 
 ##解释 
 -createjar -- Creates a JavaFX JAR executable application.
@@ -149,6 +155,34 @@ BorderPane   |        |      First Name    |                                  | 
 '/
 
 'UI control menu
+/'
+                                                                           +----------+
+                                                                           |   Node   |
+                                                                           +----------+
+                           +-----------------------------------------------------v-------------------------------------------+
+                    +------------+                  +------------+                     +--------------+               +-----------+
+                    |   Shape    |                  |  Canvas    |                     |   ImageView  |               |   Parent  |
+                    +-----^------+                  +------------+                     +--------------+               +------+----+
+                          |                                                                                                  ^
+    +--------------------------------------------+                                            +--------------------------------------------------+
++-----------+        +----------+           +---------+                                +--------------+               +-----------+      +---------------+
+| Rectangle |        |  Circle  |           |  Text   |                                |    Regin     |               |   Group   |      |   Control     |
++-----------+        +----------+           +---------+                                +------+-------+               +-----------+      +---------------+
+                                                                                              ^                                      +------------v-------------+
+                                                                                              |                                      |                          |
+                                                                                       +------+-------+                      +-------+-------+          +-------+------+
+                                                                                       |    Pane      |                      |               |          |              |
+                                                                                       +--------------+                      | ChoiceBox<T>  |          | ButtonBase   |
+                                                                                  +-----------v---------+                    |               |          |              |
+                                                                                  |                     |                    +---------------+          +-------+------+
+                                                                            +-----+------+       +------+---+                                                   ^
+                                                                            |            |       |          |                                           +-------+------+
+                                                                            |  HBox      |       | VBox     |                                           |   Button     |
+                                                                            |            |       |          |                                           |              |
+                                                                            +------------+       +----------+                                           +--------------+
+
+
+'/
 
 class MenuBar{
 	getMenus()	

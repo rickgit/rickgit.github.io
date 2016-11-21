@@ -1,0 +1,6 @@
+digraph G {
+    node[shape=plaintext]
+    "大家的日语"->{,会話}
+
+
+}

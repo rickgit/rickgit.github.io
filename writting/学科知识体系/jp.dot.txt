@@ -1,0 +1,30 @@
+digraph G {
+    node[shape=plaintext]
+	文法[shape=record ,label=" 文法| ぶんぽう"]
+    名詞[shape=record ,label=" 名詞| めいし"]
+    助詞[shape=record ,label=" 助詞| じょし"]
+    助詞[shape=record ,label=" 助詞| じょし"]
+   
+
+    性質[shape=record ,label=" 性質| せいしつ"]
+    単語[shape=record ,label=" 単語| たん‐ご"]
+    類[shape=record ,label=" 類| るい"]
+
+    意味[shape=record ,label=" 意味| い‐み"]
+    職能[shape=record ,label=" 職能| しょくのう"]
+    最小[shape=record ,label=" 最小| さい‐しょう"]
+    言語[shape=record ,label=" 言語| げんご"]
+    単位[shape=record ,label=" 単位| たん‐い"]
+
+    量[shape=record ,label=" 量| りょう"]
+    基準[shape=record ,label=" 基準| き‐じゅん"]
+
+
+    文法->名詞->品詞の一つ->品詞->文法的性質によって分けられた単語の類->{性質,単語,類}
+    名詞->国語の品詞の一
+    単語->文法上、意味・職能をもった最小の言語単位->{意味,職能,最小,言語,単位}
+    意味->言葉が示す内容
+    職能->経営組織論上の基本概念
+    最小->いちばん小さいこと
+    単位->ものの量をはかるための基準として定められた量
+}
