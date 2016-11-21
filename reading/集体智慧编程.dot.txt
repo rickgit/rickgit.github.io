@@ -13,7 +13,6 @@ digraph G{
 	皮尔逊相关度->{最佳拟合线,夸大分值}
 	//http://www.audioscrobbler.net
 	数据集->{MoviewLens,Audioscrobbler}
-	
 	//第三章
 	发现群组->{数据聚类,监督学习,无监督学习,单词向量}
 	数据聚类->聚类算法->{距离度量}	

@@ -1,0 +1,21 @@
+digraph G {
+    label=“dot 解构”
+
+
+    same[ label=" 让子图继承相同的排列"]
+	min[label=" 子图中所有结点至少比布局中其他结点的排列(rank)要小"]
+	source[label=" 强制子图所有结点严格基于某个排列，同时比其他结点排列要小(除非这些子图也指定了min或source)(?)"]
+	max[label=" 或sink ：做与最大排列接近的事情。"]
+    dot->{图,节点,边,属性,注释}
+    注释 ->"// 单行注释 /* 多行注释 */"
+    图 ->{有向图,无向图,subgraph,图的属性}
+    图的属性->{rank,rankdir}
+    rank->{ame,min,source, max,sink}
+    rankdir->{TB,LR,BT,RL}
+    有向图->"->"
+    无向图->"--"
+    节点->node->{shape,label}
+    边->edge
+    shape->{Mdiamond,oval,Msquare,box,circle,record,plaintext }
+    subgraph->{lhead,ltail}
+}

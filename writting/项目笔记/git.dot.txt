@@ -1,0 +1,5 @@
+digraph G {
+	git->{git设置,修改已提交的用户名}
+	git设置->"git config --global --edit"
+	修改已提交的用户名->"git commit --amend --reset-author"
+}
