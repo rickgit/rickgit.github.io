@@ -1,0 +1,15 @@
+digraph G {
+	Theme.Light->{background,textColor,editTextColor,listChoiceBackgroundIndicator,activatedBackgroundIndicator,quickContactBadgeOverlay,popupWindowStyle,textCheckMark,gestureOverlayViewStyle,expandableListViewStyle,list,progressBar,seekBar,ActionBar}
+	background->{windowBackground,colorBackground,colorForeground,colorForegroundInverse}
+
+	textColor->{textColorPrimary,textColorSecondary,textColorTertiary,textColorPrimaryInverse,textColorSecondaryInverse,textColorTertiaryInverse,textColorPrimaryDisableOnly,textColorPrimaryInverseDisableOnly,textColorPrimaryNoDisable,textColorSecondaryNoDisable,textColorPrimaryInverseNoDisable,textColorSecondaryInverseNoDisable,textColorHint,textColorHintInverse,textColorHighlight,textColorHighlightInverse,textColorLink,textColorLinkInverse}
+
+	textCheckMark->{textCheckMarkInverse}
+
+	list->{listViewStyle,listDivider,listSeparatorTextViewStyle}
+	
+
+	progressBar->{progressBarStyle,progressBarStyleSmall,progressBarStyleLarge,progressBarStyleInverse,progressBarStyleSmallInverse,progressBarStyleLargeInverse}
+
+	seekBar->{seekBarStyle,}
+}

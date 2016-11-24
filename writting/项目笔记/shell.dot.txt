@@ -1,0 +1,9 @@
+digraph g{
+	
+	shell->{window,unix}
+	window->{for,ren,move,dir}
+	ren->"ren *.md *.md.txt"[label="修改文件名,rename"]
+	ren->"for /f "delims=" %%a in ('dir /a-d/b *.md') do ren "%%~a" "%%~na.md.txt""
+	for->"for /F %i in ('command')"
+
+}
