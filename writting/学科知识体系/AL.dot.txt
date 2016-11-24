@@ -1,7 +1,7 @@
 digraph G {
-	AI->ML->{ANN,GA}
+	AI->ML->{ANN,GA,决策树,随机森林算法,逻辑回归,SVM,朴素贝叶斯,K最近邻算法,K均值算法,Adaboost算法,马尔可夫}
 	ANN->DL
 
 
-	ML->"https://github.com/songrotek/Deep-Learning-Papers-Reading-Roadmap"
+	//ML->"https://github.com/songrotek/Deep-Learning-Papers-Reading-Roadmap"
 }

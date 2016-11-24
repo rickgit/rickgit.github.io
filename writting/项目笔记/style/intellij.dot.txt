@@ -1,0 +1,3 @@
+digraph G{
+	Intellij->{插件开发,快捷键}
+}

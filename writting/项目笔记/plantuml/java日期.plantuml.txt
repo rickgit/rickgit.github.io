@@ -1,4 +1,4 @@
- @startuml
+@startuml
 
 skinparam monochrome true
 skinparam classBackgroundColor transparent
@@ -11,9 +11,16 @@ skinparam style strictuml
  	toString()
  }
 
- 'January 1 19 0:00:00 GMT 1970
+'January 1 19 0:00:00 GMT 1970
+
+' java.util.GregorianCalendar
+'[time=1479449290200,areFieldsSet=true,areAllFieldsSet=true,lenient=true,
+'zone=sun.util.calendar.ZoneInfo[id="Asia/Shanghai",offset=28800000,dstSavings=0,useDaylight=false,transitions=19,lastRule=null],
+'firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=1,YEAR=2016,MONTH=10,WEEK_OF_YEAR=47,WEEK_OF_MONTH=3,
+'DAY_OF_MONTH=18,DAY_OF_YEAR=323,DAY_OF_WEEK=6,DAY_OF_WEEK_IN_MONTH=3,AM_PM=1,
+'HOUR=2,HOUR_OF_DAY=14,MINUTE=8,SECOND=10,MILLISECOND=200,ZONE_OFFSET=28800000,DST_OFFSET=0]'
 abstract class Calendar{
-	'java.util.GregorianCalendar[time=1479449290200,areFieldsSet=true,areAllFieldsSet=true,lenient=true,zone=sun.util.calendar.ZoneInfo[id="Asia/Shanghai",offset=28800000,dstSavings=0,useDaylight=false,transitions=19,lastRule=null],firstDayOfWeek=1,minimalDaysInFirstWeek=1,ERA=1,YEAR=2016,MONTH=10,WEEK_OF_YEAR=47,WEEK_OF_MONTH=3,DAY_OF_MONTH=18,DAY_OF_YEAR=323,DAY_OF_WEEK=6,DAY_OF_WEEK_IN_MONTH=3,AM_PM=1,HOUR=2,HOUR_OF_DAY=14,MINUTE=8,SECOND=10,MILLISECOND=200,ZONE_OFFSET=28800000,DST_OFFSET=0]
+
 	toString()
 	getFirstDayOfWeek()'每周的第一天是星期几
 	getMinimalDaysInFirstWeek()'获取一年中第一个星期所需的最少天数
@@ -25,8 +32,34 @@ class GregorianCalendar{
 class TimeZone{
 	getTimeZone()
 }
+'String[][] oldMappings = new String[][]{{"ACT", "Australia/Darwin"}, 
+'{"AET", "Australia/Sydney"}, 
+'{"AGT", "America/Argentina/Buenos_Aires"},
+'{"ART", "Africa/Cairo"}, 
+'{"AST", "America/Anchorage"}, 
+'{"BET", "America/Sao_Paulo"},
+'{"BST", "Asia/Dhaka"}, 
+'{"CAT", "Africa/Harare"}, 
+'{"CNT", "America/St_Johns"}, 
+'{"CST", "America/Chicago"}, 
+'{"CTT", "Asia/Shanghai"}, 
+'{"EAT", "Africa/Addis_Ababa"}, 
+'{"ECT", "Europe/Paris"}, 
+'{"IET", "America/Indiana/Indianapolis"}, 
+'{"IST", "Asia/Kolkata"}, 
+'{"JST", "Asia/Tokyo"}, 
+'{"MIT", "Pacific/Apia"},
+'{"NET", "Asia/Yerevan"}, 
+'{"NST", "Pacific/Auckland"},
+'{"PLT", "Asia/Karachi"}, 
+'{"PNT", "America/Phoenix"},
+'{"PRT", "America/Puerto_Rico"},
+'{"PST", "America/Los_Angeles"},
+'{"SST", "Pacific/Guadalcanal"}, 
+'{"VST", "Asia/Ho_Chi_Minh"}};
+
 class ZoneInfoFile{
-	String[][] oldMappings = new String[][]{{"ACT", "Australia/Darwin"}, {"AET", "Australia/Sydney"}, {"AGT", "America/Argentina/Buenos_Aires"}, {"ART", "Africa/Cairo"}, {"AST", "America/Anchorage"}, {"BET", "America/Sao_Paulo"}, {"BST", "Asia/Dhaka"}, {"CAT", "Africa/Harare"}, {"CNT", "America/St_Johns"}, {"CST", "America/Chicago"}, {"CTT", "Asia/Shanghai"}, {"EAT", "Africa/Addis_Ababa"}, {"ECT", "Europe/Paris"}, {"IET", "America/Indiana/Indianapolis"}, {"IST", "Asia/Kolkata"}, {"JST", "Asia/Tokyo"}, {"MIT", "Pacific/Apia"}, {"NET", "Asia/Yerevan"}, {"NST", "Pacific/Auckland"}, {"PLT", "Asia/Karachi"}, {"PNT", "America/Phoenix"}, {"PRT", "America/Puerto_Rico"}, {"PST", "America/Los_Angeles"}, {"SST", "Pacific/Guadalcanal"}, {"VST", "Asia/Ho_Chi_Minh"}};
+
 
 	
 }

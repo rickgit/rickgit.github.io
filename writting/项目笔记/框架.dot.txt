@@ -1,0 +1,31 @@
+digraph G{
+	 
+
+	框架->	MVC[label="View：XML布局文件。\lModel：实体模型（数据的获取、存储、数据状态变化）。\lControllor：对应于Activity，处理数据、业务和UI。\l"];
+	框架->	MVP[label="View: 对应于Activity和XML，负责View的绘制以及与用户的交互。\lModel: 依然是实体模型。\lPresenter: 负责完成View与Model间的交互和业务逻辑。\l"];
+	框架->	MVVM[label="View: 对应于Activity和XML，负责View的绘制以及与用户交互。\lModel: 实体模型。\lViewModel: 负责完成View与Model间的交互，负责业务逻辑。\l"];
+	
+	subgraph clusterMVVM{
+		mvvmView[label="View"]
+		mvvmModel[label="Model"]
+		mvvmViewModel1[label="ViewModel"]
+		mvvmViewModel2[label="ViewModel"]
+		mvvmRetrofit[label="retrofit"]
+
+		mvvmCloud[ shape="polygon" sides="8" skew="0" distortion="-0.3",label="cloud"]
+		
+		mvvmView->mvvmViewModel1
+		mvvmViewModel1->mvvmView
+		mvvmViewModel1->mvvmViewModel2[label="messager",shape=none]
+
+		mvvmViewModel1->mvvmModel[label="params"]
+		mvvmModel->mvvmViewModel1[label="bean observable"]
+
+		mvvmModel->mvvmRetrofit
+		mvvmRetrofit->mvvmModel
+
+		mvvmRetrofit->mvvmCloud
+	}
+
+	MVVM->mvvmView[lhead=clusterMVVM]
+}
