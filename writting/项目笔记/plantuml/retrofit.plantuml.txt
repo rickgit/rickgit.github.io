@@ -1,0 +1,38 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'动态代理和反射
+class Retrofit{
+	- Map serviceMethodCache;'<Method, ServiceMethod>
+	create()
+}
+class Proxy{
+	newProxyInstance()
+}
+
+class ServiceMethod{
+	
+}
+
+class OkHttpCall{
+	ServiceMethod serviceMethod
+	Object[] args
+}
+
+interface Converter{
+	
+}
+
+abstract class Factory{
+	
+}
+
+Converter +..Factory
+
+
+Retrofit ..>Proxy
+Proxy ..>InvocationHandler
+@enduml
