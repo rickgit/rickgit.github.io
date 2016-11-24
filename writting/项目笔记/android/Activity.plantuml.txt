@@ -4,11 +4,13 @@ skinparam monochrome true
 skinparam classBackgroundColor transparent
 skinparam style strictuml
 
-
+note right of ApplicationThread 
+入口
+end note
 class ApplicationThread {
 	scheduleLaunchActivity()
 	schedulePauseActivity()
-	#销毁2 执行当前Activity的onPause方法
+	'销毁2 执行当前Activity的onPause方法
 	schedulePauseActivity() 
 }
 
@@ -17,15 +19,15 @@ class ActivityThread{
 	Instrumentation mInstrumentation;
 
 	+ {static} void main(String[] args)
-	#6 该方法的Looper.myQueue().addIdleHandler(new Idler());启动执行前一个activity的onStop方法
+	'6 该方法的Looper.myQueue().addIdleHandler(new Idler());启动执行前一个activity的onStop方法
 	handleLaunchActivity()
 	performPauseActivity()
 
-	# ActivityManagerNative调用ActivityManagerService对象
+	'ActivityManagerNative调用ActivityManagerService对象
 	attach()
 
-	#销毁4 调用了Looper.myQueue().addIdleHandler(new Idler())，执行栈顶Activity的销毁操作
-	#执行onstop和ondestroy
+	'销毁4 调用了Looper.myQueue().addIdleHandler(new Idler())，执行栈顶Activity的销毁操作
+	'执行onstop和ondestroy
 	handleResumeActivity()
 
 }
@@ -68,11 +70,11 @@ class ActivityManagerService extends ActivityManagerNative{
 	startActivityUncheckedLocked()
 	activityPaused()
 
-	#4 启动activity所属的进程
+	'4 启动activity所属的进程
 	startProcessLocked()
 
 	attachApplication()
-	#5 启动activity
+	'5 启动activity
 	attachApplicationLocked()
 }
 interface IActivityManager extends IInterface {
@@ -100,7 +102,7 @@ class ActivityStarter{
 	 ActivityStack mTargetStack;
 	 ActivityManagerService mService
 
-	 #2 ActivityManagerService接收启动Activity的请求
+	 '2 ActivityManagerService接收启动Activity的请求
 	 startActivity()
 	 startActivityMayWait()
 	 startActivityLocked()
@@ -110,11 +112,11 @@ class ActivityStack{
 	ActivityStackSupervisor mSupervisor
 	ActivityRecord mResumedActivity
 	startActivityLocked()
-	#销毁3 执行上一个activity的onResume方法
+	'销毁3 执行上一个activity的onResume方法
 	resumeTopActivityUncheckedLocked()
 	resumeTopActivityInnerLocked()
 
-	#3 执行栈顶activity的onpause方法
+	'3 执行栈顶activity的onpause方法
 	startPausingLocked()
 	activityPausedLocked()
 	completePauseLocked()

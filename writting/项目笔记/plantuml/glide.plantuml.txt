@@ -55,8 +55,28 @@ BufferedWriter -up-|>Writer
 
 DiskLruCache .up.>StrictLineReader
 
+ 
+
+/'
+	##整合Glide
+	1.配置
+        <meta-data
+            android:name="edu.ptu.demo.test.glide.OkHttpGlideModule"
+            android:value="GlideModule" />
+    2.OkHttpGlideModule,OkHttpUrlLoader,OkHttpStreamFetcher
+'/
+interface ModelLoader{
+	
+}
+OkHttpGlideModule ..|>GlideModule
+OkHttpUrlLoader ..|>ModelLoader
+OkHttpStreamFetcher ..|>DataFetcher
+
+OkHttpGlideModule ..>OkHttpUrlLoader
+OkHttpUrlLoader -->OkHttpClient
+OkHttpUrlLoader ..>OkHttpStreamFetcher
 
 
 
-
+ 
 @enduml
