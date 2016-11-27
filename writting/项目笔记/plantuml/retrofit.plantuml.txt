@@ -3,36 +3,144 @@
 skinparam monochrome true
 skinparam classBackgroundColor transparent
 skinparam style strictuml
+'元素：callFactory 封装OkHttp请求，baseUrl服务器地址,Converter 序列化和反序列化,CallAdapter response转化为所要的类型,callBackExecutor 请求分发
+'主要进行请求和返回的数据格式进行转化。动态代理和反射进行请求数据的封装。
 
 '动态代理和反射
 class Retrofit{
+	'OkHttpClient对象
+	okhttp3.Call.Factory callFactory;
+	HttpUrl baseUrl;
+	'UnmodifiableList,json转化器
+	List<Converter.Factory> converterFactories;
+	'UnmodifiableList,Rx转化器
+	List<CallAdapter.Factory> adapterFactories;
+	'Android平台封装了主线程的Handler
+	Executor callbackExecutor;
+	boolean validateEagerly;
+
 	- Map serviceMethodCache;'<Method, ServiceMethod>
+	'动态代理模式。当自定义类调用方法时候，触发动态代理
 	create()
+	
+	'构建者模式
+	
 }
+class Retrofit.Builder{
+		Platform platform;
+		HttpUrl baseUrl;
+		'方法内的callFactory初始化，可以看出是依赖OkHttpClient
+		build()
+}
+'java动态代理
 class Proxy{
 	newProxyInstance()
 }
 
 class ServiceMethod{
-	
+	Converter<ResponseBody, T> responseConverter;
+	'解析response返回类型的CallAdapter
+	createResponseConverter()
+	'将OkHttp库的okhttp3.Response对象，转化为Retrofit库的带泛型的retrofit.Response对象。其中泛型是ServiceMethod代理的接口的方法中的泛型
+	toResponse(Response response)
+	'构造Okhttp的Request对象
+	Request toRequest()
+	'构建calladapter和converter
+	build()
 }
 
 class OkHttpCall{
+	'an invocation of an interface method into an HTTP call.
 	ServiceMethod serviceMethod
 	Object[] args
+	okhttp3.Call createRawCall()
 }
 
 interface Converter{
 	
+	 
 }
+abstract class Converter.Factory {
 
-abstract class Factory{
+}
+'泛型T 是response的需要解析为返回类型
+interface Call{
+	execute();
+	enqueue(Callback callback)
+}
+class ExecutorCallbackCall{
 	
 }
+ExecutorCallSAdapterFactory +--ExecutorCallbackCall
+class OkHttpCall{
+	
+}
+'只能处理类型为RequestBody,ResponseBody序列化与反序列化，ResponseBody为OkHttp的返回类型
+class BuiltInConverters  extends Converter.Factory{
 
-Converter +..Factory
+}
+'适配器和责任链模式
+class RequestBodyConverter implements Converter{
 
+}
+'单例模式
+class StreamingResponseBodyConverter implements Converter{
+	
+}
+class BufferingResponseBodyConverter implements Converter{
+	
+}
+class VoidResponseBodyConverter implements Converter{
+	
+}
+BuiltInConverters ..>StreamingResponseBodyConverter
+BuiltInConverters ..>BufferingResponseBodyConverter
+BuiltInConverters ..>VoidResponseBodyConverter
+BuiltInConverters ..>RequestBodyConverter
 
-Retrofit ..>Proxy
+abstract class Converter.Factory{
+	 public Converter<ResponseBody, ?> responseBodyConverter();
+    public Converter<?, RequestBody> requestBodyConverter() ;
+    public Converter<?, String> stringConverter() ;
+}
+
+class RestAdapter{
+	
+}
+'工厂方法模式
+class ExecutorCallAdapterFactory {
+	Executor callbackExecutor;
+	Call delegate;
+	'代理模式
+
+}
+ExecutorCallAdapterFactory --|> CallAdapter.Factory
+class ExecutorCallbackCall implements Call{
+	Executor callbackExecutor;
+	Call delegate;
+}
+ExecutorCallAdapterFactory +-- ExecutorCallbackCall
+
+'代理模式 代理真正的Response
+class ExceptionCatchingRequestBody extends ResponseBody{
+	ResponseBody delegate;
+}
+
+Converter +.. Factory
+Retrofit +.. Retrofit.Builder
+'retrofit中，自定义服务接口调用到的方法代理
+Retrofit ..>Proxy 
+InvocationHandler ..>ServiceMethod
+InvocationHandler ..>OkHttpCall
+OkHttpCall-->ServiceMethod
 Proxy ..>InvocationHandler
+Call ..>Response
+BuiltInConverters --|>Converter.Facotry
+
+ServiceMethod-->ExecutorCallbackCall
+Call -->ExceptionCatchingRequestBody
+OkHttpCall+--ExceptionCatchingRequestBody
+
+Retrofit-->Converter.Factory
+Retrofit-->CallAdapter.Factory
 @enduml
