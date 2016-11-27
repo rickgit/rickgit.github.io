@@ -3,6 +3,20 @@
 skinparam monochrome true
 skinparam classBackgroundColor transparent
 skinparam style strictuml
+'元素 Request->{url,RequestBody},Response->{code,ResponseBody}
+'构建http请求
+class BridgeInterceptor{
+	
+}
+'构建url
+class HttpUrl{
+	
+}
+class OkHttpCall{
+	parseResponse()
 
-
+}
+class Response{
+	
+}
 @enduml
