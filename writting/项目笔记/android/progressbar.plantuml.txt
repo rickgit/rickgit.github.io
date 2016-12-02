@@ -1,0 +1,68 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+'默认是模糊模式，水平进度条需要设置style为android.R.style#Widget.ProgressBar.Horizontal
+'style文件目录为sdk-window\platforms\android-23\data\res\drawable
+'默认最大值是100
+class ProgressBar extends View {
+	'不显示进度的进度条一个周期动画的时间
+	private int mDuration;
+	'已经完成的进度条轨道显示的Drawable对象
+	Drawable mProgressDrawable
+	'不显示进度（模糊模式）的进度条的Drawable对象
+	Drawable mIndeterminateDrawable
+	'模糊模式图片，或者精确状态图片
+	private Drawable mCurrentDrawable;
+	'默认是LinearInterpolator
+	private Interpolator mInterpolator;
+
+	'模糊模式,动画配置
+	int mDuration = 4000;
+    int mBehavior = AlphaAnimation.RESTART;
+
+	incrementProgressBy()
+	setProgress()
+	'使用drawable的setBounds方法拉伸图片，适应progressbar大小
+	updateDrawableBounds()
+
+	'模糊模式下，启动动画
+	void startAnimation()
+	private void initProgressBar()
+
+	'动画的绘制或启动是在onDraw完成
+	onDraw()
+}
+
+class Drawable{
+	setCallBack();
+	getMinimumHeight()
+	 public boolean isStateful()
+	 public boolean setState(final int[] stateSet)
+
+	 public void scheduleSelf(Runnable what, long when)
+}
+class View{
+	'让父VIEW调用onmeasure 和onlayout重新定位该view的位置，需要在UI线程调用
+	void requestLayout() 
+	
+	'直接在子线程调用
+	void postInvalidate();
+	'强制使view重绘，需要在UI线程调用
+	invalidate()
+
+	setBounds()
+	'selector文件中的pressed，checked,selected的状态
+	public final int[] getDrawableState() 
+	public void refreshDrawableState()
+	protected static int[] mergeDrawableStates(int[] baseState, int[] additionalState)
+
+	public static int resolveSizeAndState(int size, int measureSpec, int childMeasuredState)
+}
+
+
+ProgressBar -->Drawable
+@enduml

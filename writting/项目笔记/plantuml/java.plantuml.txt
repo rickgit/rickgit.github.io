@@ -1,0 +1,11 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class ParameterizedType{
+	
+}
+
+@enduml
