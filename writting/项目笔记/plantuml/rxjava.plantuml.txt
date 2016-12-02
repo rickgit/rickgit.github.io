@@ -1,0 +1,88 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+ 
+
+
+class Schedulers{
+
+	'用于计算任务，如事件循环或和回调处理，不要用于IO操作(IO操作请使用Schedulers.io())；默认线程数等于处理器的数量
+	computation()
+	'使用指定的Executor作为调度器
+	from(executor)
+	'在当前线程立即开始执行任务
+	immediate()
+	'用于IO密集型任务，如异步阻塞IO操作，这个调度器的线程池会根据需要增长；
+	'对于普通的计算任务，请使用Schedulers.computation()；
+	'Schedulers.io( )默认是一个CachedThreadScheduler，很像一个有线程缓存的新线程调度器
+	io()
+	'为每个任务创建一个新线程
+	newThread()
+	'当其它排队的任务完成后，在当前线程排队开始执行
+	trampoline()
+}
+class LooperScheduler extends Scheduler{
+	
+}
+
+class ScheduledAction implements Runnable, Subscription {
+
+}
+class Observable{
+	'当N个结点发生的时间太靠近（即发生的时间差小于设定的值T），debounce就会自动过滤掉前N-1个结点。
+	'避免过快点击
+	debounce()
+	'合并最近N个结点。注册的时候所有输入信息（邮箱、密码、电话号码等）合法才点亮注册按钮。
+	combineLatest()
+	'两个数据源。
+	'例如一组数据来自网络，一组数据来自文件，需要合并两组数据一起展示。
+	merge()
+
+	subscribeOn()
+	observeOn()
+	subscribe()
+	'打包请求
+	zip()
+}
+
+public interface Action0 extends Action {
+    void call();
+}
+class OperatorObserveOn{
+	
+}
+
+class ObserveOnSubscriber extends Subscriber implements Action0{
+	'是个SafeSubscriber对象
+	Subscriber child;
+	call()
+}
+class SafeSubscriber extends Subscriber{
+	'是个ActionSubscriber对象
+	Subscriber actual;
+}
+class ActionSubscriber extends Subscriber{	
+	Action1 onNext;
+}
+package rxbind{
+	class RxTextView{
+		textChanges()
+		'100–150毫秒效果最好。如果你的服务器需要额外的300毫秒那么你可以在0.5秒之内做UI更新。
+     	debounce()
+     	flatMap()
+     	switchMap()
+     	retryWhen()
+     	subscribe()
+	}
+
+}
+
+OperatorObserveOn +-- ObserveOnSubscriber
+LooperScheduler +-- ScheduledAction
+'实际是ObserveOnSubscriber对象
+ScheduledAction -->Action0
+
+
+@enduml

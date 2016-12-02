@@ -1,0 +1,60 @@
+digraph G{
+	控件->{progressbar}
+	 
+	progressbar->{"环形","条形"}
+	"环形"->{"Widget.ProgressBar","Widget.Holo.ProgressBar","Widget.Material.ProgressBar"}
+	//条形状态下，通过indeterminate，进行判断是否是模糊模式
+	"条形"->{"Widget.ProgressBar.Horizontal","Widget.Holo.Horizontal","Widget.Material.Horizontal"}
+	//模糊模式的状态,indeterminateOnly为true,"indeterminateDuration"为3500ms,"indeterminateBehavior"为repeat
+	//Widget.ProgressBar为进度条的不确定模式，只有不确定图片，宽高为48dp,"mirrorForRtl"为false
+	//Drawable目录是sdk-window\platforms\android-23\data\res\drawable
+	"Widget.ProgressBar"->{"ProgressBar-indeterminateDrawable","indeterminateBehavior","indeterminateDuration"}
+	//spinner_black_48为最终的图片,动画为3500毫秒
+	"ProgressBar-indeterminateDrawable"->"progress_medium_white"->"animated-rotate"->"spinner_white_48"
+
+	//minHeight maxHeight为20dp
+	"Widget.ProgressBar.Horizontal"->{"indeterminateOnly","Horizontal-progressDrawable","Horizontal-indeterminateDrawable","mirrorForRtl"}
+	//分别由三个渐变色组成
+	"Horizontal-progressDrawable"->"Horizontal-layer-list"->{"@android:id/background","@android:id/secondaryProgress","@android:id/progress"}
+	//progressbar_indeterminate1,三张明暗相间斜线图组成的帧动画。animation-list 共600ms
+	"Horizontal-indeterminateDrawable"->"progress_indeterminate_horizontal"->"animation-list"->"三张明暗相间组成的斜线图"
+
+
+	//holo主题模糊模式
+	"Widget.Holo.ProgressBar"->"Holo-indeterminateDrawable"->"progress_medium_holo"->"Holo-layer-list"->"Holo-rotate"->{"spinner_48_outer_holo","spinner_48_inner_holo"}
+
+
+	//holo条形数值模式
+	//minHeight maxHeight 16dp
+	"Widget.Holo.Horizontal"->{"Holo.Horizontal-progressDrawable","Holo.Horizontal-indeterminateDrawable"}
+	"Holo.Horizontal-progressDrawable"->progress_horizontal_holo_dark->"Holo.Horizontal-layer-list"
+	//progressbar_indeterminate_holo1~8 ,8张不等长直线线形成的虚线组成的帧动画,用400ms
+	SmoothProgressDrawableprogress_indeterminate_horizontal_holo->"Holo.Horizontal-animation-list"->"8张不等长直线线形成的虚线组成的帧动画"->不流畅
+	"Holo.Horizontal-progressDrawable"->第三方实现，SmoothProgressDrawable比较流畅流畅
+	"Holo.Horizontal-background"[label="@android:id/background"]
+	"Holo.Horizontal-layer-list"->"Holo.Horizontal-background"->progress_bg_holo_dark
+
+	"Holo.Horizontal-secondaryProgress"[label="@android:id/secondaryProgress"]
+	"Holo.Horizontal-layer-list"->"Holo.Horizontal-secondaryProgress"->progress_secondary_holo_dark
+
+	"Holo.Horizontal-progress"[label="@android:id/progress"]
+	"Holo.Horizontal-layer-list"->"Holo.Horizontal-progress"->progress_primary_holo_dark
+
+	//Meterail环状模式主题
+	"Widget.Material.ProgressBar"->"Material-indeterminateDrawable"->progress_medium_material->"Material-animated-vector"->{vector_drawable_progress_bar_medium,"progress_indeterminate_material","progress_indeterminate_rotation_material"}
+
+	//Meterail数值模式,高度16dp
+	 "Widget.Material.Horizontal"->{"Material.Horizontal-progressDrawable","Material.Horizontal-indeterminateDrawable"}
+	 "Material.Horizontal-progressDrawable"->"Material.Horizontal-layer-list"
+	 //对应的是shape,scale,scale
+	"Material.Horizontal-background"[label="@android:id/background"]
+	"Material.Horizontal-layer-list"->"Material.Horizontal-background"
+
+	"Material.Horizontal-secondaryProgress"[label="@android:id/secondaryProgress"]
+	"Material.Horizontal-layer-list"->"Material.Horizontal-secondaryProgress"
+
+	"Material.Horizontal-progress"[label="@android:id/progress"]
+	"Material.Horizontal-layer-list"->"Material.Horizontal-progress"
+
+	"Material.Horizontal-indeterminateDrawable"->progress_indeterminate_horizontal_material->"Material.Horizontal-animated-vector"
+}
