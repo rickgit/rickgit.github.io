@@ -1,0 +1,60 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+ 
+
+abstract class Drawable{
+	setLevel(int level)
+	'返回的单位是dp
+	public int getIntrinsicWidth()
+	public int getIntrinsicHeight()
+}
+class ShapeDrawable{
+	
+}
+abstract class Shape{
+	
+}
+class RectShape{
+	
+}
+
+
+LayerDrawable -up-|>Drawable
+LayerDrawable +--ChildDrawable
+ChildDrawable -up->Drawable
+ShapeDrawable -up-|>Drawable
+BitmapDrawable -up-|>Drawable
+ColorDrawable -up-|>Drawable
+
+ScaleDrawable -up-|>Drawable
+RotateDrawable -up-|>Drawable
+DrawableContainer -up-|>Drawable
+AnimationDrawable -up-|>DrawableContainer
+AnimationDrawable ..|>Animatable
+
+RectShape-up-|>Shape
+RoundRectShape-up-|>RectShape
+ 
+BitmapShader-up-|>Shader
+LinearGradient-up-|>Shader
+ComposeShader-up-|>Shader
+SweepGradient-up-|>Shader
+RadialGradient-up-|>Shader
+ 
+
+PorterDuffXfermode-up-|>Xfermode
+ColorMatrixColorFilter-up-|>ColorFilter
+
+
+PathDashPathEffect -up-|>PathEffect
+CornerPathEffect-up-|>PathEffect
+DashPathEffect-up-|>PathEffect
+SumPathEffect-up-|>PathEffect
+DiscretePathEffect-up-|>PathEffect
+ComposePathEffect-up-|>PathEffect
+
+@enduml

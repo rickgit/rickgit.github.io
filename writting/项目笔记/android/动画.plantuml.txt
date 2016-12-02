@@ -1,0 +1,12 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class Animation{
+	public boolean getTransformation(long currentTime, Transformation outTransformation) 
+}	
+
+@enduml
