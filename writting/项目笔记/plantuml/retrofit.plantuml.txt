@@ -5,6 +5,22 @@ skinparam classBackgroundColor transparent
 skinparam style strictuml
 '元素：callFactory 封装OkHttp请求，baseUrl服务器地址,Converter 序列化和反序列化,CallAdapter response转化为所要的类型,callBackExecutor 请求分发
 '主要进行请求和返回的数据格式进行转化。动态代理和反射进行请求数据的封装。
+/'
+1)Gson: compile 'com.squareup.retrofit2:converter-gson:2.0.1'
+
+2)Jackson: compile 'com.squareup.retrofit2:converter-jackson:2.0.1'
+
+3)Moshi: compile 'com.squareup.retrofit2:converter-moshi:2.0.1'
+
+4)Protobuf: compile 'com.squareup.retrofit2:converter-protobuf:2.0.1'
+
+5)Wire: compile 'com.squareup.retrofit2:converter-wire:2.0.1'
+
+6)Simple XML: compile 'com.squareup.retrofit2:converter-simplexml:2.0.1'
+
+7)Scalars (primitives, boxed, and String): compile 'com.squareup.retrofit2:converter-scalars:2.0.1'
+'/
+
 
 '动态代理和反射
 class Retrofit{
@@ -29,6 +45,10 @@ class Retrofit{
 class Retrofit.Builder{
 		Platform platform;
 		HttpUrl baseUrl;
+		'callAdapter调用nextCallAdapter，返回 retrofit服务类方法的返回类型，对应的Adapter。
+		'默认返回的是CallAdapter对象，该对象adapt()方法返回的是ExecutorCallbackCall
+		callAdapter()
+		nextCallAdapter()
 		'方法内的callFactory初始化，可以看出是依赖OkHttpClient
 		build()
 }
@@ -39,6 +59,9 @@ class Proxy{
 
 class ServiceMethod{
 	Converter<ResponseBody, T> responseConverter;
+	'创建Adapter，调用retrofit对象的callAdapter方法
+	createCallAdapter()
+
 	'解析response返回类型的CallAdapter
 	createResponseConverter()
 	'将OkHttp库的okhttp3.Response对象，转化为Retrofit库的带泛型的retrofit.Response对象。其中泛型是ServiceMethod代理的接口的方法中的泛型
@@ -68,10 +91,16 @@ interface Call{
 	execute();
 	enqueue(Callback callback)
 }
-class ExecutorCallbackCall{
+//默认实现Call
+class ExecutorCallbackCall implement Call{
 	
 }
-ExecutorCallSAdapterFactory +--ExecutorCallbackCall
+'适配器模式,根据返回retrofit自定义服务类的方法返回的类型，决定CallAdpter类中adapte()方法返回的处理对象
+'默认返回的是ExecutorCallbackCall对象，Rxjava返回的是Observable对象，
+class CallAdapter{
+	
+}
+ExecutorCallAdapterFactory +--ExecutorCallbackCall
 class OkHttpCall{
 	
 }
@@ -124,6 +153,28 @@ ExecutorCallAdapterFactory +-- ExecutorCallbackCall
 '代理模式 代理真正的Response
 class ExceptionCatchingRequestBody extends ResponseBody{
 	ResponseBody delegate;
+}
+
+package adapter-rxjava{
+	'处理retrofit库自定义服务类中方法返回的类型是Observable的方法
+	class RxJavaCallAdapterFactory{
+
+	}
+	class CompletableCallAdapter implements CallAdapter{
+
+	}
+	class ResultCallAdapter implements CallAdapter{
+
+	}
+	class ResponseCallAdapter implements CallAdapter{
+
+	}
+	class SimpleCallAdapter implements CallAdapter{
+	
+	}
+
+	RxJavaCallAdapterFactory --|> CallAdapter.Factory
+	RxJavaCallAdapterFactory +--SimpleCallAdapter
 }
 
 Converter +.. Factory

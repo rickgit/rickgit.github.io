@@ -19,4 +19,9 @@ class OkHttpCall{
 class Response{
 	
 }
+
+class OkHttpClient{
+	'拦截器，可以添加打印日志的功能，可以clone 
+	networkInterceptors()
+}
 @enduml
