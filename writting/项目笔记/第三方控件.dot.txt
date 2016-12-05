@@ -1,0 +1,17 @@
+digraph g{
+	//总结 https://github.com/wasabeef/awesome-android-ui
+	"awesome-android-ui"->{Material,Layout,Button,"List / Grid",ViewPager,"Label / Form",Image,SeekBar,Progress,Menu,ActionBar,Dialog,Calendar,Graph,Animation,Parallax,Effect,Other}
+	常见自定义控件->{左滑显示菜单,tab指示栏,进度条,输入框,日历,模糊,开关按钮}
+	左滑显示菜单->AndroidSwipeLayout->https://github.com/daimajia/AndroidSwipeLayout
+	tab指示栏->PagerSlidingTabStrip->https://github.com/astuetz/PagerSlidingTabStrip
+	进度条->SmoothProgressBar->https://github.com/castorflex/SmoothProgressBar
+	输入框->floatlabelededittext->https://github.com/wrapp/floatlabelededittext
+	输入框->EditCard->https://github.com/Morxander/EditCard
+	输入框->ClickNumberPicker->https://github.com/polok/ClickNumberPicker
+	日历->android-times-square->https://github.com/square/android-times-square
+	模糊->blurkit-android->https://github.com/wonderkiln/blurkit-android
+	可展开文本控件->ExpandableTextView->https://github.com/Chen-Sir/ExpandableTextView
+	主页->Frisson->https://github.com/IntruderShanky/Frisson
+	开关按钮->https://github.com/BeppiMenozzi/TriStateToggleButton
+	页内导航->https://github.com/terrakok/Cicerone
+}	
