@@ -1,0 +1,97 @@
+digraph g{
+	//http://www.introtorx.com/
+	"Introduction to Rx"->{Preface,"Getting started","Sequence basics"}
+	"Introduction to Rx"->{"Taming the sequence","Concurrency","Appendix"}
+
+	Preface->{"Reactive programming",Acknowledgements}
+
+	"Reactive programming"->"Event Driven"
+	//The event driven paradigm allows for code to be invoked without the need for breaking encapsulation or applying expensive polling techniques
+	//commonly implemented with the Observer pattern
+	"Event Driven"->{"Complex Event Processing","Command Query Responsibility Segregation"}
+	//沉浸式
+	"Event Driven"->"rich immersive GUIs"
+
+	//The Reactive ->querying sequences of events and managing concurrency.
+
+	//As Rx is just a library
+	"Getting started"->"Why Rx"->{"When is Rx appropriate","Should use Rx","Could use Rx","Won't use Rx"}
+
+	//Rx offers a natural paradigm for dealing with sequences of events. A sequence can contain zero or more events. Rx proves to be most valuable when composing sequences of events.
+	"When is Rx appropriate"
+
+	"Getting started"->"Rx in action"
+
+	"Rx in action"->"网络请求"->{"Maintains a responsive UI","Supports timeouts","Knows when the search is complete"}
+	"网络请求"->{"Allows results to come back one at a time","Handles errors","Is unit testable"}
+	"网络请求"->{"changes the search, cancel current search and execute new search"}
+
+	//Essentially Rx is built upon the foundations of the Observer pattern
+	"Getting started"->"Key types"
+	"Key types"->{"IObservable<T>","IObserver<T>"}
+	/*
+
+		//Defines a provider for push-based notification.
+		public interface IObservable<out T>
+		{
+			//Notifies the provider that an observer is to receive notifications.
+			IDisposable Subscribe(IObserver<T> observer);
+		}
+	*/
+
+	/*
+		public interface IObserver<in T>
+		{
+			//Provides the observer with new data.
+			void OnNext(T value);
+			//Notifies the observer that the provider has experienced an error condition.
+			void OnError(Exception error);
+			//Notifies the observer that the provider has finished sending push-based notifications.
+			void OnCompleted();
+		}
+	*/
+
+	// IObserver<T> and the IObservable<T> as the 'reader' and 'writer' or, 'consumer' and 'publisher' interfaces. 
+
+	
+	
+	"Key types"->{"Subject<T>"}
+	//"BehaviorSubject<T>" only remembers the last publication. 
+	"Subject<T>"->{"ReplaySubject<T>","BehaviorSubject<T>"}
+
+	//Rx is effectively a functional programming paradigm. 
+	"Sequence basics"->"Creating a sequence"->{"Factory Methods","Unfold methods","Paradigm Transition"}
+	"Sequence basics"->"Reducing a sequence"->{"Where","Distinct and DistinctUntilChanged","IgnoreElements","Skip and Take"}
+	"Skip and Take"->{"SkipWhile and TakeWhile","SkipLast and TakeLast","SkipUntil and TakeUntil"}
+
+	//pluck out data that is relevant or validate that a sequence even meets our expectations.
+	"Sequence basics"->Inspection->{Any,All,Contains,DefaultIfEmpty,ElementAt,SequenceEqual}
+	//Data is not always valuable is its raw form.
+	"Sequence basics"->Aggregation->{Count,"Min, Max, Sum and Average","Functional folds","Build your own aggregations",Partitioning}
+
+
+	"Functional folds"->{First,Last,Single}
+	"Build your own aggregations"->{Aggregate,Scan}
+	Partitioning->{"MinBy and MaxBy",GroupBy,"Nested observables"}
+
+	//Rx allows you to control the quality as well as the quantity of values in the observable sequences you consume.
+
+
+	"Sequence basics"->"Transformation of sequences"
+
+
+	//part 3
+	//边际效应
+	"Taming the sequence"->"Side effects"
+	"Taming the sequence"->{Leaving the monad,Advanced error handling,Combining sequences}
+	"Taming the sequence"->{Time-shifted sequences,Hot and Cold observables}
+
+
+	//PART 4 - 
+	Concurrency->"Scheduling and threading"->{"Rx is single-threaded by default","SubscribeOn and ObserveOn","Schedulers
+"}
+
+
+	Concurrency->"Testing Rx"
+	Concurrency->"Sequences of coincidence"
+}

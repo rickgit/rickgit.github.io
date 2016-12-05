@@ -1,4 +1,13 @@
 digraph G {
+	/*
+		themes.xml：低版本的主题，目标API level一般为10或以下
+		themes_holo.xml：从API level 11添加的主题
+		themes_device_defaults.xml：从API level 14添加的主题
+		themes_material.xml：从API level 21添加的主题
+		themes_micro.xml：应该是用于Android Wear的主题
+		themes_leanback.xml： Android tv的主题
+	*/
+
 	Theme.Light->{background,textColor,editTextColor,listChoiceBackgroundIndicator,activatedBackgroundIndicator,quickContactBadgeOverlay,popupWindowStyle,textCheckMark,gestureOverlayViewStyle,expandableListViewStyle,list,progressBar,seekBar,ActionBar}
 	background->{windowBackground,colorBackground,colorForeground,colorForegroundInverse}
 

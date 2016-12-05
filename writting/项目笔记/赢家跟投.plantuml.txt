@@ -1,0 +1,70 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class FragmentContainerUI{
+	
+}
+abstract class ViewCollection{
+	''用于获取资源的Context
+	# Context resContext;
+
+	''组件主要视图
+    protected View contentView;
+
+    ''初始化contentView
+    initView()
+}
+class RankContentAdapter{
+	'初始化listivew的视图控件
+	View getView()
+}
+GainRankingUI-up-|>FragmentContainerUI
+GainRankingUI-up->GainRankFragment
+GainRankFragment -up-|>RankMajorFragment
+
+HitRankingUI-up-|>FragmentContainerUI
+HitRankingUI-up->HitRankFragment
+HitRankFragment-up-|>RankMajorFragment
+
+
+RankContentPage -up->RankContentAdapter
+
+RankContentPage -up-|>CommonContentPage
+FocusContentPage -up-|>CommonContentPage
+FollowDetailPage -up-|>CommonContentPage
+
+RankContentListItem -up-|>ViewCollection
+RankContentAdapter .up.>RankContentListItem
+
+note top of PlayerRankFragment
+热门大咖列表页
+end note
+PlayerRankFragment -up-> RankContentPage
+ 
+
+RankMajorFragment -up-> RankContentPage
+note top of RankMajorFragment
+盈利榜和命中榜的父类
+end note
+
+
+FocusContentPage -up-|>FocusContentAdapter
+FocusContentListItem -up-|>ViewCollection
+FocusContentAdapter .up.>FocusContentListItem
+UserFocusFragment -up->FocusContentPage
+note top of UserFocusFragment
+关注列表
+end note
+
+
+UserFollowDetailFragment-up->FollowDetailPage
+UserFollowDetailUI-up-|>FragmentContainerUI
+UserFollowDetailUI -up->UserFollowDetailFragment
+note top of UserFollowDetailUI
+跟投明细列表页面
+end note
+
+@enduml
