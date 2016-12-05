@@ -1,0 +1,20 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'主要是绘制mThumbe这个图片
+public abstract class AbsSeekBar extends ProgressBar {
+	private Drawable mThumb;
+    private int mThumbOffset;
+}
+'对SeekBar（拖动条）拖动事件回调
+'拖动条与水平进度条的区别是，拖动条可以手动拖动，进度条程序设置
+class SeekBar extends AbsSeekBar {
+	 private OnSeekBarChangeListener mOnSeekBarChangeListener;
+}
+class Drawable {
+	public final Rect getBounds()
+}
+@enduml

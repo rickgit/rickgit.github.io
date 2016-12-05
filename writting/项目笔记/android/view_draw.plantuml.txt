@@ -1,0 +1,13 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class View{
+	
+}
+
+
+@enduml

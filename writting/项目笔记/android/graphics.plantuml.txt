@@ -22,6 +22,41 @@ class RectShape{
 	
 }
 
+VectorDrawable-up-|>Drawable
+public class AnimatedVectorDrawable extends Drawable implements Animatable2 {
+    private final AnimatorSet mAnimatorSet = new AnimatorSet();
+    private AnimatedVectorDrawableState mAnimatedVectorState;
+	
+}
+AnimatedStateListDrawable  -up-|>  StateListDrawable
+/'
+M moveto  移动到(x y)+
+Z closepath  关闭路径(none)
+L lineto  画线到 (x y)+
+H horizontal lineto  水平线到x+
+V vertical lineto  垂直线到 y+
+C curveto  三次贝塞尔曲线到 (x1 y1 x2 y2 x y)+
+S smooth curveto  光滑三次贝塞尔曲线到 (x2 y2 x y)+
+Q quadratic Bézier curveto  二次贝塞尔曲线到 (x1 y1 x y)+
+T smooth quadratic Bézier curveto  光滑二次贝塞尔曲线到 (x y)+
+A elliptical arc  椭圆弧 (rx ry x-axis-rotation large-arc-flag sweep-flag x y)+
+
+
+M = moveto(M X,Y) ：将画笔移动到指定的坐标位置
+L = lineto(L X,Y) ：画直线到指定的坐标位置
+H = horizontal lineto(H X)：画水平线到指定的X坐标位置
+V = vertical lineto(V Y)：画垂直线到指定的Y坐标位置
+C = curveto(C X1,Y1,X2,Y2,ENDX,ENDY)：三次贝赛曲线
+S = smooth curveto(S X2,Y2,ENDX,ENDY)
+Q = quadratic Belzier curve(Q X,Y,ENDX,ENDY)：二次贝赛曲线
+T = smooth quadratic Belzier curveto(T ENDX,ENDY)：映射
+A = elliptical Arc(A RX,RY,XROTATION,FLAG1,FLAG2,X,Y)：弧线
+Z = closepath()：关闭路径
+
+文／eclipse_xu（简书作者）
+原文链接：http://www.jianshu.com/p/e3614e7abc03
+著作权归作者所有，转载请联系作者获得授权，并标注“简书作者”。
+'/
 
 LayerDrawable -up-|>Drawable
 LayerDrawable +--ChildDrawable
@@ -34,6 +69,8 @@ ScaleDrawable -up-|>Drawable
 RotateDrawable -up-|>Drawable
 DrawableContainer -up-|>Drawable
 AnimationDrawable -up-|>DrawableContainer
+StateListDrawable -up-|> DrawableContainer
+LevelListDrawable -up-|> DrawableContainer
 AnimationDrawable ..|>Animatable
 
 RectShape-up-|>Shape
