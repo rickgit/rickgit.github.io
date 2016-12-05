@@ -1,0 +1,26 @@
+digraph g{
+	LoginUI->{PasswdLoginFragment,QuickLoginFragment}
+	PasswdLoginFragment->RegistPhoneUI->RegistAuthIDUI->AuthIDResultUI->{AuthIdFailureFragment,AuthIdSuccessFragment}
+	PasswdLoginFragment->FindPasswdUI
+
+	DesktopUI->{UserCenterLayout,DesktopView}
+	DesktopView->{DeskMainFragment,MainFollowinFragment,DgQueryFragment}
+	//投注时候需要验证是否实名认证和设置支付密码
+	DesktopView->{LoginUI,RegistAuthIDUI,WebView（设置支付密码）}
+
+	MainFollowinFragment->{GainRankingUI,HitRankingUI,FollowinHomeUI,PlayerRankingUI,PopularTicketUI}
+
+	MainFollowinFragment->LoginUI[label="投注时，需要用户是登录状态"]
+
+	MainFollowinFragment->RecommendPlanDetailUI[label="推荐详情"]
+
+	FollowinHomeUI->UserFollowDetailUI[label="修改到用户中心"]
+
+	MainFollowinFragment->BetConfirmJjcChargeUI
+	FollowinHomeUI->BetConfirmJjcChargeUI
+	PopularTicketUI->BetConfirmJjcChargeUI
+	{GainRankingUI,HitRankingUI,PlayerRankingUI}->FollowinHomeUI
+
+	BetConfirmJjcChargeUI->BetPresaleResultUI
+	
+}

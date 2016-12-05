@@ -1,0 +1,58 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'android.support.v4.view;
+class ViewPager extends ViewGroup{
+	private PagerAdapter mAdapter;
+	private PagerObserver mObserver;
+	private Drawable mMarginDrawable;
+
+	private Scroller mScroller;
+	private EdgeEffectCompat mLeftEdge;
+    private EdgeEffectCompat mRightEdge;
+
+    private OnPageChangeListener mOnPageChangeListener;
+    private OnPageChangeListener mInternalPageChangeListener;
+    private OnAdapterChangeListener mAdapterChangeListener;
+
+    '初始化mScroller ,mLeftEdge,mRightEdge
+    void initViewPager() 
+}
+ interface OnPageChangeListener{
+
+ }
+public abstract class PagerAdapter {
+	void unregisterDataSetObserver(DataSetObserver observer) {
+
+	}
+	void registerDataSetObserver(DataSetObserver observer) {
+
+	}
+	public void startUpdate(ViewGroup container) {
+
+	}
+	public void destroyItem(ViewGroup container, int position, Object object) {
+
+	}
+	public void finishUpdate(ViewGroup container) {
+
+	}
+	public void restoreState(Parcelable state, ClassLoader loader) {
+    }
+}
+ViewPager -->OnPageChangeListener
+ViewPager +--OnPageChangeListener
+SimpleOnPageChangeListener ..|>OnPageChangeListener
+ViewPager +--SimpleOnPageChangeListener
+ViewPager -->OnAdapterChangeListener
+ViewPager +--OnAdapterChangeListener
+
+Viewpager -->PagerAdapter
+FragmentPagerAdapter --|>PagerAdapter
+FragmentStatePagerAdapter --|>PagerAdapter
+
+FragmentPagerAdapter --|>PagerAdapter
+@enduml

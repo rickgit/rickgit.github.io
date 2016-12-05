@@ -9,4 +9,19 @@ class Animation{
 	public boolean getTransformation(long currentTime, Transformation outTransformation) 
 }	
 
+class AnimatorSet extends Animator{
+	
+}
+
+ScaleAnimation-up-|>Animation
+TranslateAnimation-up-|>Animation
+AlphaAnimation-up-|>Animation
+RotateAnimation-up-|>Animation
+RotateAnimation-up-|>Animation
+AnimationSet-up-|>Animation
+
+ValueAnimator-up-|>Animator
+ObjectAnimator-up-|>ValueAnimator
+TimeAnimator-up-|>ValueAnimator
+
 @enduml

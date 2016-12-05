@@ -1,5 +1,9 @@
 digraph G{
-	动画->{View}
+	动画->{2d动画,3d动画}	
+	2d动画->{View,VectorAnimation}
 	View->{平移,旋转,缩放,透明度}
+
+
+	3d动画->Camera
 	
 }
