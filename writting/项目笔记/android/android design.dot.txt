@@ -1,4 +1,7 @@
 digraph g{
+
+	'https://developer.android.com/guide/practices/ui_guidelines/icon_design.html
+	'http://github.com/google/material-design-icons/
 	"Android Design"->{色彩,主题,事件状态图,应用图标,控件}
 	//http://blog.csdn.net/xyz_lmn/article/details/42675115
 	主题->{无序时代,"Holo theme","Material Design"}
