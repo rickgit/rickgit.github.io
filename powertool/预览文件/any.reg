@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Classes\*\shellex\{8895B1C6-B41F-4C1C-A562-0D564250836F}]
+@="{1531d583-8375-4d3f-b5fb-d23bbd169f22}"
