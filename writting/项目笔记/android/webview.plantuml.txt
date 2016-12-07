@@ -4,6 +4,9 @@ skinparam monochrome true
 skinparam classBackgroundColor transparent
 skinparam style strictuml
 
-
+'<uses-permission android:name="android.permission.INTERNET"/>
+class webview{
+        Window mWindow;
+}
 
 @enduml
