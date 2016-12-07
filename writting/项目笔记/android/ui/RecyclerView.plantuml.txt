@@ -1,0 +1,46 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'android.support.v7.widget.RecyclerView;依赖v4包23.01以上
+class RecyclerView extends ViewGroup implements ScrollingView, NestedScrollingChild{
+	private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayout;
+
+    AdapterHelper mAdapterHelper;
+    ChildHelper mChildHelper;
+    private NestedScrollingChildHelper mScrollingChildHelper;
+
+
+    private final ArrayList<ItemDecoration> mItemDecorations = new ArrayList<>();
+}
+
+abstract static class LayoutManager {
+	
+}
+
+class LinearLayoutManager extends LayoutManager implements ViewDropHandler {
+	
+}
+
+ 
+class StaggeredGridLayoutManager{
+	
+}
+class Adapter{
+	registerAdapterDataObserver(this.mObserver);
+    onAttachedToRecyclerView(this);
+}
+RecyclerView +-- LayoutManager
+RecyclerView +-- Adapter
+StaggeredGridLayoutManager --|> LayoutManager
+LinearLayoutManager --|> LayoutManager
+GridLayoutManager --|> LinearLayoutManager
+
+
+RecyclerView -->ChildHelper
+RecyclerView -->AdapterHelper
+
+@enduml
