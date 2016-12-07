@@ -6,12 +6,138 @@ skinparam style strictuml
 
 
 class Dialog{
-        Window mWindow;
-}
-Dialog ..|>DialogInterface
-Dialog ..|>Window.Callback
-Dialog ..|>KeyEvent.Callback
-Dialog ..|>OnCreateContextMenuListener
+        private Activity mOwnerActivity;
+        Context mContext
+        
 
-Dialog -->Window
+        final WindowManager mWindowManager;
+        Window mWindow;
+        View mDecor;
+        private ActionBarImpl mActionBar;
+
+
+        private Handler mListenersHandler; 
+
+        '简略版的activity生命周期
+        show()
+        void dismiss()
+
+}
+'对dialog的点击事件监听，onDismiss,onCancel,onShow
+class ListenersHandler extends Handler{
+	
+}
+class Window{
+	setVolumeControlStream()
+	closeAllPanels()
+	isDestroyed()
+}
+class PhoneWindow extends Window implements MenuBuilder.Callback {
+	setCallback()
+	setWindowManager()
+	setGravity()
+}
+class ActionBarImpl extends ActionBar{
+	
+}
+'添加界面mDecor,进行绘制。
+class WindowManager{
+	addView()
+	removeView()
+
+}
+
+class PolicyManager{
+	makeNewWindow(Context context)
+}
+class WindowManagerImpl {
+	'初始化前面三个参数
+	'mViews[index] = view; DecorView
+	'mRoots[index] = root; ViewRootImpl
+	'mParams[index] = wparams;
+	addView()
+}
+Dialog .up.|>DialogInterface
+Dialog .up.|>Window.Callback
+Dialog .up.|>KeyEvent.Callback
+Dialog .up.|>OnCreateContextMenuListener
+
+Dialog -up->ContextThemeWrapper
+
+Dialog .up.>PolicyManager
+Window .up.>WindowManager
+Window +-up-Window.Callback
+Window -up->Window.Callback
+Window +-up-Window.LocalWindowManager
+Window -up->Window.LocalWindowManager
+Window.LocalWindowManager-up->WindowManager
+WindowManager .up.|>ViewManager
+PhoneWindow -up->WindowManager
+WindowManagerImpl -up-|>WindowManager
+CompatModeWrapper-up-|>WindowManager
+WindowManagerImpl +-up-CompatModeWrapper
+
+Dialog -up->Window
+AlertDialog-up-|>Dialog
+TimePickerDialog-up-|>AlertDialog
+DatePickerDialog-up-|>AlertDialog
+ProgressDialog-up-|>AlertDialog
+'字符选择器对话框
+CharacterPickerDiloag-up-|>Dialog
+Dialog +-- ListenersHandler
+
+class ButtonHandler extends Handler {
+	
+}
+'初始化布局com.android.internal.R.layout.alert_dialog
+/'
+	 icon             alertTitle
+	   ^                  ^
+	   |                  |
+	+--+--+---------------+---------------+
+	|     |                               |
+	|     |                               +---->topPanel
+	|     |                               |
+	+-----+-------------------------------+
+	|                                     |
+	|                                     |
+	|                                     |
+	|                                     |
+	|                                     +---->contentPanel+---->scrollView
+	|                                     |
+	|                                     |
+	|                                     |
+	+-------------------------------------+
+	|                                     |
+	|                                     |
+	|                                     |
+	|                                     +---->customPanel
+	|                                     |
+	|                                     |
+	|                                     |
+	+------------+----------+-------------+
+	|            |          |             |
+	|            |          |             |
+	+------------+----------+-------------+
+
+'/
+class AlertController{
+	'在AlertDialog的oncreate方法执行时候调用，onCreate方法在父类Dialog的dispatchOnCreate方法内执行，dispatchOnCreate方法是在Dialog类的show方法执行
+	installContent()	
+}
+
+class AlertDialog{
+	private AlertController mAlert;
+	private TextView mTitleView;
+	'添加到topPanel，并隐藏原来的mTitleView
+	private View mCustomTitleView;
+
+
+}
+
+AlertDialog -up->AlertController
+AlertController -up->DialogInterface
+AlertDialog +-up- ButtonHandler
+
+
 @enduml

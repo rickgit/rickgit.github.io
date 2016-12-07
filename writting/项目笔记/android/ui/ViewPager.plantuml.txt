@@ -3,7 +3,11 @@
 skinparam monochrome true
 skinparam classBackgroundColor transparent
 skinparam style strictuml
+class ViewGroup{
+	public static final int MATCH_PARENT = -1;
 
+	public static final int WRAP_CONTENT = -2;
+}
 'android.support.v4.view;
 class ViewPager extends ViewGroup{
 	private PagerAdapter mAdapter;
@@ -24,35 +28,43 @@ class ViewPager extends ViewGroup{
  interface OnPageChangeListener{
 
  }
-public abstract class PagerAdapter {
-	void unregisterDataSetObserver(DataSetObserver observer) {
+ class Gravity{
 
-	}
-	void registerDataSetObserver(DataSetObserver observer) {
-
-	}
-	public void startUpdate(ViewGroup container) {
-
-	}
-	public void destroyItem(ViewGroup container, int position, Object object) {
-
-	}
-	public void finishUpdate(ViewGroup container) {
-
-	}
-	public void restoreState(Parcelable state, ClassLoader loader) {
-    }
+ }
+abstract class PagerAdapter {
+	void unregisterDataSetObserver(DataSetObserver observer) ;
+	void registerDataSetObserver(DataSetObserver observer) ;
+	public void startUpdate(ViewGroup container) ;
+	public void destroyItem(ViewGroup container, int position, Object object) ;
+	public void finishUpdate(ViewGroup container) ;
+	public void restoreState(Parcelable state, ClassLoader loader) ;
 }
+class LayoutParams extends ViewGroup.LayoutParams {
+	
+}
+abstract class FragmentPagerAdapter extends PagerAdapter {
+	
+}
+
+abstract class FragmentStatePagerAdapter extends PagerAdapter {
+	
+}
+class Scroller  {
+    private final Interpolator mInterpolator;
+}
+class ViscousFluidInterpolator implements Interpolator {
+	
+}
+
+
 ViewPager -->OnPageChangeListener
 ViewPager +--OnPageChangeListener
 SimpleOnPageChangeListener ..|>OnPageChangeListener
 ViewPager +--SimpleOnPageChangeListener
 ViewPager -->OnAdapterChangeListener
 ViewPager +--OnAdapterChangeListener
-
-Viewpager -->PagerAdapter
-FragmentPagerAdapter --|>PagerAdapter
-FragmentStatePagerAdapter --|>PagerAdapter
-
-FragmentPagerAdapter --|>PagerAdapter
+ViewPager +--LayoutParams
+ViewPager -->PagerAdapter
+ViewPager -->Scroller
+Scroller +--ViscousFluidInterpolator
 @enduml
