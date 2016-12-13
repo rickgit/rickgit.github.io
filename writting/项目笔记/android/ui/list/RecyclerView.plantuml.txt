@@ -15,16 +15,26 @@ class RecyclerView extends ViewGroup implements ScrollingView, NestedScrollingCh
 
 
     private final ArrayList<ItemDecoration> mItemDecorations = new ArrayList<>();
-}
 
-abstract static class LayoutManager {
-	
+
+}
+'onLayoutChildren是通过onMeasure调用的
+abstract class LayoutManager {
+    public void onLayoutChildren(Recycler recycler, State state)	
+}
+class ViewGroup{
+    requestDisallowInterceptTouchEvent()
 }
 
 class LinearLayoutManager extends LayoutManager implements ViewDropHandler {
 	
 }
 
+class RecyclerView.ItemDecoration{
+    public void onDraw(Canvas c, RecyclerView parent, State state)
+    public void onDrawOver(Canvas c, RecyclerView parent, State state) 
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, State state)
+}
  
 class StaggeredGridLayoutManager{
 	
@@ -35,12 +45,16 @@ class Adapter{
 }
 RecyclerView +-- LayoutManager
 RecyclerView +-- Adapter
-StaggeredGridLayoutManager --|> LayoutManager
-LinearLayoutManager --|> LayoutManager
-GridLayoutManager --|> LinearLayoutManager
+StaggeredGridLayoutManager -up-|> LayoutManager
+GridLayoutManager -up-|> LinearLayoutManager
 
 
 RecyclerView -->ChildHelper
 RecyclerView -->AdapterHelper
+RecyclerView +-- RecyclerView.ItemDecoration
+RecyclerView +-- RecyclerView.Recycler
+
+
+
 
 @enduml
