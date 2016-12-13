@@ -1,0 +1,23 @@
+ # Unit Tests
+
+    // Required -- JUnit 4 framework,依赖hamcrest-core
+    testCompile 'junit:junit:4.12'
+    // Optional -- Mockito framework
+    testCompile 'org.mockito:mockito-core:1.10.19'
+ #Single App
+ ##Espresso
+androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
+
+espresso-core,espresso-idling-resource,exposed-instrumentation-api-publish,hamcrest-core,hamcrest-integration,
+hamcrest-library,javawriter,javax.annotation-api,javax.inject,jsr305,junit,rules,runner,spport-annotations
+##Test your activities in isolation with Espresso Intents
+  androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+##Testing WebViews with Espresso Web
+
+ androidTestCompile 'com.android.support.test.espresso:espresso-web:2.2.2'
+# Multiple Apps
+##UiAutomator
+ androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.0'
+ alculatorTest extends UiAutomatorTestCase
+
+ Android Testing Support Library

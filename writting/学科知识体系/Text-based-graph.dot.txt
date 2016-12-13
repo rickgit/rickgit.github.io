@@ -1,8 +1,12 @@
 digraph g{
 	//https://en.wikipedia.org/wiki/DOT_(graph_description_language)
-	"Graph description languages"->"Text-based"->{	
+	diagram->"Graph description languages"->"Text-based"->{	
 "DOT","Graph Modelling Language (GML)", "LCF notation for cubic Hamiltonian graphs", "Newick format for trees", "Trivial Graph Format","UCINet DL","Tulip TLP"}
 
 
 	"Graph Modelling Language (GML)"->yEd->palettes->"https://github.com/ruslo/yed-uml"
+
+	diagram->信息图->{表格（table）,图表（chart）,图形（pictogram）,统计图（graph）,图解（diagram）,地图（map）}
+
+	表格（table）->"cvs"
 }

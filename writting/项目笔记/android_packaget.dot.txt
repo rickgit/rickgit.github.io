@@ -1,0 +1,38 @@
+digraph g{
+	 node [shape=box]
+	"build-tools\25.0.1\aidl.exe"[shape=ellipse,label="AIDL tool"]
+	"build-tools\25.0.1\aapt2.exe"[shape=ellipse,label="AAPT tool"]
+	"javac.exe"[shape=ellipse,label="java compiler"]
+	"build-tools\25.0.1\dx.exe"[shape=ellipse,label="dx工具"]
+	"tools\lib\sdklib.jar\com.android.sdklib.build.ApkBuilderMain"[shape=ellipse,label="apkbuilder"]
+	"build-tools\25.0.1\apksigner.bat"[shape=ellipse,label="javasigner"]
+	"build-tools\25.0.1\zipalign.exe"[shape=ellipse,label="zipalign"]
+
+	"tools\proguard\bin\proguard.bat"[shape=ellipse,label="proguard"]
+	
+	"aidl 文件"->"build-tools\25.0.1\aidl.exe"->"Java Interface"->"javac.exe"
+	"Application res"->"build-tools\25.0.1\aapt2.exe"->"R.java"->"javac.exe"
+	"Application src code"->"build-tools\25.0.1\aapt2.exe"->"javac.exe"
+	"proguard config"->"tools\proguard\bin\proguard.bat"->"proguard mapping"
+	"javac.exe"->"class files"->"tools\proguard\bin\proguard.bat"->"优化后的class文件"->"build-tools\25.0.1\dx.exe"
+	"第三方依赖库的class文件"->"build-tools\25.0.1\dx.exe"->"class.dex文件"->"tools\lib\sdklib.jar\com.android.sdklib.build.ApkBuilderMain"
+	"build-tools\25.0.1\aapt2.exe"->"compiled resources"->"tools\lib\sdklib.jar\com.android.sdklib.build.ApkBuilderMain"
+	"*其他资源"->"tools\lib\sdklib.jar\com.android.sdklib.build.ApkBuilderMain"
+	"tools\lib\sdklib.jar\com.android.sdklib.build.ApkBuilderMain"->"apk文件"->"build-tools\25.0.1\apksigner.bat"
+	"keystore文件"->"build-tools\25.0.1\apksigner.bat"
+	"build-tools\25.0.1\apksigner.bat"->"签名后的apk文件"->"build-tools\25.0.1\zipalign.exe"->"优化过的apk文件"
+
+
+	//jack jill
+	"build-tools\25.0.1\jack.jar"[shape=ellipse,label="Java Android Compiler Kit(JACK)"]
+	"build-tools\25.0.1\jill.jar"[shape=ellipse,label="Jack Intermediate Library Linker(JILL)"]
+	"App module"[label=record,label=" {*.java,res file,proguard-rules.pro}"]
+	"Library module1"[label=record,label=" {*.java,res file,proguard-rules.pro}"]
+	"Library module2"[label=record,label=" {*.java,res file,proguard-rules.pro}"]
+	"Library jar"[label=record,label=" {*.class}"]
+	{"Library module1","Library module2"}->"aar library file(s)"->"build-tools\25.0.1\jill.jar"
+	"Library jar"->"build-tools\25.0.1\jill.jar"
+	"build-tools\25.0.1\jill.jar"->"jack library file(s)"
+	"jack library file(s)"->"build-tools\25.0.1\jack.jar"
+	"build-tools\25.0.1\jack.jar"->"dex文件"
+}
