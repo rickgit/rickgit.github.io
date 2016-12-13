@@ -1,0 +1,32 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'https://github.com/linger1216/labelview
+class LabelViewHelper {
+    public void onDraw(Canvas canvas, int measuredWidth, int measuredHeight)	
+}
+
+
+class Canvas {
+	public void drawPath(@NonNull Path path, @NonNull Paint paint)
+	public void drawTextOnPath(@NonNull String text, @NonNull Path path, float hOffset,float vOffset, @NonNull Paint paint)
+}
+
+class Path {
+	reset();
+	setDither(true);
+	setAntiAlias(true);
+	setStyle(Paint.Style.STROKE);
+	setStrokeJoin(Paint.Join.ROUND);
+	setStrokeCap(Paint.Cap.SQUARE);
+	setStrokeWidth()
+	moveTo()
+	lineTo()
+}
+
+LabelViewHelper ..>Canvas
+Canvas ..>Path
+@enduml
