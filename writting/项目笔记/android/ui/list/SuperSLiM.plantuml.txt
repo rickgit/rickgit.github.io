@@ -1,0 +1,28 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class LayoutManager extends RecyclerView.LayoutManager {
+    private final SectionLayoutManager mLinearSlm;
+    private final SectionLayoutManager mGridSlm;	
+}
+
+class LinearSLM extends SectionLayoutManager {
+	
+}
+class GridSLM extends SectionLayoutManager {
+	
+}
+class GridSLM extends SectionLayoutManager {
+	
+}
+
+LayoutManager-->LinearSLM
+LayoutManager-->GridSLM
+
+
+
+@enduml

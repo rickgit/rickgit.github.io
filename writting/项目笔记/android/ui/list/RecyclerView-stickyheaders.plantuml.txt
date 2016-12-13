@@ -1,0 +1,82 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'https://github.com/eowise/recyclerview-stickyheaders
+class ViewGroup{
+    requestDisallowInterceptTouchEvent()
+}
+
+class RecyclerView extends ViewGroup{
+    private final ArrayList<OnItemTouchListener> mOnItemTouchListeners =
+            new ArrayList<OnItemTouchListener>();
+
+    removeItemDecoration(overlay);
+    addItemDecoration(top);
+
+    addOnItemTouchListener(OnItemTouchListener listener)
+}
+interface RecyclerView.OnItemTouchListener {
+
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e);
+
+
+    public void onTouchEvent(RecyclerView rv, MotionEvent e);
+}
+class StickyHeadersBuilder{
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private StickyHeadersAdapter headersAdapter;
+    private OnHeaderClickListener headerClickListener;
+    private boolean overlay;
+    private boolean isSticky;
+    private DrawOrder drawOrder;
+    public StickyHeadersItemDecoration build()
+}
+
+interface OnHeaderClickListener {
+    void onHeaderClick(View header, long headerId);
+}
+
+class StickyHeadersItemDecoration extends RecyclerView.ItemDecoration {
+    registerAdapterDataObserver()
+}
+note top of StickyHeadersItemDecoration
+ ❤StickyHeadersItemDecoration通过RecyclerView onDraw绘制
+end note
+class StickyHeadersTouchListener implements RecyclerView.OnItemTouchListener {
+    
+}
+interface OnHeaderClickListener {
+    void onHeaderClick(View header, long headerId);
+}
+interface StickyHeadersAdapter{
+    
+}
+StickyHeadersBuilder -->RecyclerView
+StickyHeadersBuilder -->RecyclerView.Adapter
+StickyHeadersBuilder -->StickyHeadersAdapter
+StickyHeadersBuilder -->OnHeaderClickListener
+StickyHeadersBuilder -->DrawOrder
+
+RecyclerView.Adapter -->AdapterDataObserver
+AdapterDataObserver -up-|>RecyclerView.AdapterDataObserver
+StickyHeadersBuilder ..>StickyHeadersItemDecoration
+RecyclerView -->RecyclerView.OnItemTouchListener
+
+
+RecyclerView +-- RecyclerView.Adapter
+RecyclerView +-- RecyclerView.AdapterDataObserver
+RecyclerView +-- RecyclerView.OnItemTouchListener
+StickyHeadersTouchListener -->OnHeaderClickListener
+
+StickyHeadersItemDecoration -->RecyclerView.Adapter
+
+StickyHeadersTouchListener -->HeaderStore
+
+RecyclerView -->RecyclerView.ItemDecoration
+HeaderStore -->StickyHeadersAdapter
+
+@enduml
