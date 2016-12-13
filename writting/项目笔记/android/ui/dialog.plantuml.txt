@@ -125,7 +125,9 @@ class AlertController{
 	'在AlertDialog的oncreate方法执行时候调用，onCreate方法在父类Dialog的dispatchOnCreate方法内执行，dispatchOnCreate方法是在Dialog类的show方法执行
 	installContent()	
 }
-
+note top of AlertController
+初始化布局com.android.internal.R.layout.alert_dialog
+end note
 class AlertDialog{
 	private AlertController mAlert;
 	private TextView mTitleView;

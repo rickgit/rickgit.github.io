@@ -51,7 +51,7 @@ note top of RankMajorFragment
 end note
 
 
-FocusContentPage -up-|>FocusContentAdapter
+FocusContentPage -up->FocusContentAdapter
 FocusContentListItem -up-|>ViewCollection
 FocusContentAdapter .up.>FocusContentListItem
 UserFocusFragment -up->FocusContentPage
