@@ -1,12 +1,13 @@
 digraph G {
 	//layout="fdp"
+	//rankdir=LR;
 	{rank = same; 康德; 贝克莱; 休谟;费希特;}
 	{rank = same;谢林;黑格尔;}
 	//哥白尼、开普勒、伽利略的数学方法和牛顿的形而上学方法
 	培根[shape=record ,label="<name> 培根|{ 英（1561~1626）| 文艺复兴| 唯物主义第一人| 经验论| 新工具| 唯物}"]
 	笛卡尔[shape=record ,label="<name> 笛卡尔|{ 法（1596~1650）| 唯理论| 理性主义| 二元论| 《第一哲学沉思集》| 《方法论》\l哲学原理\l}"]
 	斯宾诺莎[shape=record ,label="<name> 斯宾诺莎|{ 荷（1632~1677）| 一元论| 《伦理学》\l《知性改进论》\l}"]
-	莱布尼茨[shape=record ,label="<name> 莱布尼茨|{ 德(1646~1716)| 多元论| 《人类理智新论》}"]
+	莱布尼茨[shape=record ,label="<name> 莱布尼茨|{ 德(1646~1716)| 微积分| 多元论| 《人类理智新论》}"]
 
 	洛克[shape=record ,label="<name> 洛克|{ 英(1630~1704)| 知识论| 英国经验主义| 人类理解论\l政府论\l论宽容\l}"]
 	贝克莱[shape=record ,label="<name> 贝克莱|{ 英（1685~1753）| 人类知识原理}"]

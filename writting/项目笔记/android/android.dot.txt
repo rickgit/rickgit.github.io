@@ -1,4 +1,4 @@
 digraph G {
-
-	adb->"adb shell"
+	"Android 需要学习的资料"->{开发,打包,安装,维护}
+	安装->adb->"adb shell"
 }
