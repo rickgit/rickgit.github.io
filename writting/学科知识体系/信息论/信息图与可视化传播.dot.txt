@@ -1,0 +1,57 @@
+digraph g{
+	信息图与可视化传播->{可视化传播,商业信息需求,创建信息图,商业价值}
+	//https://thenounproject.com/
+	//信息图的定义和存在的科学依据
+	可视化传播->信息图->"information graphic，简称infographic。是一种将数据与设计结合起来的图片，有利于个人或组织简短有效地向受众传播信息。"
+
+	信息图->制作和发布信息图的过程->{数据可视化,信息设计,信息架构}
+
+	信息图->历史
+
+	可视化传播->可视化的科学->{视觉中枢,视觉易于理解,视觉学习,商业化}
+	视觉中枢->占大脑神经元的30%，触觉8%，听觉3%
+
+	视觉学习->VARK模型->bitly.com/sm09In
+
+	商业信息需求->各类可视化概念和数据
+	商业信息需求->{数字与概念,对事物的运作及关系,对时间、地点及人物}
+	数字与概念->{统计数据,创意和概念}
+
+
+	对事物的运作及关系->{流程,层级,关系}
+
+
+	对时间、地点及人物->{个性化的呈现方式,年表,地理方位}
+	个性化的呈现方式->简历->"www.re.vu"
+
+
+	创建信息图->{准备工作,加工创意,设计,发布}
+	准备工作->{目标,观察}
+	目标->{SMART目标}
+	SMART目标->"http://intersectionconsulting.com/"
+
+	观察->{看,听}
+
+	加工创意->{记录想法,信息合成}
+	记录想法->{纸,移动设备}
+	记录想法->网络书签->{Evernote,Diigo,google书签,Pinboard.in}
+
+
+
+	信息合成->信息图中的5个W和1个H
+	//第七章
+	设计->{争论,自己动手做信息图,外包}
+
+	自己动手做信息图->准则->{全面考量,灵感,汗水}
+
+	灵感->{alltop,cool Infographics,Daily infoGraphic,Fast company,Flowing Data}
+
+	商业价值->{传播工具,投资收益,信息图资源}
+	传播工具->内容营销->"http://contentmarketinginstitute.com/what-is-content-marketing/"
+
+	投资收益->{ROI,VOI}
+
+
+	信息图资源->{工具,延伸阅读,咨询顾问}
+	工具->{Chartle,Creately,Diagram.ly,GIMP,Gliffy,Hohli,Inkscape}
+}

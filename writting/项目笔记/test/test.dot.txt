@@ -1,0 +1,8 @@
+digraph test{
+//The Testing Support Library includes a JUnit 4 test runner (AndroidJUnitRunner ) and APIs for functional UI tests (Espresso and UI Automator).
+	//https://developer.android.com/training/testing/unit-testing/instrumented-unit-tests.html
+	test->{"unit test","UI test"}
+	"unit test"->{"local unit","instrumented unit"}
+	//junit 依赖hamcrest,一个书写匹配器对象时允许直接定义匹配规则的框架.
+	//mockito 
+}
