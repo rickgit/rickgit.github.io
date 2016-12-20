@@ -1,0 +1,18 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+InstrumentationTestCase->TestCase
+SingleLaunchActivityTestCase->TestCase
+ActivityTestCase->TestCase
+ActivityInstrumentationTestCase2->ActivityTestCase
+ActivityUnitTestCase->ActivityTestCase
+'@Deprecated
+ActivityInstrumentationTestCase->ActivityTestCase
+SyncBaseInstrumentation->TestCase
+'@Deprecated
+ProviderTestCase->TestCase
+
+@enduml
