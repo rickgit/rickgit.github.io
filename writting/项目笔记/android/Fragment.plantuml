@@ -50,6 +50,7 @@ class FragmentManagerImpl extends FragmentManager{
 
 	attachController()
 	+ void dispatchCreate() 
+	'调用Fragemt的onCreateView
 	void moveToState(int newState, boolean always)
 	+ FragmentTransaction beginTransaction() 
 	+ void enqueueAction(Runnable action, boolean allowStateLoss)
