@@ -1,0 +1,27 @@
+@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+class PopupWindow {
+	
+	'anchor在上
+	private static final int DEFAULT_ANCHORED_GRAVITY = Gravity.TOP | Gravity.START;
+
+	'如果不设置PopupWindow的背景，有些版本就会出现一个问题：无论是点击外部区域还是Back键都无法dismiss弹框
+	setBackgroundDrawable()
+
+	'相对某个控件的位置左下方，无偏移
+	public void showAsDropDown(View anchor);
+	public void showAtLocation(View parent, int gravity, int x, int y) ;
+}
+
+
+
+
+
+
+
+
+@enduml
