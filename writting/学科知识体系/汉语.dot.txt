@@ -1,5 +1,5 @@
 digraph G {
-  	rankdir=LR;
+  	rankdir=LR；
 	//layout="fdp"
 	艺术 -> {格调,品鉴,升华}
 	品味 -> 品鉴
