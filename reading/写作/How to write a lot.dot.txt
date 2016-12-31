@@ -1,0 +1,39 @@
+digraph g{
+	rankdir=LR;
+	"How to write a lot"->"美国心理学家Paul Silvia"
+	"How to write a lot"->"本书的页数66，大概两个小时可以读完。"
+
+
+	"How to write a lot"->{"introduction book","specious barriers to writing a lot","Motivational Tools","A brief foray into style","A brief foray into style",
+	"writing journal articles","Writing books","Good Books About Writing"}
+
+ 
+ "specious barriers to writing a lot"->{"i can’t find time to write","i  need to do some more analyses first","to write a lot, I need a new computer","I’m waiting until I feel like"}
+
+	"Motivational Tools"->{ scheduling,"setting goals","setting prioprities","monitoring progress"}
+
+	"A brief foray into style"->{"set Concrete, Short-Term Goals and Monitor the Group’s Progress","stick to writing goals, Not other professional goals","Big carrots can double as sticks","have different groups for faculty and students","drink coffee"}
+
+	"A brief foray into style"->{"diagnosing the problem","choose good words","write strong sentences","avoid passive，limp，and wordy phrase","write first，revise later"}
+
+	"writing journal articles"->"practical tips for writing an empirical article"
+     "practical tips for writing an empirical article"->{     "outlining and prewriting","the title and abstract","introduction"}
+
+     "writing journal articles"->{Method,Results,Discussion,"general discussion",reference,"submitting your manuscript","understanding reviews and resubmitting your manuscript"}
+
+ 	"Writing books"->"maybe, writing a  book is like writing anything else:you sit down and type"
+
+     "Writing books"->"how to write your book in two easy steps and one hard step"->{"step 1: find a coauthor","step 2:plan your book","step 3:write the damn thing"}
+
+     "Writing books"->"how to find a publisher"
+     "Writing books"->"dealing with the details"
+
+	"Writing books"->"The Good Things Still to Be Written"->"this book has proposed a practical system for becoming a productive academic writer"
+	//（总结性章节，包括了前面几张的描述）
+
+     "The Good Things Still to Be Written"->{"THE JOY OF SCHEDULING","LESS WANTING,MORE DOING","WRITING ISN’T A RACE","ENJOY LIFE"}
+
+
+	
+	//（文章结尾推荐的一系列书籍）
+}

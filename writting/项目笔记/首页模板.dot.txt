@@ -1,0 +1,46 @@
+                                                        +---------->    y=a*x*x
+          ^
+          |                                         X
+          |                                         X
+          |                                         X             +---->  y=x
+          |                                         X          XXX
+          |                                         X       XX
+          |                                       XXX  XXXXX
+          |                                       XXXXXX
+          |                                     XXXX
+          |                                  XXX  XX
+          |                             XXXXX     X
+          |                          XXX          X
+          |                        XXX           XX
+          |                    XXXX              X
+          |                   X                XX
+          |                XXX               XXX
+          |             XXX                XXX
+          |          XXX               XXXX
+          |        XX               XXXX
+          |      XX            XXXXXX
+          |   XXX       XXXX XX
+          |XXXX  XXXXXXX
++---------XXXXXXXX------------------------------------------------>
+          |
+          |
+          |
+          |
+          |
+          |
+          |
+          |
+          +
+交叉点为x=48;求出a
+48=x
+48=a*x*x
+
+
+IP address       HW type     Flags       HW address            Mask     Device
+8.8.8.8          0x1         0x0         00:00:00:00:00:00     *        eth0
+10.0.3.2         0x1         0x2         52:54:00:12:35:02     *        eth1
+192.168.56.1     0x1         0x2         0a:00:27:00:00:0d     *        eth0
+8.8.4.4          0x1         0x0         00:00:00:00:00:00     *        eth0
+
+=++++>IP address       HW type     Flags       HW address            Mask     Device
+=++++>192.168.94.1     0x1         0x2         00:0c:42:53:06:42     *        wlan0
