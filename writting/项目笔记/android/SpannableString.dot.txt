@@ -1,0 +1,21 @@
+digraph g{
+	
+	SpannableString->"android.text.style"->{AlignmentSpan,LineHeightSpan,ParagraphStyle,TabStopSpan,UpdateAppearance,UpdateLayout,WrapTogetherSpan,CharacterStyle,EasyEditSpan,LeadingMarginSpan}
+
+	CharacterStyle->{SuggestionSpan,RasterizerSpan,StrikethroughSpan,UnderlineSpan,MetricAffectingSpan,ClickableSpan,BackgroundColorSpan,MaskFilterSpan,ForegroundColorSpan}
+
+
+	MetricAffectingSpan->{LocaleSpan,StyleSpan,SuperscriptSpan,SubscriptSpan,RelativeSizeSpan,ReplacementSpan,TextAppearanceSpan,AbsoluteSizeSpan,ScaleXSpan,TypefaceSpan}
+
+
+	ReplacementSpan->DynamicDrawableSpan->ImageSpan
+
+
+	ClickableSpan->URLSpan
+
+	//LeadingMarginSpan->{DrawableMarginSpan,QuoteSpan,BulletSpan,IconMarginSpan}
+
+
+
+
+}
