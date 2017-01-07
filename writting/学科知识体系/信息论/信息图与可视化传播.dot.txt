@@ -1,17 +1,22 @@
 digraph g{
+	rankdir=LR;
 	信息图与可视化传播->{可视化传播,商业信息需求,创建信息图,商业价值}
-	//https://thenounproject.com/
-	//信息图的定义和存在的科学依据
-	可视化传播->信息图->"information graphic，简称infographic。是一种将数据与设计结合起来的图片，有利于个人或组织简短有效地向受众传播信息。"
+
+	// https://thenounproject.com/
+	// 信息图的定义和存在的科学依据
+	
+	可视化传播->信息图
+	信息图->"information graphic，简称infographic。是一种将数据与设计结合起来的图片"
+	信息图->"有利于个人或组织简短有效地向受众传播信息。"
 
 	信息图->制作和发布信息图的过程->{数据可视化,信息设计,信息架构}
 
 	信息图->历史
 
 	可视化传播->可视化的科学->{视觉中枢,视觉易于理解,视觉学习,商业化}
-	视觉中枢->占大脑神经元的30%，触觉8%，听觉3%
+	视觉中枢->"占大脑神经元的30%，触觉8%，听觉3%"
 
-	视觉学习->VARK模型->bitly.com/sm09In
+	视觉学习->VARK模型->"bitly.com/sm09In"
 
 	商业信息需求->各类可视化概念和数据
 	商业信息需求->{数字与概念,对事物的运作及关系,对时间、地点及人物}
@@ -34,7 +39,7 @@ digraph g{
 
 	加工创意->{记录想法,信息合成}
 	记录想法->{纸,移动设备}
-	记录想法->网络书签->{Evernote,Diigo,google书签,Pinboard.in}
+	记录想法->网络书签->{Evernote,Diigo,google书签,"Pinboard.in"}
 
 
 
@@ -53,5 +58,6 @@ digraph g{
 
 
 	信息图资源->{工具,延伸阅读,咨询顾问}
-	工具->{Chartle,Creately,Diagram.ly,GIMP,Gliffy,Hohli,Inkscape}
+	工具->{Chartle,Creately,"Diagram.ly",GIMP,Gliffy,Hohli,Inkscape}
+	
 }
