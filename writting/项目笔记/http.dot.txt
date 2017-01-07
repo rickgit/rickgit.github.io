@@ -1,0 +1,26 @@
+digraph g{
+	http->模块->缓存->{HttpResponseCache,"Disk Cache"}
+	"Disk Cache"->"OkHttp"
+	/*
+		如果不想使用本地缓存，直接请求服务器最新数据，比如下拉刷新，可以这么设置。
+
+		1
+		connection.addRequestProperty("Cache-Control", "no-cache");
+		如果只想使用本地缓存，不去向服务器请求数据，可以这么设置。
+
+		1
+		connection.addRequestProperty("Cache-Control", "only-if-cached");
+		如果既想使用本地缓存，又怕服务器数据有更新，需要服务器验证，可以这么设置。
+
+		1
+		connection.addRequestProperty("Cache-Control", "max-age=0");
+		如果想设置缓存过期后的有效时间，可以这么设置。
+
+		1
+		2
+		int maxStale = 60 * 60 * 24 * 28; // tolerate 4-weeks stale
+		connection.addRequestProperty("Cache-Control", "max-stale=" + maxStale);
+
+	*/
+	HttpResponseCache->Picasso
+}
