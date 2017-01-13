@@ -3,7 +3,7 @@ digraph g{
 	//(文体的要素/写作的风格/英文写作指南)
 	"写作的风格、英文写作指南（the elements of style）"->"William Strunk Jr. / E.B. White"
 	"写作的风格、英文写作指南（the elements of style）"->"文章 中文版160页，可以花2小时看完"
-	"写作的风格、英文写作指南（the elements of style）"->{第一章,第二章,第三章,第四章,第五章,附录}
+	"写作的风格、英文写作指南（the elements of style）"->{2007出版,第一章,第二章,第三章,第四章,第五章,附录}
 	第一章->惯用法的基本规则
 
 	第二章->写作的基本原则

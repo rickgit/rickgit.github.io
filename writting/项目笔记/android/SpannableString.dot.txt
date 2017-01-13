@@ -1,4 +1,13 @@
 digraph g{
+/*
+INCLUSIVE或EXCLUSIVE会影响原来的span是否影响start点或end点的新字符（SpannableStringBuilder的insert方法），而如果在start,end点之间，则肯定会受影响。而新字符插入后，则start，end点 还会改变
+
+Spannable.SPAN_EXCLUSIVE_EXCLUSIVE：新字符前后都不包括，即在指定范围的前面和后面插入新字符都不会应用新样式 （建议使用）
+Spannable.SPAN_EXCLUSIVE_INCLUSIVE	：新字符前面不包括，后面包括。即仅在范围字符的后面插入新字符时会应用新样式
+Spannable.SPAN_INCLUSIVE_EXCLUSIVE	：新字符前面包括，后面不包括。
+Spannable.SPAN_INCLUSIVE_INCLUSIVE	：新字符前后都包括。
+
+*/
 	
 	SpannableString->"android.text.style"->{AlignmentSpan,LineHeightSpan,ParagraphStyle,TabStopSpan,UpdateAppearance,UpdateLayout,WrapTogetherSpan,CharacterStyle,EasyEditSpan,LeadingMarginSpan}
 

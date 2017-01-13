@@ -1,0 +1,7 @@
+digraph g{
+	"50 android hacks"->author->"Jacke Wharton"
+	"50 android hacks"->contents->{layouts,animations}
+
+
+	layouts->{"using wights","lazy loading","custom view group"}
+}
