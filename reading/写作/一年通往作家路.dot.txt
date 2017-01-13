@@ -1,7 +1,7 @@
 digraph g{
 	rankdir=LR;
 	一年通往作家路->"苏珊·M·蒂贝尔吉安http://www·susantiberghien·com/"
-	
+	一年通往作家路->"2013-5中国人民大学出版社出版的图书"
 /*
 anAmericanwriterlivinginGeneva,Switzerland,istheauthorofthreememoirs--LookingforGold,AYearinJungianAnalysis;CirclingtotheCenter,AWoman'sEncounterwithSilentPrayer;Footsteps,AEuropeanAlbum---andthebest-sellingOneYeartoaWritingLife·Hernarrativeessaysarewidelypublishedinjournalsandanthologies·
 

@@ -1,0 +1,95 @@
+@startuml
+
+/'
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+'/
+	title "爱彩票组件图"
+
+	客户端 --> 互联网
+	互联网 --> 六科技服务器
+	互联网 --> 爱彩服务器
+	package 客户端{
+		 
+		
+		frame 彩种{
+ 
+			frame 彩种辅助功能 {
+				[开奖信息模块]
+				[投注历史查询]
+				[赢家跟投]
+				frame 支付充值{
+					[新浪支付]
+					'（梓微兴h5，威富通APP）
+					[微信支付]
+				}
+				frame 彩种限制{
+					[玩法和彩种限制]
+					[时间限制]
+				}
+			}
+			frame 彩种类别{
+				frame 竞技彩{
+					[竞足]
+					[篮彩]
+					[北单]
+					[胜负彩，任九]		
+					frame 赛事资料{
+
+					}		
+				}
+				frame 快彩{
+					[十一运夺金]
+					[江西快三]			
+				}
+				frame 数字彩{
+					[双色球]
+					[大乐透]			
+				}
+			}
+		}
+		frame 应用标配{
+			[启动页]
+			[首页]
+			[用户模块]
+			[异常处理与日志分析]
+
+			frame 应用辅助功能{
+				[百度地图]
+				[二维码功能]
+				[用户点击统计]
+				[推送]
+			}
+		}
+	}
+	cloud 互联网{
+
+	}
+	database 六科技服务器{
+
+		[daily]
+		[beta]
+		[open]
+	}
+	database 爱彩服务器{
+
+		[daily] as a_d
+		[beta]  as a_b
+		[open] as a_o
+	}
+	/'
+	frame f{
+
+	}
+	folder fl{
+
+	}
+	node n{
+
+	}
+'/
+
+@enduml

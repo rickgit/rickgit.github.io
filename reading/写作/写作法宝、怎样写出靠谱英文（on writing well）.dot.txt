@@ -3,6 +3,7 @@ digraph g{
 	
 	"写作法宝、怎样写出靠谱英文（on writing well）"->"William Zinsser（威廉.津瑟） 美国著名的作家、编辑、文学评论家"
 	//《写作法宝——非虚构写作指南》
+	"写作法宝、怎样写出靠谱英文（on writing well）"->2008出版
  
 
 
