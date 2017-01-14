@@ -38,22 +38,36 @@ digraph G {
 
 	"Design patterns"
 	"Design patterns"->{ 
-		strategy,
+		创建型,算法型,结构型
+	}
+	创建型->{
 		singleton,
-		adapter,
-		prototype,
-		decorator,
-		visitor,
-		factory, "abstract factory",
-		facade,
+		"Factory Method", 
+		"abstract factory",
+		Builder,
+		prototype
+	}
+	算法型->{
+		Iterator,
 		observer,
-		proxy,
-		delegate,
+		"Template Method",
 		command,
 		state,
-		memento,
-		iterator,
+		strategy,
+		"Chain of Responsibility",
+		Mediator,
+		visitor,
+		Interpreter,
+		memento
+	}
+	结构型->{
 		composite,
-		flyweight}
+		facade,
+		proxy,
+		adapter,
+		decorator,
+		Bridge,
+		flyweight
+	}
  
 }
