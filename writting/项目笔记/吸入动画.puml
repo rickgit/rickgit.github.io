@@ -1,8 +1,5 @@
 @startuml
 
-
-	class Canvas{
-		public void concat(Matrix matrix);
 		/'
 			bitmap：需要扭曲的原位图
 			meshWidth/meshHeight：在横/纵向上把原位图划分为多少格
@@ -10,7 +7,10 @@
 					虽然他是一个一维数组，但是实际上它记录的数据是形如(x0,y0)，(x1,y1)..(xN,Yn)格式的数据， 这些数组元素控制对bitmap位图的扭曲效果
 			vertOffset：控制verts数组从第几个数组元素开始对bitmap进行扭曲(忽略verOffset之前数据 的扭曲效果)
 		'/
-		drawBitmapMesh(Bitmap bitmap, int meshWidth, int meshHeight, float[] verts, int vertOffset, int[] colors, int colorOffset, Paint paint)
+	class Canvas{
+		+ void concat(Matrix matrix);
+
+		+ drawBitmapMesh(Bitmap bitmap, int meshWidth, int meshHeight, float[] verts, int vertOffset, int[] colors, int colorOffset, Paint paint)
 
 
 	}
