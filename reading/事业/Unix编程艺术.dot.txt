@@ -1,0 +1,271 @@
+digraph G{
+
+	ESR[shape=record,label=" Eric S.Raymond"]
+	"Unix编程艺术(TAOUP)"->作者->ESR
+	// 哲学，编程艺术，技术文化
+	"Unix编程艺术(TAOUP)"->章节->{哲学,历史,对比}
+	哲学->{文化,生命力,Unix之得,哲学基础,"Kiss 原则","应用 Unix 哲学"}
+	// 《Unix反对手册》（Unix hater’s handbook）[Garfinkel]
+	Unix之得->{开源软件,跨平台可移植性和开发标准,"Internet和万维网",开源社区,灵活性,hack}
+	跨平台可移植性和开发标准->POSIX
+	开源软件->开源->"1998年出现该词及定义"
+
+	 "Internet和万维网"->"美国国防部第一版TCP/IP协议栈开发合同交给Unix研发组"
+
+
+	 哲学基础->{"Unix管道发明人Doug Mcllroy",《unix的四分之一世纪》,"Rob Pike"}
+
+	 "Rob Pike"->"《Notes on C programming》"
+
+	 哲学基础->概括的原则->{模块原则,清晰原则,组合原则,分离原则,简洁原则}
+	 概括的原则->{吝啬原则,透明性原则,健壮原则,表示原则,通俗原则,缄默原则,补救原则,经济原则,生成原则}
+
+	 概括的原则->{优化原则,多样原则,拓展原则}
+
+	 补救原则->"Jonathan Postel"->{"第一个互联网 RFC 系列标准的编撰者","纪念性网页 www.postel.org/postel.html"}
+
+	 补救原则->输入输出方面，简单、文本化、面向流、设备无关格式
+
+	 优化原则->"Donald Knuth"->{《计算机程序设计艺术》,"过早优化是万恶之源"}
+
+	 "应用 Unix 哲学"->"Butler Lampson"->"《Hints for Computer System Design》"
+
+	 //第二章 历史
+	 历史->{Unix历史,黑客历史,开源运动,"Unix 的历史教训"}
+	 Unix历史->"1969 - 1971"->"1969 诞生于 Ken Thompason头脑中"
+	 Unix历史->"1969 - 1971"->"编译语言和解释语言 B 混合编写"->"1971年 C语言"->"1973 年 Thompson 和 Ritchie 用 C 语言重写真个 Unix 系统"
+
+	Unix历史->"1980 - 1990"->"TCP/和Unix内战"->"1977 年，伯克利毕业生管理第一版 BSD"->"1985 Richard Stallman 发表GNU宣言"
+	Unix历史->"1991 - 1995"->"1991 Linux项目"->"1993 Linux已经具备了Internet和X系统"
+	//"1961 - 1995"
+	"黑客历史"->"1961 - 1980"->"游戏在校园"
+	"黑客历史"->"1981 - 1991"->"互联网与自由软件"->"1983,BSD植入TCP/IP，Unix和ARPANET文化开始融合"
+	"黑客历史"->"1991 - 1998"->"Linus Torvalds 利用 GNU 工具包搭起了自创的 Linux 内核"
+	"1991 - 1998"->"1995 开发web服务器 Apache与Linux结合"
+	开源运动->"1998,Mozilla源码公布"->{FSM,"Linux 社区","Perl 社区","Apache 社区","BSD 社区","X 开发者","IETF"}
+
+	"Unix 的历史教训"->{"越开源越繁荣","考虑低价和灵活的方案"}
+//第三章 历史
+	对比->{操作系统的元素}
+	操作系统的元素->{统一理念,多任务能力,协作进程,内部边界,文件属性和记录结构,二进制文件格式,首选用户界面风格,目标受众}
+	统一理念->"一切皆文件"->"管道概念"
+	内部边界->{内存管理,多用户设置的真正权限组,涉及关键安全性的功能限制在尽可能小的可信代码块}
+
+	对比->"操作系统的比较"->{Unix,DEC,"CP/M","MacOS",IBM}
+	//第四章 模块化
+	模块化->{封装和最佳模块大小,紧凑性和正交性,软件是多层的,程序库,"Unix和面向对象语言","模块化编程"}
+	紧凑性和正交性->{"《程序员修炼之道》，《重构》"}
+	紧凑性和正交性->{SPOT原则,紧凑性和强单一中心,分离的价值}
+	分离的价值->"《 C 程序设计语言》"
+
+	软件是多层的->{自顶而下和自底而上,胶合层}
+	胶合层->分离原则的升华->"《计算机体系：概念和演化》"
+
+	程序库->"《可复用库架构的守则和方法》"
+
+	"Unix和面向对象语言"->"1980年代中期，面向对象理念"->"图形系统、图形用户界面和某些仿真程序"
+
+	Unix和面向对象语言"->{"《网络风格的元素》《编程风格的元素》"}
+
+//第四章 文本化
+	文本化->{文本化的重要性,数据文件元格式,应用协议设计,应用协议元格式}
+
+	数据文件元格式->{"DSV 风格","RFC 822 格式","Cookie-Jar 格式","XML","Windows INI格式","Unix 文本文件格式的约定","文件压缩的利弊"}
+	"DSV 风格"->"/etc/passed 冒号作为值分隔符"
+
+	"RFC 822 格式"->"互联网电子邮件信息 MIME"
+
+	"Cookie-Jar 格式"->"fortune 程序为随机引用数据库而使用的一种格式"
+	"Record-Jar 格式"->"%%\n产生空行"
+
+	"XML"->"《XML in a Nutshell》"
+
+	应用协议设计->"《系统设计中的端对端论》"
+	应用协议元格式->{经典的互联网应用元协议,"作为通用应用协议的HTTP","XML-RPC，SOAP 和 Jabber"}
+
+
+	经典的互联网应用元协议->"《论应用协议的设计》"->"SMTP、POP和IMAP"->"描述手段（ trope ）"
+
+
+	"作为通用应用协议的HTTP"->"《论使用HTTP作为底层》"
+
+
+
+
+	//第六章 透明性
+	透明性->{研究实例,为透明性和可显性而设计,为可维护性而设计}
+	研究实例->{audacity,GCC}
+
+
+	为透明性和可显性而设计->{透明性之禅,为透明性和可显性而编码,透明性和避免过度保护,透明性和可编辑的表现形式,透明性、故障诊断和故障恢复}
+
+
+	透明性之禅->"不要在具体操作的代码上叠放太多的抽象层"
+	
+	为可维护性而设计->{清晰原则,"开发者手册（ hacker's guide）"}
+
+
+	//第七章
+	多道程序设计->{从性能调整中分离复杂度控制,"Unix IPC 方法的分类","要避免的问题和方法",在设计层次上的进程划分}
+	从性能调整中分离复杂度控制->{使你的程序和生活更轻松,更强的安全性}
+
+	"Unix IPC 方法的分类"->{把任务转给专门程序,管道、重定向和过滤器,包装器,"安全性包装器和 Bernstein链","从进程",对等进程间通信}
+
+	//继Ken Thompson 和 Dennis Ritchie之后，Doug Mcllroy
+
+
+	管道、重定向和过滤器->"Doug Mcllroy发明了管道结构"->"做单件事并做好"->"《作为第四代语言的 Unix Shell》"
+
+	对等进程间通信->{临时文件,信号,系统守护程序和常规信号,套接字,共享内存}
+	共享内存->{"《单一 Unix 规范》"}
+	
+
+
+	"要避免的问题和方法"->"《Unix 网络编程》"
+
+	"要避免的问题和方法"->"废弃的 Unix IPC 方法"->{"System V IPC","Streams"}
+
+	"要避免的问题和方法"->{远程过程调用,线程}
+	线程->"《为什么线程是个馊主意》"
+
+
+	//第八章  微型语言
+	 微型语言->专门领域语言->{"Unix 排版语言","shell 实用程序",软件开发工具}
+
+	 微型语言->{语言分类法,应用微型语言,设计微型语言}
+	 应用微型语言->正则表达式->"《Mastering Regular Expressions》"
+	正则表达式->"regexp符号的小变种"->{"Glob 表达式","基本正则表达式","拓展的正则表达式","Perl 正则表达式"}
+
+	 应用微型语言->{"Glade","m4","XSLT",awk,PostScript,"Emacs Lisp","javascript"}
+	 XSLT->"《XSLT: Mastering XML Transformations》"
+	"javascript"->"《JavaScript: The Definitive Guide》"
+
+	设计微型语言->"《Notable Design Patterns for Domain-Specific Languages》"
+
+	设计微型语言->{选择正确的复杂度,拓展和嵌入语言,宏,语言还是应用协议}
+
+	//第九章 生成：提升规格说明层次
+
+	生成：提升规格说明层次->{数据驱动编程}
+	数据驱动编程->与面向对象区别->{数据不仅仅是某个对象的状态，还定义了程序的控制流,编写尽可能少的固定代码}
+
+	数据驱动编程->{ascii,建设性的懒惰是大师级程序员的基本美德之一}
+
+
+
+	//第十章 配置
+	配置->启动环境（包含控制信息）的位置->{"/etc下","由系统设置的环境变量","用户主目录中的运行控制文件","由用户设置的环境变量","启动程序的命令行所传递的开关和参数"}
+
+
+
+	配置->{运行控制文件,环境变量,命令行选项,如何挑选方法,"xfree 86 服务器",论打破规则}
+
+
+	运行控制文件->{"CTSS runcom 命令脚本",".netrc"}
+
+	环境变量->{系统环境变量,用户环境变量}
+
+
+	//第s十一章 接口：Unix 环境下的用户接口设计模式
+
+	接口->{最小立异原则,"Unix 接口设计历史",接口设计评估,"CLI 和可视化接口之间的权衡",透明、表现力和可配置,"Unix 接口设计模式","应用 Unix 接口设计模式",网页浏览器作为通用前端,沉默是金}
+	最小立异原则->"《The humane Interface》"
+	最小立异原则->减少用户在使用接口时必须学习的复杂过程
+	接口设计评估->{"简介、表现力、易用、透明、脚本化能力"}
+
+	"CLI 和可视化接口之间的权衡"->"《反 Mac 接口》"
+
+	"Unix 接口设计模式"->"《经验 - 用户界面设计的模式描述》"
+	"Unix 接口设计模式"->{过滤器模式,"Cantrip 模式",源模式,接收器模式,编译器模式,"ed 模式","Roguelike 模式","引擎和接口分离模式","CLI 服务器模式",基于语言的接口模式}
+
+	"应用 Unix 接口设计模式"->{多程序模式}
+
+
+	//第十二章 优化
+	优化->{先估量后优化,非定域性之害,吞吐量和延迟}
+
+	非定域性之害->保持代码短小简单
+	吞吐量和延迟->"I/O 时延"->{对可以共享启动开销的事务进行批处理,允许事务重叠,缓存}
+
+	//第13章 尽可能的简单，但别简单过头
+	复杂度->"Unix 世界观"->简单即美即雅即禅，复杂即丑即怪即恶
+
+
+
+	复杂度->复杂度概论->接口复杂度和实现复杂度的折中->{"《Lisp：好消息，坏消息以及如何获得大胜》"}
+	复杂度概论->本质的、选择的和偶然的复杂度
+	复杂度概论->映射复杂度
+	复杂度->五个编辑器的故事->{纯文本编辑,富文本编辑,句法感知,批处理输出的输出解析,同辅助进程交互}
+	五个编辑器的故事->"ed、vi、sam、Emacs、Wily"
+
+	复杂度->编译器的适当规模
+
+
+	//第14章 语言
+	语言->{解释型语言和混合策略}
+	解释型语言和混合策略->"《Unix 编程环境》"
+	语言->语言评估->"《The C Programming Language》"
+	语言评估->{"C++","Qt","Shell",Perl,Tcl,Python,Java,"Emacs Lisp"}
+
+	"C++"->{"The C++ Programming Language","C++: A Dialog","C++ Annotations"}
+
+	"Shell"->{"The Unix Programming Environment",Xmlto}
+	Perl->{"Perl 综合典藏网","Programming Perl","Learning Perl"}
+
+	Python->"《Programming Python》"
+
+	Python->PIL
+	//http://www.dmoz.org/Computers/Programming/Languages/Java
+	Java->{"Java In A Nutshell","Thinking in Java"}
+
+
+	"Emacs Lisp"->{"The GNU Emacs Lisp Reference Manual","Writing GNU Emacs Extensions"}
+
+//第15章 工具：开发的战术
+	工具->{"《Programming with GNU Software》",编译器选择,专用的代码生成器,"make 自动化编译",版本控制,运行期间调试,性能分析,"使用 Emacs 整合工具"}
+
+	编译器选择->"Vi、Emacs"->"《Learning GNU Emacs》"
+
+
+
+	专用的代码生成器->"yacc和lex"
+
+	"make 自动化编译"->{"《Managing Projects with Make》","《Programming with GNU Software》"}
+
+	"make 自动化编译"->"make 的基本理论"->"查看所有生成物及时间戳，然后做需要的最少工作来确保派生出的文件能够更新"
+
+	"make 自动化编译"->"生成 makefile"->{makedepend,Imake,aufoconf,automake}
+
+	aufoconf->"《GNU Autoconf, Automake and Libtool》"
+
+	版本控制->"变化追踪，bug 最终"
+	版本控制->"Unix 的版本控制工具（SCCS、RCS、CVS）"->{"Applying RCS and SCCS"}
+
+
+	//第16章 重用
+	重用->标准开放源码许可证->{MIT,BSD,GPL,LGPL,MPL}
+	//第十七章 
+	可移植性->{"C 语言的演化","Unix 标准"}
+	"C 语言的演化"->{"《C Programming Language》","《Portable C and Unix Systems Programming》","《Kernighan-Ritchie》"}
+	可移植性->{"Unix 标准","IETF 和 RFC 标准化过程","规格 DNA，代码 RNA",可移植性编程,国际化,可移植性、开放标准以及开放源码}
+	可移植性编程->{"C 的可移植性"}
+	"C 的可移植性"->{"《The Practice of Programming》","Recommended C Style and Coding Standards"}
+	//第十八章
+	文档
+	//第十九章 
+	开源代码->"包含 README 文件"->{项目的简短描述,项目站点的链接,注意事项以及前缀的移植问题,描述重要文件和字幕了的路标,编译及安装的指令或者指向通用内容的文件,维护者光荣列表或者指向通用内容的文件,项目的最新新闻或者指向同样内容的文件,项目邮件列表地址}
+	开源代码->尊重和遵从标准文件命名实践
+	开源代码->各种开源许可
+
+	//第二十章 
+	未来：危机
+
+	//
+	//第一部分涉及哲学和历史，第二部分有关设计和实现，第三部分着眼于所提供的工具，可助你解决问题，第四部分讲述人与人之间的事务与约定
+	序->{本书分：场景、设计、工具和社群。}
+	相关英文->{"《Unix Programming Environment》","《The Unix Philosophy》","《The Pragmatic Programmer》","《Zen Flesh, Zen Bones》"}
+
+	"《Zen Flesh, Zen Bones》"->纯净而没有神灵干扰，即禅
+
+
+}
