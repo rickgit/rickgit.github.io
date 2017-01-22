@@ -1,0 +1,113 @@
+digrahp g{
+	"UNIX shell 范例精解"->{"UNIX/Linux shell 简介","shell 编程快速入门","正则表达式","grep 家族","流编辑器 sed","awk 实用程序","交互式的 Bourne shell","Bourne shell 编程","交互式 C shell 与 TC shell","C shell 与 TC shell 编程","交互式 Korn shell","Korn shell 编程","交互式 bash shell","bash shell 编程","调试 shell 脚本","系统管理员与 shell",附录}
+
+	"UNIX/Linux shell 简介"->"两个主要的 UNIX版本"->{"AT&T 的 System V","BSD UNIX"}
+	"UNIX/Linux shell 简介"->Linux->"Linux 吉祥物 Tux"
+	Linux->"1992 年GNU软件加入 Linux 内核中以使其成为一个完整的操作系统"->"GNU工具"->"GNU shell 非标准的 UNIX shell"
+	Linux->"GPL通用公共许可证"
+
+	"UNIX/Linux shell 简介"->"shell 的定义与功能"->{"shell 是一种特殊的程序，内核以外的所有其它程序（包括 shell 程序）都保存在磁盘上，运行时才加载到内存中"}
+	"shell 的定义与功能"->"用户登录成功后，系统会启动一个交互式的 shell 提示用户输入命令"
+	"shell 的定义与功能"->"shell 执行"->"先解析命令行，再处理通配符、重定向、管道和作业控制，然后 查找命令，找到后开始执行"
+	"shell 的定义与功能"->"shell 的功能需求在 POSIX 标准中定义，即 POSIX 1003.2"
+	"shell 的定义与功能"->"当用户从脚本中执行命令时，shell 被视作一种编程语言"
+
+	"shell 的定义与功能"->"UNIX 系统大都支持 3 种主流的 shell"->{"Bourne shell（AT&T shell）","C shell（Berkeley shell）","Korn shell（Bourne shell的拓展集）"}
+	"shell 的定义与功能"->"Linux的 shell"->"默认是 GNU bash,即 Bourne again shell"
+	"Linux的 shell"->"TC shell，UNIX C shell的一个兼容分支"
+
+	"Linux的 shell"->{"Z shell",pdksh}
+	"Linux的 shell"->"查看 Linux 的 shell，『 $ cat /etc/shell 』"
+
+	"shell 的定义与功能"->"shell 的历史"->{"shell 的作用","shell 的职责"}
+
+	"shell 的定义与功能"->"系统启动与登录 shell"->"第一个进程 init"->"终端提示登录"->"『 /bin/login』登录成功，执行『 passwd 文件』最后一行的程序，通常是 shell"
+
+	"系统启动与登录 shell"->解析命令行->"token"->"shell 会读入命令行并对命令进行解析，将其分解成词"
+	"系统启动与登录 shell"->命令类型
+
+	"shell 的定义与功能"->"进程与 shell"->"进程是正在执行的程序，内核负责控制和管理进程。进程可以由可执行程序、进程的数据和堆栈、程序指针和堆栈指针、寄存器以及程序运行是需要的所有信息组成"
+	"进程与 shell"->"查看正在运行的进程『ps aux』"->"查看进程运行情况及子进程的方法 pstree（Linux）或 ptree（Solaris）"
+
+	"进程与 shell"->{创建进程}
+	创建进程->{"系统调用 fork","系统调用 wait","系统调用 exec","系统调用 exit","终止进程"}
+
+	"系统调用 wait"->"父进程先于子进程死亡，init 进程会处理遗留的僵尸子进程，否则需要重启系统"
+	"系统调用 exit"->"查看退出状态 『echo $status』"
+
+
+	"shell 的定义与功能"->"环境与继承"->{所有权,为文件创建掩码,修改权限与所有者,工作目录,变量,重定向与管道}
+	所有权->{UID,GID,EUID,EGID}
+	UID->"id 命令，查看 shell 的 UID"
+
+	为文件创建掩码->"创建文件是，会得到一组默认的权限。这组权限由创建文件的进程确定"
+	为文件创建掩码->"改变shell的掩码"->{"umask命令，当前掩码中除去某些权限","shell 初始化文件中设置"}
+
+	变量->"shell 定义了两类变量"->{局部变量,环境变量}
+
+	局部变量->"只属于创建他们的 shell，不会传给派生的任何子进程"
+
+	重定向与管道->{文件描述符,重定向,管道,"shell 和信号"}
+	文件描述符->"所有I/O，包括文字、管道和套接字，都是由内核通过一种名为文件描述符的机制进行管理的"
+	文件描述符->"文件描述符是一个比较小的无符号整数，是文件描述符表的索引。文件描述符表由内核维护，内核用它访问打开的文件和 I/O 流"
+
+	重定向->"当文件描述符被分配给终端以外的对象时，就被称为 I/O 重定向"
+	管道->管道只是一个内核缓冲区，两个进程通过它来共享数据，而不需要临时的中间文件
+	管道->"pipe命令的语法为：who | wc"
+	"shell 和信号"->信号把消息发给进程，结果常常导致该进程终止
+	"shell 和信号"->"键入 Break、Delete、Quit 或 Stop"
+
+	"shell 的定义与功能"->在脚本中执行命令->"命令和 shell 程序可以通过编辑器输入并保持为文件，即脚本"
+
+
+	//第二章
+	"shell 编程快速入门"->
+
+
+
+
+
+
+
+
+
+
+	附录->{"常用的 UNIX/Linux 实用程序","各种shell的比较"}
+	"各种shell的比较"->"Bounme, C, TC, Korn, bash"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
