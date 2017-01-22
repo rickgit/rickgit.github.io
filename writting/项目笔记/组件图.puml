@@ -21,6 +21,7 @@ skinparam style strictuml
 				[开奖信息模块]
 				[投注历史查询]
 				[赢家跟投]
+				[预约须知]
 				frame 支付充值{
 					[新浪支付]
 					'（梓微兴h5，威富通APP）
