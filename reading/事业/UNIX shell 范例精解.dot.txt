@@ -1,5 +1,6 @@
-digrahp g{
-	"UNIX shell 范例精解"->{"UNIX/Linux shell 简介","shell 编程快速入门","正则表达式","grep 家族","流编辑器 sed","awk 实用程序","交互式的 Bourne shell","Bourne shell 编程","交互式 C shell 与 TC shell","C shell 与 TC shell 编程","交互式 Korn shell","Korn shell 编程","交互式 bash shell","bash shell 编程","调试 shell 脚本","系统管理员与 shell",附录}
+digraph g{
+	rankdir=LR;
+	"UNIX shell 范例精解"->{"UNIX/Linux shell 简介","shell 编程快速入门","正则表达式与模式匹配","grep 家族","流编辑器 sed","awk 实用程序","交互式的 Bourne shell","Bourne shell 编程","交互式 C shell 与 TC shell","C shell 与 TC shell 编程","交互式 Korn shell","Korn shell 编程","交互式 bash shell","bash shell 编程","调试 shell 脚本","系统管理员与 shell",附录}
 
 	"UNIX/Linux shell 简介"->"两个主要的 UNIX版本"->{"AT&T 的 System V","BSD UNIX"}
 	"UNIX/Linux shell 简介"->Linux->"Linux 吉祥物 Tux"
@@ -61,19 +62,80 @@ digrahp g{
 
 
 	//第二章
-	"shell 编程快速入门"->
+	"shell 编程快速入门"->"Bash shell 结构"->{"shbang 行","注释","通配符","显示输出","局部变量","全局变量","提取变量值","读取变量值","参数","数组","命令替换","算术运算",运算符,条件语句,循环语句,函数}
+	"shbang 行"->"#!/bin/bash"
+	"注释"->"#"
+	"通配符"->"*、？和 [] 好常用于文件拓展\l <、>、2>、>> 和 | 则用户标准 I/O 重定向和管道"
+	"显示输出"->echo
+	"局部变量"->"declare"
+	"全局变量"->"export 或 declare -x"
+	"提取变量值"->"$variable_name"
+	"读取变量值"->"read variable_name"
+
+	"参数"->"命令行：\l $scriptname arg1 arg2 \l 脚本里：\lecho $1 $2 ：位置参数\l echo $* ：所有位置的参数\l echo $# ：位置参数的个数"
+
+	"数组"->"declare -a \ldeclare -a array_name={word1 word2} \l echo ${array_name[0]}"
 
 
 
+	//第三章 
+	"正则表达式与模式匹配"->正则表达式->"字符模式，用于在查找过程中匹配指定的字符"
+	正则表达式->元字符->{"shell 元字符","正则表达式元字符"}
+	"shell 元字符"->"由 UNIX/Linux 的 shell 来解析"
+
+	"正则表达式元字符"->由各种执行模式匹配操作的程序来解析
+	"正则表达式元字符"->{"^，$，.，*，[]，[x-y]，[^]，\ ","UNIX/Linux支持的附加元字符：\<，\>，\(..\)，x\{m\} 或 x\{m,\}或x\{m,n\}"}
+
+	"正则表达式与模式匹配"->组合正则表达式元字符
+
+	"grep 家族"->"grep 家族由命令 grep、egrep 和 fgrep 组成"->"grep 命令在文件中全局查找指定的正则表达式，并打印所有包含该表达式的行"
+	"grep 家族"->"grep 命令"->{"ex 编辑器","grep 元字符"}
+
+	"grep 元字符"->{"grep 选项"}
+	"grep 选项"[shape="record",label=" { -b | -c | -h | -i| -l| -n| -s| -v| -w}"]
+
+
+	"grep 家族"->"grep 与管道"->"ls -l | grep '^d'"->"ls 命令的输出通过管道传给 grep"
+
+	"grep 家族"->"egrep（拓展的grep）"
+	"grep 家族"->"fgrep（固定的 grep 或快速的grep）"
+
+	"grep 家族"->"Linux 与 GNU grep"
+
+	"流编辑器 sed"->"sed 是一种非交互的编辑器，使用者只能在命令行输入编辑命令、指定文件名，然后在屏幕上查看输出"
+	"流编辑器 sed"->"sedd 查找模式也使用正则表达式和各种元字符"
+	"流编辑器 sed"->定址->决定对哪些行进行编辑
+	"流编辑器 sed"->命令与选项
+
+	"awk 实用程序"->"以逐行扫描文件（或输入），从第一行到最后一行，以查找匹配摸个特定模式的文本行，并对这些文本行执行指定动作"
 
 
 
+	"交互式 bash shell"->环境->{"变量,打开的文件,当前的工作目录,函数,资源限额,信号等"}
+	环境->提示符->"4种：$，>，PS3，PS4"
+
+	环境->{搜索路径,"hash 命令",	"source 或 dot 命令"}
 
 
+	"source 或 dot 命令"->"source 命令来自于 C shell"
+
+	"交互式 bash shell"->命令行->{处理命令的顺序,命令编组}
+	处理命令的顺序->"type 命令"
+	"交互式 bash shell"->作业控制->"作业控制命令"->"bg，fg，jobs，kill，stop，stty tostop，wait ，Ctrl-Z"
+
+	作业控制->"jobs 命令的参数"
+	"交互式 bash shell"->命令行快捷方式->"hostroy 命令; fc命令"
+
+
+	"交互式 bash shell"->{别名,操作目录栈,元字符（通配符）,文件名替换,变量,引用,_命令替换,算术扩展,扩展顺序,_数组,_函数,"标准 I/O 和重定向",管道,"shell 调用选项","shell 内置命令"}
+
+	
 
 
 	附录->{"常用的 UNIX/Linux 实用程序","各种shell的比较"}
 	"各种shell的比较"->"Bounme, C, TC, Korn, bash"
+
+
 
 
 

@@ -1,0 +1,8 @@
+digraph g{
+	知识来源->{纸质书,电子书,网站,人,其它}
+	纸质书->{专业书,哲学书}
+	网站->{主动获取,被动获取}
+	主动获取->{github,"https://www.kernel.org/","http://www.gnu.org/software/software.html"}
+	被动获取->"Android 开发中文站"
+	其它->"b站"
+}
