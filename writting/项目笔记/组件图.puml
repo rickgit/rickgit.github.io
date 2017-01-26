@@ -31,6 +31,7 @@ skinparam style strictuml
 					[玩法和彩种限制]
 					[时间限制]
 				}
+
 			}
 			frame 彩种类别{
 				frame 竞技彩{
@@ -63,6 +64,10 @@ skinparam style strictuml
 				[二维码功能]
 				[用户点击统计]
 				[推送]
+				 frame 弹窗{
+                    [首页弹窗]
+                    [登录弹窗]
+                }
 			}
 		}
 	}
