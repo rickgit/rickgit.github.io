@@ -1,0 +1,6 @@
+digraph g{
+	"深入理解 Android 内核设计思想"->{"Android 编译篇","Android 原理篇","应用原理篇"}
+	"Android 原理篇"->{操作系统基础,"Android 进程/线程管理","进程间通讯","Android 启动过程简析","管理 Activity 和组件运行状态的系统进程 - AMS","GUI 系统之 SurfaceFlinger","WGUI 系统之 MS","GUI 系统之 View 体系","InputManagerService 与输入事件","音频系统"}
+	
+	"应用原理篇"->{"Intent 的匹配规则","APK 应用程序的资源适配","Android 字符编码格式","Android 和 OpenGL ES","系统的UI -- System UI","Widget 机制","Android 应用程序的编译打包","软件版本管理","系统调试辅助工具"}
+}
