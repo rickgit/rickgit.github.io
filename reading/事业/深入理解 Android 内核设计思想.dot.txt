@@ -1,6 +1,86 @@
 digraph g{
 	"深入理解 Android 内核设计思想"->{"Android 编译篇","Android 原理篇","应用原理篇"}
-	"Android 原理篇"->{操作系统基础,"Android 进程/线程管理","进程间通讯","Android 启动过程简析","管理 Activity 和组件运行状态的系统进程 - AMS","GUI 系统之 SurfaceFlinger","WGUI 系统之 MS","GUI 系统之 View 体系","InputManagerService 与输入事件","音频系统"}
+	"Android 原理篇"->{操作系统基础,"Android 进程/线程管理","进程间通讯 -- Binder","Android 启动过程简析","管理 Activity 和组件运行状态的系统进程 - AMS","GUI 系统之 SurfaceFlinger","GUI 系统之 WMS","GUI 系统之 View 体系","InputManagerService 与输入事件","音频系统"}
 	
 	"应用原理篇"->{"Intent 的匹配规则","APK 应用程序的资源适配","Android 字符编码格式","Android 和 OpenGL ES","系统的UI -- System UI","Widget 机制","Android 应用程序的编译打包","软件版本管理","系统调试辅助工具"}
+
+
+	操作系统基础->计算机体系结构->一门学科，是软件和硬件的抽象体
+	计算机体系结构->冯诺依曼结构->"起源于1945年，诺依曼发表的关于 EDVAC 的论文"
+	冯诺依曼结构->两个观点：采用二进制；程序存储
+	计算机体系结构->哈佛结构
+
+	操作系统基础->操作系统->负责管理系统硬件，并为上层应用提供稳定编程接口和人际交互界面的软件集合
+	操作系统->"2008 年，Google 员工 《Android Anatomy and Physiology》"
+	操作系统基础->进程间通信的经典实现->{共享内存,管道,"Unix Domain Socket",RPC}
+	进程间通信的经典实现->进程通信->运行在不同进程（不论是否在同一台机器）中的若干线程间的数据交换
+	操作系统基础->同步机制的经典实现->{信号量,Mutex,管程,同步范例}
+	同步机制的经典实现->多个（包括两个）进程间存在时序关系，需要协同工作以完成一项任务，则称为同步；如果它们并不满足协同的条件，而只是因为共享具有排他性的资源时所产生的关系，则称为互斥
+	同步机制的经典实现->"互斥问题由荷兰专家于 1965 年名为《Solution of a problem in concurrent programming control》"
+
+	信号量->"信号量与 PV 原语操作是由 Dijkstra 发明的，也是使用最为广泛的互斥方法之一"
+
+	操作系统基础->"Android 中的同步机制"->{Mutex,Condition,Barrier}
+
+	操作系统基础->"操作系统内存管理基础"->{虚拟内存,内存分配与回收,内存保护}
+
+	虚拟内存->{逻辑地址,线性地址,物理地址}
+	逻辑地址->{"Segment Selector（段选择子）",Offset}
+	逻辑地址->也称为『相对地址』，是程序编译后产生的地址。
+
+	线性地址->线性地址是逻辑地址经过分段机制转换后产生的。
+	物理地址->是指机器真实的物理内存所能表示的地址空间范围
+
+	"操作系统内存管理基础"->mmap->"兼容 POSIX 协议的一个系统调用"
+
+
+	操作系统基础->"Android 中的 Low Memory Killer"
+	操作系统基础->"Android 匿名共享内存"
+
+	操作系统基础->JNI
+	操作系统基础->"书的主线：操作系统的体系结构、硬件组成；辅线：Android 系统的五层矿建为辅"
+
+
+	"Android 进程/线程管理"->"进程是程序的一个运行实例，区别于『程序』这一个静态的概念；而线程则是 CPU 调度的基本单位"
+
+	"Android 进程/线程管理"->"Handler, MessageQueue, Runnable 与 Looper"
+
+	"Android 进程/线程管理"->ActivityThread
+	"Android 进程/线程管理"->"Thread 类"
+	"Android 进程/线程管理"->"Android 应用程序的典型启动流程"
+
+	"进程间通讯 -- Binder"->{智能指针,Parcel,"Binder 驱动与协议","DNS 服务器","Binder Client",AIDL,"Binder Server"}
+
+
+
+	"Android 启动过程简析"->{"第一个系统进程（Init）","系统关键服务的启动简析"}
+
+	"系统关键服务的启动简析"->{"ServiceManager","Zygote","SystemServer"}
+
+	"管理 Activity 和组件运行状态的系统进程 - AMS"->{"AMS 功能描述","Activity Stack","startActivity 流程","Activity Task"}
+
+	"AMS 功能描述"->{组件状态管理,组件状态查询,"Task 相关","AMS 其他功能"}
+
+	"GUI 系统之 SurfaceFlinger"->{"OpenGL ES 与 EGL",NAL,"Gralloc 与 Framebuffer","Android 中的本地窗口","BufferQueue",SurfaceFlinger,VSync的产生和处理}
+
+	"GUI 系统之 WMS"->{"WMS 综述",窗口属性,窗口添加过程,"Surface 管理",performLayoutAndPlaceSurfacesLockedInner,窗口大小的计算过程,启动窗口的添加与销毁,窗口动画}
+
+	"GUI 系统之 View 体系"->{"View 框架","Activity 中 ViewTree 的创建过程","在 WMS 中注册窗口","ViewRoot 的基本工作方式","ViewTree 的遍历时机","ViewTree 的遍历流程"}
+
+
+	"GUI 系统之 View 体系"->{"View 和 ViewGroup 属性",Canvas,Skia,"Surface.lockCanvas","unlockCanvasAndPost","draw 和 onDraw","View 中的消息传递","View 动画"}
+
+
+	"InputManagerService 与输入事件"->{事件的分类,事件的投递流程}
+
+
+	"音频系统"->{音频基础,音频框架,AudioFlinger,AudioPolicyService,AudioTrack,音频数据流,音量控制,音频系统的上层建筑,"Android 支持的媒体格式","ID3 信息简述","Android 多媒体文件管理"}
+
+
+
+
+
+
+
+
 }
