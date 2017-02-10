@@ -273,7 +273,106 @@ SystemServer --> PackageManagerService
 
 
 
+/'
+root@android:/ # ps
+USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
+root      1     0     420    248   c01bad0a 08054826 S /init
+root      2     0     0      0     c013aef2 00000000 S kthreadd
+root      3     2     0      0     c0129129 00000000 S ksoftirqd/0
+root      4     2     0      0     c01375c3 00000000 S kworker/0:0
+root      5     2     0      0     c01375c3 00000000 S kworker/u:0
+root      6     2     0      0     c01611c4 00000000 S migration/0
+root      7     2     0      0     c0136c9d 00000000 S khelper
+root      8     2     0      0     c0197604 00000000 S sync_supers
+root      9     2     0      0     c0198197 00000000 S bdi-default
+root      10    2     0      0     c0136c9d 00000000 S kintegrityd
+root      11    2     0      0     c0136c9d 00000000 S kblockd
+root      12    2     0      0     c0136c9d 00000000 S ata_sff
+root      13    2     0      0     c038380b 00000000 S khubd
+root      14    2     0      0     c01375c3 00000000 S kworker/0:1
+root      16    2     0      0     c0191c27 00000000 S kswapd0
+root      17    2     0      0     c01d7fdd 00000000 S fsnotify_mark
+root      18    2     0      0     c0136c9d 00000000 S crypto
+root      31    2     0      0     c01375c3 00000000 S kworker/u:1
+root      32    2     0      0     c032aaec 00000000 S scsi_eh_0
+root      33    2     0      0     c032aaec 00000000 S scsi_eh_1
+root      34    2     0      0     c01375c3 00000000 S kworker/u:2
+root      35    2     0      0     c0136c9d 00000000 S kpsmoused
+root      36    2     0      0     c0136c9d 00000000 S binder
+root      37    2     0      0     c01375c3 00000000 S kworker/u:3
+root      38    2     0      0     c01375c3 00000000 S kworker/0:2
+root      39    2     0      0     c0511c67 00000000 S krfcommd
+root      40    2     0      0     c0136c9d 00000000 S deferwq
+root      41    1     424    4     c01bad0a 08054826 S /sbin/ueventd
+root      47    2     0      0     c02473d3 00000000 S jbd2/sda6-8
+root      48    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      49    2     0      0     c02473d3 00000000 S jbd2/sdb1-8
+root      50    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      51    2     0      0     c02473d3 00000000 S jbd2/sdb3-8
+root      52    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      53    2     0      0     c0136c9d 00000000 S iprt
+root      56    1     11524  2136  ffffffff b7488f80 S /system/bin/genyd
+radio     57    1     6052   928   c02eb151 b75c9a0e S /system/bin/logwrapper
+shell     58    1     6396   1376  c02eb151 b7591a0e S /system/bin/sh
+root      59    1     6864   180   ffffffff 0805a18c S /sbin/adbd
+radio     61    57    8404   1176  ffffffff b75aee53 S /system/bin/genybaseband
+root      95    1     2096   184   c01bad0a b76a15ba S /sbin/v86d
+system    141   1     6208   928   c03ea413 b75addbe S /system/bin/servicemanager
+root      142   1     10364  1556  ffffffff b75b29c1 S /system/bin/vold
+root      143   1     6260   1180  c0438608 b75dda0e S /system/bin/vinput
+root      144   1     6244   952   c01bad0a b74f8f80 S /system/bin/vinput_seamless
+root      145   1     42120  3824  ffffffff b75c6f80 S /system/bin/local_opengl
+root      146   1     6244   948   c013e7b8 b75649c1 S /system/bin/local_gps
+root      147   1     9716   948   c01bad0a b75adf80 S /system/bin/local_camera
+root      148   1     9720   948   c01bad0a b7579f80 S /system/bin/local_camera
+root      149   1     16224  1996  ffffffff b755b9c1 S /system/bin/netd
+root      150   1     6336   976   c043e1df b7518e53 S /system/bin/debuggerd
+radio     151   1     11152  1584  ffffffff b75829c1 S /system/bin/rild
+system    152   1     71700  6720  ffffffff b75b1dbe S /system/bin/surfaceflinger
+root      153   1     482668 42872 ffffffff b759cf80 S zygote
+drm       154   1     16660  3868  ffffffff b7543dbe S /system/bin/drmserver
+media     155   1     48052  9072  ffffffff b7584dbe S /system/bin/mediaserver
+bluetooth 156   1     7172   1760  c01bad0a b74d15ba S /system/bin/dbus-daemon
+root      157   1     6280   1204  c04c6d47 b758ea0e S /system/bin/installd
+keystore  158   1     8044   1724  c043e1df b7542e53 S /system/bin/keystore
+root      166   59    6396   1384  c02eb151 b74efa0e S /system/bin/sh
+root      186   59    6388   1436  c01bad0a b755ef80 S logcat
+root      326   2     0      0     c01c9e92 00000000 S flush-8:16
+system    342   153   566708 40880 ffffffff b759cdbe S system_server
+wifi      409   1     9364   2244  c01bad0a b74dff80 S /system/bin/wpa_supplicant
+u0_a40    417   153   518828 61408 ffffffff b759e507 S com.android.systemui
+u0_a20    465   153   492044 30352 ffffffff b759e507 S com.android.inputmethod.latin
+radio     478   153   508172 30668 ffffffff b759e507 S com.android.phone
+u0_a21    494   153   522488 42980 ffffffff b759e507 S com.android.launcher
+system    508   153   495692 25680 ffffffff b759e507 S com.android.settings
+u0_a0     542   153   515184 37428 ffffffff b759e507 S android.process.acore
+u0_a45    560   153   488912 23148 ffffffff b759e507 S com.android.smspush
+u0_a12    639   153   491392 26344 ffffffff b759e507 S com.android.deskclock
+u0_a0     669   153   495288 26256 ffffffff b759e507 S com.android.contacts
+dhcp      713   1     6396   1216  c01bad0a b758c5ba S /system/bin/dhcpcd
+u0_a58    725   153   500268 32052 ffffffff b759e507 S cn.trinea.android.developertools
+u0_a7     743   153   490696 26688 ffffffff b759e507 S com.android.providers.calendar
+u0_a14    761   153   492592 29064 ffffffff b759e507 S android.process.media
+u0_a15    811   153   499728 28940 ffffffff b759e507 S com.android.email
+u0_a16    837   153   496368 24912 ffffffff b759e507 S com.android.exchange
+u0_a26    856   153   494824 27188 ffffffff b759e507 S com.android.mms
+u0_a43    907   153   489048 23164 ffffffff b759e507 S com.android.voicedialer
+u0_a52    919   153   516232 39744 ffffffff b759e507 S com.wandoujia.phoenix2:channel
+u0_a52    944   153   555436 50004 ffffffff b759e507 S com.wandoujia.phoenix2
+u0_a6     959   153   495556 25872 ffffffff b759e507 S com.android.calendar
+u0_a51    1008  153   493688 26224 ffffffff b759e507 S com.wandoujia.phoenix2.usbproxy
+u0_a52    1056  944   7104   1172  ffffffff b7df5a0e S uuids_sys
+u0_a52    1075  153   505708 36844 ffffffff b759e507 S com.wandoujia.phoenix2:update_service
+u0_a48    1087  153   505316 34112 ffffffff b759e507 S com.woqutz.didi
+root      1193  2     0      0     c01c9e92 00000000 S flush-8:32
+root      1234  59    6396   1388  c010230d b75a7caa S /system/bin/sh
+root      1239  1234  6440   1220  00000000 b7592a0e R ps
 
+
+查看进程的线程
+root@android:/ # ps -T -p 153
+
+'/
 
 
 

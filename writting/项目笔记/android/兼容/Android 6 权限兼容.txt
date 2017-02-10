@@ -1,0 +1,1 @@
+﻿adb shell pm list permissions -d -g
