@@ -1,9 +1,10 @@
 digraph g{
-	"深入理解 Android 内核设计思想"->{"Android 编译篇","Android 原理篇","应用原理篇"}
+	rankdir=LR;
+	"深入理解 Android 内核设计思想"->{"Android 编译篇","Android 原理篇","应用原理篇","Android 系统工具篇"}
 	"Android 原理篇"->{操作系统基础,"Android 进程/线程管理","进程间通讯 -- Binder","Android 启动过程简析","管理 Activity 和组件运行状态的系统进程 - AMS","GUI 系统之 SurfaceFlinger","GUI 系统之 WMS","GUI 系统之 View 体系","InputManagerService 与输入事件","音频系统"}
 	
-	"应用原理篇"->{"Intent 的匹配规则","APK 应用程序的资源适配","Android 字符编码格式","Android 和 OpenGL ES","系统的UI -- System UI","Widget 机制","Android 应用程序的编译打包","软件版本管理","系统调试辅助工具"}
-
+	"应用原理篇"->{"Intent 的匹配规则","APK 应用程序的资源适配","Android 字符编码格式","Android 和 OpenGL ES","系统的UI -- System UI","Widget 机制","Android 应用程序的编译打包"}
+"Android 系统工具篇"->{"软件版本管理","系统调试辅助工具"}
 
 	操作系统基础->计算机体系结构->一门学科，是软件和硬件的抽象体
 	计算机体系结构->冯诺依曼结构->"起源于1945年，诺依曼发表的关于 EDVAC 的论文"
@@ -46,41 +47,268 @@ digraph g{
 	"Android 进程/线程管理"->"Handler, MessageQueue, Runnable 与 Looper"
 
 	"Android 进程/线程管理"->ActivityThread
-	"Android 进程/线程管理"->"Thread 类"
+	"Android 进程/线程管理"->"Thread 类"->"VMThread.create"
 	"Android 进程/线程管理"->"Android 应用程序的典型启动流程"
 
-	"进程间通讯 -- Binder"->{智能指针,Parcel,"Binder 驱动与协议","DNS 服务器","Binder Client",AIDL,"Binder Server"}
+	"进程间通讯 -- Binder"->{智能指针,Parcel,"Binder 驱动与协议"," “DNS 服务器” - ServiceManager","Binder Client",AIDL,"匿名 Binder Server"}
+	智能指针->{"强指针","弱指针"}
+	"Binder 驱动与协议"->"Binder 不是一个硬件设备，而是基于内存的 “伪硬件” ,运行于内核态"
+	" “DNS 服务器” - ServiceManager"->"本身也是一个 Bind Server，参照 TCP/IP 通讯"
+	"Binder Client"->"Service、Broadcast、inten"
+	"Binder Client"->"WindowManagerService 服务，通过 addService 把自己注册到 Service Manager中，任何 Binder Client 都可以通过 SM 的 getService 接口获取他的一个引用"
 
+	"匿名 Binder Server"->"不在 Service Manager 中注册的 Binder Server"
 
 
 	"Android 启动过程简析"->{"第一个系统进程（Init）","系统关键服务的启动简析"}
 
 	"系统关键服务的启动简析"->{"ServiceManager","Zygote","SystemServer"}
+	ServiceManager->"由 /init 进程创建的进程（终端命令 ps，查看 ServiceManager 的 ppid）"
+	"SystemServer"->"init1 方法"->"完成本地层 Service 的启动"
 
 	"管理 Activity 和组件运行状态的系统进程 - AMS"->{"AMS 功能描述","Activity Stack","startActivity 流程","Activity Task"}
-
+	"AMS 功能描述"->启动过程
 	"AMS 功能描述"->{组件状态管理,组件状态查询,"Task 相关","AMS 其他功能"}
 
 	"GUI 系统之 SurfaceFlinger"->{"OpenGL ES 与 EGL",NAL,"Gralloc 与 Framebuffer","Android 中的本地窗口","BufferQueue",SurfaceFlinger,VSync的产生和处理}
+	"Gralloc 与 Framebuffer"->"Framebuffer 是内核系统提供的图形硬件的抽象描述，占用系统存储空间的一部分，是一块包含屏幕信息的缓冲区"
+	"Gralloc 与 Framebuffer"->"Gralloc 是由 FramebufferNativeWindow 构造函数中加载的"
+	
+
+	"Android 中的本地窗口"->{FramebufferNativeWindow,Surface}
+	FramebufferNativeWindow->"为 SurfaceFlinger 服务端"
+	FramebufferNativeWindow->"OpenGL ES 的本地窗口之一"
+
+	Surface->"应用程序端的本地窗口"
+	"BufferQueue"->"最多包含 32 个 BufferSlot"
+
+
+	SurfaceFlinger->"Android 4.1：Project Btter"->{VSync,"Triple Buffering"}
+	SurfaceFlinger->显示器->"显示器刷新率 66Hz，CPU/GPU 的会话能力则达到 100Hz，一帧数据分别需要 0.015 秒和 0.01 秒"
+
+	SurfaceFlinger->显示器->"两个特性"->{行频,场频}
+	行频->"水平扫描频率，屏幕每秒从左至右扫描的次数"
+	场频->"垂直扫毛频率，每秒整个屏幕刷新的次数"
+
+
+	SurfaceFlinger->"SurfaceFlinger 的启动"->"与 ServiceManager 有点类似"
+
+
+
+
+
+
 
 	"GUI 系统之 WMS"->{"WMS 综述",窗口属性,窗口添加过程,"Surface 管理",performLayoutAndPlaceSurfacesLockedInner,窗口大小的计算过程,启动窗口的添加与销毁,窗口动画}
 
+	"GUI 系统之 WMS"->{"全局的窗口管理","全局的事件管理派发"}
+
+	"全局的事件管理派发"->{"触摸屏，鼠标，轨迹球"} 
+
+	"WMS 综述"->"WMS 相关服务"->{SurfaceFlinger,IMS,AMS}
+	"WMS 综述"->"WMS 的启动"->"由 SystemServer启动"
+
+	"WMS 综述"->"WMS 的工作方式"->{"4.1 VMThread","4.1以后，wmHandlerThread"}
+
+
+	窗口属性->窗口类型->{"Window、System Window 和 Sub Window"}
+
+
+
+	窗口动画->"窗口动画类型"->{AppWindowAnimator,WindowStateAnimator,ScreenRotationAnimation}
+
+	窗口动画->Choreographer
+ 
+
+
+
+
+
+
 	"GUI 系统之 View 体系"->{"View 框架","Activity 中 ViewTree 的创建过程","在 WMS 中注册窗口","ViewRoot 的基本工作方式","ViewTree 的遍历时机","ViewTree 的遍历流程"}
+
+	"View 框架"->"View 和 ViewRootImpl"->"ViewRootImpl 是 View 树的管理者。ViewRootImpl 的核心任务是与 WindowManagerService 进行通信"
+
+	"View 框架"->"View 和 Window 的关系"->"Window 没有直接和 ViewRootImpl 联系，而是通过 Window 对象"
+
+	"View 和 Window 的关系"->"Window 的含义是与 WindowManagerService 进行通信"
+
+	"View 和 Window 的关系"->"WindowManager 是个接口，实现类是 WindowManagerImpl，WindowManagerImpl 是为了管理 Window"
+
+	"View 框架"->"ViewRootImpl 和 WindowManagerImpl 的关系"->"WindowManagerImpl 包含 WindowManagerGlobal类，WindowManagerGlobal类包含 ViewRootImpl 数组，ViewRootImpl 与 Activity 一一对应"
+
+	"View 框架"->"ViewRootImpl 和 WindowManagerService 的关系"->"IWindowSeesion 类进行 binder 通信"
+
+
+	"ViewTree 的遍历流程"->"ViewRootImpl#performTraversals UI显示三内容"->{performMeasure（尺寸大小）,performLayout（位置）,performDraw（内容绘制）}
+
+
+
+
+
+
 
 
 	"GUI 系统之 View 体系"->{"View 和 ViewGroup 属性",Canvas,Skia,"Surface.lockCanvas","unlockCanvasAndPost","draw 和 onDraw","View 中的消息传递","View 动画"}
 
 
 	"InputManagerService 与输入事件"->{事件的分类,事件的投递流程}
+	事件的投递流程->"WMS 分配"->"WindowManagerService 是窗口的大主管，同时也是 InputEvent 的派发着"
+
+	事件的投递流程->IMS->"本地 InputManager 两个线程"->{InputReaderThread,InputDispatcherThread}
+
+
+
+
+
+
+
+
 
 
 	"音频系统"->{音频基础,音频框架,AudioFlinger,AudioPolicyService,AudioTrack,音频数据流,音量控制,音频系统的上层建筑,"Android 支持的媒体格式","ID3 信息简述","Android 多媒体文件管理"}
 
+	音频基础->声波->机械波->由机械振荡产生的，所以他的传播需要介质的支持
+	音频基础->音频采样->采样
+	采样->{样本,采样器,量化,编码,采样速率,采样深度}
+	音频基础->"Nyquist-Shannon 采样定律"
+	音频基础->"声音定级 Weber-Fechner law"
+
+
+	音频框架->"Linux 中的音频框架"->声卡的组成部分->{Connectors,"Audio Circuits",Interface}
+	"Linux 中的音频框架"->"两种音频驱动架构"->{OSS,ALSA}
+
+
+
+
+ 	"应用原理篇"->{Intent的匹配规则,应用程序的资源适配,字符编码格式,"OpenGL ES","System UI","Widget 机制",应用程序的编译打包,软件版本管理,辅助调试工具}
+
+
+ 	应用程序的资源适配->屏幕适配
+
+
+ 	"OpenGL ES"->"3D 图形学基础"->{图形管线}
+
+
+ 	图形管线->"图形硬件设备（GPU）支持的渲染流程，简单说，以 3D 数据为输入，并最终输出 2D 光栅图形的一种流水线处理过程"
+
+
+ 	"OpenGL ES"->EGL->{"创建 rendering surfaces","创建图形环境（graphics context）","同步应用程序和本地平台渲染 API","提供了对显示设备的访问","提供了对渲染配置的管理"}
+
+
+ 	"System UI"->{"Status Bar","Navigation Bar","Combined Bar"}
+ 	"Navigation Bar"->{"为没有物理按键的设备提供便利","Android 4.0 后加入，提供 Home，Back，Menu "}
+ 	"Combined Bar"->"为 Table 设计的一种系统栏样式"
+
+
+
+
+ 	"软件版本管理"->Git->基础配置->{"Git config","个人信息","编译器选择","差异比较工具选择","配置信息列表"}
 
 
 
 
 
 
+
+
+
+/*
+USER     PID   PPID  VSIZE  RSS     WCHAN    PC         NAME
+root      1     0     420    252   c01bad0a 08054826 S /init                       √
+root      2     0     0      0     c013aef2 00000000 S kthreadd                    √
+root      3     2     0      0     c0129129 00000000 S ksoftirqd/0
+root      5     2     0      0     c01375c3 00000000 S kworker/u:0
+root      6     2     0      0     c01611c4 00000000 S migration/0
+root      7     2     0      0     c0136c9d 00000000 S khelper
+root      8     2     0      0     c0197604 00000000 S sync_supers
+root      9     2     0      0     c0198197 00000000 S bdi-default
+root      10    2     0      0     c0136c9d 00000000 S kintegrityd
+root      11    2     0      0     c0136c9d 00000000 S kblockd
+root      12    2     0      0     c0136c9d 00000000 S ata_sff
+root      13    2     0      0     c038380b 00000000 S khubd
+root      16    2     0      0     c0191c27 00000000 S kswapd0
+root      17    2     0      0     c01d7fdd 00000000 S fsnotify_mark
+root      18    2     0      0     c0136c9d 00000000 S crypto
+root      32    2     0      0     c032aaec 00000000 S scsi_eh_0
+root      33    2     0      0     c032aaec 00000000 S scsi_eh_1
+root      34    2     0      0     c01375c3 00000000 S kworker/u:2
+root      35    2     0      0     c0136c9d 00000000 S kpsmoused
+root      36    2     0      0     c0136c9d 00000000 S binder                     √
+root      38    2     0      0     c0511c67 00000000 S krfcommd
+root      39    2     0      0     c0136c9d 00000000 S deferwq
+root      40    1     424    4     c01bad0a 08054826 S /sbin/ueventd
+root      46    2     0      0     c02473d3 00000000 S jbd2/sda6-8
+root      47    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      48    2     0      0     c02473d3 00000000 S jbd2/sdb1-8
+root      49    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      50    2     0      0     c02473d3 00000000 S jbd2/sdb3-8
+root      51    2     0      0     c0136c9d 00000000 S ext4-dio-unwrit
+root      52    2     0      0     c0136c9d 00000000 S iprt
+root      55    1     11524  2140  ffffffff b7442f80 S /system/bin/genyd
+radio     56    1     6052   928   c02eb151 b754ba0e S /system/bin/logwrapper
+shell     57    1     6396   1380  c02eb151 b7547a0e S /system/bin/sh
+root      58    1     7892   192   ffffffff 0805a18c S /sbin/adbd
+radio     60    56    8436   1180  ffffffff b7504e53 S /system/bin/genybaseband
+root      94    1     2096   180   c01bad0a b76ff5ba S /sbin/v86d
+system    140   1     6208   936   c03ea413 b7510dbe S /system/bin/servicemanager
+root      141   1     10364  1556  ffffffff b757f9c1 S /system/bin/vold
+root      142   1     6260   1188  c0438608 b7586a0e S /system/bin/vinput
+root      143   1     6244   948   c01bad0a b758bf80 S /system/bin/vinput_seamless
+root      144   1     67740  7500  ffffffff b756cf80 S /system/bin/local_opengl
+root      145   1     6244   948   c013e7b8 b75c99c1 S /system/bin/local_gps
+root      146   1     9716   944   c01bad0a b75bef80 S /system/bin/local_camera
+root      147   1     9716   948   c01bad0a b7522f80 S /system/bin/local_camera
+root      148   1     16272  2140  ffffffff b759c9c1 S /system/bin/netd
+root      149   1     6336   976   c043e1df b75ace53 S /system/bin/debuggerd
+radio     150   1     11152  1584  ffffffff b751c9c1 S /system/bin/rild
+system    151   1     76832  6780  ffffffff b7528dbe S /system/bin/surfaceflinger  √
+root      152   1     482668 42880 ffffffff b75a1f80 S zygote                      √
+drm       153   1     16660  3876  ffffffff b75c6dbe S /system/bin/drmserver
+media     154   1     49132  9248  ffffffff b7583dbe S /system/bin/mediaserver
+bluetooth 155   1     7172   1760  c01bad0a b74df5ba S /system/bin/dbus-daemon
+root      156   1     6292   1196  c04c6d47 b7545a0e S /system/bin/installd
+keystore  157   1     8044   1720  c043e1df b751be53 S /system/bin/keystore
+root      168   58    6396   1380  c02eb151 b75a4a0e S /system/bin/sh
+root      194   58    6500   1440  c01bad0a b755df80 S logcat
+root      334   2     0      0     c01375c3 00000000 S kworker/0:2
+root      335   2     0      0     c01c9e92 00000000 S flush-8:16
+system    350   152   580336 45876 ffffffff b75a1dbe S system_server
+wifi      418   1     9364   2248  c01bad0a b74baf80 S /system/bin/wpa_supplicant
+u0_a40    425   152   521280 63764 ffffffff b75a3507 S com.android.systemui
+u0_a20    473   152   492288 30724 ffffffff b75a3507 S com.android.inputmethod.latin
+radio     487   152   508176 30764 ffffffff b75a3507 S com.android.phone
+u0_a21    502   152   529528 48520 ffffffff b75a3507 S com.android.launcher
+system    523   152   495692 25676 ffffffff b75a3507 S com.android.settings
+u0_a45    550   152   488912 23132 ffffffff b75a3507 S com.android.smspush
+u0_a0     565   152   515144 37376 ffffffff b75a3507 S android.process.acore
+u0_a12    649   152   499880 32576 ffffffff b75a3507 S com.android.deskclock
+dhcp      733   1     6396   1216  c01bad0a b755f5ba S /system/bin/dhcpcd
+u0_a58    734   152   500272 32020 ffffffff b75a3507 S cn.trinea.android.developertools
+u0_a7     758   152   490696 26908 ffffffff b75a3507 S com.android.providers.calendar
+u0_a14    772   152   492548 28964 ffffffff b75a3507 S android.process.media
+u0_a15    813   152   499728 28796 ffffffff b75a3507 S com.android.email
+u0_a43    894   152   489048 23148 ffffffff b75a3507 S com.android.voicedialer
+u0_a52    907   152   518280 39688 ffffffff b75a3507 S com.wandoujia.phoenix2:channel
+u0_a52    947   152   569604 51308 ffffffff b75a3507 S com.wandoujia.phoenix2
+u0_a6     961   152   495556 25804 ffffffff b75a3507 S com.android.calendar
+u0_a51    1009  152   493688 26440 ffffffff b75a3507 S com.wandoujia.phoenix2.usbproxy
+u0_a52    1047  947   6096   1296  c01d8ffe b7df5a0e S uuids_sys
+u0_a52    1071  152   507788 39228 ffffffff b75a3507 S com.wandoujia.phoenix2:update_service
+u0_a3     1355  152   593032 119800 ffffffff b75a3507 S com.android.browser
+u0_a33    1385  152   493872 25104 ffffffff b75a3507 S com.svox.pico
+root      1443  58    6384   1196  c010230d b757bcaa S /system/bin/sh
+root      1445  1443  6256   1176  c01bad0a b757df80 S logcat
+u0_a11    1602  152   488928 24000 ffffffff b75a3507 S com.android.defcontainer
+system    1620  152   489008 25500 ffffffff b75a3507 S com.android.keychain
+u0_a28    1642  152   489028 23848 ffffffff b75a3507 S com.android.musicfx
+u0_a39    1655  152   490460 27076 ffffffff b75a3507 S com.noshufou.android.su
+u0_a36    1704  152   490592 24460 ffffffff b75a3507 S com.android.quicksearchbox
+u0_a31    1942  152   502756 30940 ffffffff b75a3507 S com.android.packageinstaller
+root      1967  2     0      0     c01375c3 00000000 S kworker/0:1
+root      2645  58    6396   1384  c010230d b755bcaa S /system/bin/sh
+root      2650  2645  6440   1224  00000000 b75b9a0e R ps
+
+*/
 
 }
