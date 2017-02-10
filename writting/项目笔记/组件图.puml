@@ -15,14 +15,21 @@ skinparam style strictuml
 	package 客户端{
 		 
 		
-		frame 彩种{
+		frame 彩票功能{
  
-			frame 彩种辅助功能 {
-				[开奖信息模块]
-				[投注历史查询]
+			frame 彩票代购功能 {
+				
+				[投注记录]
 				[赢家跟投]
-				[预约须知]
-				frame 支付充值{
+				[开奖信息模块]
+				 
+				frame 投注{
+					[投注]
+					[跟投]
+					[追号]
+
+				}
+				frame 资金流水{
 					[新浪支付]
 					'（梓微兴h5，威富通APP）
 					[微信支付]
@@ -32,6 +39,10 @@ skinparam style strictuml
 					[时间限制]
 				}
 
+			}
+			frame 附加辅助玩法{
+				[赢家跟投]
+				[投注交易]
 			}
 			frame 彩种类别{
 				frame 竞技彩{
@@ -54,9 +65,12 @@ skinparam style strictuml
 			}
 		}
 		frame 应用标配{
+			[网络模块]
+			[图片加载模块]
+
 			[启动页]
-			[首页]
 			[用户模块]
+			[应用升级]
 			[异常处理与日志分析]
 
 			frame 应用辅助功能{
@@ -64,10 +78,16 @@ skinparam style strictuml
 				[二维码功能]
 				[用户点击统计]
 				[推送]
+			}
+			frame 界面及文本可配置功能{
+				[首页]
 				 frame 弹窗{
                     [首页弹窗]
                     [登录弹窗]
                 }
+				[彩种玩法限制]
+				[提示文本]
+
 			}
 		}
 	}
