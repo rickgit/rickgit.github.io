@@ -118,7 +118,8 @@ digraph g{
 
 
 	"source 或 dot 命令"->"source 命令来自于 C shell"
-
+	"交互式 bash shell"->"交互式 bash shell 简介"->"在 bash 提示符下键入 UNIX/Linux 命令，等待它的响应"
+	"交互式 bash shell 简介"->"启动-> init->getty->logoin->bash"
 	"交互式 bash shell"->命令行->{处理命令的顺序,命令编组}
 	处理命令的顺序->"type 命令"
 	"交互式 bash shell"->作业控制->"作业控制命令"->"bg，fg，jobs，kill，stop，stty tostop，wait ，Ctrl-Z"
