@@ -1,0 +1,14 @@
+digraph g{
+	"深入剖析 Android 系统"->"杨长刚 2013年"
+	"深入剖析 Android 系统"->{智能指针,消息处理和线程处理,"Binder IPC 及其应用","HAL 硬件抽象层","Android 启动过程","输入系统",MassStorage,Sensor,RIL,"com.android.phone 进程",Graphic,"OpenGL ES软件层次栈",Multimedia,Audio,Stagefright,OMXCodec,GPS,NFC,USB,"Bluetooth 和 Wi-Fi 简析",Debuggerd}
+	"Android 启动过程"->"Android 初始化语言"
+	MassStorage->{"守护进程 Vold"}
+
+	RIL->{"rild 守护进程"}
+
+
+	Graphic->{SurfaceFlinger}
+
+
+
+}

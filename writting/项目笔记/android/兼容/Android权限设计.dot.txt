@@ -1,5 +1,14 @@
-﻿adb shell pm list permissions -d -g
 
+检查权限->运行时权限->"Android 23,compilersdkversion 23"
+运行时权限->"敏感权限组"->{PERSONAL_INFO,COST_MONEY,LOCATION,MESSAGES,NETWORK,ACCOUNTS,STORAGE,PHONE_CALLS,HARDWARE_CONTROLS,SYSTEM_TOOLS}
+运行时权限->显式申请权限->{授权,未授权}
+运行时权限->用户已禁用权限->"Toast.makeText(MainActivity.this, "您没有授权该权限，请在设置中打开授权", Toast.LENGTH_SHORT).show();"
+ 
+权限->{系统权限,特殊权限}
+系统权限->{普通权限,危险权限}
+特殊权限->{SYSTEM_ALERT_WINDOW,WRITE_SETTINGS}
+
+/**
 C:\Users\anshu.wang>adb shell pm list permissions -d -g
 Dangerous Permissions:
 
@@ -86,3 +95,4 @@ group:android.permission-group.SYSTEM_TOOLS
   permission:android.permission.WRITE_SETTINGS
 
 ungrouped:
+**/
