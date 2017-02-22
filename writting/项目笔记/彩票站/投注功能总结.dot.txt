@@ -1,0 +1,116 @@
+digraph g{
+	label="购彩功能总结"
+	//===============================投注页面功能======================================
+//购彩元素，彩票，也称奖券，玩法所有选项相当于柜台盒，玩法选项相当于柜台盒的物品
+	彩种->彩项->竞技彩->彩项（足彩）->{胜平负,让球胜平负,全场比分,总进球,半全场胜平负}
+	竞技彩->彩项（篮彩）->{胜负,让分胜负,大小分,胜分差}
+	竞技彩->彩项（北单）->{胜平负,全场比分,总进球,半全场胜平负,上下单双}
+	彩种->彩项（数字彩）->彩项（号码）
+	// 计价秤（price-computing instrument）
+	// 计项器
+	// 计场器
+
+	// 购彩篮
+
+	彩项（竞技彩赛事）->{赛事信息,彩项组}
+
+	class ZcLotteryItemWapper extends BetPanel{
+		List<Match> match; 
+
+	}
+	class Match{
+		String Hostno;
+		String Guestno;
+
+		Team HostName;
+		Team GuestName;
+
+		String no;
+		String name;
+		String pubulishTime;// 竞足竞篮pubulishTime +[12:00--次日12:00]分组
+		String endTime;// 北单是根据截止时间+[10:00--次日10:00]
+
+		MatchDetail guest;
+	}
+	class Team{
+		String name;
+		String icon;
+	}
+	class MatchDetail{
+		String history;
+		String lastResult;
+	}
+	class ZcBdSpfMatchDeatil extends MatchDetail{
+		String op;
+		String supportRate;
+	}
+
+	class SzcLotteryItemWapper extends BetPanel{
+		SzcRecord SzcRecord;
+	}
+	class SzcRecord extends Record{
+		String lastTerm;
+		String lastJackpot;
+		List<SzcResult> result;
+	}
+	class SzcResult extends BaseResult{
+		String term;
+		String termResult;
+	}
+	class Jxk3Result extends BaseResult{
+		String term;
+		String termResult;
+	}
+
+	class Jxk3LotteryItemWapper extends BetPanel{
+		SzcRecord SzcRecord;
+
+	}
+	//能触发确定按钮的界面元素
+	class BetPanel{
+ 	}
+	PriceComputingTool implement ComputingTool{
+
+	}
+	ItemComputingTool implement ComputingTool{
+	
+	}
+	MatchNumComputingTool implement ComputingTool{
+	
+	}
+
+	LotteryLimit implement Limit{
+
+	}
+	LotteryJjcPlayTypeLimit implement Limit{
+	
+	}
+	LotterySzcNumLimit implement Limit{
+	
+	}
+	//当前窗口的界面元素
+	class BetPage{
+		List<BetPanel> betPanel;//界面元素
+		List<ShoppingBasket> ShoppingBasket;//内存中的数据
+
+	}
+	//工具类和限制类子类实现，界面监听接口，避免BetPage，频繁改动
+	class JjcBetPage extends BetPage implement ViewAction{
+		ComputingTool computingInstrument;
+		Limit lotteryJjcPlayTypeLimit;
+		Limit lotterySzcNumLimit;
+		Map<String,NotifyViewListener> viewListener;//用于反馈给界面数据改变
+	}
+	interface BetAction extends ViewAction{
+		onCheckItem(int panelIndex,int playtype,boolean check);
+	}
+	interface SzcAction extends ViewAction{
+		onCheckItem(int panelIndex,int num,boolean check);
+	}
+	interface LoadMatchAction extends ViewAction{
+		loadData();
+	}
+	interface SzcTermAction extends ViewAction{
+		loadTerm();
+	}
+}

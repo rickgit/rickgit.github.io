@@ -1,0 +1,98 @@
+Martin Fowler的经典大作，英文版。
+
+[Addison-Wesley Professional] 分析模式 可复用的对象模型
+[Addison-Wesley Professional] Analysis Patterns Reusable Object Models (E-Book)
+[作者信息] Martin Fowler
+[出版机构] Addison-Wesley Professional
+[出版日期] 1996年10月19日
+[图书页数] 384页
+[图书语言] 英语
+[图书格式] PDF格式
+
+=======================================================
+[Addison-Wesley Professional] 规划极限编程
+[Addison-Wesley Professional] Planning Extreme Programming (E-Book)
+[作者信息] Kent Beck, Martin Fowler
+[出版机构] Addison-Wesley Professional
+[出版日期] 2000年10月26日
+[图书页数] 160页
+[图书语言] 英语
+[图书格式] CHM格式
+
+===================================================================
+[Addison-Wesley Professional] UML精粹 标准对象建模语言简明指南 第3版
+[Addison-Wesley Professional] UML Distilled A Brief Guide to the Standard Object Modeling Language 3rd Edition (E-Book)
+[作者信息] Martin Fowler
+[出版机构] Addison-Wesley Professional
+[出版日期] 2003年09月15日
+[图书页数] 208页
+[图书语言] 英语
+[图书格式] CHM格式
+
+===================================================================
+[Addison-Wesley Professional] 企业应用架构模式
+[Addison-Wesley Professional] Patterns of Enterprise Application Architecture (E-Book)
+[作者信息] Martin Fowler
+[出版机构] Addison-Wesley Professional
+[出版日期] 2012年03月09日
+[图书页数] 560页
+[图书语言] 英语
+[图书格式] CHM格式
+
+===================================================================
+[Addison-Wesley Professional] 重构 改善既有代码的设计
+[Addison-Wesley Professional] Refactoring Improving the Design of Existing Code (E-Book)
+[作者信息] Martin Fowler, Kent Beck, John Brant, William Opdyke, Don Roberts
+[出版机构] Addison-Wesley Professional
+[出版日期] 2012年03月09日
+[图书页数] 464页
+[图书语言] 英语
+[图书格式] CHM格式
+
+
+
+Robert C. Martin 经典软件著作合集
+
+ [Prentice Hall] 敏捷软件开发 原则、模式与实践 (C#版) 
+ [Prentice Hall]  Agile Principles, Patterns, and Practices in C# (E-Book) 
+ [作者信息] Micah Martin, Robert C. Martin 
+ [出版机构] Prentice Hall 
+ [出版日期] 2006年07月20日 
+ [图书页数] 768页 
+ [图书语言] 英语 
+ [图书格式] CHM格式 
+ =================================================================== 
+ [Prentice Hall] 代码整洁之道 
+ [Prentice Hall] Clean Code A Handbook of Agile Software Craftsmanship (E-Book) 
+ [作者信息] Robert C. Martin [出版机构] Prentice Hall [出版日期] 2008年08月01日 
+ [图书页数] 466页 
+ [图书语言] 英语 
+ [图书格式] PDF格式 
+ =================================================================== 
+ [Prentice Hall] 程序员的职业素养 
+ [Prentice Hall] The Clean Coder A Code of Conduct for Professional Programmers (E-Book) 
+ [作者信息] Robert C. Martin [出版机构] Prentice Hall [出版日期] 2011年05月13日 
+ [图书页数] 256页 
+ [图书语言] 英语 
+ [图书格式] PDF格式 
+
+ 《代码整洁之道》 , 《程序员的职业素养》 ， 《敏捷软件开发(原则模式与实践)》 ， 《敏捷软件开发(原则模式与实践)》 ， 《UML for Java For Programmers》 ， 《Extreme Programming in Practice》
+
+
+
+
+
+
+
+
+Kent Beck （1961~）跟极限编程创始人
+
+1996. Smalltalk Best Practice Patterns. Prentice Hall. (ISBN 978-0134769042)
+1996. Kent Beck's Guide to Better Smalltalk : A Sorted Collection. Cambridge University Press. (ISBN 978-0521644372)
+1999. Extreme Programming Explained: Embrace Change. Addison-Wesley. Winner of the Jolt Productivity Award. (ISBN 978-0321278654)
+2000. Planning Extreme Programming. With Martin Fowler. Addison-Wesley. (ISBN 978-0201710915)
+2002. Test-Driven Development: By Example. Addison-Wesley. Winner of the Jolt Productivity Award. (ISBN 978-0321146533)
+2003. Contributing to Eclipse: Principles, Patterns, and Plugins. With Erich Gamma. Addison-Wesley. (ISBN 978-0321205759)
+2004. JUnit Pocket Guide. O'Reilly. (ISBN 978-0596007430)
+2004. Extreme Programming Explained: Embrace Change, 2nd Edition. With Cynthia Andres. Addison-Wesley. Completely rewritten. (ISBN 978-0201616415)
+2008. Implementation Patterns. Addison-Wesley. (ISBN 978-0321413093)

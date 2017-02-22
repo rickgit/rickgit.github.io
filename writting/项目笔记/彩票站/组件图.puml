@@ -24,7 +24,7 @@ skinparam style strictuml
 				[开奖信息模块]
 				 
 				frame 投注{
-					[投注]
+					[投注1]
 					[跟投]
 					[追号]
 
