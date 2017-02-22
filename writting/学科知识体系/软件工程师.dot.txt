@@ -1,0 +1,18 @@
+digraph G{
+	克利斯托弗[shape=record,label=" 克利斯托弗·亚历山大| { 1936~1635(奥地利) | 建筑师| 模式语言}"]
+	Booch[shape=record,label=" Grady Booch| { 1955~ | UML创始人| 《面向对象分析与设计》}"]
+	Beck[shape=record,label=" Kent Beck| { 1961~ | 跟极限编程创始人}"]
+	沃德·坎宁安[shape=record,label=" 沃德·坎宁安| { 1949~ | 发明了维基概念}"]
+	 
+	"Fred Brooks"[shape=record,label=" Fred Brooks| { 1931~ | 1975年《人月神话》}"]
+
+	"Watts Humphrey"[shape=record,label=" Fred Brooks| { 1927 – 2010 | 软件能力成熟度模型，即CMM（《软件过程管理》）| 《软件工程规范》| 《个体软件过程》| 《小组软件开发过程》| 《技术人员管理》| 《软件制胜之道》}"]
+
+	"Ivar Jacobson"[shape=record,label=" Ivar Jacobson| { ~ | UML、RUP、组件和组件架构、用例等技术之父}"]
+	JamesRumbaugh[shape=record,label=" JamesRumbaugh| { ~ | 与GradyBooch和IvarJacobson一道，开发了统一建模语言}"]
+
+	"Edward Yourdon"[shape=record,label=" JamesRumbaugh| { 1944-  | 软件工程方法论的创始人}"]
+"Martin Fowler"
+"Robert Martin"
+
+}

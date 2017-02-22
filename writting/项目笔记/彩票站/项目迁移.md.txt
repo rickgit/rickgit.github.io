@@ -1,0 +1,24 @@
+「我去彩票站」合作版
+打包需处理：
+1、使用新的bundle id。
+2、需要根据bundle id进行调整的第三方应用处理：
+	①百度地图SDK、	DidiPluginHost/AndroidManifest.xml:90
+	②信鸽push SDK、DidiPluginHost/AndroidManifest.xml:245
+	③连连支付SDK、打岔	
+	④友盟统计SDK、	DidiPluginHost/AndroidManifest.xml:93
+    ⑤微信支付SDK        
+    ⑥微信开放平台APP ID com.woqutz.didi.common.config.AppConfig#WEIXIN_PAY_ID
+    7.BUGLY DidiPluginHost/AndroidManifest.xml:96
+    8.QQ分享 com.woqutz.didi.common.config.AppConfig#QQ_APPID
+    9.微博分享 com.woqutz.didi.common.config.AppConfig#WEIBO_APPID
+    10.阿里用户反馈
+3、替换app  icon文件、启动loading图文件、设置页icon切图。
+4、微信分享处理。
+
+
+应用名称	易中彩票
+icon	
+渠道号	 
+密钥	 
+Bundle ID	com.wqcpz.yzcp
+微信开放平台APP ID	
