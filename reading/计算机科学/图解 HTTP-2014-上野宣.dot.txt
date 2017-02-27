@@ -1,0 +1,84 @@
+digraph g{
+//重要概念,web ,tcp/ip, http,html
+	//172张图，2014年 上野宣
+	"图解 HTTP"->"HTTP 协议结构"
+	"图解 HTTP"->"了解 Web 及网络基础"->HTTP->"TCP/IP 协议族"->{应用层,传输层,网络层,数据链路层}
+	"图解 HTTP"->"简单的 HTTP 协议"->请求报文->{请求方法,"请求 URI",协议版本,可选的请求首部字段,内容实体}
+	"简单的 HTTP 协议"->响应报文->{协议版本,状态码,用以解释状态码的原因短语,可选的响应首部字段,实体主体}
+	"简单的 HTTP 协议"->"HTTP 是不保存状态的协议"->"Cookie 技术"
+	请求方法->{GET,POST,PUT,HEAD,DELETE,OPTIONS,TRACE,CONNECT,LINK,UNLINK}
+	"简单的 HTTP 协议"->持久连接节省通信量->{持久连接,管线化}
+	持久连接->"HTTP/1.1 keep-alive"
+
+	"图解 HTTP"->"HTTP 报文内的 HTTP 信息"->编码提升传输速率->压缩传输的内容编码->{gzip,compress,deflate,identity}
+	编码提升传输速率->分割发送的分块传输编码
+
+	"HTTP 报文内的 HTTP 信息"->发送多种数据的多部分对象集合->{"multipart/form-data","multipart/byteranges"}
+
+	"HTTP 报文内的 HTTP 信息"->获取部分内容的范围请求->范围请求
+	"HTTP 报文内的 HTTP 信息"->内容协商返回最合适的内容->{服务器驱动协商,客户端驱动协商,透明协商}
+
+
+
+
+	"图解 HTTP"->"返回结果的 HTTP 状态码"->{"2xx 成功","3xx 重定向","4xx 客户端错误","5xx 服务器错误"}
+
+
+	"图解 HTTP"->"与 HTTP 协作的 web 服务器"->"Web 托管服务"->虚拟主机
+"与 HTTP 协作的 web 服务器"->通讯数据转发程序->{代理,网关,隧道}
+	代理->{缓存代理,透明代理}
+
+	"图解 HTTP"->"HTTP 首部字段"->"4 种 HTTP 首部字段类型"->{通用首部字段,请求首部字段,响应首部字段,实体首部字段}
+	"HTTP 首部字段"->{"HTTP/1.1 首部字段","非 HTTP/1.1 首部字段"}
+
+	"HTTP 首部字段"->"End-to-end 首部和 Hop-by-hop 首部"
+
+	"图解 HTTP"->"确保 Web 安全的 HTTPS"->"HTTP 的缺点"
+	"确保 Web 安全的 HTTPS"->"HTTP + 加密 + 认证 + 完整性保护 = HTTPS"
+
+	"确保 Web 安全的 HTTPS"->相互交换密钥的公开密钥加密技术->"SSL 公开密钥加密"->{共享密钥加密的困境}
+
+	相互交换密钥的公开密钥加密技术->"HTTPS 采用混合加密机制"->交换密钥环节使用公开密钥加密方式，之后的建立通信交换报文阶段则使用共享密钥加密方式
+
+	"确保 Web 安全的 HTTPS"->证明公开密钥正确性的整数
+	"确保 Web 安全的 HTTPS"->"HTTPS 的安全通信机制"
+
+	"图解 HTTP"->"确认访问用户身份"->{"BASIC 认证","DIGEST 认证","SSL 客户端认证","FormBase 认证"}
+
+
+
+
+	"FormBase 认证"->"Session 管理及 Cookie 应用"
+
+	"图解 HTTP"->"基于 HTTP 的功能追加"->"消除 HTTP 瓶颈的 SPDY"->{Ajax,"Comet 的解决方法"}
+	"基于 HTTP 的功能追加"->"基于 SPDY 的 HTTP/2.0"
+	"基于 HTTP 的功能追加"->  WebSocket
+	"基于 HTTP 的功能追加"->  WebDAV
+
+
+
+
+	"图解 HTTP"->"构建 Web 内容的技术"->HTML
+
+"构建 Web 内容的技术"->"动态 HTML"
+"构建 Web 内容的技术"->"Web 应用"
+"构建 Web 内容的技术"->"数据发布的格式及语言"->{XML,RSS、Atom,JSON}
+
+
+
+	"图解 HTTP"->"Web 的攻击技术"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
