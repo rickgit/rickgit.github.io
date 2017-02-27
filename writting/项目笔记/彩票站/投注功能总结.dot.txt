@@ -78,6 +78,9 @@ digraph g{
 	MatchNumComputingTool implement ComputingTool{
 	
 	}
+	JjcChuangComputingTool implement ComputingTool{
+	
+	}
 
 	LotteryLimit implement Limit{
 
@@ -113,4 +116,15 @@ digraph g{
 	interface SzcTermAction extends ViewAction{
 		loadTerm();
 	}
+
+	class ShoppingBasketPage{
+		ShoppingBasket shoppingBasket;
+		MatchNumComputingTool matchNumComputingTool;
+	}
+	class ShoppingBasket{
+		Match match;
+		Item item;
+	}
+
+
 }

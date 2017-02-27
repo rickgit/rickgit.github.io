@@ -2,23 +2,46 @@
 打包需处理：
 1、使用新的bundle id。
 2、需要根据bundle id进行调整的第三方应用处理：
-	①百度地图SDK、	DidiPluginHost/AndroidManifest.xml:90
-	②信鸽push SDK、DidiPluginHost/AndroidManifest.xml:245
+	√①百度地图SDK、	DidiPluginHost/AndroidManifest.xml:90
+	√②信鸽push SDK、DidiPluginHost/AndroidManifest.xml:245
 	③连连支付SDK、打岔	
 	④友盟统计SDK、	DidiPluginHost/AndroidManifest.xml:93
-    ⑤微信支付SDK        
-    ⑥微信开放平台APP ID com.woqutz.didi.common.config.AppConfig#WEIXIN_PAY_ID
+    √⑤微信支付SDK        
+    √⑥微信开放平台APP ID com.woqutz.didi.common.config.AppConfig#WEIXIN_PAY_ID
     7.BUGLY DidiPluginHost/AndroidManifest.xml:96
     8.QQ分享 com.woqutz.didi.common.config.AppConfig#QQ_APPID
     9.微博分享 com.woqutz.didi.common.config.AppConfig#WEIBO_APPID
     10.阿里用户反馈
+    11.360加固包
 3、替换app  icon文件、启动loading图文件、设置页icon切图。
 4、微信分享处理。
 
 
+
+*    百度地图
+*    QQ 分享的图标需要修改
+***** 微信支付 App，紫微星 H5 可以，威富通调用本地不支持。
+    微信密钥,由微信工具生成。 02d575893fe2c347fc4d3ba77036dd40
+**  新浪分享 需要重新申请，只可以使用未安装新浪微博
+
+*** 信鸽推送，需要增加 id，并修改后台推送功能。
+    信鸽推送key ，需要后台配置推送
+    server 添加<action android:name="com.wqcpz.yzcp.PUSH_ACTION" />
+    YOUR_ACCESS_ID，YOUR_ACCESS_KEY
+
+-    友盟后台的应用名与实际应用名和包名无关
+
+
+
 应用名称	易中彩票
 icon	
-渠道号	 
-密钥	 
+渠道号 100145
+密钥  piw2B5TarQG#sRNY#rseRZAy+
 Bundle ID	com.wqcpz.yzcp
 微信开放平台APP ID	
+
+02d575893fe2c347fc4d3ba77036dd40
+
+keytool -list -v -keystore didi-apk.keystore
+
+"appid" -> "wx8fc2b5fa44fcff32"
