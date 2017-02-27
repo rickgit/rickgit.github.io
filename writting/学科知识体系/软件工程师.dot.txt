@@ -1,18 +1,26 @@
 digraph G{
-	克利斯托弗[shape=record,label=" 克利斯托弗·亚历山大| { 1936~1635(奥地利) | 建筑师| 模式语言}"]
-	Booch[shape=record,label=" Grady Booch| { 1955~ | UML创始人| 《面向对象分析与设计》}"]
-	Beck[shape=record,label=" Kent Beck| { 1961~ | 跟极限编程创始人}"]
-	沃德·坎宁安[shape=record,label=" 沃德·坎宁安| { 1949~ | 发明了维基概念}"]
 	 
+	"Watts Humphrey"[shape=record,label=" Watts Humphrey| { 1927 – 2010 | 软件能力成熟度模型，即CMM（《软件过程管理》）| 《软件工程规范》| 《个体软件过程》| 《小组软件开发过程》| 《技术人员管理》| 《软件制胜之道》}"]
 	"Fred Brooks"[shape=record,label=" Fred Brooks| { 1931~ | 1975年《人月神话》}"]
+	克利斯托弗[shape=record,label=" 克利斯托弗·亚历山大| { 1936~1635(奥地利) | 建筑师| 模式语言}"]
 
-	"Watts Humphrey"[shape=record,label=" Fred Brooks| { 1927 – 2010 | 软件能力成熟度模型，即CMM（《软件过程管理》）| 《软件工程规范》| 《个体软件过程》| 《小组软件开发过程》| 《技术人员管理》| 《软件制胜之道》}"]
+	"Edward Yourdon"[shape=record,label=" 爱德华·纳什·尤登| { 1944-  | 软件工程方法论的创始人| 结构化编程 结构化系统的分析和设计}"]
 
-	"Ivar Jacobson"[shape=record,label=" Ivar Jacobson| { ~ | UML、RUP、组件和组件架构、用例等技术之父}"]
-	JamesRumbaugh[shape=record,label=" JamesRumbaugh| { ~ | 与GradyBooch和IvarJacobson一道，开发了统一建模语言}"]
+	"Ivar Jacobson"[shape=record,label=" Ivar Jacobson| { 1939~ | UML、RUP、组件和组件架构、用例等技术之父}"]
+	JamesRumbaugh[shape=record,label=" JamesRumbaugh| { 1947~ | 与GradyBooch和IvarJacobson一道，开发了统一建模语言}"]
+	Booch[shape=record,label=" Grady Booch| { 1955~ | UML创始人| 《面向对象分析与设计》}"]
 
-	"Edward Yourdon"[shape=record,label=" JamesRumbaugh| { 1944-  | 软件工程方法论的创始人}"]
-"Martin Fowler"
-"Robert Martin"
+	沃德·坎宁安[shape=record,label=" 沃德·坎宁安| { 1949~ | 发明了维基概念}"]
+	"Robert Martin"[shape=record,label=" Robert Martin| { 1952~ | 《程序员的职业素养》}"]
+
+
+	Beck[shape=record,label=" Kent Beck| { 1961~ | 1996极限编程创始人 }"]
+	"Erich Gamma"[shape=record,label=" Erich Gamma| { 1961~ | 《设计模式》}"]
+	"Martin Fowler"[shape=record,label=" Martin Fowler| { 1963~ | 面向对象分析设计、UML、模式等方面的专家，敏捷开发方法的创始人之一| 《分析模式》、《UML精粹》和《重构》}"]
+
+	JamesRumbaugh->UML
+	Booch->UML
+	"Ivar Jacobson"->UML
+	UML->软件开发方法
 
 }
