@@ -1,0 +1,84 @@
+digraph g{
+	手势解锁界面->元素->手势面板->{点,线}
+	手势面板->{相对父容器左上点坐标,宽,高}
+	相对父容器左上点坐标->{起始点X,起始点Y}
+	点->{位置,中心点坐标,颜色,大小,选中外边框}
+	//Android Path 类表示。
+	线->{起点,中间点,按压点,终点}
+ 	
+ 	class Panel{
+ 		List<Dot> dots;
+ 		List<Dot> select;//有序
+ 		//初始化，面板，点的信息。
+ 		init()
+
+ 		drawCircle(){
+ 			dot.draw();
+ 		}
+ 		//选择点的圆心坐标为起始端，画直线。
+ 		drawLine(){
+
+ 		}
+ 		//根据手势面板的起始点，宽高获取每个手势选择点的中心坐标
+ 		int[] calDotCenterCoord()
+
+ 		selectDot(){
+
+ 		}
+ 	}
+ 	class IDrawable{
+ 		drawale()
+ 	}
+ 	 class ISelectable{
+ 		select(boolean select)
+ 	}
+ 	class DrawElement{
+ 		int color;
+ 	}
+ 	class Circle extends DrawElement implement IDrawable{
+		int[] centerCoord;
+ 		int size;
+ 	}
+ 	class Dot extends Circle implement IDrawable,ISelectable{
+ 		int index;
+ 		Circle circleLine;
+ 		boolean isSelect;
+
+ 		draw(){
+ 			circleLine.drawable()
+ 		}
+ 		select(boolean select){
+ 			isSelect=select;
+ 		}
+ 	}
+
+
+ 	/*
++-------------+------------+------------+
+|             |            |            |
+|             |            |            |
+|     ++      |     ++     |     ++     |
+|             |            |            |
+|             |            |            |
++---------------------------------------+
+|             |            |            |
+|             |            |            |
+|     ++      |     ++     |      ++    |
+|             |            |            |
+|             |            |            |
++---------------------------------------+
+|             |            |            |
+|             |            |            |
+|     ++      |     ++     |     ++     |
+|             |            |            |
+|             |            |            |
++-------------+------------+------------+
+
+
+
+ 	*/
+ 	手势解锁界面->业务流程->{设置,出错超过限制,不同手机} 
+ 	手势解锁界面->密码保存两份本地和服务器->只允许一台手机登录。
+ 	出错超过限制->微信是用支付密码进行重置。
+
+ }

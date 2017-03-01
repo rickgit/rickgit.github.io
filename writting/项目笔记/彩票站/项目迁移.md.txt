@@ -13,21 +13,32 @@
     9.微博分享 com.woqutz.didi.common.config.AppConfig#WEIBO_APPID
     10.阿里用户反馈
     11.360加固包
-3、替换app  icon文件、启动loading图文件、设置页icon切图。
-4、微信分享处理。
 
 
+1、替换app  icon文件、启动loading图文件、设置页icon切图。
+ 
+    应用名从资源文件中转移到gradle，详见[](http://blog.csdn.net/tiankong1206/article/details/50436007)
+    ```
+    <string name="app_name">易中彩票</string>
 
-*    百度地图
-*    QQ 分享的图标需要修改
+
+     resValue "string", "app_name", "易中彩票"
+    ```
+
+2、配置处理
+*    百度地图,需要Manifest 文件修改 key
+*    QQ 分享 需要代码修改图标的地址
 ***** 微信支付 App，紫微星 H5 可以，威富通调用本地不支持。
     微信密钥,由微信工具生成。 02d575893fe2c347fc4d3ba77036dd40
 **  新浪分享 需要重新申请，只可以使用未安装新浪微博
 
-*** 信鸽推送，需要增加 id，并修改后台推送功能。
-    信鸽推送key ，需要后台配置推送
-    server 添加<action android:name="com.wqcpz.yzcp.PUSH_ACTION" />
-    YOUR_ACCESS_ID，YOUR_ACCESS_KEY
+*** 信鸽推送，
+    1、需要增加 id；
+    2、修改后台推送功能。
+    3、Manifest 文件。
+        修改信鸽推送key ，需要后台配置推送。
+        server 添加<action android:name="com.wqcpz.yzcp.PUSH_ACTION" />。
+        YOUR_ACCESS_ID，YOUR_ACCESS_KEY,YOUR_ACCESS_Secret KEY。
 
 -    友盟后台的应用名与实际应用名和包名无关
 
@@ -39,9 +50,6 @@ icon
 密钥  piw2B5TarQG#sRNY#rseRZAy+
 Bundle ID	com.wqcpz.yzcp
 微信开放平台APP ID	
-
 02d575893fe2c347fc4d3ba77036dd40
-
 keytool -list -v -keystore didi-apk.keystore
-
 "appid" -> "wx8fc2b5fa44fcff32"
