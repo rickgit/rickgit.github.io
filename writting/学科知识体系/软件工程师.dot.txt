@@ -18,6 +18,8 @@ digraph G{
 	"Erich Gamma"[shape=record,label=" Erich Gamma| { 1961~ | 《设计模式》}"]
 	"Martin Fowler"[shape=record,label=" Martin Fowler| { 1963~ | 面向对象分析设计、UML、模式等方面的专家，敏捷开发方法的创始人之一| 《分析模式》、《UML精粹》和《重构》}"]
 
+	"Steve McConnell"[shape=record,label=" Steve McConnell| {  ~ | 《代码大全》}"]
+
 	JamesRumbaugh->UML
 	Booch->UML
 	"Ivar Jacobson"->UML
