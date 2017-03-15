@@ -1,0 +1,12 @@
+digraph g{
+	"High Performance Browser Networking"->{Networking,"Wireless Networks",HTTP,"Browser APIs and Protocols"}
+	Networking->{"Primer on Latency and Bandwidth"}
+	"Primer on Latency and Bandwidth"->{Latency,Bandwidth}
+	latency->"The time from the source sending a packet to the destination receiving it"
+	Bandwith->"Maximum throughput of a logical or physical communication path"
+	latency->{"Propagation delay","Transmission delay","Processing delay","Queuing delay"}
+
+	"Wireless Networks"->{WiFi,"Mobile Networks"}
+
+	"Browser APIs and Protocols"->{XMLHttpRequest,SSE,WebSocket,WebRTC}
+}

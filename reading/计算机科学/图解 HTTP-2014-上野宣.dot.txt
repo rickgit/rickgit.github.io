@@ -1,5 +1,5 @@
 digraph g{
-//重要概念,web ,tcp/ip, http,html
+//重要概念,web ,tcp/ip, http，https,http/2.0,websocket,html
 	//172张图，2014年 上野宣
 	"图解 HTTP"->"HTTP 协议结构"
 	"图解 HTTP"->"了解 Web 及网络基础"->HTTP->"TCP/IP 协议族"->{应用层,传输层,网络层,数据链路层}
