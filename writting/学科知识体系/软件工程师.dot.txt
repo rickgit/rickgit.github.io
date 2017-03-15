@@ -1,5 +1,5 @@
 digraph G{
-	 
+	 //http://lucida.me/blog/on-reading-books/
 	"Watts Humphrey"[shape=record,label=" Watts Humphrey| { 1927 – 2010 | 软件能力成熟度模型，即CMM（《软件过程管理》）| 《软件工程规范》| 《个体软件过程》| 《小组软件开发过程》| 《技术人员管理》| 《软件制胜之道》}"]
 	"Fred Brooks"[shape=record,label=" Fred Brooks| { 1931~ | 1975年《人月神话》}"]
 	克利斯托弗[shape=record,label=" 克利斯托弗·亚历山大| { 1936~1635(奥地利) | 建筑师| 模式语言}"]

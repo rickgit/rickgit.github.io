@@ -53,3 +53,14 @@ Bundle ID	com.wqcpz.yzcp
 02d575893fe2c347fc4d3ba77036dd40
 keytool -list -v -keystore didi-apk.keystore
 "appid" -> "wx8fc2b5fa44fcff32"
+
+
+//设置代码中的字段
+buildConfigField 'String', 'WEIXIN_PAY_ID', '"wx86ced225503e4bbd"'
+resValue "string", "app_name", "易中彩票"
+ //信鸽
+manifestPlaceholders = [XG_V2_ACCESS_ID: "2100252482",
+                        XG_V2_ACCESS_KEY: "AXVPR86E837L",
+                        XG_V2_SECRET_KEY: "e662807870ec50addbe742d3b7f62069",
+                        XG_PUSH_ACTION: "com.wqcpz.yzcp.PUSH_ACTION",
+                        BUGLY_APPID: "d8db142a2f"]
