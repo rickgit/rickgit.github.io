@@ -1,0 +1,117 @@
+digraph g{
+//Holistic ：Relating to a study of the whole instead of a separation into parts.
+	"Learn More Study Less"->{Introduction,"The Holistic Learning Strategy","Holistic Learning Techniques","Beyond Holistic Learning","Summary & Quick Guide"}
+
+
+	Introduction->smart->Intelligence->IQ
+	smart->"means bing able to learn quickly, remember a large amount of information and be able to sort that information in a way that achieves your goals"->{learn ,infomation,goals}
+	Introduction->"holistic learning"->"two major goals"->{"how to learn better","learn techniques"}
+	Introduction->{"My Story","What is Holistic Learning"}
+	"My Story"->"Smart People"
+	"My Story"->"Holistic learning introduces many new concepts and techniques"
+	"What is Holistic Learning"->"Holistic learning is the opposite of rote memorization"->"Rote memorization"
+	"What is Holistic Learning"->"Learning anything requires associations. "->"But learning doesn’t fit into boxes. Learning fits into webs."
+	//整体性学习的三种主要观点
+	"The Holistic Learning Strategy"->"How You Store Information"->"Holistic learning is based on three main ideas"->{Constructs,Models,Highways}
+	"Highways"->"With highways, you can import your own understandings from different subjects."//《人类知识起源》《普通逻辑原理》
+	"The Holistic Learning Strategy"->"Familiar Constructs"
+	Models->subspace
+
+	"The Holistic Learning Strategy"->"The Sequence of Holistic Learning"->{acquire,understand,explore,debug,apply}
+	"acquire"->{simplicity,volume,speed}
+	understand->"Learning by rote is learning with only the Understand Phase"
+	explore->"Exploration is really the start of holistic learning."
+	explore->{depth,lateral,vertical}
+	//康德把世界的信息分为，事物和理念。本书描述的是随意，观点，过程，具体，抽象信息
+	"information structures"->"basic information structures"->{arbitrary,opinion,process,concrete,abstract}
+
+	arbitrary->"Arbitrary information is a set of facts, dates, definitions or rules that have no logical grouping"->"logical grouping"
+	arbitrary->" encountered in schools and less frequentlyin the real world"
+	arbitrary->{Linking,Pegging,Compression}
+	opinion->"Opinion information is information you need to argue."
+	process->"Process information is information you need to act upon."
+	process->{Visceralization,Metaphor,Diagraming,"Model Debugging"}
+	concrete->"Concrete information deals with ideas you can interact with tangibly"
+
+abstract->"lacks the obvious connection with the senses"
+"Why Your Classes are Boring"->"认为与自身无关，所以枯燥"
+"Goals for Learning"->{motivation,purpose}
+"Goals for Learning"->"Holistic learning can make your classes more valuable."->{useful}
+
+	//第二部分"
+	"Holistic Learning Techniques"->{"Acquiring Ideas","Linking Ideas","Handdling the Arbitrary","Extending Ideas"}
+
+	"Acquiring Ideas"->{"Speed Reading","Flow-Based Notetaking"}
+
+	"Linking Ideas"->{Metaphor,Visceralization,Diagraming}
+	"Handdling the Arbitrary"->{Linking,Pegging,"Information Compression"}
+
+	"Extending Ideas"->{"Practical Usage","Model Debugging","Project-Based Learing"}
+	//个人观点是细节都是《如何阅读一本书》的细节
+	"Speed Reading"->"Breakthrough Rapid Reading"->{"Using a pointer","Practice reading","active reading"}
+
+	"Flow-Based Notetaking"->"Hybrid Flow-Based Notetaking"->{"Flow-Based Afternotes","Flow-Based Commenting"}
+
+	"Flow-Based Notetaking"->"Recognizing Critical Information"
+
+	"Linking Ideas"->{information,"Using Linking Methods to Form Models"}
+
+	information->{"Difficult information","Critical Information"}
+
+	Metapher->{" look for something in your experience that models this process","three simple steps","Tips for Improving"}
+	Visceralization->{"works best with concrete information","How to Visceralize",Metaphorisceralization}
+	Diagraming->"three main types of diagrams"->{"Flow-Based Diagrams","Concept-Based Diagrams","Image Diagrams"}
+
+	"Flow-Based Diagrams->"start with a single element, and draw connecting arrows to different ideas as they relate to that element"
+
+
+	"Image Diagrams"->"10-20 second doodle can be valuable"
+
+
+	Linking->{"Steps to Use the Link Method","Broken Links","Indecipherable Symbols","Lost Triggers"}
+	//挂钩法
+	"Information Compression"  ->{mnemonics, "picture linking" , "notes reduction"}
+
+
+	"Practical Usage"->"self-education"
+	//第三部分
+	"Beyond Holistic Learning"->{"The Productive Student","Educate Yourself"}
+
+	"The Productive Student"->{"Manage Your Energy","Don't Study","Nuke Procrastination","Batching","Be Organized"}
+	//https://www.scotthyoung.com/blog/my-projects/
+	"Educate Yourself"->{"Structuring Learning Habits","Overcoming the Frustration Barrier","Setting Learning Goals","Summary & Self-Education Resources"}
+	
+/*Summary & Self-Education Resources : self-education
+
+MIT OpenCourseWare – A collection of free courses online offered by MIT.
+EHow.com - How to articles on a variety of subjects.
+FreeEd.net - “Free education on the Internet” according to their website.
+Portal to Free Online Courses – This article links to many major universities which
+offer free courses online
+	*/
+
+
+
+/* Productivity Websites
+
+ScottHYoung.com - My website devoted to productivity, learning and habits.
+ZenHabits.net - Productivity through simplicity.
+Lifehack.org - One of the largest productivity websites.
+PickTheBrain.com - Productivity and motivation.
+StudyHacks – Productivity for the student
+StevePavlina.com – Personal development for smart people
+
+Productivity Books
+Getting Things Done - The classic by David Allen.
+The Power of Full Engagement - Energy management.
+Zen To Done - A spin off of Getting Things Done, this one focuses on slowly
+building productive habits.
+How to Be a Straight-A Student & How to Win at College – Both classic books that
+can help you become more productive and handle the challenges of learning. Definitely
+worth reading
+*/
+
+
+
+
+}

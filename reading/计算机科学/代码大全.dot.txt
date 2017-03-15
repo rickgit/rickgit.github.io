@@ -1,0 +1,146 @@
+digraph g{
+	代码大全->基础->{软件建构,隐喻,前期准备,关键的构建决策}
+	软件建构->软件工程->{定义问题,需求分析,规划构建,软件架构,详细设计,编码与调试,单元测试,集成测试,集成,系统测试,保障维护}
+	软件建构->编码或编程->把已经存在的设计机械化地翻译成计算机语言
+	软件建构->构建->需要可观的创造力和判断力
+	软件建构->主要活动->{详细设计,编码,调试,集成,开发者测试（单元测试和集成测试）}
+
+	隐喻->描述了软件领域中各种特定的现象和事物
+	隐喻->类比（建模）
+	隐喻->更像启示（试探法），而不是算法
+	隐喻->问题概念化
+	隐喻->软件隐喻->书法->"《The Elements of Programming Style》编程风格要素"->"《The Elements of Style》文体的要素"
+	书法->"《人月神话》"
+
+
+	软件隐喻->耕作法->"《Rethinking Systems Analysis and Design》中论设计直觉"
+
+	软件隐喻->牡蛎养殖观点->"《软件工程管理原理》（The Principles of Software Engineering Management，1988）"->演进式交付->敏捷编程方法
+
+	软件隐喻->软件构建->"《是什么撑起了天花板》（What Supports the Roof，2003）"
+
+	软件隐喻->软件技术->技术不是规矩，而是分析工具
+
+	前期准备->前期准备的重要性->前期准备中心目标->降低风险
+	前期准备的重要性->常见的项目风险->糟糕的需求分析和项目计划
+	前期准备的重要性->前期准备不是一门精密科学，要根据每一个项目的特点来选择特定的风险降低风险的方法
+
+	前期准备的重要性->"《专业软件开发》（Protessional Software Development，2004）"
+
+	前期准备的重要性->"《程序开发心理学》(《The Psychology of Computer Programming》,1998)"
+	前期准备的重要性->前期准备的绝对有理且简明的论据->{逻辑,类比,数据}
+
+	类比->草图（表达设计概念）和蓝图（设计详图，包含所有细节信息）
+
+
+	前期准备->软件类型->{迭代开发法,序列开发法}
+	前期准备->问题定义的先决条件
+	前期准备->需求的先决条件->"《Rapid Development》，1996"
+	前期准备->架构的先决条件->架构的质量决定了系统的 “概念完整性”，概念完整性决定了系统的最终质量
+
+	架构的先决条件->构的组成部分->{程序组织,主要的类,数据设计,业务规则,业务规则,用户界面设计,资源管理,安全性,性能,可伸缩性,互用性,国际化/本地化,输入输出,错误处理,容错性,架构的可行性,过度工程,决策,变更策略,架构的总体质量}
+
+	安全性-"《Writing Secure Code》，2003 和《IEEE Software》，2002"
+
+
+	//需求：《软件需求》，《掌握需求过程》，《实用软件需求》，《编写有效用例》
+	//软件架构：《软件构架实践》，《面向模式的软件体系结构 卷 1：模式系统》，《软件架构编档》，《软件构架评估》，《企业应用架构模式》，《统一软件开发过程》
+	//软件开发方法：《RUP 统一过程引论》，《统一软件开发过程》，《解析极限编程：拥抱变化》，《快速软件开发》，《敏捷迭代开发：管理者指南》
+
+
+
+//第二部分
+	代码大全->创建高质量代码->{软件构建中的设计,可以工作的类,高质量的子程序,防御式编程,伪代码编写过程}
+软件构建中的设计->软件设计->把需求分析和编码调试连在一起的活动
+软件设计->"《A Rational Design Process：How and Why to Fake it》，1986"
+
+
+软件构建中的设计->关键是设计概念->"Brooks《没有银弹：软件工程中本质和偶然性》"
+关键是设计概念->{本质问题,偶然问题}
+
+关键是设计概念->Dijkstra
+
+软件构建中的设计->设计范畴内的特征
+软件构建中的设计->设计的层次->{软件系统,子系统和包,包中的类,子程序内部}
+包中的类->"《Agile Database Techniques》，2003"
+软件构建中的设计->设计构造块：启发式方法->对象、抽象、实现细节、继承、信息隐藏、易变区域、松耦合、设计模式
+设计构造块：启发式方法->"《怎样解题》（How to Solve It），1957"
+
+
+软件构建中的设计->"《Conceptual Blockbusting》"
+//软件设计，一般性问题 ：《面向对象的思考过程》（The Object-Oriented Thought Process） 
+//《OOD启示录》（Object-Object Design Heuristics）1996
+//《Programming On Purpose：Essays on Software Design》1993
+//《面向对象构造》（Object-Oriented Software Contruction）1997
+//《UNIX 编程艺术》（The Art of UNIX Programming）2004
+//《UML 和模式应用》2001
+//软件设计理论：《IEEE Transactions on Software Engineering》,《Communications of the ACM》
+//软件设计模式：《设计模式》1995，《Design Patterns Explained》2002
+
+//广义的设计：《Conceptual Blockbusting：A Guide to Better Ideas》2001,
+//《How to Solve It：A New Aspect of Mathmatical Method》1957
+//《How to Solve It：Modern 2000
+//《The Sciences of the Artificial》1996
+//《Software Creativity》1995
+//《Design Paradigms：Case Histories of Error and Judgment in Engineering》1994
+
+
+可以工作的类->"《Pragmatic Programer》2000,《Applied UML and Patterns》2001，《Fundamentals of Object-Oriented Design in UML》2000"
+
+可以工作的类->创建类的原因
+//类，一般问题：《面向对象软件构造》《Object-Oriented Design Heuristics》
+
+//Java ：《Effective Java Programming Language Guide》2001
+
+
+高质量的子程序->创建子程序的正当理由
+
+防御式编程->"《Object-Oriented Software Construction》1997"
+
+防御式编程->辅助调试的代码->"《Writing Solid Code》1993"
+
+
+//安全，断言，异常的书
+
+
+伪代码编写过程->"《High Output Management》"
+//《Test-Driven Development：By Example》
+
+
+//第三部分 变量
+代码大全->{变量,语句,代码改善,系统考虑,软件工艺}
+
+/*
+
+http://lucida.me/blog/on-reading-books/
+
+Code Complete：软件构建全程最佳实践指南。
+|
+|----How to Solve it：系统解决问题。
+|
+|----Conceptual Blockbusting：跳出思维的壁垒。
+|
+|----Mythical Man Month：软件工程不能做什么。
+|
+|----Programming Pearls：极简算法手册。
+     |
+     |----The Science of Programming：编写正确的程序。
+     |
+     |----Writing Efficient Programs：编写高效的程序。
+|
+|----Pragmatic Programmer：高效程序员的实践。
+|
+|----Refactoring：如何改进自己的代码。
+|
+|----Programming on Purposes：用正确的编程模式处理问题。
+|
+|----Software Tools：用合适的抽象封装复杂度。
+     |
+     |----The Practice of Programming：极简编程风格指南。
+          |
+          |---- Writing Solid Code：减少调试的时间。
+          |
+          |---- Elements of Programming Style：极简编程风格指南。
+
+*/
+}
