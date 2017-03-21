@@ -1,0 +1,3 @@
+digraph g{
+	写给大家看的设计书->author->"2008 Robin Williams"->"C.R.A.P四条基本原则"
+}
