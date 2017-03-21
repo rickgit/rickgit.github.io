@@ -1,0 +1,9 @@
+digraph g{
+	"Android 应用 UI 设计模式"->{"作者：Greg Nudelman","58 个界面模式",前言,"12 个反模式","www.AndroidDesignBook.com"}
+	"58 个界面模式"->{欢迎页、主屏幕、导航、搜索、排序和筛选、数据输入和表单}
+	"作者：Greg Nudelman"->"《移动应用 UI 设计模式》《Web 界面设计》Theresa Neil"
+
+	前言->"《建筑的永恒之道》"
+}
+
+<![CDATA[ <font color="#ff971a"> sd </font> ]]> 不能用单引号
