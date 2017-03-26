@@ -1,9 +1,116 @@
 digraph g{
+	//信息架构
 	"Android 应用 UI 设计模式"->{"作者：Greg Nudelman","58 个界面模式",前言,"12 个反模式","www.AndroidDesignBook.com"}
 	"58 个界面模式"->{欢迎页、主屏幕、导航、搜索、排序和筛选、数据输入和表单}
 	"作者：Greg Nudelman"->"《移动应用 UI 设计模式》《Web 界面设计》Theresa Neil"
 
 	前言->"《建筑的永恒之道》"
+
+	"Android 应用 UI 设计模式"->第一部分->"Android 应用界面"->{启动图标,操作栏与信息架构,选项卡,专用选择页,选择控件,按钮,搜索结果屏幕,结果详情屏幕,最终结果}
+	第一部分->"Android 特殊"->"tap-worthy area, http://globalmoxie.com"
+
+
+
+/**
+
+//================================statubar================================
+	
+	Class<?> c = null;
+	Object obj = null;
+	Field field = null;
+	int x = 0, sbar = 0;
+	try {
+	        c = Class.forName("com.android.internal.R$dimen");
+	        obj = c.newInstance();
+	        field = c.getField("status_bar_height");
+	        x = Integer.parseInt(field.get(obj).toString());
+	        sbar = getResources().getDimensionPixelSize(x);
+	} catch (Exception e1) {
+	        loge("get status bar height fail");
+	        e1.printStackTrace();
+	}  
+
+anshu.wang@zwc2014c01-0391 MINGW32 /d/workspace/sdk-window/platforms/android-N/data/res
+$ grep -rn "status_bar_height" ./
+./values/dimens.xml:33:    <dimen name="status_bar_height">24dp</dimen>
+
+
+//================================action bar================================
+
+	if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {  
+	    if (((ActionBarActivity) getActivity()).getTheme()  
+	            .resolveAttribute(android.R.attr.actionBarSize, tv, true)) {  
+	        actionBarHeight = TypedValue.complexToDimensionPixelSize(  
+	                tv.data, getResources().getDisplayMetrics());  
+	    }  
+	}  
+	else {  
+	    // 使用android.support.v7.appcompat包做actionbar兼容的情况  
+	    if (((ActionBarActivity) getActivity()).getTheme()  
+	            .resolveAttribute(  
+	                    android.support.v7.appcompat.R.attr.actionBarSize,  
+	                    tv, true)) {  
+	        actionBarHeight = TypedValue.complexToDimensionPixelSize(  
+	                tv.data, getResources().getDisplayMetrics());  
+	    }  
+
+	} 
+
+anshu.wang@zwc2014c01-0391 MINGW32 /d/workspace/sdk-window/platforms/android-N/data/res
+$ grep -rn "actionBarSize" ./
+./values/themes.xml:369:        <item name="actionBarSize">@dimen/action_bar_default_height</item>
+./values/themes_holo.xml:349:        <item name="actionBarSize">@dimen/action_bar_default_height</item>
+
+
+anshu.wang@zwc2014c01-0391 MINGW32 /d/workspace/sdk-window/platforms/android-N/data/res
+$ grep -rn "action_bar_default_height" ./
+./values/dimens.xml:199:    <dimen name="action_bar_default_height">48dip</dimen>
+./values/dimens_material.xml:37:    <dimen name="action_bar_default_height_material">56dp</dimen>
+
+
+
+////================================navigation================================
+
+	int resourceId = resources.getIdentifier("navigation_bar_height",  
+	        "dimen", "android");  
+	//获取NavigationBar的高度  
+	int height = resources.getDimensionPixelSize(resourceId);  
+
+
+	anshu.wang@zwc2014c01-0391 MINGW32 /d/workspace/sdk-window/platforms/android-N/data/res
+$ grep -rn "navigation_bar_height" ./
+./values/dimens.xml:35:    <dimen name="navigation_bar_height">48dp</dimen>
+./values/dimens.xml:36:    <!-- Height of the bottom navigation bar in portrait; often the same as @dimen/navigation_bar_height -->
+./values/dimens.xml:37:    <dimen name="navigation_bar_height_landscape">48dp</dimen>
+./values/dimens.xml:41:    <dimen name="navigation_bar_height_car_mode">96dp</dimen>
+
+**/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
-<![CDATA[ <font color="#ff971a"> sd </font> ]]> 不能用单引号
+ 
