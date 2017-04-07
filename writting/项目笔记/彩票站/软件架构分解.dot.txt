@@ -1,0 +1,13 @@
+//[软件架构分解](https://www.ibm.com/developerworks/cn/rational/1312_wanggb_arch/)
+//https://en.wikipedia.org/wiki/Software_architecture
+/*
+搜索 动词,没有目地查找
+索引 名词,文献、文章的目录
+检索 动词,有目的查找某一类文献
+查询 动词,对某一方面的内容进行查找和咨询
+*/
+架构分解->业务域分解->{会员,产品,交易（订单）,支付,查询,产品信息}
+//用户可以是匿名的，会员有注册信息，会员属于用户
+
+架构分解->技术域分解->{gradle,java}
+java->{网络,图片,存储}
