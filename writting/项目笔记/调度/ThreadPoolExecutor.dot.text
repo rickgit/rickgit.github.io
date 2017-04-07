@@ -1,0 +1,22 @@
+//###########################################################
+ThreadPoolExecutor
+
+ctl : StomicInteger
+workQueue : LinkedBlockingQueue
+mainLock : ReentrantLock
+	sync : ReentrantLock$NoonfairSync
+workers : HashSet
+	item : ThreadPoolExecutor$Worker//ThreadFactory#newThread 方法回调的 Runnable
+		thread : Thread
+		firstTask : Runnable//传进去的Runnable
+termination : AbstractQueuedSynchronizer$ConditionObject
+largestPoolSize : int
+completedTaskCount : int 
+threadFactory : ThreadFactory
+handler : ThreadPoolExecutro$AbortPolicy
+keepAliveTime : int
+allowCoreThreadTimeOut : boolean
+corePoolSize : int
+maximunPoolSize : int
+
+//###########################################################

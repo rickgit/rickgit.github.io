@@ -1,0 +1,5 @@
+鞋子->{皮质鞋子}
+
+皮质鞋子->{"common project","Axel Arigato","Gustin","Greats","Erik Schedin"}
+
+鞋子->{ecco,skap,clarks}
