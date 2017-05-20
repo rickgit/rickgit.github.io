@@ -1,0 +1,81 @@
+11运
+1.加奖没有信息 √ 待核对公司加奖
+2.限号和限制彩种 √ 投注时候才限号查询，限玩法在加载时候限制
+3.右上角菜单-玩法说明 √
+4.十一运彩期数量过多 只要有追号，multiples必须加上
+5.方案详情 乐三中奖纪录。√ com/woqutz/didi/widget/query/utils/Detail11x5Tool.java:66
+6.十一运彩期切换，没有更新为最新的彩期 
+7.机选 com.woqutz.didi.common.math.X115Logic#X115_PLAYTYPES √
+8.记住最后一次投注选项
+
+单串关投注页面
+日期栏新增比赛总计数 √
+串关投注玩法允许投注单关 √
+玩法限制不变 √
+删除不包含单关的投注项com/woqutz/didi/widget/betconfirm/ui/fragment/betconfirm/BetJcConfirmFragment.java:187 √
+com/woqutz/didi/widget/betconfirm/ui/fragment/betconfirm/BetJcConfirmFragment.java:193
+过关限制 √
+
+红包打赏
+打赏接口联调 √
+打赏记录 延迟加载
+打赏按钮交互，与描述文本更改 √
+
+红包页面
+预售界面-拆红包页面 √ 
+红包接口未联调 √
+拆红包 为联调 √
+发红包 √
+红包弹窗 √
+红包记录 √
+拆红包只有在第一次，弹放弃的弹窗 √
+推单设置-ToggleButton SwitchButton √
+提示弹窗“跟单红包” √
+表盘 TextPaint √
+前端限制一下，不能输入0个 √ 
+推荐时判断方案是否重复 √
+推单没有判断是否升级 √
+方案过期 √
+固定单关投注 √
+追号分割线
+标题栏
+
+
+红包入口
+	红包详情
+	领红包
+	查看红包
+com/woqutz/didi/widget/betconfirm/ui/fragment/betconfirm/BaseBetConfirmFragment.java:748
+
+
+com/woqutz/didi/widget/betconfirm/service/jc/JczqCfmServiceImpl.java:26 客胜的选项 √
+com/woqutz/didi/widget/betjc/control/ui/BaseJcCenterUI.java:214 判断是否选择了单关 √
+日期 com/woqutz/didi/widget/betjc/control/fragment/BaseJcFragment.java:308 √
+
+
+client域名 √
+
+
+
+问题，升级gradle可能导致studio一直refreshing
+
+
+阿里百川 √
+
+
+投注
+
+	BetItemList {betItem (spkey,betkey,matchbean)}
+	日志输出，mvp架构
+
+
+商务推广 防注册，警报，活动。
+
+
+竞足开奖没有蒙版
+
+
+okHttp 3.7 升级
+
+
+v142 2017年5月11日 发版
