@@ -16,7 +16,7 @@
 
 [TOC]
 
-##SparseMap创建及初始化
+##SparseMap 创建及初始化
 相关属性
 ```java
     private static final Object DELETED = new Object();
@@ -27,7 +27,7 @@
     private int mSize;//含有的数据
 ```
 
-ArrayMap包含个构造函数，接下来只分析无参构造函数。
+SparseArrays 包含个构造函数，接下来只分析无参构造函数。
 ```java
     public SparseArray() {
         this(10);
@@ -51,7 +51,7 @@ ArrayMap包含个构造函数，接下来只分析无参构造函数。
         mSize = 0;
     }
 ```
-默认开辟10单位的内存空间 
+默认开辟 10 单位的内存空间 
 
 ##存储键值对
 ```java
@@ -82,9 +82,9 @@ ArrayMap包含个构造函数，接下来只分析无参构造函数。
         }
     }
 ```
-1. 二分查找mkeys，判断是否有存在key,有则设置，没有走下一步
+1. 二分查找 mkeys，判断是否有存在 key,有则设置，没有走下一步
 2. 判读最后查找的是否是已经标记为*DELETED*,若是则覆盖，否走下一步
-3. 若mGarbage为真，且大小已经超过mKeys的大小，则运行gc方法,gc方法将没有标记为*DELETED*覆盖，数组前面有标记*DELETED*，重新查找mkey
+3. 若 mGarbage 为真，且大小已经超过mKeys的大小，则运行 gc 方法, gc 方法将没有标记为*DELETED*覆盖，数组前面有标记*DELETED*，重新查找mkey
 4. 设置新的*mKeys*,*mValues*,*mSize*
 ```java
     private void gc() {
