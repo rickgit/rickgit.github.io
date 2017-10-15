@@ -1,6 +1,11 @@
 # pull to refresh （下拉加载）
+## RecyclerView
+ View 缓存 ：onCreateViewHolder
+ View 布局多样性：getItemViewType
+ View 重用 ：onBindViewHolder ->设置每次重用 view 的动画
+ 分割线：
 
-## 下拉刷新（SwipeRefreshLayout，PullToRefresh）
+## 下拉刷新（SwipeRefreshLayout-下拉刷新，PullToRefresh-释放刷新）
 - SwipeRefreshLayout
 
 - PullToRefresh
@@ -30,10 +35,6 @@ support ScrollView,ListView,RecyclerView,WebView and all another views
 
 - PullLoadMoreRecyclerView，XRecyclerView，AnimRFRecyclerView（耦合太大忽略）
 
-
- 
-
-
 - com.lzy.widget.HeaderViewPager （派发 ViewPager 事件）
 
 - 嵌套滚动（NestedScrollingParent, NestedScrollingChild）
@@ -53,6 +54,19 @@ c “查看全文”
 WebView，文本查看全文
 
 
+## 固定标题栏
+[sticky-headers-recyclerview](https://github.com/timehop/sticky-headers-recyclerview)
+[ExpandableRecyclerView](https://github.com/ayalma/ExpandableRecyclerView)
+
+[FlexibleAdapter]()
+## 附加控件
+
+### 指示器
+引入 ** compile 'com.android.support:design:22.2.0' **
+android.support.design.widget.TabLayout
+
+
+### 
 ---------------------
 
 [^1]: SwipeToLoadLayout
