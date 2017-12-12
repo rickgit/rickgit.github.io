@@ -1,0 +1,171 @@
+digraph g{
+	"Android 群英传"->{"Android 体系与系统架构","开发工具","控件架构与自定义控件",ListView,滑动分析,绘图机制,动画机制,"Activity 调用栈","系统信息与安全机制",性能优化,"UI 设计"}
+	"Android 体系与系统架构"->{"Google 生态体系","Android 系统架构"}
+	"Android 系统架构"->四层结构->{"Linux 内核层","库和运行时","Framework 层","应用层"}
+	"Linux 内核层"->{硬件驱动,进程管理,安全系统等}
+	"库和运行时"->{运行时}
+	运行时->{Dalvik,ART}
+	Dalvik->运行时编译
+	ART->安装时编译
+
+	"应用层"->应用组件架构->四大组件->{Activity,BroadCastReciver,ContentProvider,Service}
+	应用组件架构->传递数据->Intent
+	应用组件架构->上下文环境对象->Context
+
+	"Android 体系与系统架构"->源码->"http://androidxref.com"
+
+
+	开发工具->{"开发 IDE",ADB,模拟器}
+	"开发 IDE"->Studio
+	"开发 IDE"->"镜像网站 http://www.androiddevtools.cn/"
+	ADB->命令的来源->{"\system\core\toolbox","\frameworks\base\cmds"}
+
+
+	"控件架构与自定义控件"->{"控件架构",自定义控件}
+	控件架构->{控件}
+	控件->{View,ViewGroup}
+
+	/**
+
+	+----------------------------------+
+	|  Activity                        |
+	|                                  |
+	|  +-----------------------------+ |
+	|  | PhoneWindow                 | |
+	|  |                             | |
+	|  | +-------------------------+ | |
+	|  | | DecorView               | | |
+	|  | | +---------------------+ | | |
+	|  | | |                     | | | |
+	|  | | |      TitleView      | | | |
+	|  | | +---------------------+ | | |
+	|  | | +---------------------+ | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |    ContentView      | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | |                     | | | |
+	|  | | +---------------------+ | | |
+	|  | +-------------------------+ | |
+	|  +-----------------------------+ |
+	+----------------------------------+
+
+	**/
+
+
+	View->测量->{MeasureSpec}
+	MeasureSpec->{测量模式,测量大小}
+	测量模式->{EXACTLY,AT_MOST,UNSPECIFIED}
+
+
+	View->绘制
+
+	自定义控件->{拓展控件,自定义复合控件,重写控件}
+	自定义控件->事件拦截机制
+
+	ListView->{ViewHolder,分割线,滚动条,点击效果,定位,数据改变后通知,空数据情况,滑动监听}
+
+
+
+	滑动分析->{坐标系,滑动的方法}
+	/**
+		                     X
+		  +------------------>
+		  |
+		  | +-------------------------+
+		  | |                         |
+		  | |                         |
+		  | |                         |
+		  | |                         |
+		  | |                         |
+		Y v |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    |                         |
+		    +-------------------------+
+
+
+	**/
+	坐标系->{师徒坐标系,触控事件}
+	滑动方法->{layout,offsetLeftAndRight与offsetTopAndBottom,LayoutParams,ScrollTo与ScrollBy,Scroller,属性动画,ViewDragHelper}
+
+
+	绘图机制->{屏幕尺寸信息,"XML 绘图",绘图技巧,图像处理,SurfaceView}
+	屏幕尺寸信息->{屏幕参数,系统屏幕密度,独立相熟密度（dp）,单位转化}
+	"XML 绘图"->{Bitmap,Shape,Layer,Selector}
+	绘图技巧->{Canvas,Layer}
+	图像处理->{色彩特效处理,图形特效处理,画笔特效处理}
+	色彩特效处理->{色彩矩阵分析,颜色矩阵（ColorMatrix）,像素点分析}
+	画笔特效处理->{PorterDuffXfermode,Shader,PathEffect}
+
+
+
+	动画机制->{视图动画框架,属性动画,布局动画,差值动画,自定义动画,矢量动画,动画特效}
+	视图动画框架->{透明度动画,旋转动画,位移动画,缩放动画,动画集合（AnimationSet）}
+
+	属性动画->{ObjectAnimation,"Property ValuesHolder",ValueAnimator,动画事件监听,AnimatorSet,"XML 属性动画","View#animate()"}
+
+	矢量动画->{SVG}
+
+
+	"Activity 调用栈"->{"Activity 生命周期","Activity 任务栈","Manifest 启动模式","Intent Flag 启动模式"}
+
+	"启动模式"->{standard,singleTop,singleTask,singleInstance}
+
+
+	"系统信息与安全机制"->{系统信息,安全机制}
+	系统信息->{"android.os.Build",SystemProperty}
+	系统信息->应用信息->{PackageManager,ActivityManager}
+	安全机制->{安全隐患,"Apk 反编译","Apk 加密"}
+	安全隐患->{代码漏洞,"Root 风险",安全机制不健全,用户安全意识}
+
+	"Apk 反编译"->{apktool,"Dex2jar、jd-gui"}
+	"Apk 加密"->代码混淆
+
+	性能优化->{布局优化,内存优化,Lint,TraceView,MAT,Dumpsys}
+	布局优化->{"Profile GPU Rendering",Overdraw,include,ViewStub,"Hierarchy Viewer"}
+
+	内存优化->内存定义->{寄存器,栈,堆,静态存储区域,常量池}
+	内存优化->内存信息->{"Process Stats",Meminfo}
+
+
+	内存优化->内存回收
+
+
+	"UI 设计"->{"Meterial Design",Palette,视图与阴影,"Tinting 和 Clipping",列表与卡片,过度动画,Toolbar,Notification}
+	"Meterial Design"->"Meterial Design 动画效果"->{Ripple,"Circular Reveal","View state changes Animation"}
+	Notification->{普通式,折叠式,悬挂式,显示等级}
+
+
+}

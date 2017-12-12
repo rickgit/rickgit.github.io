@@ -1,0 +1,22 @@
+
+新增：这个开关开启的时候，点击“立即跟投”，提示“暂不支持购彩”，判断优先级放最前面，不用管有没有登录
+
+
+1. 点击胆拖没有重新计算奖金 √
+
+2. com/woqutz/didi/widget/query/control/view/dg/DgJjcPlanView.java:204 √
+
+3. 赛事推荐 @see {@link TzRaceRecommendBitConstant} 
+
+4。 投注页面，跳转。单关，Sfc的彩期。竞技彩的开始结束时间 √
+
+5. 投注界面的玩法说明
+
+
+## 首页十一运
+倒计时有点问题
+
+## 胆投
+投注界面，按钮太大
+
+## 跟投加上市场审核开关

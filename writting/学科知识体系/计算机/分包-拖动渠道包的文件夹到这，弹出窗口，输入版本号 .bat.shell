@@ -1,0 +1,24 @@
+@echo off
+set drawFile=%1
+set /p inputVersion=请输入版本号（如：1.4.7）:  
+set v=%inputVersion:.=_%
+echo 转化的版本号%v%
+SETLOCAL ENABLEDELAYEDEXPANSION 
+for /f "tokens=1,2,3" %%a in (渠道列表.txt) do (
+	set temp=%%b
+ 	set path=!temp:/=\!
+	set agent=%%a
+	
+ 	if exist %drawFile%\woqutzz_android_v%v%-!agent!.apk (
+		if not exist %cd%\分包_%v%\!path! md %cd%\分包_%v%\!path!
+		echo %cd%\分包_%v%\!path!\woqutzz_android_v%v%-!agent!.apk
+		call copy %drawFile%\woqutzz_android_v%v%-!agent!.apk    %cd%\分包_%v%\!path!\woqutzz_android_v%v%-!agent!.apk
+	) else (
+		echo 未找到   %drawFile%\woqutzz_android_v%v%-!agent!.apk
+	)
+	 
+)
+echo=
+echo 按任意键退出……
+pause>nul
+exit
