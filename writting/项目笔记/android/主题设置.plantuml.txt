@@ -1,0 +1,22 @@
+@startuml
+
+class Activity{
+	Window mWindow
+
+	setContentView()
+}
+
+class PhoneWindow extends Window{
+	setContentView()
+
+	private void installDecor() 
+	protected DecorView generateDecor(int featureId)
+
+	//Apply data from current theme.
+	protected ViewGroup generateLayout(DecorView decor)
+
+}
+
+
+Activity -->PhoneWindow 
+@enduml
