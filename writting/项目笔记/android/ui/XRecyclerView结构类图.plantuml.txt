@@ -1,0 +1,32 @@
+﻿@startuml
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+abstract class ViewHolder{
+    View itemView
+}
+abstract class Adapter{
+    View itemView
+    - AdapterDataObservable mObservable
+}
+class RecyclerView{
+ public int getChildAdapterPosition(View child)
+}
+abstract class LayoutManager{
+}
+
+View <|-- RvMvpView 
+Adapter <|-- RvMvpAdapter 
+ViewHolder <|-- RvMvpHolder 
+ViewHolder <-- Adapter 
+View <-- ViewHolder 
+
+RecyclerView <|-- XRecyclerView  
+
+Adapter <-- RecyclerView 
+LayoutManager <-- RecyclerView  
+LayoutManager <|-- GridLayoutManager
+@enduml

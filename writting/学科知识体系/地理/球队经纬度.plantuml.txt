@@ -1,0 +1,182 @@
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 52.8
+viewPosLong = -1
+viewMagnification = 25
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+' 英超 联队球队位置 
+51.30 0 " 伦敦 切尔西 阿森纳 热刺 水晶宫 "
+51.20 0.1 "西汉姆联"
+51.8 -0.2 "沃特福德"
+53.2 -2.59 " 利物浦 埃弗顿 "
+53.27 -2.14 " 曼城 曼联    "
+52.5 -1.9 " 西布罗姆维奇 "
+52.63 -1.13 " 莱 彻 斯 特 城"
+53.78 -2.24 " 伯恩利 "
+53.5 -2.0 " 哈德斯菲尔德 "
+50.84 -1.4 " 南安普顿  "
+50.71 -1.88 " 伯恩茅斯   "
+50.79  0.08 " 布莱顿    "
+53.0 -2.17 "斯托克"
+54.9782520000 -1.6177800000 "纽卡斯尔"
+51.56 -4 "斯旺西"
+@enduml
+
+
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 40
+viewPosLong = -2.8
+viewMagnification = 12
+'viewMagnification = 5
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+' 西甲 球队位置 
+41.4 2 " 巴萨 西班牙人"
+40.25 -3.45 " 皇马 马竞 莱加内斯"
+40   -3.4  " 赫塔费"
+38.98   -0.5  " 瓦伦西亚 莱万特"
+36.8   -4.24  " 马拉加 "
+37.31   -5.9  " 塞维利亚 皇家贝蒂斯"
+41.96    2.84  " 赫罗纳 "
+39.93    -0.1  "比利亚雷亚尔 "
+43.18   -2.49  "埃瓦尔 "
+43.29  -1.97  "皇家社会"
+42.24  -8.70  "塞尔塔 "
+43.42 -2.93  "毕尔巴鄂竞技	"
+43.35 -8.41 "拉科鲁尼亚"
+42.84 -2.67 "阿拉维斯"
+28.25 -14.14 "拉斯帕尔马斯"
+@enduml
+
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 50
+viewPosLong = 10
+viewMagnification = 15
+'viewMagnification = 5
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+' 德国  球队位置 
+48.12 11.59 " 拜仁 "
+51.65 7.08 " 沙尔克"
+51.4  7.46  " 多特蒙德 "
+51.04   7.01 " 沃勒库森"
+51.33   12.37  " 莱比锡 "
+51.18   6.44  "门兴"
+48.65   11.84  " 霍芬海姆 "
+50.11    8.68  "法兰克福"
+48.37   10.89 "奥格斯堡	"
+52.52  13.40  "柏林"
+52.37  9.73 "汉诺威	"
+52.42 10.78 "沃尔夫斯堡"
+47.99 7.84 "弗赖堡	"
+48.77 9.18 "斯图加特 "
+49.9 8.24 "美因茨 "
+53.07 8.80 "云达不莱梅 "
+53.55 9.99 "汉堡  "
+50.8 6.96 "科隆 "
+@enduml
+
+
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 46.6
+viewPosLong = 3
+viewMagnification = 10
+'viewMagnification = 5
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+' 法甲  球队位置 
+48.85 2.35 "巴黎 "
+43.79 7.45 " 摩纳哥	"
+45.76 4.83 " 里昂  "
+43.29  5.36  " 马赛	"
+47.21  -1.5  " 南特	 "
+43.7   7.26  "尼斯	"
+43.61 3.87 " 蒙彼利埃	 "
+48.11 -3.14 "甘冈	"
+48.56  -1.89 "雷恩		"
+47.32  5.04  "第戎	"
+48.57  7.75 "斯特拉斯堡		"
+49.18 -0.37 "卡昂	"
+49.89 2.29 "亚眠		"
+48.29 4.07 "特鲁瓦	 "
+44.83 0.57 "波尔多	 "
+45.43 4.38 "圣埃蒂安	 "
+43.60 1.44 "图卢兹	  "
+50.62 3.05 "里尔	 "
+47.47 -0.56 "昂热		 "
+49.11 6.17  "梅斯		 "
+@enduml
+
+
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 42.6
+viewPosLong = 14
+viewMagnification = 11
+'viewMagnification = 5
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+'  意 甲  球队位置 
+40.85 14.26 "那不勒斯	 "
+45.07 7.68 "都灵 尤文图斯	"
+45.46 9.18 " 米兰  "
+41.90  12.49  " 罗马 拉齐奥	"
+44.40 8.94  "热那亚 桑普多利亚 "
+45.69 9.67  "亚特兰大"
+43.76 11.25 " 佛罗伦萨"
+46.19 13.16 "乌迪内斯		"
+44.49 11.34 "博洛尼亚			"
+45.43 10.99 "切沃  维罗纳	"
+39.22 9.12 "卡利亚里 "
+44.59 10.78 "萨索罗		"
+39.13 17.00 "克罗托内	"
+44.83 11.61 "费拉拉 "
+41.12 14.47 "贝内文托  " 
+@enduml
+
+
+
+@startuml
+xearth(600,600)
+viewPositionType = Fixed
+viewPosLat = 52
+viewPosLong = 5.6
+viewMagnification = 38
+'viewMagnification = 5
+daySideBrightness = 90
+nightSideBrightness = 50
+terminatorDiscontinuity = 30
+'荷甲  球队位置 
+51.44 5.46 "埃因霍温"
+52.37 4.89 "阿贾克斯"
+52.63 4.75 " 阿尔克马尔	 "
+52.51  6.08  "兹沃勒	"
+51.9 4.47  "费耶诺德 SBV精英 鹿特丹斯巴达"
+52.09 5.21  "乌德勒支	"
+51.98 5.89 " 维特斯 "
+52.96 5.96 "海伦芬 "
+52.07 4.3 "海牙 "
+52.36 6.66 "赫拉克勒斯"
+51.37 6.17 "芬洛  "
+53.21 6.56 "格罗宁根 "
+51.5 5.05 "威廉二世"
+52.22 6.89 "特温特	"
+51.57 4.76 "布雷达	 " 
+50.86  6.07 "罗达JC	" 
+51.57 4.76 "布雷达	 " 
+@enduml
+

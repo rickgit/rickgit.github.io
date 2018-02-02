@@ -1,0 +1,19 @@
+@startuml
+xearth
+24.5 117.5   "泉 州 " 
+24 117   " 厦门  " 
+26 119   "福州 " 
+25 121      "台北 "
+20 110      "海口  "
+18.5 109.5      "三亚 "
+31 121      " 上海  "
+30 120      "杭州 "
+27 109 "  铜仁   "
+23 114 "深圳 "
+viewPositionType = Fixed
+viewMagnification = 5.1
+daySideBrightness = 100
+nightSideBrightness = 30
+viewPosLat = 28
+viewPosLong = 120
+@enduml
