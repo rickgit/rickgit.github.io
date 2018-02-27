@@ -1,0 +1,100 @@
+digraph g{
+	
+	Bitcoin->"http://zhibimo.com/read/wang-miao/mastering-bitcoin/index.html"
+
+	Bitcoin->"竞争币"->{"货币属性不同","一致性机制创新","多目的挖矿","致力于匿名性"}
+	"货币属性不同"->{"Litecoin","Dogecoin"," Freicoin"}
+	"Litecoin"->{"更适合零售业的交易","2011年"}
+	"2011年"->{"一致性算法：scrypt ","货币总量：到2140年达到8,400万 "}
+	"Dogecoin"->{"2013年12月发布","基于莱特币的一款竞争币","一致性算法：scrypt "}
+
+	"一致性机制创新"->{"Peercoin","Myriad","Blackcoin","VeriCoin","NXT"}
+
+	"多目的挖矿"->{"Primecoin","Curecoin","Gridcoin"}
+
+
+	"致力于匿名性"->{"CryptoNote","Bytecoin","Monero","Zerocash/Zerocoin","Dash","Darkcoin"}
+	"CryptoNote"->{"提供了电子货币基础的匿名性的参考实现","Bytecoin (BCN), Aeon (AEON), Boolberry (BBR), duckNote (DUCK), Fantomcoin (FCN), Monero (XMR), MonetaVerde (MCN), 和Quazarcoin(QCN)基于CryptoNote实现的"}
+
+	"Monero"->{"一致性算法：基于Cryptonight的工作量证明机制"}
+
+	"Zerocash/Zerocoin"->{"2013 年,Zerocoin是一种理论实现","Equihash算法"}
+
+	"Dash"->{"Masternode 机制","注重隐私、POS 权益"}
+	Bitcoin->"竞争块链"->{"概念","域名币","以太坊","Cardano","EOS","Lisk网络","NEO","NXT","Tangle网络"}
+
+	"概念"->"区块链（Blockchain）是指通过去中心化和去信任的方式集体维护一个可靠数据库的技术方案。"
+
+	"域名币"->"共识算法：SHA256工作量证明法"
+	"以太坊"->{"以太坊内置一种叫做ether的货币","智能合约"}
+	Cardano->{"代币ADA","基于香港的IT公司IOHK开发。IOHK成立于2015年"}
+	"EOS"->"股权授权共识机制（DPOS）"
+	 
+	"Tangle网络"->{"共识算法tangle","IOTA"}
+
+	/*bitcoin
+	工作证明
+		挖矿
+	矿机
+	支付网络
+		Ripple
+			用来支付交易费，即每产生一笔交易就会消耗一些 XRP
+			清算网络，类似于全球化的支付宝。
+			理念早在2004年就已经出现
+		Stellar
+	金融生态系统
+		NEM
+			基于POI（重要性证明）算法的块链同步解决方案
+			Eigentrust++算法
+
+	*/
+	/*其他货币
+		Dogecoin
+			2013年12月发布
+			基于莱特币的一款竞争币
+			一致性算法：scrypt 
+		 Freicoin
+			一致性算法：SHA256 
+			为了鼓励用户消费和减少储蓄
+			滞留性通货
+		Peercoin
+			2012年8月发布
+			一致性算法：工作量证明和权益证明混用 
+		Myriad
+			2014年2月发布
+			一致性算法：多重算法的工作量证明机制 
+			同时使用5种工作量证明算法（HA256d, Scrypt, Qubit, Skein, or Myriad-Groestl）
+		Blackcoin
+			2014年2月
+			 一致性算法：权益证明机制 
+		VeriCoin
+			2014年5月
+			一致性算法：权益证明机制 
+		NXT
+			一致性算法：权益证明机制 
+			彻底抛弃工作量证明，而仅仅使用权益证明共识机制
+				不需要采取挖矿方式
+		Primecoin
+			2013年7月
+			一致性算法：含有素数计算功能的工作量证明算法 
+		Curecoin
+			一致性算法：含有蛋白质结构研究功能的工作量证明算法 
+			2013年5月
+		Gridcoin
+			2013年10月
+			一致性算法：整合了BOINC网格计算的工作量证明算法 
+		Bytecoin
+			CryptoNote的第一个实现
+			2012年发布
+			一致性算法：基于Cryptonight的工作量证明机制 
+		Darkcoin
+			2014年1月发布
+			一致性算法：基于多轮哈希的工作量证明算法 
+			使用了11轮不同的哈希函数（blake, bmw, groestl, jh, keccak, skein, luffa, cubehash, shavite, simd, echo）
+		EOS
+			股权授权共识机制（DPOS）	
+
+
+
+	*/
+}
