@@ -1,0 +1,105 @@
+digraph g{
+
+	"英文字根词源精讲"->{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z}
+	a->alt->altus->high
+
+	a->"alter/ali"->alter->other
+
+
+	a->am->amare->"to love"
+
+	a->"angl/angul"->angulus->angle
+
+	a->anim->anima->breath
+
+	a->ann->annus->year
+
+	a->anthrop->anthropos->man
+
+	a->"apt/ept"->aptus->fit
+
+	a->aqua->"aqua 水"->water
+
+
+	a->art->"art 技术"->"skill / art"
+	a->aud->audire->"to hear"
+	a->aug->augere->"to increase"
+
+	a->avi->avis->bird
+
+
+	b->"band/bond"->"（梵文）bhand"->"to bind （捆绑）"
+
+	b->"bar"->"barra"->"bar （横木）"
+	b->"bell"->"Bellona（罗马神话，女战神贝罗娜）"->"war （战争）"
+	b->"brev"->"（拉丁文）brevis|（拉丁格言，Ars longa,vita brevis est）"->"short"
+
+	c->"calc"->"calculus"->"lime 石灰，stone石头"
+	c->"camp"->"campus"->"field"
+	c->"cand"->"candidus"->"white 白色；bright 光亮的"
+	c->"can/chant/cent"->"canere"->"to sing"
+	c->"cap"->"caput"->"head"
+	c->"cap/cep/cip/ceive"->"capere"->"take,seize"
+	c->"car"->"carrus/currere"->"to run"
+	c->"carn"->"caro"->"flesh"
+	c->"cast"->"（中古英语）casten"->"to throw"
+	c->"cav"->"cavus"->"hollow"
+	c->"cede/ceed/cess"->"cedere"->"to go,to proceed"
+	c->"cent"->"centum"->"hundred"
+	c->"centr/center"->"（希腊语）kentron,（拉丁文）centrum"->"center"
+	c->"cern/cret"->"cernere"->"to separate（分离）, to sift（筛选）; to observe（观察）"
+	c->"cret"->"certus"->"certain, sure"
+	c->"chron"->"Cronus（希腊神话宙斯父亲，时间之神）"->"time"
+	c->"cide/cise"->"caedere"->"to cut"
+	c->"circ/cyc"->"circus"->"circle,ring （环）"
+	c->"cite"->"citare"->"to call（呼叫）；to urge（驱策）"
+	c->"claim/clam"->"clamare"->"to cry（大叫）"
+ 	c->"clin/cliv"->"clinare"->"to bend（弯曲）,to lean（倾斜）"
+ 	c->"clud/clos/clus"->"claudere"->"to shut"
+ 	c->"cognis/gnos"->"cognoscere"->"to know"
+ 	c->"cord"->"cor"->"heart"
+ 	c->"corp"->"corpus"->"body"
+ 	c->"cosm"->"（希腊文）kosmos"->"ornament （装饰）,order（秩序）"
+ 	c->"count"->"computare"->"to count"
+ 	c->"cover"->"cooperire"->"to cover"
+ 	c->"cre/cresc"->"crescere"->"to make"
+ 	c->"cred"->"credere"->"to believe"
+ 	c->"crim"->"crimen"->"accusation （控诉）;crime（罪行）"
+ 	c->"crit"->"krinein"->"to judge"
+ 	c->"cruc"->"（拉丁）cruc"->"cross"
+ 	c->"cult"->"cultivare"->"to till（耕种）"
+ 	c->"cub/cumb"->"cub-、cumb-（拉丁动词词根）"->"to till（耕种）"
+ 	c->"cur"->"curare"->"care for（关怀，关注）"
+ 	c->"curr/curs"->"currere"->"to run"
+ 	c->"cuss"->"cuere"->"to strike, to shake"
+ 	
+ 	d->"deb/du"->"debere"->"to owe"
+ 	d->"de/div"->"deus ex machina（希腊，罗马戏剧的解围之神）"->"god"
+ 	d->"dem"->"（希腊语）demos"->"people"
+ 	d->"dent"->"（拉丁文）dent"->"tooth"
+ 	d->"dic"->"dicere"->"to say"
+ 	d->"dign"->"dignus"->"worthy"
+ 	d->"divid/divis"->"dividere"->"to divide"
+ 	d->"doc/doct"->"docere"->"to teach"
+ 	d->"dom"->"domus"->"house"
+ 	d->"dom"->"dominus"->"master"
+ 	d->"dom/dot/dow"->"donare"->"to give"
+ 	d->"dorm"->"dormire"->"to sleep"
+ 	d->"dogma/dox"->"（希腊文）doxa"->"opinion"
+ 	d->"draw"->"trahere"->"to draw（拉）"
+ 	d->"duc"->"ducere"->"to lead"
+ 	d->"dur"->"durare"->"to last（持续）"
+ 	d->"dyn/dynam"->"（希腊文）dynamis"->"power（力量）"
+
+
+ 	e->"eco"->"（希腊文）oikos"->"house"
+ 	e->"ego"->"（拉丁文）ego"->"I（我）, self（自己）"
+ 	e->"electr"->"（希腊文）elektron（elecktor太阳，elektron 琥珀,因为琥珀摩擦能吸物体）"->"electric"
+ 	e->"em/empt/ampl"->"（拉丁文）emere"->"to take"
+ 	e->"equ"->"（拉丁文）aequalis"->"equal"
+ 	e->"err"->"（拉丁文）errare（Errare humanum est 人非圣贤孰能无过）"->"to wander; to err"
+ 	e->"ess,est"->"（拉丁文）esse"->"to be（存在）"
+
+
+
+}
