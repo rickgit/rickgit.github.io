@@ -1,4 +1,20 @@
+
 # pull to refresh （下拉加载）
+## 嵌套滚动
+[FlyRefresh](https://github.com/race604/FlyRefresh)
+[TwinklingRefreshLayout](https://github.com/lcodecorex/TwinklingRefreshLayout) 
+
+[SmartRefreshLayout](https://github.com/scwang90/SmartRefreshLayout) 支持嵌套各种滑动组件
+	NestedScrollingChild 可以滑动的 View，包含一个 NestedScrollingChildHelper 辅助类
+	NestedScrollingParent 有一个 NestedScrollingParentHelper 辅助类来默默的帮助你实现和 Child 交互的逻辑。
+	滑动动作是 Child 主动发起，Parent 就收滑动回调并作出响应。
+	
+	子view									父view
+	startNestedScroll			onStartNestedScroll、onNestedScrollAccepted
+	dispatchNestedPreScroll		onNestedPreScroll
+	dispatchNestedScroll		onNestedScroll
+	stopNestedScroll			onStopNestedScroll
+
 ## RecyclerView
  View 缓存 ：onCreateViewHolder
  View 布局多样性：getItemViewType
