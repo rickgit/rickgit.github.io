@@ -1,0 +1,16 @@
+digraph g {
+	node [shape=plaintext];
+		
+
+	proj1[label="娃娃v110 | 故障申诉功能 | 邮费可配置 | push后台开发 | 配置APP内页"];//
+	time1[label="3月 6号"];
+	proj1->time1
+
+
+	proj2[label="彩票站v149 | 冠军彩"];//
+	time2[label="3月 16号"];
+	proj2->time2
+
+	{ rank=same; proj1 proj2   }
+	{ rank=same; time1 time2   } 
+}
