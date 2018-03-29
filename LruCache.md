@@ -1,4 +1,4 @@
-#LruCache分析
+# LruCache分析
 
 > A cache that holds strong references to a limited number of values. Each time a value is accessed, it is moved to the head of a queue. When a value is added to a full cache, the value at the end of that queue is evicted and may become eligible for garbage collection.
 
@@ -15,7 +15,7 @@
 
 [TOC]
 
-##LruCache创建及初始化
+## LruCache创建及初始化
 相关属性
 ```java
     private final LinkedHashMap<K, V> map;//LinkedHashMap比HashMap多了个指向前一个和后一个元素的指针
@@ -71,7 +71,7 @@ accessOrder如果为true，LinkedHashMap每次get方法调用Entry对象后重�
         }
 ```
 
-##存储键值对
+## 存储键值对
 ```java
     public final V put(K key, V value) {
         if (key == null || value == null) {
@@ -100,7 +100,7 @@ accessOrder如果为true，LinkedHashMap每次get方法调用Entry对象后重�
 - entryRemoved模板方法，需要重写，做该对象相应的处理
 - trimToSize方法移除不常使用的对象，根据双向链表的eldest方法
 
-##移除键值对
+## 移除键值对
 remove开始分析
 ```java
     public final V remove(K key) {
@@ -124,7 +124,7 @@ remove开始分析
     }
 ```
 
-##清理容器
+## 清理容器
 - evictAll 清除map数据
 ```java
     public final void evictAll() {
@@ -133,5 +133,5 @@ remove开始分析
 
 ``` 
 
-##类图
+## 类图
 [LruCache plantuml](https://raw.githubusercontent.com/rickgit/rickgit.github.io/master/diagram/LruCache.plantuml.txt)
