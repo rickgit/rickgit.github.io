@@ -1,3 +1,11 @@
 digraph g{
 	English->{"base vocabulary","common vocabulary"}
+
+
+	"common vocabulary"->study->{guild,community}
+	"common vocabulary"->compute->geek
+	"common vocabulary"->compute->"Blockchain"->{cryptocurrencies}
+	cryptocurrencies->{bitcoin}
+	bitcoin->{"Bitcoin Forks"}
+
 }

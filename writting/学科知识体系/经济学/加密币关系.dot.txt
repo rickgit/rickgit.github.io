@@ -1,0 +1,41 @@
+btc->"中本聪"->"加文·安德烈森"
+btc->BCE->"core团队"
+
+btc->bch->"Bitcoin XT，Bitcoin Classic，Bitcoin Unlimited，Bitcoin ABC 4个开发团"
+bch->"btc 硬分叉"
+
+
+ltc->"莱特币创始人查理·李"
+ltc->"非常流行的比特币替代品"
+
+
+
+
+Ripple->"Chris Larsen"->"互联网银行E-Loan和p2p信贷公司Prosper的创始人"
+Ripple->Stellar->"Jed McCaleb"->"Ripple的联合创始人"
+
+btc->eth->etc->"以太坊创始人Vitalik Buterin"
+etc->eth硬分叉，索取被盗eth
+
+eth->Cardano-> {"Charles Hoskinson "," Jeremy Wood"}->"这两位都是前以太坊团队的核心成员"
+Cardano->"紧密的合作：英国爱丁堡大学，美国伊利诺伊大学，美国斯坦福大学"
+"Charles Hoskinson"->"他除了参与了以太坊的开发，还参与了Bitshare的开发"
+Cardano->ADA
+Cardano->"集成了数字货币（如比特币，莱特币 ）和智能合约（以太坊，EOS）的区块链生态系统"
+
+eth->eos->"Daniel Larimer"
+
+iota->"联合创始人Dominik Schiener"
+iota->"加密代币, 即 MIOTA"
+
+btc->"隆布罗佐"->"Ciphrex的联合创始人和联合首席执行官。贡献，包括开放支付网络Ripple和以太币"
+
+
+Monero->"斯帕格尼是Monero的7位创始人之一"
+Zcash->"美国计算机安全专家威尔科克斯"->"Zcash的创始人和首席执行官"
+"美国计算机安全专家威尔科克斯"->"Tahoe Least-Authority File Store (Tahoe-LAFS)，这是一种安全、分散的文件存储系统"
+Zcash->"美国约翰霍普金斯大学的密码专家马修·格林"
+dash->"原名 darkcoin"
+dash->"EvanDuffield"
+
+
