@@ -1,0 +1,11 @@
+提取过滤对话框的重构
+
+1. 重构的对象：包含 ZcBaseFragment, LcBaseFragment, BdBaseFragment
+2. 原因：对话框放在 Fragment 中，导致类的文件过大，阅读起来不方便，不利于以后修改代码
+3. 提取到新的类，并提供接口，用于回调，通知界面，更新过滤的数据
+
+ZcMatchFilterView
+
+1. 提取 showFilterPopup 方法，提取父类的方法，放在新的基础类。
+2. 将共有的方法提取到接口。
+3. isHotOnly 字段

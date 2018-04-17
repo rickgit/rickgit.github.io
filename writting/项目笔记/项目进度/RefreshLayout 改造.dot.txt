@@ -1,0 +1,30 @@
+# 需要替换的类及涉及的文件
+
+## com.woqutz.didi.common.view.NoScrollerListView
+com.woqutz.didi.widget.followin.MainFollowinFragment                pzh
+
+
+## com.woqutz.didi.control.refresh.PullToRefreshView
+com.woqutz.didi.widget.followupwinner.ui.FollowerHomeUI             pzh
+com.woqutz.didi.widget.charge.ui.ChargePayWayCenterUI               xiaojia
+com.woqutz.didi.widget.charge.fragment.DrawApplyFragment            xiaojia
+com.woqutz.didi.widget.followin.MainFollowinFragment                pzh
+com.woqutz.didi.widget.followupwinner.ui.RecommendPlanDetailUI      pzh
+com.woqutz.didi.widget.followupwinner.ui.RecommendPlanHistoryUI     pzh
+
+
+## com.woqutz.didi.control.refresh.XListView
+com.woqutz.didi.widget.scorelive.control.component.livetab.MatchRankView                   yu.liu
+com.woqutz.didi.widget.followupwinner.fragments.prizereport.PrizeReportFragment            yu.liu
+
+
+
+
+## com.woqutz.didi.widget.betjc.control.widget.PHExpandableListView
+com.woqutz.didi.widget.betjc.control.fragment.bd.BaseBdFragment
+com.woqutz.didi.widget.betjc.control.fragment.lc.BaseLcFragment
+com.woqutz.didi.widget.betjc.control.fragment.zc.BaseZcFragment
+
+
+## com.xlibs.xrv.view.XRecyclerView
+com.woqutz.didi.widget.followupwinner.fragments.attention.BaseAttentionFragment
