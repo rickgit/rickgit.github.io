@@ -1,0 +1,8 @@
+TensorFlow
+建议安装CPU版
+
+安装方式：
+1. pip （推荐）
+python 3.6 已经包含 pip
+
+2. Anacoda（用于科学计算的 Python 发行版）

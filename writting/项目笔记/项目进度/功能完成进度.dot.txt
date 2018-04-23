@@ -55,3 +55,7 @@ https://github.com/typ0520/fastdex
 003
 	预计奖金 √
 	ARCore->https://developers.google.cn/ar/ √
+
+
+004 
+	Android P 问题

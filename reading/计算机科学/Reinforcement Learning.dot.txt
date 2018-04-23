@@ -1,0 +1,23 @@
+"Reinforcement Learning (RL)"->"The simplified way of implementing a process that improves machine performance with time is using Reinforcement Learning (RL). Reinforcement Learning is an approach through which intelligent programs, known as agents, work in a known or unknown environment to constantly adapt and learn based on giving points. The feedback might be positive, also known as rewards, or negative, also called punishments."
+"Reinforcement Learning (RL)"->"some key concepts"->{"agents","environments","state","action","reward"}
+
+" state"->{"rewards","punishments"}
+
+/**
+•	 The agent is the intelligent program
+•	 The environment is the maze
+•	 The state is the place in the maze where the agent is
+•	 The action is the move we take to move to the next state
+•	 The reward is the points associated with reaching a particular
+state. 
+
+*/
+environments->{"Deterministic","Observable","Discrete or continuous","Single or multiagent"}
+
+"Deterministic"->{"DFA","NDFA"}
+
+//charpt  2
+"Reinforcement Learning (RL)"->"algorithms"
+"Markov Decision Process (MDP)"
+"SARSA"
+"Q Learning and dynamic programming"

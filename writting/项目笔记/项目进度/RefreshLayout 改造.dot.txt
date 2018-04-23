@@ -16,15 +16,15 @@ com.woqutz.didi.widget.followupwinner.ui.RecommendPlanHistoryUI     pzh
 ## com.woqutz.didi.control.refresh.XListView
 com.woqutz.didi.widget.scorelive.control.component.livetab.MatchRankView                   yu.liu
 com.woqutz.didi.widget.followupwinner.fragments.prizereport.PrizeReportFragment            yu.liu
-
+com.woqutz.didi.widget.main.ui.DeskMainView                                                anshu.wang
 
 
 
 ## com.woqutz.didi.widget.betjc.control.widget.PHExpandableListView
-com.woqutz.didi.widget.betjc.control.fragment.bd.BaseBdFragment
-com.woqutz.didi.widget.betjc.control.fragment.lc.BaseLcFragment
-com.woqutz.didi.widget.betjc.control.fragment.zc.BaseZcFragment
+com.woqutz.didi.widget.betjc.control.fragment.bd.BaseBdFragment                           anshu.wang
+com.woqutz.didi.widget.betjc.control.fragment.lc.BaseLcFragment                           anshu.wang
+com.woqutz.didi.widget.betjc.control.fragment.zc.BaseZcFragment                           anshu.wang
 
 
 ## com.xlibs.xrv.view.XRecyclerView
-com.woqutz.didi.widget.followupwinner.fragments.attention.BaseAttentionFragment
+com.woqutz.didi.widget.followupwinner.fragments.attention.BaseAttentionFragment            pzh
