@@ -1,0 +1,73 @@
+
+## 沉浸式标题栏
+
+1. 修改主题
+Theme.AppCompat.Light.NoActionBar
+
+
+2. BaseUI
+    public static void translateStatusBar(Window window) {
+        if (isSupportTranslateStatusBar()) {//color os
+            WindowManager.LayoutParams localLayoutParams = window.getAttributes();
+            localLayoutParams.flags = (WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | localLayoutParams.flags);
+        }
+//        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+//            View decorView = window.getDecorView();
+//            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    |View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            window.setStatusBarColor(Color.TRANSPARENT);
+//        }
+    }
+
+
+3. TitleControl
+ if (isSupportTranslateStatusBar()) {
+            ViewGroup.LayoutParams statuVHLp = statusViewholder.getLayoutParams();
+            statuVHLp.height = statubarHeight;
+            statusViewholder.setLayoutParams(statuVHLp);
+//            ViewCompat.setFitsSystemWindows(rootView,false);
+            mTitleView.setFitsSystemWindows(false);
+        } else {
+            ViewGroup.LayoutParams statuVHLp = statusViewholder.getLayoutParams();
+            statuVHLp.height = 0;
+            statusViewholder.setLayoutParams(statuVHLp);
+        }
+
+
+
+4. Dialog
+
+        if (TitleControl.isSupportTranslateStatusBar()) {
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE );
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+////        getWindow().setStatusBarColor(Color.TRANSPARENT);
+            WindowManager.LayoutParams attributes = getWindow().getAttributes();
+            attributes.width = AppConfig.S_scrWidth;
+            attributes.height = AppConfig.S_scrHeight;
+            getWindow().setAttributes(attributes);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
+
+
+
+5. Popupwindow
+public void showPopWindow(PopupWindow popupWindow, View archor) {
+        if (Build.VERSION.SDK_INT < 24) {
+            popupWindow.showAsDropDown(archor);
+        } else {
+            int[] location = new int[2];  // 获取控件在屏幕的位置
+            archor.getLocationOnScreen(location);
+            if (Build.VERSION.SDK_INT == 25) {
+                int tempheight = popupWindow.getHeight();
+                if (tempheight == WindowManager.LayoutParams.MATCH_PARENT || AppConfig.S_scrHeight <= tempheight) {
+                    popupWindow.setHeight(AppConfig.S_scrHeight - location[1] - archor.getHeight());
+                }
+            }
+            popupWindow.showAtLocation(archor, Gravity.NO_GRAVITY, location[0], location[1] + archor.getHeight());
+        }
+
+
+    }

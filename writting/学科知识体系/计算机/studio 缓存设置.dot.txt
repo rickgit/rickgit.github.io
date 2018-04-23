@@ -1,0 +1,11 @@
+.gradle 
+设置环境变量
+GRADLE_USER_HOME D:/cache/gradle
+
+.androidstudio
+
+
+.android
+设置环境变量 $USER_HOME$/.android目录
+ANDROID_SDK_HOME D:/cache/gradle
+修改后可能导致连不上模拟器
