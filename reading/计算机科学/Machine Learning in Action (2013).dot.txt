@@ -1,0 +1,18 @@
+digraph g{
+	"Machine Learning in Action"->"Classification"->"supervised learning"->"Supervised learning asks the machine to learn from our data when we specify a target variable."
+
+	"Classification"->"basics"->expert systems"
+	"basics"->"supervised learning"->{"classification task","regression task"}
+	"basics"->"unsupervised learning"->{"clustering","density estimation"}
+	"basics"->"Python"->"scientific libraries"->{"SciPy","NumPy"}
+	"Python"->"scientific tools"->"Matplotlib"
+	"Python"->"Pylab"
+
+	"Classification"->{"Classifying with k-Nearest Neighbors","decision trees","Classifying with probability theory","Logistic regression"}
+	//支持向量机,为一种supervised learning算法,属于classification的范畴
+	"Classification"->{"Support vector machines","Improving classification with the AdaBoost meta-algorithm"}
+	//part 2
+	"Machine Learning in Action"->"Regression"->{"linear regression"," locally weighted linear regression","shrinkage methods","Tree-based regression"}
+	//part 3
+	"Machine Learning in Action"->"Unsupervised learning"->{"k-means clustering algorithm","Apriori algorithm","FP-growth algorithm"}
+}

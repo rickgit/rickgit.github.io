@@ -1,3 +1,5 @@
+﻿//https://github.com/MorvanZhou/Reinforcement-learning-with-tensorflow
+
 "Reinforcement Learning (RL)"->"The simplified way of implementing a process that improves machine performance with time is using Reinforcement Learning (RL). Reinforcement Learning is an approach through which intelligent programs, known as agents, work in a known or unknown environment to constantly adapt and learn based on giving points. The feedback might be positive, also known as rewards, or negative, also called punishments."
 "Reinforcement Learning (RL)"->"some key concepts"->{"agents","environments","state","action","reward"}
 
@@ -17,7 +19,13 @@ environments->{"Deterministic","Observable","Discrete or continuous","Single or 
 "Deterministic"->{"DFA","NDFA"}
 
 //charpt  2
-"Reinforcement Learning (RL)"->"algorithms"
-"Markov Decision Process (MDP)"
-"SARSA"
-"Q Learning and dynamic programming"
+"Reinforcement Learning (RL)"->"algorithms"->{"Hyperparameters","Markov Decision Process (MDP)","SARSA","Q Learning","dynamic programming"}
+ 
+ //
+ "Reinforcement Learning (RL)"->"plantform"->{"Google DeepMind","OpenAI"}
+ //https://github.com/openai/gym.git
+ // https://deepmind.com/
+
+"Reinforcement Learning (RL)"->"Swarm intelligence "
+"Reinforcement Learning (RL)"->"library->{"Keras","ChainerRL"}
+//git clone https://github.com/chainer/chainerrl.git

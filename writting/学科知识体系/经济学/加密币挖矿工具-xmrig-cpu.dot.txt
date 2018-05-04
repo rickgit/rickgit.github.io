@@ -1,0 +1,28 @@
+
+# 依赖库 libuv
+下载 https://github.com/libuv/libuv
+或则已经编译好的 https://github.com/xmrig/xmrig-deps/releases
+
+# msys2 or vs:
+http://www.msys2.org/
+
+# cmake
+- msys 位于 E:\software\msys2\mingw64\bin
+$ pacman -Sy
+$ pacman -S mingw-w64-i686-gcc
+$ pacman -S make
+$ pacman -S mingw-w64-i686-cmake
+$ pacman -S mingw-w64-i686-pkg-config
+
+- 单独安装 https://cmake.org/download/
+## cmake安装后，可能在msys2环境中找不到:
+$ export PATH=$PATH:/E/software/msys2/mingw64/bin
+$ which cmake
+
+
+# 编译
+// 进入源代码 
+$ mkdir build
+$ cd build
+$ cmake .. -G "Unix Makefiles" -DXMRIG_DEPS=/E/software/xmrig-deps-3.0/gcc/x64
+$ make
