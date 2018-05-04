@@ -1,0 +1,29 @@
+﻿digraph g{
+	"Efficient Learning Machines"->{"Machine Learning"}
+	"Machine Learning"->"Machine Learning Algorithms"->"Based on underlying mappings"->{"Supervised learning","Unsupervised learning algorithms","Semi-supervised learning","Reinforcement learning (RL) methodology","Transductive learning","Inductive inference"}
+	
+	"Machine Learning Algorithms"->"10 most influential data mining algorithms"->{"C4.5","k-Means","SVMs", "Apriori","estimation maximization (EM)", "PageRank", "AdaBoost","k–nearest neighbors (k-NN)", "naive Bayes","classification and regression trees (CARTs)""}
+
+
+	"Efficient Learning Machines"->"Knowledge discovery"->{"classification", "clustering", "dimensionality reduction", "collaborative filtering","Similarity Matrix"}
+
+	"classification"->{"Logistic regression","Random Forest","Hidden Markov Model","Multilayer Perceptron"}
+
+	"clustering"->{"k-means clustering","Fuzzy k-Means","Streaming k-Means"}
+	"Streaming k-Means"->{"streaming step","ball k-means step"}
+
+	"dimensionality reduction"->{"Singular Value Decomposition","Principal Component Analysis","Lanczos Algorithm"}
+	"collaborative filtering"->{"User-Based Collaborative Filtering","Item-Based Collaborative Filtering","Alternating Least Squares with Weighted-l-Regularization"}
+
+	"Similarity Matrix"->{"Pearson Correlation Coefficient","Spearman Rank Correlation Coefficient","Euclidean Distance","Jaccard Similarity Coefficient"}
+
+	"Efficient Learning Machines"->"support vector machine"
+	"support vector machine"->"supervised classification tasks"
+	"Efficient Learning Machines"->"Support Vector Regression"
+	"Efficient Learning Machines"->"Swarm Intelligence"
+	"Efficient Learning Machines"->"Deep Neural Networks"
+	"Efficient Learning Machines"->"Cortical Algorithms"
+	"Efficient Learning Machines"->"Deep Learning"
+	"Efficient Learning Machines"->"Multiobjective Optimization"
+
+}

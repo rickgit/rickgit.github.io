@@ -71,3 +71,12 @@ public void showPopWindow(PopupWindow popupWindow, View archor) {
 
 
     }
+
+
+6. 标题栏
+- 标题栏一样的颜色
+- 无标题栏，需要一个透明的占位
+
+TitleControl titleControl = (TitleControl)findViewById(R.id.loginTitleControl);
+titleControl.bindView(null);
+titleControl.setBgColor(0x00ffffff);//具体看是否有必要
