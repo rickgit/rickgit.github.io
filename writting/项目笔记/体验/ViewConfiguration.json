@@ -1,0 +1,17 @@
+JSONObject.toJSONString(ViewConfiguration.get(getContext()))
+{
+    "fadingMarqueeEnabled":true,
+    "scaledDoubleTapSlop":150,
+    "scaledDoubleTapTouchSlop":12,
+    "scaledEdgeSlop":18,
+    "scaledFadingEdgeLength":18,
+    "scaledMaximumDrawingCacheSize":2073600,
+    "scaledMaximumFlingVelocity":12000,
+    "scaledMinimumFlingVelocity":75,
+    "scaledOverflingDistance":9,
+    "scaledOverscrollDistance":0,
+    "scaledPagingTouchSlop":24,
+    "scaledScrollBarSize":15,
+    "scaledTouchSlop":12,
+    "scaledWindowTouchSlop":24
+}
