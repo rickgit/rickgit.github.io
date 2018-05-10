@@ -1,0 +1,25 @@
+﻿滑动底部带有viewpager
+
+实现上推下拉
+
+## 问题：
+### 控件大于屏幕
+        measureChildren(widthMeasureSpec, measureSpec);
+        setMeasuredDimension(widSpecSize, MeasureSpec.getSize(measureSpec));
+
+
+
+### 下拉到点后，在上推 ViewPager 向上；
+1. 重新拦截。
+
+
+### 下拉头部，切换viewpager
+
+1. 所有viewpager 的滚动到头部。
+
+### 滑动时候，松开。会点击按钮，导致用户误认为，误点
+
+
+### 经验
+
+1. 先把不处理的过滤掉
