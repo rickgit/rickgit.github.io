@@ -1,0 +1,31 @@
+digraph g{
+	//专业术语 
+	//tactical 战术
+	//possession 控球
+	//goalmouth 球门
+	//pass 传球
+	//diagonal pass 斜传
+	//penalty box 禁区
+	//dribbling 盘球,带球
+	//Dump  pass  抛球
+	//Rebound 反弹球
+	"Attacking Soccer (a tactical analysis)"->"attacking phase"
+
+	"attacking phase"->{"ideal placement","ATTACKING PHASE IN RELATION TO THE NUMBER OF PLAYERS THAT PARTICIPATE IN THEM"}
+	"ideal placement"->{"Taking advantage of width","Taking advantage of depth","Unpredictability"}
+	"ATTACKING PHASE IN RELATION TO THE NUMBER OF PLAYERS THAT PARTICIPATE IN THEM"->{"Elaborate attack","Maneuvered counterattack","Instant attack"}
+
+	"attacking phase"->"A TACTICAL ANALYSIS OF THE ATTACKING PHASE"->{"DEVELOPING ATTACK AFTER GAINING POSSESSION","Build-up of play","Final touches","Shooting"}
+
+	"Build-up of play"->{"Elaborate, or maneuvered build-up","IMMEDIATE BUILD-UP","Mixed build-up"}
+	"Attacking Soccer (a tactical analysis)"->"THE 4–4–2 SYSTEM"
+	"THE 4–4–2 SYSTEM"->{"break","the attack in depth","side attack","central attack"}
+	"THE 4–4–2 SYSTEM"->"POSITION OF THE PLAYERS FOR A CROSS"
+	"THE 4–4–2 SYSTEM"->"POSITION OF THE PLAYERS WHEN WINNING POSSESSION FROM A REBOUND"
+	"THE 4–4–2 SYSTEM"->"OPPONENTS’ SYSTEM"
+
+	"Attacking Soccer (a tactical analysis)"->{"THE 4–4–2 SYSTEM","THE 4–3–3 SYSTEM","THE 3-5-2 SYSTEM","THE 4-3-1-2 SYSTEM","THE 4-5-1 SYSTEM"}
+
+	"Attacking Soccer (a tactical analysis)"->"TRAINING THE ATTACKING PHASE"
+
+}
