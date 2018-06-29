@@ -1,0 +1,29 @@
+@startuml
+title XRecyclerView 下拉刷新
+/' You can also declare:
+   participant L as "I have a really\nlong name"  #99FF99，
+inclue:
+actor
+boundary
+control
+entity
+database
+  '/
+participant XRecyclerView #Cyan
+
+participant Server #Cyan
+participant DataPagerUtils #Cyan
+participant RvMvpAdapter #Cyan
+participant RvMvpHolder #Cyan
+participant RvMvpView #Cyan
+
+XRecyclerView -> Server: onRefresh()
+Server  -> DataPagerUtils :返回数据
+DataPagerUtils  -> RvMvpAdapter :判断有数据的情况\naddPage() 添加分页数据\n到 DataPagerUtils 的 datas
+RvMvpAdapter -> RvMvpHolder :调用notifyDataSetChange等方法，\n更新数据
+RvMvpHolder ->RvMvpView :onCreateViewHolder() 绑定RvMvpHolder。\nRvMvpView 继承 Framelayout，\n作为RvMvpHolder的itemview
+RvMvpAdapter <--RvMvpHolder: RvMvpHolder 继承 ViewHolder ，\n RvMvpAdapter 的onCreateViewHolder()返回给RvMvpAdapter
+XRecyclerView <--RvMvpAdapter :onBindMvpHolder() 绑定数据，\n显示在XRecyclerView 控件上
+
+RvMvpView<--RvMvpView:处理数据，\ngetUserAdapter()和getAdapterPosition()两个方法，\n通知界面数据更新
+@enduml
