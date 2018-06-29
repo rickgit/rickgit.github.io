@@ -1,0 +1,16 @@
+digraph g{
+	"The One Thing"->{"go small","The Domino Effect","Success Leaves Clues","The Lies","The Truth","Extraordinary Results"}
+	"go small"->"ignoring all the things you could do and doing what you should do"
+	"The Domino Effect"->"The key is over time"
+
+	"Success Leaves Clues"->"ONE PERSON"->"No one succeeds alone. No one."
+	"The Lies"->{"Everything Maters Equally","Multitasking","A Disciplined Life","Willpower Is Always on Will-Call","A Balanced Life","Big Is Bad"}
+	"Everything Maters Equally"->"Life is too short to chase unicorns. "
+
+	"The Truth"->{"The Focusing Question","The Success Habit","The Path to Great Answers"}
+
+	"Extraordinary Results"->{"Live with Purpose","Live by Priority","Live for Productivity","The Three Commitments","The Four Thieves","The Journey"}
+	//profit and productivity are also driven by priority and purpose
+	// five factors that contribute to our happiness: positive emotion and pleasure, achievement, relationships, engagement, and meaning
+
+}

@@ -1,0 +1,24 @@
+digraph g{
+	"RxJava Essentials"->{"RX - from .Net to RxJava","Observables","Android Reactive","Filtering Obervables","Transforming Obervables","Combining Observables","Schedulers","REST"}
+	"Observables"->{"The Observer pattern","The RxJava Oberver pattern toolkit"}
+	"The RxJava Oberver pattern toolkit"->{"four main players","Hot and cold Observables","Creating an Observable","Subject = Observable + Observer"}
+	"four main players"->"{"Observable/Observer/Subscriber/Subjects"}
+	"four main players"->"Observables and Subjects are the two "producing" entities. Observers and Subscribers are the two "consuming" entities"
+	"Creating an Observable"->{"Observable.create()","Observable.from()","Observable.just()","Observable.empty(), Observable.never(), and Observable.throw()"}
+
+	"Subject = Observable + Observer"->{"PublishSubject/BehaviorSubject/ReplaySubject/AsyncSubject"}
+
+	"Android Reactive"->{"just()","repeat","defer()","range()","interval()","timer()"}
+
+	"Filtering Obervables"->{"filter()","take()/takeLast()","Once and only once","First and last","Skip and SkipLast"}
+	"Once and only once"->{"distinct()/distinctUntilChanged()"}
+
+	"Filtering Obervables"->{"ElementAt()","Sampling","Timeout","Debounce"}
+	"Transforming Obervables"->"The *map family"->" map(), flatMap(), concatMap(), flatMapIterable(), and switchMap()"
+	"The *map family"->" Scan(), GroupBy(), Buffer(), Window(), and Cast()"
+
+	"Combining Observables"->{"Merge, Zip , Join, combineLatest, And/The/When, Switch, StartWith"}
+
+	"Schedulers"->{".io() .computation() .immediate() .newThread() .trampoline()"}
+
+}
