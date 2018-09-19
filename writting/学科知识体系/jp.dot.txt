@@ -1,4 +1,7 @@
-digraph G {
+﻿digraph G {
+    ////计算机词汇网站 http://e-words.jp/
+    // 小学生日报 http://mainichi.jp/maisho/
+    //字典 https://jisho.org/search/kawaii ；http://nihongo.monash.edu/cgi-bin/wwwjdic
     node[shape=plaintext]
 	文法[shape=record ,label=" 文法| ぶんぽう"]
     名詞[shape=record ,label=" 名詞| めいし"]
@@ -36,3 +39,4 @@ digraph G {
     计算机类-> 文書[shape=record ,label=" 文書| もんそ"]
 
 }
+

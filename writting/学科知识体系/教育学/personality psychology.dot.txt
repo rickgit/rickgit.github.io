@@ -1,0 +1,28 @@
+digraph g{
+    "personality psychology"->{"introduction"}
+
+    "introduction"->{"introduction to personality psychology","Personality Assessment, Measurement, and Research Design"}
+    "introduction to personality psychology"->{"personality defined","three levels","six domains"}
+    //六个因素,即外向性、愉悦性、公正严谨性、情绪性、坦诚—谦恭、智力/想象力/创新性。
+    "personality defined"->{"trait-descriptive adjectives"}
+    "personality defined"->"Personality is the set of psychological traits and mechanisms within the individual that are organized and relatively enduring and that influence his or her interactions with, and adaptations to, the intrapsychic, physical, and social environments"
+    "personality defined"->"Psychological traits are characteristics that describe ways in which people are different from each other ."
+    "personality defined"->"Psychological mechanisms"
+    "personality defined"->"person–environment interaction"->{"selection","evocations","manipulations"}
+    "personality defined"->"adaptations"
+
+    "three levels"->{"human nature","individual and group difference","individual uniqueness"}
+    "six domains"->{"dispositional domain","biological domain","intrapsychic domain","cognitive-experiential domain","social and cultural domain","adjustment domain"}
+
+    "introduction to personality psychology"->{"standards for evaluating personality theories"}
+    ""standards for evaluating personality theories"->{"Comprehensiveness","Heuristic value","Testability","Parsimony"," Compatibility and integration across domains and levels"}
+
+
+    "Personality Assessment, Measurement, and Research Design"->{"Sources of Personality Data","Evaluation of Personality Measures"}
+
+    "Sources of Personality Data"->{"Self-Report Data (S-Data)","Observer-Report Data (O-Data)","Test Data (T-Data)","Life-Outcome Data (L-Data)"}
+    "Evaluation of Personality Measures"->{"Reliability","Validity","Generalizability"}
+
+
+
+}

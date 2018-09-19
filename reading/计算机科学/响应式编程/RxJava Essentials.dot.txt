@@ -20,5 +20,6 @@ digraph g{
 	"Combining Observables"->{"Merge, Zip , Join, combineLatest, And/The/When, Switch, StartWith"}
 
 	"Schedulers"->{".io() .computation() .immediate() .newThread() .trampoline()"}
+	"Schedulers"->"SubscribeOn and ObserveOn"
 
 }

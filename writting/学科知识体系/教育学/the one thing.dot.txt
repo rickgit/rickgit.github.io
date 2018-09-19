@@ -1,0 +1,5 @@
+digraph g{
+    "the one thing"->{"the one thing define","domino effect","success leaves clues","the lies","the truth","extraordinary results","put one thing to work"}
+    "the one thing define"->{"something had to give","going small"}
+    "success leaves clues"->{"one product, one service","one person","one person, one skill","one life","one thing"}
+}
