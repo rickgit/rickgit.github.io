@@ -1,0 +1,6 @@
+digraph g{
+    "The Complete Idiot's Guide to Playing the Guitar"->{"Preparing to Play",}
+
+    "Preparing to Play"->{"History","What Is a Guitar",""}
+    "What Is a Guitar"->{"➤ The parts of the guitar","➤ Guitar styles: classical, flamenco, folk, jazz, and rock","➤ Guitar types: classical, acoustic, electric","➤ More guitar talk","➤ Selecting a guitar","➤ Guitar variants"}
+}

@@ -1,0 +1,35 @@
+## Glide
+An image loading and caching library for Android focused on smooth scrolling
+
+[组件地址](https://bumptech.github.io/glide/)
+### 占位图以及过渡动画
+
+ 占位图
+ 1. 默认图片，placeholder（）
+ 2. 加载错误图片，error（）
+ 3. 加载到 null 图片， fallback（）
+
+
+### 加载本地图片
+### 加载Gif
+
+### 绑定生命周期
+
+### 内存缓存与磁盘缓存
+BitmapPool
+#### Cache Keys
+keyFactory.buildKey 生成 key，参数如下
+1. 屏幕宽高
+2. The optional Transformation
+3. Any added Options
+4. The requested data type (Bitmap, GIF, etc)
+
+
+### 自定义缓存
+
+### 图片的压缩
+### 图片预处理(圆角,高斯模糊等)
+ 
+ 1. 裁剪
+ 2. 滤化
+### 图片的剪裁(ScaleType)
