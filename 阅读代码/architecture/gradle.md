@@ -5,9 +5,9 @@
 
 > [hello](http://blog.csdn.net/innost/article/details/48228651)
 
-##gradle
+## gradle
 
-##groovy特性
+## groovy特性
 ###	GroovyBeans / Properties
 
 ```groovy
@@ -53,10 +53,10 @@
 curry 过的闭包使得实现计算的函数模式出奇得容易
 ###	XML and JSON processing
 > [processing-xml](http://groovy-lang.org/processing-xml.html)
-###1. Parsing XML
-###2. GPath
-###3. Creating XML
-###4. Manipulating XML
+### 1. Parsing XML
+### 2. GPath
+### 3. Creating XML
+### 4. Manipulating XML
 
 
 1. JsonSlurper
@@ -106,10 +106,10 @@ file.close()
 ###
 
 
-##gradle
+## gradle
 google 搜索[android gradle dsl](http://google.github.io/android-gradle-dsl/current/)
 
-##task
+## task
 **C:/Users/Haibin/.gradle/wrapper/dists/gradle-2.10-all/a4w5fzrkeut1ox71xslb49gst/gradle-2.10/src/core/org/gradle/api/Task.java**
 第一个脚本
 ```gradle 
