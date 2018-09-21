@@ -1,4 +1,4 @@
-#Android Base64编码
+# Android Base64编码
 
 > Utilities for encoding and decoding the Base64 representation of binary data.  See RFCs <a href="http://www.ietf.org/rfc/rfc2045.txt">2045</a> and <a href="http://www.ietf.org/rfc/rfc3548.txt">3548</a>. ---Android
 > Base64 is a group of similar binary-to-text encoding schemes that represent binary data in an ASCII string format by translating it into a radix-64 representation. ---[wiki](https://en.wikipedia.org/wiki/Base64)
