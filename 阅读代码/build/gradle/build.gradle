@@ -1,0 +1,347 @@
+apply plugin: 'com.android.application'
+//import com.android.build.gradle.tasks.PackageApplication
+import com.android.build.gradle.tasks.PackageApplication
+android {
+    compileSdkVersion 16
+    buildToolsVersion "21.1.2"
+    signingConfigs {
+        release {
+            storeFile file("didi-apk.keystore")
+            storePassword "didi201508181632"
+            keyAlias "didi-apk.keystore"
+            keyPassword "didi201508181632"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    productFlavors {
+
+        parseProperties().each { name, config ->
+            "$name" {
+                sourceSets["$name"].res.srcDirs = [config.resPathKey]
+//,new File("C:\\Users\\Haibin\\Downloads\\anshu\\package\\main\\特殊版本的icon"+"\\"+config.appicon)//特殊图标的路径
+                sourceSets["$name"].assets.srcDirs = [config.assetsPathKey]
+//                resPathKey : resPath,
+//                packageId:packageMatch[0][1],
+//                packageName:packagenameMatch[0][1],
+//                isall:isallMatch[0][1],
+//                appicon:appiconMatch[0][1],
+//                newAgentId:newAgentIdMatch[0][1],
+//                newAgentValue:newAgentValueMatch[0][1]
+                applicationId = config.packageId
+                copy {
+                    from('src/main/res') {
+                        include '**/*.xml'
+                    }
+                    into 'productFlavors/' + config.newAgentId + '/res-_' + config.newAgentId
+//                    exclude {detail->
+//                        detail.file.text.contains('嘀嘀')
+//                    }
+                    filter {
+//                        String line -> line.replaceAll("嘀嘀", "滴滴didi")
+                    }
+                }
+
+
+            }
+        }
+
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['../Bet/src/main/java', '../ChargeWidget/src/main/java', '../UserWidget/src/main/java', 'src/main/java','../WebView/src/main/java','../Query/src/main/java']
+            res.srcDirs = ['../Bet/src/main/res', '../ChargeWidget/src/main/res', '../UserWidget/src/main/res', 'src/main/res','../WebView/src/main/res','../Query/src/main/res']
+            assets.srcDirs=['assets','./src/main/assets','../WebView/src/main/assets']
+        }
+    }
+    defaultConfig {
+//        multiDexEnabled true
+        applicationId "com.woqutz.didi"
+        minSdkVersion 8
+        targetSdkVersion 16
+//        versionCode 2
+        versionName "1.2.0"
+    }
+    buildTypes {
+
+        release {
+//            runProguard true // old version
+            debuggable false
+            minifyEnabled true// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true // 默认为true
+        }
+        //产生插件包的路径
+        product {
+//            runProguard true // old version
+            debuggable false
+            minifyEnabled true// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true // 默认为true
+        }
+        debug {
+            debuggable true
+            minifyEnabled false// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        daily {
+            debuggable false
+            minifyEnabled true// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        beta {
+            debuggable false
+            minifyEnabled true// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        open {
+            debuggable false
+            minifyEnabled true// 代码混淆,插件common包，混淆要谨慎
+            shrinkResources true// 依赖于minifyEnabled,删除没用的资源
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+//    sourceSets { main { res.srcDirs = ['src/main/res', 'src/main/res/drawable-hdpi'] } }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    android.applicationVariants.all { variant ->
+        variant.properties.entrySet().each {
+//            println "===>variant.properties " + it.key + " _ " + it.value
+        }
+        variant.outputs.each { output ->
+
+            if (output.zipAlign) {
+                def file = output.outputFile
+                def fileName = "woqutzz_android_v$variant.versionName-" + variant.buildType.name+"_"+( new Date().format('yyyyMMdd'))+"_";
+                try {
+                    fileName += variant.flavorName
+                } catch (Exception ignore) {
+                    fileName += "default"
+                }
+//                fileName += "_"+( new Date().format('yyyyMMdd'))+"_1"+".apk";
+                fileName += ".apk";
+               project.ext.each{i->
+//                   println "===>ext"+i
+               }
+                project.ext.pluginReleaseName[variant.buildType.name]=fileName//拷贝变量
+                def file1 = new File(file.parent, fileName)
+                output.outputFile = file1
+//                println "===>output.outputFile " + output.outputFile
+            }
+        }
+    }
+
+}
+project.ext {
+//    pluginReleaseName = ''
+    pluginReleaseName = [default:""]
+}
+
+def getMyFlavorsFromFileSystem() {
+    def flavors = [:]
+    if (project.hasProperty('mc')) {
+
+        println '------setup flavors ---------------'
+        def path = './productFlavors/productFlavors'
+        def prefix = '_'
+
+        file(path).eachLine { line ->
+            println line
+            def f = file("./productFlavors/$line")
+            if (!f.exists()) {
+                f.mkdir()
+            }
+
+            def resPath = file("./productFlavors/$line/res-" + prefix + line)
+            if (!resPath.exists()) {
+                resPath.mkdir()
+            }
+
+//            copyRes(resPath.absolutePath,line)
+            copyManifest(line)
+            flavors.put(prefix + line, [
+                    resPathKey: resPath
+            ])
+        }
+
+    }
+    return flavors
+}
+
+def copyManifest(String type) {
+    BufferedReader reader = file('./src/main/AndroidManifest.xml').newReader('utf-8')
+    StringBuffer _file = new StringBuffer()
+    reader.eachLine { line ->
+        _file.append(line).append("\n")
+    }
+    reader.close()
+
+    def dest_file = file("./productFlavors/$type/AndroidManifest.xml")
+
+//    println "===>xi "+dest_file.absolutePath
+//    if(!dest_file.exists()){
+//        dest_file.createNewFile()
+//    }
+//    BufferedWriter writer = new BufferedWriter(new FileWriter(dest_file))
+    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dest_file), "UTF-8"))
+//防止写入时候，中文乱码
+    writer.write(_file.toString() + "<!-- $type -->")
+    writer.close()
+}
+
+
+def parseProperties() {
+
+    def flavors = [:]
+    if (project.hasProperty('mc')) {
+        def file = new File('C:/Users/Haibin/Downloads/anshu/workspace/ws-ticket-svn/Didi/Ticket/Main/productFlavors/change.properties') as String[]
+
+        file[0].split('[,]').each {
+//            println it;
+            def prefix = '_'
+//FIXME 解析原来的change.properties，改文件阅读不易，希望优化
+            def packageMatch = it =~ /(.*)##/
+            def packagenameMatch = it =~ /##(.*):/
+            def isallMatch = it =~ /:(.*)_/
+            def appiconMatch = it =~ /_(.*);/
+            def newAgentIdMatch = it =~ /;(.*) /
+            println newAgentIdMatch[0][1]
+            def newAgentValueMatch = it =~ / (.*)/
+
+            def line = newAgentIdMatch[0][1]
+
+            def f = new File("./Main/productFlavors/$line")
+            if (!f.exists()) {
+                def mkdirs = f.mkdirs()
+            }
+            //FIXME 包含的资源文件夹，添加value文件夹
+            def resPath = new File("./Main/productFlavors/$line/res-" + prefix + line)
+            def assetsPath = new File(resPath.getParentFile().getCanonicalPath() + "/assets")
+            if (!resPath.exists()) {
+                resPath.mkdir()
+            }
+            if (!assetsPath.exists()) {
+                assetsPath.mkdir()
+            }
+            println resPath.absolutePath
+
+            flavors.put(prefix + newAgentIdMatch[0][1], [
+                    resPathKey   : resPath.getCanonicalFile(),
+                    assetsPathKey: assetsPath.getCanonicalFile(),
+                    packageId    : packageMatch[0][1],
+                    packageName  : packagenameMatch[0][1],
+                    isall        : isallMatch[0][1],
+                    appicon      : appiconMatch[0][1],
+                    newAgentId   : newAgentIdMatch[0][1],
+                    newAgentValue: newAgentValueMatch[0][1]
+            ])
+            //修改渠道号
+            def assetsFolderFile = new File(assetsPath.getCanonicalPath() + "/channel.properties")
+
+            def writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(assetsFolderFile.getCanonicalFile()), "UTF-8"))
+            writer.writeLine("agentId=" + newAgentIdMatch[0][1])
+            writer.writeLine("agentValue=" + newAgentValueMatch[0][1])
+            writer.close()
+            copyManifest(newAgentIdMatch[0][1])
+//            agentId=230266
+//            agentValue=Jskj+JnmTaOGr4cSEubx1D1ZLYE=
+            //TODO for循环 替换相同包名的渠道，公用用相同图片和更改后的包名，字符串
+
+
+            println ""
+        }
+    }
+    return flavors
+
+}
+/**
+ * copy 插件apk到微核心
+ */
+assembleRelease << {
+    copy {
+        from('build/outputs/apk')
+        into('../DidiPluginHost/assets/plugins')
+        include(pluginReleaseName.release)
+        rename(pluginReleaseName.release, 'Main.apk')
+    }
+}
+assembleProduct << {
+    copy {
+        from('build/outputs/apk')
+        into('bin')
+        include(pluginReleaseName.product)
+        rename(pluginReleaseName.product, 'Main.apk')
+    }
+}
+
+assembleProduct.finalizedBy(clean)
+
+// 拷贝so文件到
+task copyNativeLibs(type: Copy) {
+    from(new File('libs')) { include '**/*.so' }
+    into new File(buildDir, 'native-libs')
+}
+
+tasks.withType(JavaCompile) { compileTask -> compileTask.dependsOn copyNativeLibs }
+tasks.withType(PackageApplication) { pkgTask ->
+    pkgTask.jniFolders = new HashSet<File>()
+    pkgTask.jniFolders.add(new File(buildDir, 'native-libs'));
+//    pkgTask.outputFile = new File("D:/$agentId.apk")
+}
+
+configurations {
+    libDp
+}
+dependencies {
+    libDp ':BaiduLBS_Android'
+    libDp ':locSDK_5.2'
+    compile project(':Zxing')
+
+    libDp ':android-support-v4'
+    libDp 'com.alibaba:fastjson:1.2.5'
+//    libDp (':Common-1.0'){
+//        transitive = false
+//    }
+//    libDp (':Common-1.0-progard'){
+//        transitive = false
+//    }
+    libDp(project(':Common')) {
+        transitive = false
+    }
+//    libDp(':PlugDL-lib-1.0') {
+//        transitive = false//排除所有的传递依赖
+//    }
+//    libDp(project(':PlugDL-lib')) {
+//        transitive = false//排除所有的传递依赖
+//    }
+//    libDp(project(':EventBus')) {
+//        transitive = false//排除所有的传递依赖
+//    }
+//    libDp(':EventBus-1.0') {
+//        transitive = false//排除所有的传递依赖
+//    }
+    provided configurations.libDp
+    debugCompile configurations.libDp
+    dailyCompile configurations.libDp
+    betaCompile configurations.libDp
+    openCompile configurations.libDp
+}
