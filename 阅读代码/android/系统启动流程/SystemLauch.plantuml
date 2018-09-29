@@ -5,22 +5,38 @@ skinparam classBackgroundColor transparent
 skinparam style strictuml
 skinparam shadowing false
 
-class init_c {
-	
+class Bootloader{
 
+}
+note top of Bootloader 
+手机上电后，硬件会从固定的地址（固化在ROM中）加载bootloader到RAM。
+作用是硬件初始化
+end note
+Bootloader --> init_cpp :加载boot.img文件，开始调用内核
+
+class init_cpp {
+	main()
+	LoadBootScripts()
 }
 
 
-note top of init_c
+note top of init_cpp
+源码地址 https://www.androidos.net.cn/
 http://www.cnblogs.com/rocomp/p/5001639.html
 init进程 –> Zygote进程 –> SystemServer进程 –>各种应用进程
 
 1.首先Bootloader引导程序启动完Linux内核后，
 会加载各种驱动和数据结构，
 当有了驱动以后，开始启动Android系统，
-同时会加载用户级别的第一个进程init(system\core\init.c),
-该进程会首先加载一个init.rc配置文件
+同时会加载用户级别的第一个进程init(system/core/init/init.cpp),
+执行 main 方法,该进程会首先加载一个 init.rc 配置文件
 
+2.init进程有几个阶段。
+挂载分区,创建设备节点和一些关键目录,启用SELinux安全策略；
+初始化属性系统和SELinux系统；
+加载一个 init.rc 配置文件；
+
+3.init.rc 通过LoadBootScripts一些业务被分拆不同目录下
 
 end note
 
@@ -29,6 +45,10 @@ class init_rc{
 
 }
 note top of init_rc
+ 
+Android Init Language语法：定义在platform/system/core/init/README.md
+文件位于 platform/system/core/rootdir/init.rc
+
 init.rc配置文件会进行很多的配置，
 创建很多的文件夹及文件，
 然后初始化一些Android驱动器，
@@ -37,20 +57,33 @@ init.rc配置文件会进行很多的配置，
 用来启动Android的其他服务进程
 end note
 
-
-
-class app_process{
+class app_main_cpp{
 	
 }
+note top of app_main_cpp
 
-note top of app_process
-Zygote会执行一个app_process可执行文件，
-在这个文件中首先添加了Android运行时环境，
-在Android运行时中调用了ZygoteInit.java，
-这就从c++代码跳到了java代码
-
+init.cpp 调用 am.QueueEventTrigger("late-init");，触发 init.rc 执行命令，调用zygote进程
+zygote进程调用二进制文件是 /system/bin/app_process64，
+即frameworks/base/cmds/app_process/Android.mk 定义的app_main.cpp文件
 
 end note
+
+class AndroidRuntime_cpp{
+	start()
+	onVmCreated() start方法创建完虚拟机后调用
+
+	callMain() 执行CallStaticVoidMethod 最终将调用com.android.internal.os.ZygoteInit的main函数。
+}
+note top of AndroidRuntime_cpp
+
+定义在 app_main.cpp文件内.
+实现在 platform/frameworks/base/core/jni/AndroidRuntime.cpp
+
+虚拟机创建完后，可以调用java文件了，返回app_main.cpp，反射调用了ZygoteInit.java，
+这就从c++代码跳到了java代码
+end note
+
+
 
 class ZygoteInit {
 	+ {static} void main(String argv[])
@@ -77,6 +110,12 @@ preloadSharedLibraries()用于初始化系统libraries；
 preloadTextResources()用于初始化文字资源； 
 prepareWebViewInZygote()用于初始化webview;
 end note
+
+class RuntimeInit{
+
+	zygoteInit() 执行到 invokeStaticMain 调用com.android.server.SystemServer类的main函数
+}
+ 
 
 class Zygote{
 	private static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
@@ -178,13 +217,17 @@ class ActivityStackSupervisor{
 
 }
 
- 
 
 
-init_c --> init_rc
-init_rc --> app_process
-app_process --> ZygoteInit
-ZygoteInit --> SystemServer
+
+init_cpp --> init_rc
+init_rc --> app_main_cpp
+
+app_main_cpp --> AndroidRuntime_cpp
+AndroidRuntime_cpp --> ZygoteInit :初始化zygote进程
+AndroidRuntime_cpp --> RuntimeInit :启动普通应用程序
+ZygoteInit --> RuntimeInit
+RuntimeInit --> SystemServer
 SystemServer --> com_android_server_SystemServer_cpp
 com_android_server_SystemServer_cpp --> System_init_cpp
 System_init_cpp --> SystemServer

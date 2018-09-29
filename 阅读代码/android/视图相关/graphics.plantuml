@@ -18,16 +18,19 @@ class ShapeDrawable{
 abstract class Shape{
 	
 }
+
 class RectShape{
 	
 }
 
-VectorDrawable-up-|>Drawable
-public class AnimatedVectorDrawable extends Drawable implements Animatable2 {
+VectorDrawable -up-|>Drawable
+class AnimatedVectorDrawable {
     private final AnimatorSet mAnimatorSet = new AnimatorSet();
     private AnimatedVectorDrawableState mAnimatedVectorState;
 	
 }
+AnimatedVectorDrawable -up-|> Drawable
+AnimatedVectorDrawable .up.|> Animatable2
 AnimatedStateListDrawable  -up-|>  StateListDrawable
 /'
 M moveto  移动到(x y)+

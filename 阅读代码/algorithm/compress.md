@@ -1,6 +1,6 @@
-#压缩算法
-##数据压缩算法
-> 1. JDK GZIP ——这是一个压缩比高的慢速算法，压缩后的数据适合长期使用。JDK中的java.util.zip.GZIPInputStream / GZIPOutputStream便是这个算法的实现。
+# 压缩算法
+## 数据压缩算法
+1. JDK GZIP ——这是一个压缩比高的慢速算法，压缩后的数据适合长期使用。JDK中的java.util.zip.GZIPInputStream / GZIPOutputStream便是这个算法的实现。
 2. JDK deflate ——这是JDK中的又一个算法（zip文件用的就是这一算法）。它与gzip的不同之处在于，你可以指定算法的压缩级别，这样你可以在压缩时间和输出文件大小上进行平衡。可选的级别有0（不压缩），以及1(快速压缩)到9（慢速压缩）。它的实现是java.util.zip.DeflaterOutputStream / InflaterInputStream。
 3. LZ4压缩算法的Java实现——这是本文介绍的算法中压缩速度最快的一个，与最快速的deflate相比，它的压缩的结果要略微差一点。如果想搞清楚它的工作原理，我建议你读一下这篇文章。它是基于友好的Apache 2.0许可证发布的。
 4. Snappy——这是Google开发的一个非常流行的压缩算法，它旨在提供速度与压缩比都相对较优的压缩算法。我用来测试的是这个实现。它也是遵循Apache 2.0许可证发布的。
@@ -10,7 +10,7 @@
 
 请注意！请注意！请注意！zip和gzip只是文件格式，算法是使用DEFLATE算法
 
-###ZipOutputStream 压缩（compression）
+### ZipOutputStream 压缩（compression）
 ```
     public ZipOutputStream(OutputStream out) {
         this(out, StandardCharsets.UTF_8);
@@ -255,7 +255,7 @@ Libcore的类关系图<br/>
     }
 ```
 
-###ZipInputStream 解压（decompression）
+### ZipInputStream 解压（decompression）
 
 ```
 new ZipInputStream(new FileInputStream(filename))
@@ -465,14 +465,15 @@ readLOC()读取解析entry.在通过BufferedInputStream封装ZipInputStream，�
 
 到此，文件的具体压缩算法在WriteNextEntry和ReadNextEnxty方法中。
 
-##GZIP
-
-> "gzip" is often also used to refer to the gzip file format, which is:
-
-1. a 10-byte header, containing a magic number (1f 8b), a version number and a timestamp
-2. optional extra headers, such as the original file name,
-3. a body, containing a DEFLATE-compressed payload
-4. an 8-byte footer, containing a CRC-32 checksum and the length of the original uncompressed data, modulo 2^32.[3] 
+## GZIP
+>
+> "gzip" is often also used to refer to the gzip file 
+> format, which is:
+>
+> 1. a 10-byte header, containing a magic number (1f 8b), a version number and a timestamp
+> 2. optional extra headers, such as the original file name,
+> 3. a body, containing a DEFLATE-compressed payload
+> 4. an 8-byte footer, containing a CRC-32 checksum and the > length of the original uncompressed data, modulo 2^32.[3] 
 > The ZIP format can hold collections of files without an external archiver [wikipadia](https://en.wikipedia.org/wiki/Gzip)
 
 
@@ -492,9 +493,9 @@ readLOC()读取解析entry.在通过BufferedInputStream封装ZipInputStream，�
     }
 ```
 
-够着方法执行的writeHeader方法就是引用的第一点，写入10字节的header。
+构造方法执行的writeHeader方法就是引用的第一点，写入10字节的header。
 
-###png文件格式压缩过程
+### png文件格式压缩过程
 > PNG uses a 2-stage compression process:[wikipekia](https://en.wikipedia.org/wiki/Portable_Network_Graphics)
 
 1. pre-compression: filtering (prediction)
