@@ -1,6 +1,6 @@
-#算法
+# 算法
 
-##随机数生成算法 Random
+## 随机数生成算法 Random
 初始化
 ```java
     private static final long multiplier = 0x5deece66dL;//final 说明不可再赋值
