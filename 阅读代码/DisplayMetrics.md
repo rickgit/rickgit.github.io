@@ -1,4 +1,4 @@
-#Android DisplayMetrics
+# Android DisplayMetrics
 
 > A structure describing general information about a display, such as its size, density, and font scaling.  <p>To access the DisplayMetrics members, initialize an object like this:</p> <pre> DisplayMetrics metrics = new DisplayMetrics(); getWindowManager().getDefaultDisplay().getMetrics(metrics);</pre>
 
@@ -13,7 +13,7 @@
 
 [TOC]
 
-##创建及初始化
+## 创建及初始化
 相关属性
 ```
     public static final int DENSITY_LOW = 120;
@@ -162,7 +162,7 @@ DisplayMetrics是由displayInfo获取到的，上面的代码可以看出是从g
     }
 ```
 至此，已经了解到了DisplayMetrics的由来。
-##getDeviceDensity方法
+## getDeviceDensity方法
 android.util.DisplayMetrics#getDeviceDensity
 ```
     private static int getDeviceDensity() {

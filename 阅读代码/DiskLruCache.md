@@ -1,4 +1,4 @@
-#DiskLruCache分析
+# DiskLruCache分析
 
 > 
 
@@ -15,8 +15,8 @@
 
 [TOC]
 
-##DiskLruCache创建及初始化
+## DiskLruCache创建及初始化
 相关属性 
 
 LruCache包含个构造函数，接下来只分析构造函数。  
-##清理容器 
+## 清理容器 
