@@ -1,4 +1,4 @@
-#SparseMap分析
+# SparseMap分析
 
 > SparseArrays map integers to Objects.  Unlike a normal array of Objects, there can be gaps in the indices.  It is intended to be more memory efficient than using a HashMap to map Integers to Objects, both because it avoids auto-boxing keys and its data structure doesn't rely on an extra entry object for each mapping.
 > 采用[稀疏数组](http://hi.baidu.com/piaopiao_0423/item/d8cc2b99729f8380581461d1)
@@ -16,7 +16,7 @@
 
 [TOC]
 
-##SparseMap 创建及初始化
+## SparseMap 创建及初始化
 相关属性
 ```java
     private static final Object DELETED = new Object();
@@ -116,7 +116,7 @@ SparseArrays 包含个构造函数，接下来只分析无参构造函数。
     }
 ```
 
-##移除键值对
+## 移除键值对
 remove开始分析
 ```java
     public void remove(int key) {
@@ -134,7 +134,7 @@ remove开始分析
     }
 ```
 
-##清理容器
+## 清理容器
 - clear 清除mArray数据
 ```java
     public void clear() {

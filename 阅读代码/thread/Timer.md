@@ -1,4 +1,4 @@
-#Timer分析
+# Timer分析
 
 > 
 
@@ -160,6 +160,6 @@ this.notify会唤醒TimerImpl的run的wait的代码。
 ```
 ---------------------
 
-##Thread.currentThread().getTHreadStackTrace()##
+## Thread.currentThread().getTHreadStackTrace() ##
 //android 调用堆栈 [0]dalvik.system.VMStack#getThreadStackTrace [1]java.lang.Thread#getStackTrace->[2]LogUtils#logDetailInfo->[3]调用的方法
 //java调用堆栈 [0]java.lang.Thread#getStackTrace->[1]LogUtils#logDetailInfo->[2]调用的方法

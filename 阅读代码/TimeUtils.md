@@ -1,4 +1,4 @@
-#Android TimeUtils
+# Android TimeUtils
 
 > 
 
@@ -12,7 +12,7 @@
 
 [TOC]
 
-##创建及初始化
+## 创建及初始化
 TimeUnit是个枚举类，里面有7个类型 *NANOSECONDS*,*MICROSECONDS*,*MILLISECONDS*,*SECONDS*,*MINUTES*,*HOURS*,*DAYS*
 ```
     NANOSECONDS {
@@ -94,7 +94,7 @@ TimeUnit是个枚举类，里面有7个类型 *NANOSECONDS*,*MICROSECONDS*,*MILL
     };
 ```
 
-##sleep方法
+## sleep方法
 ```
     public void sleep(long timeout) throws InterruptedException {
         if (timeout > 0) {

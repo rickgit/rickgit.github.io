@@ -16,7 +16,7 @@
 
 [TOC]
 
-##ArrayMap创建及初始化
+## ArrayMap创建及初始化
 
 ArrayMap包含三个构造函数，接下来只分析无参构造函数。
 ```
@@ -102,7 +102,7 @@ allocArrays根据要分配的大小，分3种情况处理
 ```
 上面这段代码，可以知道mArray是mHashes数组长度的一倍。
 
-##存储键值对
+## 存储键值对
 android.support.v4.util.SimpleArrayMap#put调用indexOfNull获取一个没用过的index(key的hash一样，mArray数组里面key的值一样，
 根据hash值的一倍寻找存储的值，解决Hash冲突的和Hashmap一样。
 - key为null时
@@ -131,7 +131,7 @@ android.support.v4.util.SimpleArrayMap#put调用indexOfNull获取一个没用过
 重新分配内存是用新的数组，如果hash大小是4或8，就先缓存，再将mHashes，mArray数组需要释放
 
 
-##移除键值对
+## 移除键值对
 从android.util.ArrayMap#remove开始分析
 ```
     public V remove(Object key) {
@@ -156,7 +156,7 @@ mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3
 ```
 - 没满足上面的条件，mHash直接置为null，不调整数组大小
 
-##清理容器
+## 清理容器
 - clear 清除mArray数据，并缓存mBaseCache或mTwiceBaseCache
 ```
     public void clear() {
