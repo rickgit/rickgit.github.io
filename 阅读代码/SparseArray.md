@@ -1,33 +1,33 @@
-# SparseMapåˆ†æ
+# SparseMap·ÖÎö
 
 > SparseArrays map integers to Objects.  Unlike a normal array of Objects, there can be gaps in the indices.  It is intended to be more memory efficient than using a HashMap to map Integers to Objects, both because it avoids auto-boxing keys and its data structure doesn't rely on an extra entry object for each mapping.
-> é‡‡ç”¨[ç¨€ç–æ•°ç»„](http://hi.baidu.com/piaopiao_0423/item/d8cc2b99729f8380581461d1)
+> ²ÉÓÃ[Ï¡ÊèÊı×é](http://hi.baidu.com/piaopiao_0423/item/d8cc2b99729f8380581461d1)
 
-@(æºç åˆ†æ)[SparseMap|Android]
+@(Ô´Âë·ÖÎö)[SparseMap|Android]
 
-**SparseMapï¼Œå°†ä»ä»¥ä¸‹å‡ ç‚¹åˆ†æ
+**SparseMap£¬½«´ÓÒÔÏÂ¼¸µã·ÖÎö
 
-- **SparseMapåˆ›å»ºåŠåˆå§‹åŒ–**
-- **å­˜å‚¨é”®å€¼å¯¹**
-- **ç§»é™¤é”®å€¼å¯¹**
-- **æ¸…ç†å®¹å™¨**
+- **SparseMap´´½¨¼°³õÊ¼»¯**
+- **´æ´¢¼üÖµ¶Ô**
+- **ÒÆ³ı¼üÖµ¶Ô**
+- **ÇåÀíÈİÆ÷**
 
 ---------------------
 
 [TOC]
 
-## SparseMap åˆ›å»ºåŠåˆå§‹åŒ–
-ç›¸å…³å±æ€§
+## SparseMap ´´½¨¼°³õÊ¼»¯
+Ïà¹ØÊôĞÔ
 ```java
     private static final Object DELETED = new Object();
-    private boolean mGarbage = false;//æœ‰å¯¹è±¡è¢«åˆ é™¤
+    private boolean mGarbage = false;//ÓĞ¶ÔÏó±»É¾³ı
 
     private int[] mKeys;  
     private Object[] mValues;
-    private int mSize;//å«æœ‰çš„æ•°æ®
+    private int mSize;//º¬ÓĞµÄÊı¾İ
 ```
 
-SparseArrays åŒ…å«ä¸ªæ„é€ å‡½æ•°ï¼Œæ¥ä¸‹æ¥åªåˆ†ææ— å‚æ„é€ å‡½æ•°ã€‚
+SparseArrays °üº¬¸ö¹¹Ôìº¯Êı£¬½ÓÏÂÀ´Ö»·ÖÎöÎŞ²Î¹¹Ôìº¯Êı¡£
 ```java
     public SparseArray() {
         this(10);
@@ -51,9 +51,9 @@ SparseArrays åŒ…å«ä¸ªæ„é€ å‡½æ•°ï¼Œæ¥ä¸‹æ¥åªåˆ†ææ— å‚æ„é€ å‡½æ•°ã€‚
         mSize = 0;
     }
 ```
-é»˜è®¤å¼€è¾Ÿ 10 å•ä½çš„å†…å­˜ç©ºé—´ 
+Ä¬ÈÏ¿ª±Ù 10 µ¥Î»µÄÄÚ´æ¿Õ¼ä 
 
-##å­˜å‚¨é”®å€¼å¯¹
+##´æ´¢¼üÖµ¶Ô
 ```java
     public void put(int key, E value) {
         int i = ContainerHelpers.binarySearch(mKeys, mSize, key);
@@ -82,10 +82,10 @@ SparseArrays åŒ…å«ä¸ªæ„é€ å‡½æ•°ï¼Œæ¥ä¸‹æ¥åªåˆ†ææ— å‚æ„é€ å‡½æ•°ã€‚
         }
     }
 ```
-1. äºŒåˆ†æŸ¥æ‰¾ mkeysï¼Œåˆ¤æ–­æ˜¯å¦æœ‰å­˜åœ¨ key,æœ‰åˆ™è®¾ç½®ï¼Œæ²¡æœ‰èµ°ä¸‹ä¸€æ­¥
-2. åˆ¤è¯»æœ€åæŸ¥æ‰¾çš„æ˜¯å¦æ˜¯å·²ç»æ ‡è®°ä¸º*DELETED*,è‹¥æ˜¯åˆ™è¦†ç›–ï¼Œå¦èµ°ä¸‹ä¸€æ­¥
-3. è‹¥ mGarbage ä¸ºçœŸï¼Œä¸”å¤§å°å·²ç»è¶…è¿‡mKeysçš„å¤§å°ï¼Œåˆ™è¿è¡Œ gc æ–¹æ³•, gc æ–¹æ³•å°†æ²¡æœ‰æ ‡è®°ä¸º*DELETED*è¦†ç›–ï¼Œæ•°ç»„å‰é¢æœ‰æ ‡è®°*DELETED*ï¼Œé‡æ–°æŸ¥æ‰¾mkey
-4. è®¾ç½®æ–°çš„*mKeys*,*mValues*,*mSize*
+1. ¶ş·Ö²éÕÒ mkeys£¬ÅĞ¶ÏÊÇ·ñÓĞ´æÔÚ key,ÓĞÔòÉèÖÃ£¬Ã»ÓĞ×ßÏÂÒ»²½
+2. ÅĞ¶Á×îºó²éÕÒµÄÊÇ·ñÊÇÒÑ¾­±ê¼ÇÎª*DELETED*,ÈôÊÇÔò¸²¸Ç£¬·ñ×ßÏÂÒ»²½
+3. Èô mGarbage ÎªÕæ£¬ÇÒ´óĞ¡ÒÑ¾­³¬¹ımKeysµÄ´óĞ¡£¬ÔòÔËĞĞ gc ·½·¨, gc ·½·¨½«Ã»ÓĞ±ê¼ÇÎª*DELETED*¸²¸Ç£¬Êı×éÇ°ÃæÓĞ±ê¼Ç*DELETED*£¬ÖØĞÂ²éÕÒmkey
+4. ÉèÖÃĞÂµÄ*mKeys*,*mValues*,*mSize*
 ```java
     private void gc() {
         // Log.e("SparseArray", "gc start with " + mSize);
@@ -116,8 +116,8 @@ SparseArrays åŒ…å«ä¸ªæ„é€ å‡½æ•°ï¼Œæ¥ä¸‹æ¥åªåˆ†ææ— å‚æ„é€ å‡½æ•°ã€‚
     }
 ```
 
-## ç§»é™¤é”®å€¼å¯¹
-removeå¼€å§‹åˆ†æ
+## ÒÆ³ı¼üÖµ¶Ô
+remove¿ªÊ¼·ÖÎö
 ```java
     public void remove(int key) {
         delete(key);
@@ -134,8 +134,8 @@ removeå¼€å§‹åˆ†æ
     }
 ```
 
-## æ¸…ç†å®¹å™¨
-- clear æ¸…é™¤mArrayæ•°æ®
+## ÇåÀíÈİÆ÷
+- clear Çå³ımArrayÊı¾İ
 ```java
     public void clear() {
         int n = mSize;
