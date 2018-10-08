@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="705px" preserveAspectRatio="none" style="width:1010px;height:705px;" version="1.1" viewBox="0 0 1010 705" width="1010px" zoomAndPan="magnify"><defs/><g><!--class Looper--><rect fill="#FFFFFF" height="72.4346" id="Looper" style="stroke: #383838; stroke-width: 1.5;" width="393" x="491" y="110"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="39" x="668" y="128.752">Looper</text><line style="stroke: #383838; stroke-width: 1.5;" x1="492" x2="883" y1="136.3887" y2="136.3887"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="119" x="497" y="152.9946">MessageQueue mQueue</text><line style="stroke: #383838; stroke-width: 1.5;" x1="492" x2="883" y1="159.4116" y2="159.4116"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="381" x="497" y="176.0176">static final ThreadLocal&lt;Looper&gt; sThreadLocal = new ThreadLocal&lt;Looper&gt;();</text><!--class MessageQueue--><rect fill="#FFFFFF" height="42.3887" id="MessageQueue" style="stroke: #383838; stroke-width: 1.5;" width="94" x="765.5" y="8"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="88" x="768.5" y="26.752">MessageQueue</text><line style="stroke: #383838; stroke-width: 1.5;" x1="766.5" x2="858.5" y1="34.3887" y2="34.3887"/><line style="stroke: #383838; stroke-width: 1.5;" x1="766.5" x2="858.5" y1="42.3887" y2="42.3887"/><!--class Handler--><rect fill="#FFFFFF" height="72.4346" id="Handler" style="stroke: #383838; stroke-width: 1.5;" width="226" x="658.5" y="300"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="44" x="749.5" y="318.752">Handler</text><line style="stroke: #383838; stroke-width: 1.5;" x1="659.5" x2="883.5" y1="326.3887" y2="326.3887"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="79" x="664.5" y="342.9946">Looper mLooper</text><line style="stroke: #383838; stroke-width: 1.5;" x1="659.5" x2="883.5" y1="349.4116" y2="349.4116"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="214" x="664.5" y="366.0176">public void dispatchMessage(Message msg)</text><!--class Message--><rect fill="#FFFFFF" height="72.4346" id="Message" style="stroke: #383838; stroke-width: 1.5;" width="131" x="868" y="490"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="51" x="908" y="508.752">Message</text><line style="stroke: #383838; stroke-width: 1.5;" x1="869" x2="998" y1="516.3887" y2="516.3887"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="68" x="874" y="532.9946">Handler target</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="119" x="874" y="548.0176">MessageQueue mQueue</text><line style="stroke: #383838; stroke-width: 1.5;" x1="869" x2="998" y1="554.4346" y2="554.4346"/><!--class Thread--><rect fill="#FFFFFF" height="42.3887" id="Thread" style="stroke: #383838; stroke-width: 1.5;" width="45" x="411" y="125"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="39" x="414" y="143.752">Thread</text><line style="stroke: #383838; stroke-width: 1.5;" x1="412" x2="455" y1="151.3887" y2="151.3887"/><line style="stroke: #383838; stroke-width: 1.5;" x1="412" x2="455" y1="159.3887" y2="159.3887"/><!--class HandlerThread--><rect fill="#FFFFFF" height="57.4116" id="HandlerThread" style="stroke: #383838; stroke-width: 1.5;" width="94" x="458.5" y="307.5"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="83" x="464" y="326.252">HandlerThread</text><line style="stroke: #383838; stroke-width: 1.5;" x1="459.5" x2="551.5" y1="333.8887" y2="333.8887"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="82" x="464.5" y="350.4946">Looper mLooper;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="459.5" x2="551.5" y1="356.9116" y2="356.9116"/><path d="M6,242 L6,429.5439 A0,0 0 0 0 6,429.5439 L423,429.5439 A0,0 0 0 0 423,429.5439 L423,340 L458.499,336 L423,332 L423,252 L413,242 L6,242 A0,0 0 0 0 6,242 " fill="#ECECEC" style="stroke: #383838; stroke-width: 1.0;"/><path d="M413,242 L413,252 L423,252 L413,242 " fill="#ECECEC" style="stroke: #383838; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="0" x="16" y="261.8979"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="396" x="12" y="279.6523">final Handler mHandler = new Handler(mHandlerThread.getLooper()) {</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="60" x="28" y="297.4067">@Override</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="253" x="28" y="315.1611">public void handleMessage(Message msg) {</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="322" x="44" y="332.9155">Log.i("tag", "鎺ユ敹鍒版秷鎭細" + msg.obj.toString());</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="4" x="28" y="350.6699">}</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="8" x="12" y="368.4243">};</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="0" x="16" y="386.1787"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="393" x="12" y="403.9331">涓嶉渶瑕佽繖涓猯ooper绾跨▼鐨勬椂鍊欓渶瑕佹墜鍔ㄥ仠姝㈡帀锛�</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="0" x="16" y="421.6875"/><!--class IntentService--><rect fill="#FFFFFF" height="72.4346" id="IntentService" style="stroke: #383838; stroke-width: 1.5;" width="224" x="591.5" y="622"/><text fill="#000000" font-family="sans-serif" font-size="12" font-style="italic" lengthAdjust="spacingAndGlyphs" textLength="72" x="667.5" y="640.752">IntentService</text><line style="stroke: #383838; stroke-width: 1.5;" x1="592.5" x2="814.5" y1="648.3887" y2="648.3887"/><rect fill="none" height="6" style="stroke: #595959; stroke-width: 1.0;" width="6" x="599.5" y="658.4001"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="155" x="611.5" y="664.9946">volatile Looper mServiceLooper;</text><rect fill="none" height="6" style="stroke: #595959; stroke-width: 1.0;" width="6" x="599.5" y="673.4231"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="198" x="611.5" y="680.0176">volatile ServiceHandler mServiceHandler;</text><line style="stroke: #383838; stroke-width: 1.5;" x1="592.5" x2="814.5" y1="686.4346" y2="686.4346"/><!--class Service--><rect fill="#FFFFFF" height="42.3887" id="Service" style="stroke: #383838; stroke-width: 1.5;" width="46" x="783.5" y="505"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="40" x="786.5" y="523.752">Service</text><line style="stroke: #383838; stroke-width: 1.5;" x1="784.5" x2="828.5" y1="531.3887" y2="531.3887"/><line style="stroke: #383838; stroke-width: 1.5;" x1="784.5" x2="828.5" y1="539.3887" y2="539.3887"/><!--class ServiceHandler--><rect fill="#FFFFFF" height="42.3887" id="ServiceHandler" style="stroke: #383838; stroke-width: 1.5;" width="90" x="658.5" y="505"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="84" x="661.5" y="523.752">ServiceHandler</text><line style="stroke: #383838; stroke-width: 1.5;" x1="659.5" x2="747.5" y1="531.3887" y2="531.3887"/><line style="stroke: #383838; stroke-width: 1.5;" x1="659.5" x2="747.5" y1="539.3887" y2="539.3887"/><!--link MessageQueue to Looper--><path d="M786.837,53.61 C769.213,69.824 745.514,91.628 725.683,109.871 " fill="none" id="MessageQueue-Looper" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="790.727,50.031,781.3954,53.1809,787.0474,53.4163,786.812,59.0683,790.727,50.031" style="stroke: #383838; stroke-width: 1.0;"/><!--link Looper to Handler--><path d="M705.459,187.194 C720.407,220.648 741.48,267.811 755.771,299.797 " fill="none" id="Looper-Handler" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="703.3,182.361,703.3206,192.2098,705.3402,186.9258,710.6243,188.9455,703.3,182.361" style="stroke: #383838; stroke-width: 1.0;"/><!--link Handler to Message--><path d="M805.429,376.374 C834.296,409.874 875.377,457.549 903.166,489.797 " fill="none" id="Handler-Message" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="801.971,372.361,804.8133,381.7908,805.2339,376.1496,810.8751,376.5702,801.971,372.361" style="stroke: #383838; stroke-width: 1.0;"/><!--link MessageQueue to Message--><path d="M849.74,53.247 C868.679,67.217 890.061,86.782 901.5,110 C964.575,238.024 949.373,415.514 939.132,489.947 " fill="none" id="MessageQueue-Message" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="845.49,50.174,850.4406,58.6882,849.5422,53.1031,855.1272,52.2047,845.49,50.174" style="stroke: #383838; stroke-width: 1.0;"/><!--link Thread to Looper--><path d="M461.414,146 C471.155,146 480.895,146 490.636,146 " fill="none" id="Thread-Looper" style="stroke: #383838; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#383838" points="456.32,146,465.32,150,461.32,146,465.32,142,456.32,146" style="stroke: #383838; stroke-width: 1.0;"/><!--link Thread to HandlerThread--><path d="M448.439,186.007 C462.332,222.284 482.68,275.414 494.951,307.456 " fill="none" id="Thread-HandlerThread" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="441.821,188.3,441.205,167.119,454.895,183.293,441.821,188.3" style="stroke: #383838; stroke-width: 1.0;"/><!--link Looper to HandlerThread--><path d="M640.245,185.396 C620.721,202.054 598.304,222.245 579.5,242 C559.726,262.774 539.609,288.407 525.351,307.497 " fill="none" id="Looper-HandlerThread" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="644.11,182.113,634.6615,184.8924,640.2997,185.3506,639.8416,190.9889,644.11,182.113" style="stroke: #383838; stroke-width: 1.0;"/><!--link Service to IntentService--><path d="M778.085,562.864 C763.542,581.219 745.902,603.4829 731.429,621.7498 " fill="none" id="Service-IntentService" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="772.725,558.357,790.632,547.028,783.698,567.051,772.725,558.357" style="stroke: #383838; stroke-width: 1.0;"/><!--link Handler to ServiceHandler--><path d="M751.833,391.375 C738.082,429.39 720.504,477.989 710.785,504.858 " fill="none" id="Handler-ServiceHandler" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="none" points="745.324,388.788,758.71,372.361,758.49,393.55,745.324,388.788" style="stroke: #383838; stroke-width: 1.0;"/><!--link Looper to IntentService--><path d="M662.811,186.626 C653.92,203.106 644.981,222.838 640.5,242 C608.116,380.486 599.452,425.83 640.5,562 C647.011,583.601 660.217,604.802 672.863,621.6763 " fill="none" id="Looper-IntentService" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="665.314,182.067,657.4769,188.0319,662.9081,186.4501,664.4899,191.8813,665.314,182.067" style="stroke: #383838; stroke-width: 1.0;"/><!--link ServiceHandler to IntentService--><path d="M693.181,552.13 C690.389,571.917 690.002,599.7358 692.02,621.7498 " fill="none" id="ServiceHandler-IntentService" style="stroke: #383838; stroke-width: 1.0;"/><polygon fill="#383838" points="693.987,547.028,688.6319,555.2938,693.207,551.9668,696.534,556.5418,693.987,547.028" style="stroke: #383838; stroke-width: 1.0;"/><!--link ServiceHandler to IntentService--><path d="M713.572,547.028 C716.548,562.94 717.586,585.905 716.687,606.7385 " fill="none" id="ServiceHandler-IntentService" style="stroke: #383838; stroke-width: 1.0;"/><ellipse cx="716.2034" cy="613.7686" fill="#FFFFFF" rx="8" ry="8" style="stroke: #383838; stroke-width: 1.0;"/><line style="stroke: #383838; stroke-width: 1.0;" x1="716.7519" x2="715.655" y1="605.7874" y2="621.7498"/><line style="stroke: #383838; stroke-width: 1.0;" x1="724.1846" x2="708.2223" y1="614.3171" y2="613.2202"/><!--link HandlerThread to IntentService--><path d="M510.041,369.831 C517.77,416.261 536.979,502.111 579.5,562 C596.299,585.661 620.718,606.1389 643.451,621.9614 " fill="none" id="HandlerThread-IntentService" style="stroke: #383838; stroke-width: 1.0; stroke-dasharray: 7.0,7.0;"/><polygon fill="#383838" points="509.198,364.642,506.6922,374.1667,509.9994,369.5774,514.5888,372.8846,509.198,364.642" style="stroke: #383838; stroke-width: 1.0;"/><!--
+@startuml Handler_class_diagram
+
+skinparam monochrome true
+skinparam classBackgroundColor transparent
+skinparam style strictuml
+
+
+class Looper {
+	static final ThreadLocal<Looper> sThreadLocal = new ThreadLocal<Looper>();
+	
+	MessageQueue mQueue
+}
+
+class MessageQueue {
+	
+}
+class Handler {
+	Looper mLooper
+
+	public void dispatchMessage(Message msg) 
+}
+class Message {
+	Handler target
+	MessageQueue mQueue
+}
+class Thread {
+}
+
+
+
+MessageQueue <- - Looper
+Looper <- - Handler
+Handler <- - Message
+MessageQueue <-left- Message
+Thread <.left. Looper
+
+
+class HandlerThread extends Thread {
+	 Looper mLooper;
+}
+note left of HandlerThread 
+
+final Handler mHandler = new Handler(mHandlerThread.getLooper()) {
+    @Override
+    public void handleMessage(Message msg) {
+        Log.i("tag", "鎺ユ敹鍒版秷鎭細" + msg.obj.toString());
+    }
+};
+
+涓嶉渶瑕佽繖涓猯ooper绾跨▼鐨勬椂鍊欓渶瑕佹墜鍔ㄥ仠姝㈡帀锛�
+
+end note
+Looper <- - HandlerThread
+
+abstract class IntentService extends Service {
+	- volatile Looper mServiceLooper;
+	- volatile ServiceHandler mServiceHandler;
+}
+
+class ServiceHandler extends Handler  {
+	
+}
+
+Looper <- - IntentService
+ServiceHandler <- - IntentService
+ServiceHandler - -+ IntentService
+HandlerThread <.. IntentService
+
+
+
+@enduml
+
+PlantUML version 1.2018.07(Tue Jun 12 01:29:06 CST 2018)
+(GPL source distribution)
+Java Runtime: Java(TM) SE Runtime Environment
+JVM: Java HotSpot(TM) 64-Bit Server VM
+Java Version: 1.8.0_181-b13
+Operating System: Windows 10
+OS Version: 10.0
+Default Encoding: GBK
+Language: zh
+Country: CN
+--></g></svg>
