@@ -1,4 +1,4 @@
-@startuml
+@startuml Handler_class_diagram
 
 skinparam monochrome true
 skinparam classBackgroundColor transparent

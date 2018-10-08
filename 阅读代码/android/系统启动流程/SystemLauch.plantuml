@@ -113,28 +113,29 @@ end note
 
 class RuntimeInit{
 
-	zygoteInit() 执行到 invokeStaticMain 调用com.android.server.SystemServer类的main函数
+	//ZygoteInit 执行到 invokeStaticMain 调用com.android.server.SystemServer类的main函数
 }
  
 
 class Zygote{
-	private static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
-	public static int forkSystemServer()
-	native private static int nativeForkSystemServer()
+	- static final ZygoteHooks VM_HOOKS = new ZygoteHooks();
+	- static int forkSystemServer()
+	native - static int nativeForkSystemServer()
 }
 class ZygoteHooks {
 	
 }
 
 class SystemServer {
-	private ActivityManagerService mActivityManagerService;
-	private PackageManagerService mPackageManagerService;
+	- ActivityManagerService mActivityManagerService;
+	- PackageManagerService mPackageManagerService;
 
 	+ {static}  void main(String[] args)
+	- void run()
 
-	private void startBootstrapServices()
-	private void startCoreServices()
-	private void startOtherServices()
+	- void startBootstrapServices()
+	- void startCoreServices()
+	- void startOtherServices()
 }
 note top of SystemServer
 在SystemServer.java代码中有两个方法

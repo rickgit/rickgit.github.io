@@ -1,0 +1,1 @@
+java -jar %PLANTUML_JAR%\plantuml.jar -tsvg %1
