@@ -100,7 +100,8 @@ struct timeval {
 ```
 1. （n&-n）==n代表2的幂指数，及(1<<k)，((n * (long) next(31)) >> 31)相当于(0,1)*n
 2. (bits - val + (n - 1) < 0)。val是bits取模产生的。所以代表bits要是n的两倍以上。
-3. next方法是根据《The Art of Computer Programming》Volume 2: Seminumerical Algorithms</i>, section 3.2.1，采用现流行的线性同余序列。seed开始值，multiplier倍数，0xbL增量
+3. next方法是根据《The Art of Computer Programming》Volume 2: Seminumerical Algorithms</i>, section 3.2.1，采用现流行的线性同余序列（[linear congruential generator](https://en.wikipedia.org/wiki/Linear_congruential_generator
+)即 x(n+1) = {a*x(n)+c}mod m）。seed开始值，multiplier倍数，0xbL增量
 
 ```
     public long nextLong() {
