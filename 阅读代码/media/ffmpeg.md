@@ -1081,3 +1081,13 @@ arm-linux-androideabi-gcc is unable to create an executable file.
   ## 相关多媒体文件下载
 
   [sample video](https://www.sample-videos.com/)
+
+  
+
+sudo ./ffmpeg  -re -i SampleVideo_1280x720_1mb.mp4 -c copy -f h264 rtmp://localhost:2016/live/film
+
+sudo ./ffmpeg  -re -i SampleVideo_1280x720_1mb.mp4 -c copy -f h264 rtmp://localhost:2016/hls_alic/film
+
+## 编译ffplay
+
+必须手动下载[ SDL2.0 ](www.libsdl.org/download-2.0.php)进行编译（configura & make &make install）
