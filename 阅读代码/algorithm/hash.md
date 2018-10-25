@@ -17,6 +17,7 @@ SafepointSynchronize::is_at_safepoint() 安全点，STW 工作，本质时等于
 hotspot/src/share/vm/runtime/safepoint.hpp:64:      _synchronized     = 2 
 ```
 
+<<<<<<< HEAD
 ReadStableMark()
 ```
 livelock problem
@@ -48,6 +49,9 @@ hotspot/src/share/vm/utilities/globalDefinitions.hpp:102:const int BitsPerWord  
 ```
 > [HotSpot虚拟机中，对象在内存中存储的布局可以分为三块区域：对象头（Header）、实例数据（Instance Data）和对齐填充（Padding）。](https://blog.csdn.net/zhoufanyang_china/article/details/54601311)，对象头分为两部分，其中前一部分，官方称它为“Mark Word”，Mark Word用于存储对象自身的运行时数据，如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等等，占用内存大小与虚拟机位长一致。
 ；另外一部分是类型指针。
+=======
+
+>>>>>>> 3077a39b26060bbe4ad418e5f6601eccb2a71262
 
 ## MD5
 > The MD5 message-digest algorithm is a widely used cryptographic hash function producing a 128-bit (16-byte) hash value, typically expressed in text format as a 32 digit hexadecimal number.[MD5 - wikipekia](https://en.wikipedia.org/wiki/MD5)
