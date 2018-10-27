@@ -1,0 +1,20 @@
+digraph g{
+    "The Unicode Consortium - Unicode Standar,9.0"->{"Introduction","General Structure","Conformance"}
+
+    "Instroduction"->"Design Goals"
+
+    "General Sstructure"->{"Architectural Context","Unicode Design Principles","Code Points and Characters","Encoding Forms","Encoding Schemes","Unicode Allocation","Details of Allocation"}
+
+    "Architectural Context"->{"Text Eliements,Characters,Text Processes"}
+
+    "Encoding Forms"->{"UTF-8","UTF-16","UTF-32"}
+
+    "UTF-32"->"常用于UNIX磁盘，内存"
+    "UTF-8"->"HTML等"
+
+    "Encoding Schemes"->{"big-endian or little-endian"}
+
+    "Unicode Allocation"->"Planes"->"Unicode 0-10FFFF 分为多个 Planes，每个平面的大小是64k，CJK（中日韩字符）位于第二辅助平面，又称为表意文字补充平面"
+
+    "Details of Allocation"->{"Plane 0 - BMP","Plane 1 - SMP","Plane 2 - SIP","Other Plane"}
+}
