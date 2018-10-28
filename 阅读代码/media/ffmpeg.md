@@ -1091,3 +1091,63 @@ sudo ./ffmpeg  -re -i SampleVideo_1280x720_1mb.mp4 -c copy -f h264 rtmp://localh
 ## 编译ffplay
 
 必须手动下载[ SDL2.0 ](www.libsdl.org/download-2.0.php)进行编译（configura & make &make install）
+
+
+## 测试代码
+使用 Mumu模拟器进行测试
+```
+adb push buddy.mp4 adb push buddy.mp4 /storage/emulated/0
+
+```
+
+添加权限
+```
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+```
+
+测试代码
+
+```
+extern "C"
+JNIEXPORT void JNICALL
+Java_edu_ptu_ffmpeg_ffmpegclang_MainActivity_decode(JNIEnv *env, jclass type, jstring input_,
+                                                     jstring output_) {
+    unsigned int ver = avcodec_version();
+    const char *config  = avcodec_configuration();
+    const char *license = avcodec_license();
+
+    const char *input = env->GetStringUTFChars(input_, 0);
+    FFLOGE("%s",config);
+    //1.注册所有组件
+    av_register_all();
+
+    //封装格式上下文，统领全局的结构体，保存了视频文件封装格式的相关信息
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
+    FFLOGE("%s",input);
+    //2.打开输入视频文件
+    if (avformat_open_input(&pFormatCtx, input, NULL, NULL) != 0)
+    {
+        FFLOGE("%s","无法打开输入视频文件");
+        return;
+    }
+
+    //3.获取视频文件信息
+    if (avformat_find_stream_info(pFormatCtx,NULL) < 0)
+    {
+        FFLOGE("%s","无法获取视频文件信息");
+        return;
+    }
+    FFLOGE("%s","加载成功");
+}
+
+```
+
+以下是编译成功so并且能正确执行so的日志
+```
+10-28 20:48:20.889 9541-9541/edu.ptu.ffmpeg.ffmpegclang E/ffmpeg: --logfile=/home/anshu/workspace/ffmpeg-4.0.2/build-ffmpeg/armeabi-v7a/build-configure.txt --target-os=linux --arch=arm --cpu=cortex-a8 --cross-prefix=arm-linux-androideabi- --sysroot=/home/anshu/workspace/toolchain/sysroot --prefix=/home/anshu/workspace/ffmpeg-4.0.2/build-ffmpeg/armeabi-v7a --enable-gpl --disable-static --enable-shared --disable-programs --disable-doc --enable-yasm --disable-debug --extra-cflags='-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16' --extra-ldflags='-march=armv7-a -Wl,--fix-cortex-a8'
+10-28 20:48:20.893 9541-9541/edu.ptu.ffmpeg.ffmpegclang E/ffmpeg: /storage/emulated/0/buddy.mp4
+10-28 20:48:21.317 9541-9541/edu.ptu.ffmpeg.ffmpegclang E/ffmpeg: 加载成功
+
+```
