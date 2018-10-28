@@ -17,4 +17,6 @@ digraph g{
     "Unicode Allocation"->"Planes"->"Unicode 0-10FFFF 分为多个 Planes，每个平面的大小是64k，CJK（中日韩字符）位于第二辅助平面，又称为表意文字补充平面"
 
     "Details of Allocation"->{"Plane 0 - BMP","Plane 1 - SMP","Plane 2 - SIP","Other Plane"}
+
+    "UTF-16"->"www.fmddlmyy.cn/text17.html"
 }
