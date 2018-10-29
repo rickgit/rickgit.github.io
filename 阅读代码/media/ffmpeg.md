@@ -1100,14 +1100,14 @@ adb push buddy.mp4 adb push buddy.mp4 /storage/emulated/0
 
 ```
 
-添加权限
+项目中添加权限
 ```
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 ```
 
-测试代码
+测试ffmpeg的c代码
 
 ```
 extern "C"
@@ -1151,3 +1151,6 @@ Java_edu_ptu_ffmpeg_ffmpegclang_MainActivity_decode(JNIEnv *env, jclass type, js
 10-28 20:48:21.317 9541-9541/edu.ptu.ffmpeg.ffmpegclang E/ffmpeg: 加载成功
 
 ```
+
+
+## [经典教程](http://dranger.com/ffmpeg/)

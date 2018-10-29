@@ -82,6 +82,8 @@ hotspot/src/share/vm/runtime/os.hpp:732:  static long random();                 
   */
 ```
 
+Hash高效，循环周期要大，求余数要大。计算要快，即余数是字长（32bit）
+
 ## MD5
 > The MD5 message-digest algorithm is a widely used cryptographic hash function producing a 128-bit (16-byte) hash value, typically expressed in text format as a 32 digit hexadecimal number.[MD5 - wikipekia](https://en.wikipedia.org/wiki/MD5)
 
