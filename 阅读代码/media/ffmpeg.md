@@ -1151,6 +1151,29 @@ Java_edu_ptu_ffmpeg_ffmpegclang_MainActivity_decode(JNIEnv *env, jclass type, js
 10-28 20:48:21.317 9541-9541/edu.ptu.ffmpeg.ffmpegclang E/ffmpeg: 加载成功
 
 ```
+## NGNIX 作为RTMP服务器
+[WINDOWS 下 继承RTMP功能的NGNIX](https://github.com/illuspas/nginx-rtmp-win32)
+[VLC 播放网络流](https://www.videolan.org/)
+[VirtualBox 网络设置为桥接模式](https://www.virtualbox.org/)
+[Ffmpeg 推流](https://ffmpeg.zeranoe.com/builds/win64/shared/) 
+1.将摄像头推流到hls（Windows）
+```
+./ffmpeg -f vfwcap  -i "0" -c:v libx264 -preset ultrafast  -acodec libmp3lame -ar 44100 -ac 1  -f flv rtmp://192.168.2.12:1935/hls/home
+```
+2.将视频文件推流到hls （Linux）
 
+```
+ffmpeg -re -i ./big_buck_bunny.mp4 -vcodec copy -acodec copy -f flv rtmp://192.168.2.12:1935/hls/stream
+```
+3.将屏幕推流到rtmp（Windows）
+```
+ffmpeg -f gdigrab -i desktop -vcodec libx264 -preset ultrafast -acodec libmp3lame -ar 44100 -ac 1 -f flv rtmp://localhost:1935/live/screen
+```
+4.将视频文件推流到rtmp（Linux）
+```
+ffmpeg -re -i ./big_buck_bunny.mp4 -vcodec copy -acodec copy -f flv rtmp://localhost:1935/live/stream
+```
 
+[点播与直播协议介绍文章](https://blog.csdn.net/caoshangpa/article/details/79543916)
+[视频样本](https://archive.blender.org/features-gallery/movies/)
 ## [经典教程](http://dranger.com/ffmpeg/)
