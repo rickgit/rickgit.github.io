@@ -41,6 +41,8 @@
 
 ## 2 Java 基础
 > 《Core Java》（延展阅读《C Primer Plus》《C++ Primer》）
+-- 基本语法
+注释，关键字、标识符、常量、字符串值，或者是一个符号
 
 ```
                                                +   byte
@@ -60,7 +62,7 @@
                          |
                          |
                          |
-            ++primiti^e  ++ Char
+            ++primitive  ++ Char
             | Typeifine  |
             |            |
             |            |
@@ -428,15 +430,15 @@ Generational Collection（分代收集）算法
 - 类与对象
 字段，方法，构造方法，方法参数
 包
-注释
+
 - 封装，继承，多态，父类与子类，重载与重写，与抽象类，访问修饰符
 this,super
 
 equals()，hashcode()，toString()
 自动装箱和拆箱
 
-- 枚举，接口，Lambda表达式，内部类
-- 反射，代理，注解，泛型
+- 枚举类，接口，Lambda表达式，内部类
+- 反射，代理，注解接口，泛型
 1. 泛型：Generics in Java is similar to templates in C++.
 集合容器和网络请求经常用到
 
@@ -444,7 +446,7 @@ equals()，hashcode()，toString()
 
 #### 异常，断言，日志
 
-### 2.1 数据 - Collection 类（List, Queue, Map）
+### 2.1 数据集合 - Collection 类（List, Queue, Map）
 
 ```text
                          +--------------+                                          +----------------+
@@ -455,7 +457,7 @@ equals()，hashcode()，toString()
         +---------------------------------------------+                               |                       |
         |                       |                     |                             .....                  ......
 +-------+-------+        +------+------+       +------+-----+                 +--------------+         +------------+
-|               |        |             |       |            |                 |              |         |            |
+|无序的、不可重复|        |有序的、可重复 |       |            |                 |              |         |            |
 |   Set         |        |   List      |       |    Queue   |                 | HashMap      |         |  SortMap   |
 +------+--------+        +-----+-------+       +-------+----+                 +-------+------+         +-------+----+
        ^                       ^                       ^                              ^                        ^
@@ -468,39 +470,273 @@ equals()，hashcode()，toString()
 
 
 ```
+#### ArrayList
+```
+java.util.ArrayList object internals:
+ OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
+      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                  int AbstractList.modCount                     0//在使用迭代器遍历集合的时候同时修改集合元素
+     12     4                  int ArrayList.size                            0
+     16     4   java.lang.Object[] ArrayList.elementData                     []
+     20     4                      (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
-#### HashTable
-开放地址法解决Hash冲突
+java.util.ArrayList$Itr object internals:
+ OFFSET  SIZE                  TYPE DESCRIPTION                               VALUE
+      0     4                       (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                       (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                   int Itr.cursor                                0
+     12     4                   int Itr.lastRet                               -1
+     16     4                   int Itr.expectedModCount                      0
+     20     4   java.util.ArrayList Itr.this$0                                (object)
+     24     8                       (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+```
+初始容量 10
+加载因子（0.0~1.0）  超过容量1.0，执行扩容
+扩容增量 
+```
+int newCapacity = oldCapacity + (oldCapacity >> 1);//整除则结果为 1.5倍，不能整除，结果为1.5倍加1
+
+java.util.ArrayList object internals:
+ OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
+      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                  int AbstractList.modCount                     11
+     12     4                  int ArrayList.size                            11
+     16     4   java.lang.Object[] ArrayList.elementData                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, null, null, null]
+     20     4                      (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+
+#### Vector
+
+```
+java.util.Vector object internals:
+ OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
+      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                  int AbstractList.modCount                     0
+     12     4                  int Vector.elementCount                       0
+     16     4                  int Vector.capacityIncrement                  0//自定义扩容大小
+     20     4   java.lang.Object[] Vector.elementData                        [null, null, null, null, null, null, null, null, null, null]
+     24     8                      (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+java.util.Vector$Itr object internals:
+ OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
+      0     4                    (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                int Itr.cursor                                0
+     12     4                int Itr.lastRet                               -1
+     16     4                int Itr.expectedModCount                      0
+     20     4   java.util.Vector Itr.this$0                                (object)
+     24     8                    (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+
+初始容量 10
+加载因子（0.0~1.0）  超过容量1.0，执行扩容
+扩容增量 增加一倍，或者自定义
+```
+ int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
+                                         capacityIncrement : oldCapacity);
+
+```
 #### HashMap
-- 自动扩容机制
-容量(Capacity)和负载因子(Load factor)
-自动扩容原来2倍
-threshold = (newCapacity >> 1) + (newCapacity >> 2); // 3/4 capacity
+```
+java.util.HashMap object internals:
+ OFFSET  SIZE                       TYPE DESCRIPTION                               VALUE
+      0     4                            (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                            (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4              java.util.Set AbstractMap.keySet                        null
+     12     4       java.util.Collection AbstractMap.values                        null
+     16     4                        int HashMap.size                              0
+     20     4                        int HashMap.modCount                          0
+     24     4                        int HashMap.threshold                         0//自增阀值，判断是否需要自增容量，等于容量*加载因子
+     28     4                      float HashMap.loadFactor                        0.75
+     32     4   java.util.HashMap.Node[] HashMap.table                             null// Node对象，包含key，value和下一个Node对象
+     36     4              java.util.Set HashMap.entrySet                          null
+     40     8                            (loss due to the next object alignment)
+Instance size: 48 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+
+java.util.HashMap$EntryIterator object internals:
+ OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
+      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                      int HashIterator.expectedModCount             0
+     12     4                      int HashIterator.index                        0
+     16     4   java.util.HashMap.Node HashIterator.next                         null
+     20     4   java.util.HashMap.Node HashIterator.current                      null
+     24     4        java.util.HashMap HashIterator.this$0                       (object)
+     28     4        java.util.HashMap EntryIterator.this$0                      (object)
+     32     8                          (loss due to the next object alignment)
+Instance size: 40 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+
+初始容量  16
+加载因子（0.0~1.0）  0.75f
+扩容增量（扩容hash表）  一倍
+```
+
+newCap = oldCap << 1
+```
 
 - 哈希碰撞
+```
+    static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);//位的亦或运算
+    }
+```
 hash bucket 大小设置为 length=2^n。
 2^n-1对应的二进制 1111...111，hash bucket的索引值是通过 hash & (tab.length - 1)，设置为2^n，减少哈希碰撞
 
+- 链地址过长，（红黑树）树化
+  TREEIFY_THRESHOLD = 8时，对哈希冲突链地址树化
+
+```
 哈希碰碰撞时的解决方法
 1. 开放地址法（HashTable），包括 线性探测再散列，二次探测再散列，伪随机探测再散列
 2. 链地址法（HashMap 用红黑树代替链表，加快搜索）
 3. 再哈希法
 4. 建立一个公共溢出区
-- 树化
-  TREEIFY_THRESHOLD = 8时，对哈希冲突链地址树化
+```
+#### HashSet
+```
+java.util.HashSet object internals:
+ OFFSET  SIZE                TYPE DESCRIPTION                               VALUE
+      0     4                     (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                     (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.HashMap HashSet.map                               (object)
+     12     4                     (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.HashMap$KeyIterator object internals:
+ OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
+      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                      int HashIterator.expectedModCount             0
+     12     4                      int HashIterator.index                        0
+     16     4   java.util.HashMap.Node HashIterator.next                         null
+     20     4   java.util.HashMap.Node HashIterator.current                      null
+     24     4        java.util.HashMap HashIterator.this$0                       (object)
+     28     4        java.util.HashMap KeyIterator.this$0                        (object)
+     32     8                          (loss due to the next object alignment)
+Instance size: 40 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+初始容量 （HashMap决定）16
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍
+```
+
+newCap = oldCap << 1
+```
+
+
+#### HashTable
+开放地址法解决Hash冲突
+
+```
+java.util.Hashtable object internals:
+ OFFSET  SIZE                          TYPE DESCRIPTION                               VALUE
+      0     4                               (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                               (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                           int Hashtable.count                           0
+     12     4                           int Hashtable.threshold                       8
+     16     4                         float Hashtable.loadFactor                      0.75
+     20     4                           int Hashtable.modCount                        0
+     24     4   java.util.Hashtable.Entry[] Hashtable.table                           [null, null, null, null, null, null, null, null, null, null, null]
+     28     4                 java.util.Set Hashtable.keySet                          null
+     32     4                 java.util.Set Hashtable.entrySet                        null
+     36     4          java.util.Collection Hashtable.values                          null
+     40     8                               (loss due to the next object alignment)
+Instance size: 48 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+java.util.Collections$EmptyIterator object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0     4        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     8        (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+```
+初始容量 11
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍+1
+```
+
+int newCapacity = (oldCapacity << 1) + 1;
+```
+
+
+#### LinkedHashMap
+
+LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
+HashMap节点类 Node 包好 next;
+```
+java.util.LinkedHashMap object internals:
+ OFFSET  SIZE                            TYPE DESCRIPTION                               VALUE
+      0     4                                 (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                   java.util.Set AbstractMap.keySet                        null
+     12     4            java.util.Collection AbstractMap.values                        null
+     16     4                             int HashMap.size                              0
+     20     4                             int HashMap.modCount                          0
+     24     4                             int HashMap.threshold                         0
+     28     4                           float HashMap.loadFactor                        0.75
+     32     4        java.util.HashMap.Node[] HashMap.table                             null
+     36     4                   java.util.Set HashMap.entrySet                          null
+     40     1                         boolean LinkedHashMap.accessOrder                 false  //相比Hashmap多出的部分，访问顺序排序，可以LinkedEntryIterator，打印出来。LinkedHashMapEntry，相比Hashmap新增before,after两个字段，用来排序。false则保存插入顺序，true则按访问顺序
+     41     3                                 (alignment/padding gap)                  
+     44     4   java.util.LinkedHashMap.Entry LinkedHashMap.head                        null  //相比Hashmap多出的部分,双向链表
+     48     4   java.util.LinkedHashMap.Entry LinkedHashMap.tail                        null  //相比Hashmap多出的部分,双向链表
+     52     4                                 (loss due to the next object alignment)
+Instance size: 56 bytes
+Space losses: 3 bytes internal + 4 bytes external = 7 bytes total
+
+java.util.LinkedHashMap$LinkedEntryIterator object internals:
+ OFFSET  SIZE                            TYPE DESCRIPTION                               VALUE
+      0     4                                 (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                             int LinkedHashIterator.expectedModCount       0
+     12     4   java.util.LinkedHashMap.Entry LinkedHashIterator.next                   null
+     16     4   java.util.LinkedHashMap.Entry LinkedHashIterator.current                null
+     20     4         java.util.LinkedHashMap LinkedHashIterator.this$0                 (object)
+     24     4         java.util.LinkedHashMap LinkedEntryIterator.this$0                (object)
+     28     4                                 (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+初始容量（继承Hashmap）  16
+加载因子（0.0~1.0）  0.75f
+扩容增量（扩容hash表）  一倍
+```
+
+newCap = oldCap << 1
+```
+
+
 #### TreeMap
 红黑树平衡调整
 二叉树搜索
 
 #### SortedMap
 Charset#availableCharsets():SortedMap
-
-#### LinkedHashMap
-
-LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
-HashMap节点类 Node 包好 next;
-
-
 
 
  
@@ -511,8 +747,19 @@ RandomAccessFile
 
 BUffer,Channel ,Selector
 
-文件（xml,json），网络，数据库
-### 2.4 数据访问 - 多线程与并发
+- 文件（xml,json）
+
+- 网络
+查看 **计算机网络**
+- 数据库
+  
+### 2.4 数据并发访问 - 多线程与并发
+线程初始化 Thread,Runnable
+线程的生命周期
+```
+
+```
+
 - 多线程
   
   线程池：ThreadPoolExecutor
@@ -542,6 +789,22 @@ BUffer,Channel ,Selector
 
     -  协作对象之间发生的死锁
 - volatile。保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
+
+```
+volatile的读写操作的过程: 
+（1）线程写volatile变量的过程：  
+         1、改变线程工作内存中volatile变量的副本的值  
+         2、将改变后的副本的值从工作内存刷新到主内存  
+（2）线程读volatile变量的过程：  
+        1、从主内存中读取volatile变量的最新值到线程的工作内存中  
+        2、从工作内存中读取volatile变量的副本
+--------------------- 
+作者：于亮 
+来源：CSDN 
+原文：https://blog.csdn.net/jiuqiyuliang/article/details/62216574 
+版权声明：本文为博主原创文章，转载请附上博文链接！
+
+```
 - 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
 - 重入锁 ReentrantLock（内部通过 AbstractQueuedSynchronizer实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
 - 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()
@@ -619,8 +882,11 @@ BUffer,Channel ,Selector
 
 
 ### 2.5 C语言，NDK，汇编及CPU处理二进制
+[C内存模型](https://blog.csdn.net/ufolr/article/details/52833736)
 ```
-                                  +IntegerType      int
+                                               ++   char
+                                               |
+                                  +IntegerType ++   int
                                   | +short
                                   | |long
                                   | |sign
@@ -633,27 +899,28 @@ BUffer,Channel ,Selector
                          |
                          |
                          |
-            ++Predifine  ++ Char  +  Char
-            | Typeifine  |  Type
-            |            | +sign
-            |            | +unsign
+            ++Base      ++
+            | Type
             |
-            |            +  Arr
-C data type |            |
-            |  Structure |  Struct
-            |  Type      |
-            |            |  Union
+            |            +  pointerType
             |            |
-            |            ++ Enum
+            |            |
+C data type |            |  functionType
+            |  derived   |
+            |  Type      |               +   Array
+            |            |               |
+            |            |  AggregateType|
+            |            |               +   Struct
+            |            |
+            |            +  union
+            | 
             |
-            |
-            | PointerType
-            |
-            |
+            | EnumType
             |
             |
             |
            ++ VoidType
+
 
                                   +IntegerType      int
                                   | +short
@@ -678,8 +945,8 @@ C data type |            |
             |            ++ void
             |
             |            +  Arr
-C++         | some       |
-data type   | Other  +-+ |  Struct
+C++         |            |
+data type   | derived+-+ |  Struct
             | Type       |
             |            |  Union
             |            |
@@ -695,134 +962,6 @@ data type   | Other  +-+ |  Struct
 
 
 ```
-## 3 Android 基础
-
-### 3.1  Android 系统体系
-
-应用层，framework层，libs和Runtime层，内核层
-#### 应用层
-- 四大组件，Fragment
-
-- Handler 消息机制
-- AsyncTask
-    
-    容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
-    并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
-- HandlerThread
-- IntentService
-- LruCache
-- 窗口（Window，Activity，DecorView以及ViewRoot）
-- View 测量，布局及绘制
-
-- 进程通信
-AIDL
-文件
-- Bitmap
-
-- 动画
-1. 补间动画
-   烟花效果
-2. 视图动画（Rotate,Scale,translate,alpha）
-   箭头动画
-   启动图片放大动画
-   弹窗动画
-3. 属性动画，插值器（Interpolator）和估值器（TypeEvaluator）
-   估值器自定义滑动效果
-4. Viewpager转化动画
-5. SVG动画
-6. Activity转场动画
-7. Camera 3D动画
-8. AR沉浸式效果（ARCore）
-
-- 图形及用户界面
-1. 界面及事件
-2. openGl
-   
-- Context
-
-- 持久化和序列化（Parcelable，Serializable）
-
-### 3.2 Android 开发模式
-
-#### 性能优化总结
-- 渲染速度
-    1. 布局优化（include merge, viewstub）
-    分析工具，不必要不加载（include merge, viewstub），ConstaintLayout，Lint
-    1. 绘制优化
-    尽量用Drawable
-    1. 响应速度优化
-    2. ListView/RecycleView及Bitmap优化
-    3. 线程优化
-- 内存优化
-- 电量消耗
-    3.内存泄漏优化
-        3.1 单例
-        3.2 非静态内部类
-        3.3 资源未关闭（webview没执行 destroy）
-        3.4 ListView 未缓存
-        3.5 集合类未销毁
-
-- 其他性能优化的建议
-
-#### 内存泄漏
- 
-#### 架构之模块化（插件化及组件化）
-插件化
-- Dynamic-loader-apk
-- Replugin
-
-组件化
-- 组件间解耦
-  1. AAC 
-   ViewModel LiveData
-  2. MVP DI框架Dagger2解耦
-- 通信
-1. 对象持有
-2. 接口持有
-3. 路由 （ARouter）
-   Dagger2 依赖注入控制反转，
-
-#### apk安装过程
-
-#### 推送
-- MQTT
-1.  最核心的传输协议 Subcribe（定阅）和Publish（推送）
-2. QoS（定阅等级）
-   
-- XMPP
-1.  OpenFire管理服务器
-2.  asmack包提供协议支持
-3.  XMPP通信原语有3种：message、presence和iq
-
-#### 直播
-- 腾讯云直播（互动直播，收费）
-1.  环境初始化与销毁
-2.  房间初始化与销毁，声音控制
-3.  上麦推流，下麦拉流
-   
-- 即构（互动视频）
-1.  环境初始化与销毁
-2.  房间初始化与销毁，声音控制
-3.  推流和拉流
-
-#### popupwindow 与 Dialog
-- popupwindow 非阻塞浮层
-- Dialog 阻塞式对话框
-### 3.3 开源框架
-#### OkHttp
-
-#### Retrofit
-
-#### RPC
-
-#### EventBus
-反射与注解
-
-
-#### ARouter
-控制反转和面向切面
-
-#### FLutter
 
 ## 4 算法与数据结构
 KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半数值计算，组合算法（枚举与回溯-图论-最优化与递归），造句算法
