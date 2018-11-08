@@ -1,4 +1,24 @@
-## Android知识体系
+## Android应用体系
+> 软件是计算机系统中与硬件相互依存的另一部分，它是包括程序，数据及其相关文档的完整集合 《软件工程概论》
+
+阅读应用流程（以APK文档为主线，程序Main方法为入口）
+
+``` dot
+APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
+
+APK打包安装及加载流程->Android系统架构->Android系统启动流程
+
+四大组件->Handler消息机制
+
+Activity->启动模式与任务栈->Activity生命周期->onCreate->setContentView->常用控件与布局方式->View的绘制流程->{View的事件响应流程,View获取Res资源流程}
+View获取Res资源流程->"Context 概念"
+Activity->"接收数据显示，传递数据到后台"->{SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络}
+常用控件与布局方式->SurfaceView
+
+Service->数据操作,传递前台显示->Activity交互->AIDL等跨进程通信方式
+
+ContentProvider->保存和获取数据，并使其对所有应用程序可见
+```
 
 ## 3 Android 基础
 

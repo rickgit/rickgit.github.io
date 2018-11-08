@@ -789,25 +789,44 @@ BUffer,Channel ,Selector
 
     -  协作对象之间发生的死锁
 - volatile。保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
+[volatile的读写操作的过程: ](https://blog.csdn.net/jiuqiyuliang/article/details/62216574)
 
 ```
-volatile的读写操作的过程: 
+
 （1）线程写volatile变量的过程：  
          1、改变线程工作内存中volatile变量的副本的值  
          2、将改变后的副本的值从工作内存刷新到主内存  
 （2）线程读volatile变量的过程：  
         1、从主内存中读取volatile变量的最新值到线程的工作内存中  
-        2、从工作内存中读取volatile变量的副本
---------------------- 
-作者：于亮 
-来源：CSDN 
-原文：https://blog.csdn.net/jiuqiyuliang/article/details/62216574 
-版权声明：本文为博主原创文章，转载请附上博文链接！
-
+        2、从工作内存中读取volatile变量的副本 
 ```
 - 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
-- 重入锁 ReentrantLock（内部通过 AbstractQueuedSynchronizer实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
-- 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()
+- 重入锁 ReentrantLock（内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
+```
+edu.ptu.java.lib.RefType$AbstractQueuedSynchronizer object internals:
+ OFFSET  SIZE                                                         TYPE DESCRIPTION                                        VALUE
+      0     4                                                              (object header)                                    05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                                              (object header)                                    00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                                             java.lang.Thread AbstractOwnableSynchronizer.exclusiveOwnerThread   null
+     12     4                                                          int AbstractQueuedSynchronizer.state                   0
+     16     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.head                    null
+     20     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.tail                    null
+     24     8                                                              (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+
+java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject object internals://new ReentrantLock().newCondition()
+ OFFSET  SIZE                                                         TYPE DESCRIPTION                               VALUE
+      0     4                                                              (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                                              (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node ConditionObject.firstWaiter               null
+     12     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node ConditionObject.lastWaiter                null
+     16     4        java.util.concurrent.locks.AbstractQueuedSynchronizer ConditionObject.this$0                    (object)
+     20     4                                                              (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+- 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()（阻塞与通知）
 - 乐观锁思想-CAS原子操作。修改前，对比直到共享内存和当前值（当前线程临时内存）一致，才做修改，这个流程不会加锁阻塞
     - AtomicStampedReference来解决ABA问题；
     - 循环时间长开销大
@@ -815,7 +834,7 @@ volatile的读写操作的过程:
     
 - 并发集合 ArrayBlockingQueue,LinkedBlockingQueue,
     - ConcurrentHashMap。有并发要求，使用该类替换HashTable
-### 面向对象与设计模式
+### 数据 - 类实现面向对象与设计模式
  五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 
 - 创建型
@@ -1016,3 +1035,8 @@ WHERE student.sno = tempSC.sno
 ```
 - 集合查询
   UNION、UNION ALL、INTERSECT、EXCEPT
+
+
+## 数据完整性与安全
+MD5
+RSA
