@@ -753,21 +753,61 @@ BUffer,Channel ,Selector
 查看 **计算机网络**
 - 数据库
   
-### 2.4 数据并发访问 - 多线程与并发
+### 2.4 数据并发访问 - 线程与并发
 线程初始化 Thread,Runnable
 线程的生命周期
 ```
+                                       +---------------+
+                                       |               |
+                            +----------+ Block         | <-----------------+   run synchronized
+                            |          |               |                   |
+                            |          +---------------+                   |
+                            |          +---------------+                   |
+                            |          |               |                   |
+                            +----------+ Time_waitting | <-----------------+   sleep(),wait(ms),join(ms)
+                            |          |               |                   |
+                            |          +---------------+                   |   LockSupport.parkNanos(),LockSupport.parkUntil()
+                            |          +---------------+                   |
+                            |          |               |                   |
+                            +----------+ Waitting      | <-----------------+   wait(),join(),LockSupport.park()
+                            |          |               |                   |
+                            v          +---------------+                   |
+                     +-------------------------------------------------------------+
++---------+          | +------------+            yield()             +-----------+ |      +--------------+
+|         |          | |            |   +------------------------>   |           | |      |              |
+|  New    | +------> | | Runnable   |                                |  Ready    | +----> |  Terminated  |
+|         |          | |            |                                |           | |      |              |
++---------+          | +------------+   <------------------------+   +-----------+ |      +--------------+
+                     |          (Running)        system call                       |
+                     +-------------------------------------------------------------+
+
 
 ```
 
 - 多线程
-  
-  线程池：ThreadPoolExecutor
+  线程通讯：volatile/synchronized，wait()/nofity()，pipe,join(),ThreadLocal
+ 
+  线程池：ThreadPoolExecutor/ScheduledThreadPoolExecutor
     - 任务队列 SynchronousQueue,LinkedBlockingDeque（常用）,ArrayBlockingQueue
-    - 任务 FutureTask（get方法会阻塞，知道FutureTask执行结束）,Callable,
-- 并发是为了提高效率，减少时间，引入多线程实现并发，同时多线程带来些问题，包括共享变量，锁活跃性问题(死锁,饥饿、活锁) ,性能问题
+    - 任务 FutureTask（get方法会阻塞，知道FutureTask执行结束）,Callable
+  
+- 并发：为了提高效率，减少时间，引入多线程实现并发，同时多线程带来些问题，包括共享变量（内存可见的happens-before原则，避免重排序），锁活跃性问题(死锁,饥饿、活锁) ,性能问题
 
-- 死锁
+
+- 风险
+  1. 安全(原子性，可见性，有序性)
+  2. 跳跃性
+  3. 性能（上下文切换，死锁，资源限制）
+
+#### 并发底层实现
+  1. volatile
+  2. synchronized
+上下文切换查看工具 **vmstat**,**LMbench**
+
+
+
+
+#### 内置锁（synchronized）
     
     - 静态的锁顺序死锁。一个线程执行a方法且已经获得了A锁，在等待B锁；另一个线程执行了b方法且已经获得了B锁，在等待A锁。这种状态，就是发生了静态的锁顺序死锁。
     - [动态的锁顺序死锁](https://www.androidos.net.cn/codebook/AndroidRoad/java/concurrence/deadlock.md)
@@ -788,7 +828,14 @@ BUffer,Channel ,Selector
     ```
 
     -  协作对象之间发生的死锁
-- volatile。保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
+- 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
+
+  - Object.wait(),Object.notify()
+
+#### volatile 与 CAS
+  定义：meaning that writes to this field are immediately made visible to other threads.
+  [正确使用 Volatile 变量](https://www.ibm.com/developerworks/cn/java/j-jtp06197.html)
+  保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
 [volatile的读写操作的过程: ](https://blog.csdn.net/jiuqiyuliang/article/details/62216574)
 
 ```
@@ -800,15 +847,39 @@ BUffer,Channel ,Selector
         1、从主内存中读取volatile变量的最新值到线程的工作内存中  
         2、从工作内存中读取volatile变量的副本 
 ```
-- 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
-- 重入锁 ReentrantLock（内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
+
+#### volatile 内存模型
+ volatile 内存语义， 重排序,顺序一致性
+ 内存可见性、锁 
+ final 内存语义，读写重排序规则
+ hanpen before，指两个操作指令的执行顺序
+  - 原子操作类：采用 volatile和[Unsafe](/home/anshu/workspace/openjdk/hotspot/src/share/vm/prims)的CAS原子操作
+```
+java.util.concurrent.atomic.AtomicInteger object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0     4        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4    int AtomicInteger.value                       0
+     12     4        (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+```
+  - 乐观锁思想-CAS原子操作。修改前，对比直到共享内存和当前值（当前线程临时内存）一致，才做修改，这个流程不会加锁阻塞（《Java 并发编程的艺术》2.3节）
+      - AtomicStampedReference来解决ABA问题；
+      - 循环时间长开销大
+      - AtomicReference类来多个共享变量合成一个共享变量来操作
+
+  
+
+#### 重入锁 ReentrantLock/ReentrantReadWriteLock/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
 ```
 edu.ptu.java.lib.RefType$AbstractQueuedSynchronizer object internals:
  OFFSET  SIZE                                                         TYPE DESCRIPTION                                        VALUE
       0     4                                                              (object header)                                    05 00 00 00 (00000101 00000000 00000000 00000000) (5)
       4     4                                                              (object header)                                    00 00 00 00 (00000000 00000000 00000000 00000000) (0)
       8     4                                             java.lang.Thread AbstractOwnableSynchronizer.exclusiveOwnerThread   null
-     12     4                                                          int AbstractQueuedSynchronizer.state                   0
+     12     4                                                          int AbstractQueuedSynchronizer.state                   0// volatile 修饰符
      16     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.head                    null
      20     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.tail                    null
      24     8                                                              (loss due to the next object alignment)
@@ -826,14 +897,14 @@ java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject object int
 Instance size: 24 bytes
 Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
+
 - 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()（阻塞与通知）
-- 乐观锁思想-CAS原子操作。修改前，对比直到共享内存和当前值（当前线程临时内存）一致，才做修改，这个流程不会加锁阻塞
-    - AtomicStampedReference来解决ABA问题；
-    - 循环时间长开销大
-    - AtomicReference类来保证引用对象之间的原子性
-    
-- 并发集合 ArrayBlockingQueue,LinkedBlockingQueue,
-    - ConcurrentHashMap。有并发要求，使用该类替换HashTable
+
+      
+#### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
+  - ConcurrentHashMap。有并发要求，使用该类替换HashTable
+  - 并发框架 Fork/Join
+  - CountDownLatch，CyclicBarrier，Semaphore，Exchanger
 ### 数据 - 类实现面向对象与设计模式
  五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 
@@ -981,6 +1052,163 @@ data type   | derived+-+ |  Struct
 
 
 ```
+```
+          +-------------------------------------------+
+         XX                                        XX |
+      XX                                         XXX  |
+    XX----------------------------------------+XX     |
+    |                                         |       |
+    |              Stack                      |       | //动态分配内存,每个线程都会有自己的栈
+|   |                                         |       |
+|   +-----------------------------------------+       |
+v   |                                         |       |
+    |                                         |       |
+    |                                         |       |
+    |                                         |       |
+    |                                         |       |
+    |                                         |       |
+    |                                         |       |
+    |                                         |       |
+^   |                                         |       |
+|   |                                         |       |
+|   +-----------------------------------------+       |
+    |              Heap                       |       | //动态分配内存
+    |                                         |       |
+    +-----------------------------------------+       |
+    |              Bass                       |       | // 存放程序中为初始化的和零值全局变量。静态分配，在程序开始时通常会被清零。
+    |                                         |       |
+    +-----------------------------------------+       |
+    |              GVAR                       |       | //已经初始化的非零全局变量。静态分配。
+    |                                         |       |
+    +-----------------------------------------+       +
+    |              TEXT                       |     XX  //存放程序执行代码，同时也可能会包含一些常量(如一些字符串常量等）。该段内存为静态分配，只读(某些架构可能允许修改)。 
+    |                                         |  XX
+    +-----------------------------------------XXX
+
+
+
+```
+###jni
+####数据类型定义：
+- jdk/src/share/javavm/export/jni.h:
+
+```
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*
+ * JNI Types
+ */
+
+#ifndef JNI_TYPES_ALREADY_DEFINED_IN_JNI_MD_H
+
+typedef unsigned char   jboolean;
+typedef unsigned short  jchar;
+typedef short           jshort;
+typedef float           jfloat;
+typedef double          jdouble;
+
+typedef jint            jsize;
+
+#ifdef __cplusplus
+
+class _jobject {};
+class _jclass : public _jobject {};
+class _jthrowable : public _jobject {};
+class _jstring : public _jobject {};
+class _jarray : public _jobject {};
+class _jbooleanArray : public _jarray {};
+class _jbyteArray : public _jarray {};
+class _jcharArray : public _jarray {};
+class _jshortArray : public _jarray {};
+class _jintArray : public _jarray {};
+class _jlongArray : public _jarray {};
+class _jfloatArray : public _jarray {};
+class _jdoubleArray : public _jarray {};
+class _jobjectArray : public _jarray {};
+
+typedef _jobject *jobject;
+typedef _jclass *jclass;
+typedef _jthrowable *jthrowable;
+typedef _jstring *jstring;
+typedef _jarray *jarray;
+typedef _jbooleanArray *jbooleanArray;
+typedef _jbyteArray *jbyteArray;
+typedef _jcharArray *jcharArray;
+typedef _jshortArray *jshortArray;
+typedef _jintArray *jintArray;
+typedef _jlongArray *jlongArray;
+typedef _jfloatArray *jfloatArray;
+typedef _jdoubleArray *jdoubleArray;
+typedef _jobjectArray *jobjectArray;
+
+#else
+
+struct _jobject;
+
+typedef struct _jobject *jobject;
+typedef jobject jclass;
+typedef jobject jthrowable;
+typedef jobject jstring;
+typedef jobject jarray;
+typedef jarray jbooleanArray;
+typedef jarray jbyteArray;
+typedef jarray jcharArray;
+typedef jarray jshortArray;
+typedef jarray jintArray;
+typedef jarray jlongArray;
+typedef jarray jfloatArray;
+typedef jarray jdoubleArray;
+typedef jarray jobjectArray;
+
+#endif
+
+typedef jobject jweak;
+
+typedef union jvalue {
+    jboolean z;
+    jbyte    b;
+    jchar    c;
+    jshort   s;
+    jint     i;
+    jlong    j;
+    jfloat   f;
+    jdouble  d;
+    jobject  l;
+} jvalue;
+
+struct _jfieldID;
+typedef struct _jfieldID *jfieldID;
+
+struct _jmethodID;
+typedef struct _jmethodID *jmethodID;
+
+/* Return values from jobjectRefType */
+typedef enum _jobjectType {
+     JNIInvalidRefType    = 0,
+     JNILocalRefType      = 1,
+     JNIGlobalRefType     = 2,
+     JNIWeakGlobalRefType = 3
+} jobjectRefType;
+
+
+#endif /* JNI_TYPES_ALREADY_DEFINED_IN_JNI_MD_H */
+
+/*
+ * jboolean constants
+ */
+
+#define JNI_FALSE 0
+#define JNI_TRUE 1
+
+```
+
+#### JNI签名
+**JNICALL**表示调用约定，相当于C++的stdcall，说明调用的是本地方法
+**JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数 
+
+
 
 ## 4 算法与数据结构
 KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半数值计算，组合算法（枚举与回溯-图论-最优化与递归），造句算法
@@ -1006,9 +1234,256 @@ KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半
     2.4. 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点。
 
 ## 6 计算机网络
-- TCP/IP
-- HTTP/HTTPS
-http2.0支持长连接
+网络数据：报文格式
+- Socket 
+### TCP/IP
+ TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。TCP是全双工模式，这就意味着，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了，主机1告诉主机2，它的数据已经全部发送完毕了
+
+[TCP Header Format](https://tools.ietf.org/html/rfc793)
+``` 
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          Source Port          |       Destination Port        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Sequence Number                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Acknowledgment Number                      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Data |           |U|A|P|R|S|F|                               |
+   | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+   |       |           |G|K|H|T|N|N|                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           Checksum            |         Urgent Pointer        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Options                    |    Padding    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             data                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                            TCP Header Format
+
+
+```
+TCP层的Flag
+```
+SYN表示建立连接，
+FIN表示关闭连接，
+ACK表示响应，
+PSH表示有 DATA数据传输，
+RST表示连接重置。
+URG(urgent紧急)
+
+```
+
+```
++-------------+
+|  Http data  |        App layer        应 用 层
++-------------+
+
+
+
++--------------+
+|  TCP Header  |
+|              |
+|    Http Data |
+|              |       Transport layer  传 输 层
++--------------+
+
+
+
++---------------+
+| IP Header     |
+|               |
+|   TCP Header  |
+|               |      Network layer    网 络 层
+|     Http Data |
+|               |
++---------------+
+
++-------------------+
+| Eth Header        |
+|                   |
+|   IP Header       |  Data link layer  链 路 层
+|                   |
+|     TCP Header    |
+|                   |
+|       Http Data   |
++-------------------+
+
+```
+TCP断开连接时，会有四次挥手过程。
+
+```ascii
+三次握手四次挥手
+    +-----------+                                    +-------------+                +------------+                               +--------------+
+    |           |                                    |             |                |            |                               |              |
+    |  Client   |                                    |   Ser^er    |                |   Client   |                               |    Ser^er    |
+    |           |                                    |             |                |            |                               |              |
+    +-----+-----+                                    +-------+-----+                +-----+------+                               +-------+------+
+Close     |                                                  |  Close                     |                                              |
+          |            SYN=1 Seq=X                           |                            |             FIN=1 ACK=Z   Seq=X              |
+          |   +------------------------------------------->  |                            |  +---------------------------------------->  |
+          |                                                  |                 FIN        |                                              |
+          |                                                  |                 WAIT-1     |             ACK=X+1 Seq=Z                    |
+          |                                                  |  Listen                    | <---------------------------------------+    |
+          |                                                  |                            |                                              |
+          |                                                  |                 FIN        |                                              | CLOSE_WAIT
+          |            SYN=1 ACK=X+1 Seq=Y                   |                 WAIT-2     |             FIN=1 ACK=X Seq=Y                |
+          |   <------------------------------------------+   |                            |                                              |
+          |                                                  |                            |  <--------------------------------------+    |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              | CLOSE_WAIT
+SYN_SENT  |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          |            ACK=Y+1 Seq=Z                         |                            |             ACK=Y Seq=X                      |
+          |    +------------------------------------------>  |  SYN_RCVN                  |  +-------------------------------------->    | LAST_ACK
+          |                                                  |                TIME WAIT   |                                              |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          |                                                  |                            |   2MSL                                       |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          |                                                  |                            |                                              |
+          +                                                  +                            +                                              +
+     ESTABLISHED                                          ESTABLISHED                  Closed                                         Closed
+
+```
+
+### HTTP/HTTP2
+[HTTP 1.1 RCF](https://tools.ietf.org/html/rfc2068)
+[HTTP/2 RCF](https://tools.ietf.org/html/rfc7540)
+
+[wiredshark抓包](https://blog.csdn.net/u014530704/article/details/78842000)
+1. http contains  baidu.com （SSL 过滤 https）
+2.  ip.src==47.95.165.112 or ip.dst==47.95.165.112 
+
+> HTTP/2。HTTP/2**支持明文传输**，而SPDY强制使用HTTPS；HTTP/2消息头的压缩算法采用HPACK，而非SPDY采用的DEFLATE。
+相较于HTTP1.1，HTTP/2的主要优点有采用二进制帧封装，传输变成多路复用，流量控制算法优化，服务器端推送，首部压缩，优先级等特点。
+> Hypertext Transfer Protocol Secure (HTTPS) is an extension of the Hypertext Transfer Protocol (HTTP) for secure communication over a computer network, and is widely used on the Internet.（Https使用了安全协议SSL）
+
+> SSL更新到3.0时，IETF对SSL3.0进行了标准化，并添加了少数机制(但是几乎和SSL3.0无差异)，标准化后的IETF更名为TLS1.0(Transport Layer Security 安全传输层协议)，可以说TLS就是SSL的新版本3.1。
+
+SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加密是合适的。
+
+
+#### SSL/TLS
+**Content Type**指示SSL通信处于哪个阶段，分为 ：握手(Handshake)，开始加密传输(ChangeCipherSpec)，正常通信(Application)，（EncryptedAlert）四种
+
+**version** 
+0: SSL 3.0，
+1: TLS 1.0，
+2: TLS 1.1,
+3: TLS 2.1
+
+**handshanke** ：当**Content Type**为握手阶段的标识，有以下几个过程
+```
+0 HelloRequest
+1 ClientHello
+2 ServerHello
+11 Certificate
+12 ServerKeyExchange
+13 CertificateRequest
+14 ServerHelloDone
+15 CertificateVerify
+16 ClientKeyExchange
+20 Finished
+```
+
+**Cipher Suit**分为 四部分
+```
+密钥交换算法，用于决定客户端与服务器之间在握手的过程中如何认证，用到的算法包括RSA，Diffie-Hellman，ECDH，PSK等，非对称加密算法主要用于 交换对称加密算法的密钥，而非数据交换
+加密算法，用于加密消息流，该名称后通常会带有两个数字，分别表示密钥的长度和初始向量的长度，比如DES 56/56, RC2 56/128, RC4 128/128, AES 128/128, AES 256/256
+报文认证信息码（MAC）算法，用于创建报文摘要，确保消息的完整性（没有被篡改），算法包括MD5，SHA，SHA256等。
+PRF（伪随机数函数），用于生成“master secret”。
+
+```
+
+例如：TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
+
+```
+基于TLS协议的；
+使用ECDHE、RSA作为密钥交换算法；
+加密算法是AES（密钥和初始向量的长度都是256）；
+MAC算法（这里就是哈希算法）是SHA。
+``` 
+
+[SSL/TLS 协议报文](https://www.cnblogs.com/findumars/p/5929775.html)
+```
++---------------------------------------------------------------+
+|                                                               |
+|                    APPLICATION PROTOCOL                       |
+|                                                               |
++-----------------+----------------------+----------------------+
+|                 |                      |                      |
+|  SSL HandSHARK  |SSL Change Cipher Spec|   SSL Alert Protocol |
++-----------------+----------------------+----------------------+
+|                                                               |
+|                      SSL RECORD（封装SSL/TLS握手协议或http数据）|
++---------------------------------------------------------------+
+|                                                               |
+|                      TCP                                      |
+|                                                               |
++---------------------------------------------------------------+
+|                                                               |
+|                                                               |
+|                      IP                                       |
+|                                                               |
++---------------------------------------------------------------+
+
+```
+
+```
+             +------------+                            +------------+
+             |            |                            |            |
+             |   Client   |                            |   Ser^er   |
+             |            |                            |            |
+             +-----+------+                            +------+-----+
+                   |                                          |
+                   |             Client Hello                 +
+                   |            （Support CipSuites,Client RN）+
+                   |    +---------------------------------->  +
+                   |                                          |
+                   |                                          |
+                   |                                          | Choose CipherSuites
+                   |                                          |
+                   |             Server Hello                 | (Ser^er RN,Choosed chip)
+                   |                                          |
+                   |                                          |
+                   |             Certificate                  | (CA and Key Exchange Pubkey)
+                   |             Server Key Exchange          | (encrypted Pubkey,Signature Hash key)
+                   |                                          |
+                   |             Server Hello DONE            |
+                   |    <---------------------------------+   |
+                   |                                          |
+Client RN,Server RN|                                          |
+to generate        |                                          |
+premaster secret   |                                          |
+                   | (premaster secret,Signature Hash key)    |
+                   |             Client Key Exchange          |
+                   |    +--------------------------------->   |
+msg Pubkey=        |               ChangeCipherSpec           |(notify use encrypted meg)
+Client RN          |              encrypted handshake msg     |
++Server RN         |                                          |
++premaster secret  |                                          |
+                   |                                          |
+                   |                                          |
+                   |                                          |
+                   |   <---------------------------------+    |
+                   |            ChangeCipherSpec              |
+                   |            encrypted handshake msg       |
+                   |                                          |
+                   |                                          |
+                   |                                          |
+                   +                                          +
+
+
+
+
+```
+
 ## 7 操作系统
 参考 Brian Ward,《How Linux works - what every superuser should know》[M].No Starch Press(2014)
 
@@ -1022,21 +1497,79 @@ http2.0支持长连接
 事务 ACID
 
 ### Sql 
-- 多表查询（内连接，外连接）
-- 嵌套查询
-  与IN、ALL、ANY、EXISTS配合使用。
-- 派生表查询
-```sql
+基本操作：增删改查
+```
+create database <dbName>
+```
+
+```
+create table <tableName>(
+  <column0> <columnType0>,
+  <column1> <column1Type>
+  )
+```
+
+```
+drop table <tableName>
+```
+```
+alert table <tableName> add <columnName> <columnType>
+```
+
+```
+insert into <tableName> (
+  <colunm0>,
+  <column1>)
+  values (
+    <column0Value>,
+    <column1Value>
+  )
+
+```
+```
+delete from <tableName> where <columnName>=<columnNewValue>
+```
+```
+update <tableName> set <columnName>=<columnNewValue> where <column1Name>=<column1Value>
+```
+```
+SELECT column_name [, column_name ]
+FROM   table1 [, table2 ]
+WHERE  column_name OPERATOR
+      (SELECT column_name [, column_name ]
+      FROM table1 [, table2 ]
+      [WHERE])
+ 
 SELECT * FROM student,(
     SELECT sno FROM SC WHERE cno=1//派生查询
 ) AS tempSC
 WHERE student.sno = tempSC.sno
-
 ```
+模糊查询，分组查询，having查询
+
+- 多表查询（内连接，外连接）
+- 嵌套查询
+  与IN、ALL、ANY、EXISTS配合使用。
+- 派生表查询
+ 
 - 集合查询
   UNION、UNION ALL、INTERSECT、EXCEPT
-
-
+- 事务
+```
+begin;
+<insert,delete,update,select>
+rollback;/commit;
+```
+### sqlite 数据类型
+ 常用数据类型及**亲和类型**
+```sql
+NULL 值是一个 NULL 值。
+INTEGER 值是一个带符号的整数，根据值的大小存储在 1、2、3、4、6 或 8 字节中。
+REAL 值是一个浮点值，存储为 8 字节的 IEEE 浮点数字。
+TEXT 值是一个文本字符串，使用数据库编码（UTF-8、UTF-16BE 或 UTF-16LE）存储。
+BLOB 值是一个 blob 数据，完全根据它的输入存储。
+```
+B-tree和page cache共同对数据进行管理。
 ## 数据完整性与安全
 MD5
 RSA
