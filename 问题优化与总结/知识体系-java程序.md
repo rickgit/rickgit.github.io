@@ -156,10 +156,39 @@ Byte通过加法实现加减，移位和加法实现乘除法
 
 - 原码，反码，补码
   正数：原码，反码，补码一致
-  负数：反码符号位不变其他位按位取反，补码为反码加1
+  负数：反码符号位不变其他位按位取反，补码为反码加1（取反加一，两个过程符号位都不变）
+```
+3bit有符号二进制
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|  -3       |    -2     |   -1    |  -4    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 原码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
 
+负数反码，相当与在负数范围换下位置。 
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|   -4      |    -1     |   -2    |  -3    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+ 
+负数补码，整个数变得有序
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|   -1      |    -2     |   -3    |  -4    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+
+
+```
   原码：加负数，不是预期值（1-1= 00000001^1000001（原码）=10000010=-2）
-  反码：正数原码加负数的原码，计算的结果不是想要的值（1-1= 00000001（反）^11111110（反码）=11111111（反）=10000000（原））
+  反码：正数原码加负数的原码，计算的结果不是想要的值（1-1= 00000001（反）^11111110（反码）=11111111（反）=10000000（原））。
   补码：正数加负数的反码，符号位不对，用补码可以正确（1-1= 00000001（补）^11111111(补码)=00000000=0）
 - [补码原理：同余](https://www.cnblogs.com/baiqiantao/p/7442907.html)
   负数取模：A mod b= A-B*Math.floor（A/B）
@@ -182,6 +211,12 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 [-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
 
 ### 数据 - 引用类型
+运行时数据区：线程共用：方法区，堆；线程独立分配：栈，本地方法栈，程序计数器 
+```
+
+
+```
+
 [ObjectHeader64Coops 内存结构](https://gist.github.com/arturmkrtchyan/43d6135e8a15798cc46c)
 ```
 ObjectHeader32
@@ -800,12 +835,9 @@ BUffer,Channel ,Selector
   3. 性能（上下文切换，死锁，资源限制）
 
 #### 并发底层实现
-  1. volatile
+  1. volatile（内存可见性，其他线程看到的value值都是最新的value值，即修改之后的volatile的值） + cas 原子操作(atomic operation)是不需要synchronized，不会被线程调度机制打断的操作。
   2. synchronized
 上下文切换查看工具 **vmstat**,**LMbench**
-
-
-
 
 #### 内置锁（synchronized）
     
@@ -850,19 +882,75 @@ BUffer,Channel ,Selector
 
 #### volatile 内存模型
  volatile 内存语义， 重排序,顺序一致性
- 内存可见性、锁 
+ 内存可见性、volatile锁 
  final 内存语义，读写重排序规则
  hanpen before，指两个操作指令的执行顺序
-  - 原子操作类：采用 volatile和[Unsafe](/home/anshu/workspace/openjdk/hotspot/src/share/vm/prims)的CAS原子操作
+
+ 可以保证变量的可见性 ，不能保证变量状态的“原子性操作”，原子性操作需要lock或cas
+#### 原子操作类：采用 volatile和[Unsafe#Unsafe_CompareAndSwapInt](/home/anshu/workspace/openjdk/hotspot/src/share/vm/prims)的CAS原子操作
 ```
 java.util.concurrent.atomic.AtomicInteger object internals:
  OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
       0     4        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
       4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4    int AtomicInteger.value                       0
+      8     4    int AtomicInteger.value                       0 //volatile修饰
      12     4        (loss due to the next object alignment)
 Instance size: 16 bytes
 Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+```
+
+```
+
+java.util.concurrent.atomic.AtomicStampedReference object internals:
+ OFFSET  SIZE                                                      TYPE DESCRIPTION                               VALUE
+      0     4                                                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.concurrent.atomic.AtomicStampedReference.Pair AtomicStampedReference.pair               (object)  //volatile修饰
+     12     4                                                           (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.concurrent.atomic.AtomicStampedReference$Pair object internals:
+ OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
+      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                int Pair.stamp                                0  //final修饰
+     12     4   java.lang.Object Pair.reference                            0  //final修饰
+     16     8                    (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+
+```
+java.util.concurrent.atomic.AtomicReference object internals:
+ OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
+      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.lang.Object AtomicReference.value                     null //volatile修饰
+     12     4                    (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+
+AtomicInteger的cas原理
+```
+jdk/src/share/classes/sun/misc/Unsafe.java
+public final int getAndAddInt(Object o, long offset, int delta) {
+    int v;
+    do {
+        v = getIntVolatile(o, offset);//读取线程共享主存的最新值
+    } while (!compareAndSwapInt(o, offset, v, v + delta));//没有置换成功，继续循环直到竞争成功
+    return v;
+}
+
+hotspot/src/share/vm/prims/unsafe.cpp
+UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))
+  UnsafeWrapper("Unsafe_CompareAndSwapInt");
+  oop p = JNIHandles::resolve(obj);
+  jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);
+  return (jint)(Atomic::cmpxchg(x, addr, e)) == e;//只需要关注到这。将主存的副本和线程的新值传进去，后续cpu进行CAS操作。查看是否把主存原来的值置换出来，新增的值置换到主存
+UNSAFE_END 
 
 ```
   - 乐观锁思想-CAS原子操作。修改前，对比直到共享内存和当前值（当前线程临时内存）一致，才做修改，这个流程不会加锁阻塞（《Java 并发编程的艺术》2.3节）
@@ -872,20 +960,40 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
   
 
-#### 重入锁 ReentrantLock/ReentrantReadWriteLock/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
+#### AQS
+重入锁 ReentrantLock/ReentrantReadWriteLock/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
+
+
+CountDownLatch，CyclicBarrier，Semaphore，Exchanger （这类使用AQS）
+- ReentrantLock: 使用了AQS的独占获取和释放,用state变量记录某个线程获取独占锁的次数,获取锁时+1，释放锁时-1，在获取时会校验线程是否可以获取锁。
+- Semaphore: 使用了AQS的共享获取和释放，用state变量作为计数器，只有在大于0时允许线程进入。获取锁时-1，释放锁时+1。
+- CountDownLatch: 使用了AQS的共享获取和释放，用state变量作为计数器，在初始化时指定。只要state还大于0，获取共享锁会因为失败而阻塞，直到计数器的值为0时，共享锁才允许获取，所有等待线程会被逐一唤醒
+  
 ```
-edu.ptu.java.lib.RefType$AbstractQueuedSynchronizer object internals:
+java.util.concurrent.locks.ReentrantLock object internals:
+ OFFSET  SIZE                                            TYPE DESCRIPTION                               VALUE
+      0     4                                                 (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4                                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.concurrent.locks.ReentrantLock.Sync ReentrantLock.sync                        (object)  //AQS子类
+     12     4                                                 (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.concurrent.locks.ReentrantLock$NonfairSync object internals://继承AQS，没有加字段，只是重写lock()，tryRequire()方法
  OFFSET  SIZE                                                         TYPE DESCRIPTION                                        VALUE
-      0     4                                                              (object header)                                    05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      0     4                                                              (object header)                                    01 00 00 00 (00000001 00000000 00000000 00000000) (1)
       4     4                                                              (object header)                                    00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                                             java.lang.Thread AbstractOwnableSynchronizer.exclusiveOwnerThread   null
-     12     4                                                          int AbstractQueuedSynchronizer.state                   0// volatile 修饰符
+      8     4                                             java.lang.Thread AbstractOwnableSynchronizer.exclusiveOwnerThread   null //竞争到的线程
+     12     4                                                          int AbstractQueuedSynchronizer.state                   0     // volatile 修饰符
      16     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.head                    null
      20     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.tail                    null
      24     8                                                              (loss due to the next object alignment)
 Instance size: 32 bytes
 Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
 
+ 
+
+ 
 java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject object internals://new ReentrantLock().newCondition()
  OFFSET  SIZE                                                         TYPE DESCRIPTION                               VALUE
       0     4                                                              (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
@@ -900,11 +1008,11 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 - 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()（阻塞与通知）
 
-      
+
+
 #### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
   - ConcurrentHashMap。有并发要求，使用该类替换HashTable
   - 并发框架 Fork/Join
-  - CountDownLatch，CyclicBarrier，Semaphore，Exchanger
 ### 数据 - 类实现面向对象与设计模式
  五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 
@@ -1000,9 +1108,9 @@ C data type |            |  functionType
             |  Type      |               +   Array
             |            |               |
             |            |  AggregateType|
-            |            |               +   Struct
+            |            |               +   Struct // 结构是 C 编程中另一种用户自定义的可用的数据类型，它允许您存储不同类型的数据项。
             |            |
-            |            +  union
+            |            +  union                   // 共用体是一种特殊的数据类型，允许您在相同的内存位置存储不同的数据类型。任何时候只能有一个成员带有值。
             | 
             |
             | EnumType
@@ -1052,7 +1160,14 @@ data type   | derived+-+ |  Struct
 
 
 ```
+- 内存查看工具
+  1. vs环境下，选项设置C/C++->命令行，然后在其他选项这里写上/d1 reportAllClassLayout，查看内存结构
+  2. sizeOf()
+
+c ：Stack,Heap， Dat区/GVAR(global value),Bss（未初始化的和零值全局变量）,Text代码段(Code)
+c++ ：5个区：栈、堆、自由存储区、全局/静态存储区、常量存储区
 ```
+<pre>
           +-------------------------------------------+
          XX                                        XX |
       XX                                         XXX  |
@@ -1072,22 +1187,73 @@ v   |                                         |       |
 ^   |                                         |       |
 |   |                                         |       |
 |   +-----------------------------------------+       |
-    |              Heap                       |       | //动态分配内存
-    |                                         |       |
+    |              Heap                       |       | //动态分配内存。堆是操作系统维护的一块内存，而自由存储是C++中通过new与delete动态分配和释放对象的抽象概念。
+    |                                         |       | //C++ new 本质也是通过malloc()分配
     +-----------------------------------------+       |
-    |              Bass                       |       | // 存放程序中为初始化的和零值全局变量。静态分配，在程序开始时通常会被清零。
-    |                                         |       |
-    +-----------------------------------------+       |
-    |              GVAR                       |       | //已经初始化的非零全局变量。静态分配。
-    |                                         |       |
+    |              Bass          |            |       | // 未初始化的和零值全局变量。静态分配，在程序开始时通常会被清零。
+    |                            |            |       |
+    +-----------------------------   c++      |
+    |              GVAR          |  不区分     |       | // 已初始化的非零全局变量。静态分配。
+    |                            |  有无初始化 |       |
     +-----------------------------------------+       +
     |              TEXT                       |     XX  //存放程序执行代码，同时也可能会包含一些常量(如一些字符串常量等）。该段内存为静态分配，只读(某些架构可能允许修改)。 
     |                                         |  XX
     +-----------------------------------------XXX
 
-
+</pre>
 
 ```
+
+
+#### 关键词
+ typedef 
+  - 抑制劣质代码，容易记忆的**类型名**
+  - 代码简化，定义[**复杂声明**](https://blog.csdn.net/skywalker_leo/article/details/48622193)“右左法则”： 从变量名看起，先往右，再往左，碰到一个圆括号就调转阅读的方向；括号内分析完就跳出括号，还是按先右后左的顺序，如此循环，直到整个声明分析完。
+  - typedef 声明看起来象 static，extern 等**存储类关键字**类型的变量声明，typedef声明中不能用 register（或任何其它存储类关键字）
+  - typedef 有另外一个重要的用途，那就是**定义机器无关的类型**
+
+```
+int My_Add(int a, int b)
+{
+    return a + b;
+}
+int My_Sub(int a, int b)
+{
+    return a - b;
+}
+struct  CTest
+{
+    int(*Add)(int, int); //函数指针
+    int(*Sub)(int, int);
+};
+```
+ const char * 、char const *、 char * const 三者的区别
+
+存储类的关键字（如auto、extern、mutable、static、register等一样）
+
+
+- inline
+ 在c/c++中，为了解决一些频繁调用的小函数大量消耗栈空间（栈内存）的问题，特别的引入了inline修饰符，表示为内联函数。，使用在函数声明处，表示程序员请求编译器在此函数的被调用处将此函数实现插入，而不是像普通函数那样生成调用代码(申请是否有效取决于编译器)。 
+#### C++ 类
+
+C与C++结构体区别：
+```
+1. C语言中的结构体不能为空
+2. C语言的结构体中不能定义成员函数，但是却可以定义函数指针，C++可以直接定义函数
+3. C语言中结构体变量定义的时候，若为struct 结构体名 变量名定义的时候，struct不能省略
+```
+C++中的struct对C中的struct进行了扩充，C++为C语言中的结构体引入了成员函数、访问控制权限、继承、包含多态等面向对象特性。
+ 
+C++中的struct与类区别
+```
+1. struct是值类型，class是引用类型。值类型变量的赋值操作，仅仅是2个实际数据之间的复制。而引用类型变量的赋值操作，复制的是引用，即内存地址，由于赋值后二者都指向同一内存地址，所以改变其中一个，另一个也会跟着改变。值类型的内存不由垃圾回收控制，作用域结束时，值类型会自行释放，减少了托管堆的压力，因此具有性能上的优势。
+2. struct作为数据结构的实现体，它默认的数据访问控制是public的，而class作为对象的实现体，它默认的成员变量访问控制是private的
+3. class还可以用于表示模板类型，struct则不行。
+
+```
+
+类的生命周期
+
 ###jni
 ####数据类型定义：
 - jdk/src/share/javavm/export/jni.h:
@@ -1409,7 +1575,43 @@ PRF（伪随机数函数），用于生成“master secret”。
 加密算法是AES（密钥和初始向量的长度都是256）；
 MAC算法（这里就是哈希算法）是SHA。
 ``` 
+[密钥协商类型一，RSA](https://blog.csdn.net/andylau00j/article/details/54583769)
 
+``
+1. 客户端连上服务端
+2. 服务端发送 CA 证书给客户端
+3. 客户端验证该证书的可靠性
+4. 客户端从 CA 证书中取出公钥
+5. 客户端生成一个随机密钥 k，并用这个公钥加密得到 k'
+6. 客户端把 k' 发送给服务端
+7. 服务端收到 k' 后用自己的私钥解密得到 k
+8. 此时双方都得到了密钥 k，协商完成。
+```
+密钥协商类型二，hm（离散对数问题）
+```
+1. 客户端先连上服务端
+2. 服务端生成一个随机数 s 作为自己的私钥，然后根据算法参数计算出公钥 S（算法参数通常是固定的）
+3. 服务端使用某种签名算法把“算法参数（模数p，基数g）和服务端公钥S”作为一个整体进行签名
+4. 服务端把“算法参数（模数p，基数g）、服务端公钥S、签名”发送给客户端
+5. 客户端收到后验证签名是否有效
+6. 客户端生成一个随机数 c 作为自己的私钥，然后根据算法参数计算出公钥 C
+7. 客户端把 C 发送给服务端
+8. 客户端和服务端（根据上述 DH 算法）各自计算出 k 作为会话密钥
+
+
+```
+密钥协商类型三，ECDH（ 依赖的是——求解“椭圆曲线离散对数问题”的困难。）
+密钥协商类型四，PSK 
+```
+　　在通讯【之前】，通讯双方已经预先部署了若干个共享的密钥。
+　　为了标识多个密钥，给每一个密钥定义一个唯一的 ID
+　　协商的过程很简单：客户端把自己选好的密钥的 ID 告诉服务端。
+　　如果服务端在自己的密钥池子中找到这个 ID，就用对应的密钥与客户端通讯；否则就报错并中断连接。
+```
+密钥协商类型五，SRP 
+```
+ client/server 双方共享的是比较人性化的密码（password）而不是密钥（key）。该算法采用了一些机制（盐/salt、随机数）来防范“嗅探/sniffer”或“字典猜解攻击”或“重放攻击”。
+```
 [SSL/TLS 协议报文](https://www.cnblogs.com/findumars/p/5929775.html)
 ```
 +---------------------------------------------------------------+
