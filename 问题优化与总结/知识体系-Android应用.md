@@ -6,14 +6,17 @@
 ``` dot
 APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
 
-APK打包安装及加载流程->Android系统架构->Android系统启动流程
+APK打包安装及加载流程->Android系统架构->Android系统启动流程->Dalvik及framework初始化（packagemanager,activitymanager,resourcemanager,viewsystem）
 
 四大组件->Handler消息机制
 
-Activity->启动模式与任务栈->Activity生命周期->onCreate->setContentView->常用控件与布局方式->View的绘制流程->{View的事件响应流程,View获取Res资源流程}
-View获取Res资源流程->"Context 概念"
+Activity->启动模式与任务栈->Activity生命周期（back和home键）->onCreate->setContentView->常用控件与布局方式->View的绘制流程->"Context 概念"->View获取Res资源流程->动画
+ 
+
 Activity->"接收数据显示，传递数据到后台"->{SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络}
 常用控件与布局方式->SurfaceView
+
+Activity生命周期->onresume->View的事件响应流程
 
 Service->数据操作,传递前台显示->Activity交互->AIDL等跨进程通信方式
 
@@ -23,10 +26,138 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
 ## 3 Android 基础
 
 ### 3.1  Android 系统体系
+```
++-----------------------------------------------------------------------+
+|                                AppS                                   |
+|                                                                       |
+|                                                                       |
++-----------------------------------------------------------------------+
+|                       App Framework                                   |
+|                                                                       |
+|     Activity Mgr        window Mgr    content provider    View System |
+|                                                                       |
+|  Package Mgr     Tel Mgr      Res Mgr      Loc Mgr      Notify Mgr    |
+|                                                                       |
+|                                                                       |
+|                                                                       |
+|                                                                       |
++-------------------------------------------------+---------------------+
+|                  Libraries                      |  Android Runtime    |
+|                                                 |  +----------------+ |
+|  Surface Mgr     Media Framework    Sqlite      |  | core Libraries | |
+|                                                 |  | dal^ik ^m      | |
+|  OpenGL|ES       FreeType           Webkit      |  +----------------+ |
+|                                                 +---------------------|
+|  SGL             SSL/TLS            libc                              |
+|                                                                       |
++-----------------------------------------------------------------------+
+|                      Linux kernel                                     |
+|  Display Driver      Camera Driver   Flash Driver   Bind (IPC) Driver |
+|                                                                       |
+|  KeyPad Driver    WIFI Driver    Audio Driver   Power Management      |
+|                                                                       |
++-----------------------------------------------------------------------+
 
-应用层，framework层，libs和Runtime层，内核层
+```
+
 #### 应用层
 - 四大组件，Fragment
+```
+                                            +--------+
+                                            | Start  |
+                                            |        |
+                                            +----+---+
+                                                 v
+
+                                            +--------+
+         +------------------------------->  |onCreate|
+         |                                  |        |
+         |                                  +---+----+
+         |                                      v
+         |  back to
+         |  foreground                      +--------+                 +-----------+
+         |                                  |onStart |  <--------------+ onRestart +-----+
+         |                                  |        |                 |           |     |
++--------+---------+                        +----+---+                 +-----------+     |
+| Process killed   |                             v                                       |
+|                  |                                                                     |
++--------+---------+              +-------+ +--------+                                   |
+         |                        v         |onResume|  <-----+                          |
+         |                   +----+-----+   |        |        |                          |
+         |                   |Running   |   +--------+        |  activity                |  activity
+         |                   |          |                     |  froreground             |  foreground
+         |            other  +----+-----+                     |                          |
+         |            activity    |         +--------+        |                          |
+         |            foreground  +-------> |onPause |        |                          |
+         |  <-----------------------------+ |        | +----->+                          |
+         | other app need memory            +---+----+                                   |
+         |                                      v                                        |
+         |                                                                               |
+         |                                  +--------+                                   |
+         |                                  |onStop  |                                   |
+         +--------------------------------+ |        | +---------------------------------+
+                                            +---+----+
+                                                v
+
+                                            +--------+
+                                            |onDestroy
+                                            |        +
+                                            +---+----+
+                                                v
+
+                                            +--------+
+                                            |shutdown|
+                                            |        |
+                                            +--------+
+
+
+
+```
+[事件](https://blog.csdn.net/shareus/article/details/50763237)
+```
+                                    +-------------------------+        +-----------------+
+                                    |        Activity         |        | ACTION_DOWN     |
+                                    |  +------------------+   |  <---+ |                 |
+              +---------------------+  |dispatchTouchEvent|   |        +-----------------+
+              |                     |  |                  |   |
+              |            +------> |  +------------------+   |
+              |            | True   |                         |
+              |            |        |  +------------------+   |
+              |            |        |  |onTouchEvent      |   |
+              |            +----->  |  |                  |   |
+              |            | False  |  +------------------+   |
+              |            |        +-------------------------+
+              |            |
+              |            |                        True
+              v            |             +---------------------------------+
+                           |             |                                 |
+       +-------------------+-------+     |                     +-----------+-----------------+
+       |         ViewGroup         |     |                     |          View               |
+       |    +-----------------+    |     |                     |     +-----------------+     |
++----> | +--+dispatchTouchEvent    |     |             +-----> |  +--+dispatchTouchEvent <-+ |
+|      | |  |                 +    | <---+             |       |  |  |                 |   | |
+|      | |  +-----------------+    |                   |       |  |  +-----------------+   | | True
+|      | |                         |            False  |       |  |                        | |
++----+ | |  +-----------------+    |                   |       |  |  +-----------------+   | |
+       | +> |onIntercept      |    |                   |       |  |  |onTouchEvent     |   | |
+       |    |TouchE^ent       |  +---------------------+       |  +> |                 | +-+ |
+       |    +-----------------+    |                           |     +-----------------+     |
+       |                           |                           |                             |
+       |    +-----------------+    |                           |                             |
+       |    |onTouchEvent     |    |                           |                             |
+       |    |                 |    |                           |                             |
+       |    +-----------------+    |                           |                             |
+       +---------------------------+                           +-----------------------------+
+
+
+```
+
+[渲染流程线](https://blog.csdn.net/cpcpcp123/article/details/79942700?utm_source=blogxgwz8)
+UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU—-> GPU对图进行光栅化(Frame Rate ) —->硬件时钟(Refresh Rate)—-垂直同步—->投射到屏幕
+
+Activity->PhoneWindow
+WindowManagerGlobal
+
 
 - Handler 消息机制
 - AsyncTask
