@@ -1,6 +1,6 @@
 ## Android应用体系
 > 软件是计算机系统中与硬件相互依存的另一部分，它是包括程序，数据及其相关文档的完整集合 《软件工程概论》
-
+环境 Android 系统
 阅读应用流程（以APK文档为主线，程序Main方法为入口）
 
 ``` dot
@@ -197,6 +197,20 @@ AIDL
 - Context
 
 - 持久化和序列化（Parcelable，Serializable）
+
+#### dalvk
+支持的垃圾回收机制
+Mark-sweep算法：还分为Sticky, Partial, Full，根据是否并行，又分为ConCurrent和Non-Concurrent
+MarkSweep::MarkSweep(Heap* heap, bool is_concurrent, const std::string& name_prefix)
+mark_compact 算法：标记-压缩（整理)算法
+concurrent_copying算法：
+semi_space算法:
+
+
+作者：Little熊猫
+链接：https://www.jianshu.com/p/153c01411352
+來源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
 
 ### 3.2 Android 开发模式
 
