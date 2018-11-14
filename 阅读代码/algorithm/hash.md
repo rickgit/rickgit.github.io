@@ -68,7 +68,14 @@ uintptr_t value() const { return (uintptr_t) this; }//方法在markOopDesc内中
 
 如果没有从 mark word获取到 hash值，调用 **get_next_hash** 生成新的Hash值，包含[五种不同的hashCode生成策略](https://blog.csdn.net/topc2000/article/details/79454064?utm_source=blogxgwz6)
 [OpenJDK 默认算法](https://srvaroa.github.io/jvm/java/openjdk/biased-locking/2017/01/30/hashCode.html)
-
+```
+0. A randomly generated number.                                                         （Park-Miller伪随机数生成器 jdk 6,7）
+1. A function of memory address of the object.
+2. A hardcoded 1 (used for sensitivity testing.)
+3. A sequence.
+4. The memory address of the object, cast to int.                                        （dalvik vm，默认的GC不移动对象，是个基于mark-sweep算法实现的GC）
+5. Thread state combined with xorshift (https://en.wikipedia.org/wiki/Xorshift)           （Marsaglia XORshift随机数算法 jdk 8,9）
+```
 1. 第一种，
 ```
 hotspot/src/share/vm/runtime/os.hpp:732:  static long random();                    // return 32bit pseudorandom number
@@ -100,7 +107,7 @@ public int hashCode() {
     return h;
 }
 ```
-
+[效率问题](https://blog.csdn.net/steveguoshao/article/details/12576849)
 
 ## MD5
 > The MD5 message-digest algorithm is a widely used cryptographic hash function producing a 128-bit (16-byte) hash value, typically expressed in text format as a 32 digit hexadecimal number.[MD5 - wikipekia](https://en.wikipedia.org/wiki/MD5)

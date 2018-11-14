@@ -55,7 +55,7 @@
                                   |
                          +  Number|
                          |  Type  |
-                         |        |            +    Float
+                         |        |            ++   Float
                          |        +DecimalType |
                          |                     ++   Long
                          |
@@ -216,6 +216,76 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 
 
 ```
+[jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)
+- 数组 
+  
+Arrays.sort 双轴快排算法（包含归并排序算法，经典快速排序算法，插入排序算法混用，及**jdk 1.7**废弃掉的归并排序和插入排序混用）
+
+```ObjectHeader64Coops
+          +-            +------------------------+
+          |             |                        |
+          |             |     Mark Word          |   8Byte
+          |             |                        |
+Header    |             +------------------------+
+          |             |                        |
+          |             |     Klass Pointer      |   4Byte
+          |             |                        |
+          ++            +------------------------+
+                        |     Array Length       |   4Byte
+                        |                        |
+                        +------------------------+
+                        |                        |
+                        |                        |
+                        |                        |
+                        |                        |
+                        +------------------------+
+                        |                        |
+                        |                        |
+                        +------------------------+
+
+```
+
+- [类的内存大小](https://segmentfault.com/a/1190000007183623)
+
+```ObjectHeader64Coops
+          +-            +------------------------+
+          |             |                        |
+          |             |     Mark Word          |   8Byte
+          |             |                        |
+Header    |             +------------------------+
+          |             |                        |
+          |             |     Klass Pointer      |   4Byte
+          |             |                        |
+          ++            +------------------------+
+                        |                        |
+                        |                        |
+                        |                        |
+                        |                        |
+                        |                        |
+                        |                        |
+                        |                        |
+                        +------------------------+
+                        |                        |
+                        |                        |
+                        +------------------------+
+
+
+```
+
+[内存占用查看工具](https://segmentfault.com/a/1190000007183623)
+
+以下是 64bit电脑，打印的信息。markword 8bytes,
+```
+edu.ptu.java.lib.RefType object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0    12        (object header)                           N/A
+     12     4        (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+16
+Footprint{Objects=1, References=0, Primitives=[]}
+```
 
 [ObjectHeader64Coops 内存结构](https://gist.github.com/arturmkrtchyan/43d6135e8a15798cc46c)
 ```
@@ -343,82 +413,17 @@ Instance size: 24 bytes
 Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 ```
-[jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)
-- 数组 
-  
-Arrays.sort 双轴快排算法（包含归并排序算法，经典快速排序算法，插入排序算法混用，及**jdk 1.7**废弃掉的归并排序和插入排序混用）
 
-```ObjectHeader64Coops
-          +-            +------------------------+
-          |             |                        |
-          |             |     Mark Word          |   8Byte
-          |             |                        |
-Header    |             +------------------------+
-          |             |                        |
-          |             |     Klass Pointer      |   4Byte
-          |             |                        |
-          ++            +------------------------+
-                        |     Array Length       |   4Byte
-                        |                        |
-                        +------------------------+
-                        |                        |
-                        |                        |
-                        |                        |
-                        |                        |
-                        +------------------------+
-                        |                        |
-                        |                        |
-                        +------------------------+
-
-```
-
-- [类的内存大小](https://segmentfault.com/a/1190000007183623)
-
-```ObjectHeader64Coops
-          +-            +------------------------+
-          |             |                        |
-          |             |     Mark Word          |   8Byte
-          |             |                        |
-Header    |             +------------------------+
-          |             |                        |
-          |             |     Klass Pointer      |   4Byte
-          |             |                        |
-          ++            +------------------------+
-                        |                        |
-                        |                        |
-                        |                        |
-                        |                        |
-                        |                        |
-                        |                        |
-                        |                        |
-                        +------------------------+
-                        |                        |
-                        |                        |
-                        +------------------------+
-
-
-```
-
-[内存占用查看工具](https://segmentfault.com/a/1190000007183623)
-
-以下是 64bit电脑，打印的信息。markword 8bytes,
-```
-edu.ptu.java.lib.RefType object internals:
- OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
-      0    12        (object header)                           N/A
-     12     4        (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-16
-Footprint{Objects=1, References=0, Primitives=[]}
-```
 
 - 虚拟机，垃圾回收器，回收算法
 1. 对象的创建
 2. Java内存区域与内存模型
 3. Java类加载机制及类加载器
 4. Java垃圾回收算法及垃圾收集器
+   标记-清除算法(mark-sweep), dalvikvm
+   标记-压缩算法(mark-compact),
+   复制算法(copying)
+   引用计数算法(reference counting)
 5. JVM判断对象是否已死（根节点没有引用）
 >《Inside the Java Virtual Machine》
 
@@ -484,24 +489,25 @@ equals()，hashcode()，toString()
 ### 2.1 数据集合 - Collection 类（List, Queue, Map）
 
 ```text
-                         +--------------+                                          +----------------+
-                         |              |                                          |                |
-                         |   Collection |                                          |     Map        |
-                         +------+-------+                                          +-------^--------+
-                                ^                                                     +-----------------------+
-        +---------------------------------------------+                               |                       |
-        |                       |                     |                             .....                  ......
-+-------+-------+        +------+------+       +------+-----+                 +--------------+         +------------+
-|无序的、不可重复|        |有序的、可重复 |       |            |                 |              |         |            |
-|   Set         |        |   List      |       |    Queue   |                 | HashMap      |         |  SortMap   |
-+------+--------+        +-----+-------+       +-------+----+                 +-------+------+         +-------+----+
-       ^                       ^                       ^                              ^                        ^
-     ..^..                     | <---------------------+                              |                        |
-       |                     ....                      |                              |                        |
-+------+--------+  +-----------+  +---------+    +-----+-----------+         +--------+--------+        +------+------+
-|               |  |           |  |         |    |                 |         |                 |        |             |
-|   HashSet     |  | ArrayList |  | Vector  |    |   LinkedList    |         |   LinkedHashMap |        |   TreeMap   |
-+---------------+  +-----------+  +---------+    +-----------------+         +-----------------+        +-------------+
+                                            +--------------+                                          +----------------+
+                                            |              |                                          |                |
+                                            |   Collection |                                          |     Map        |
+                                            +------+-------+                                          +-------^--------+
+                                                   ^                                                     +-----------------------+------------+
+                           +---------------------------------------------+                               +                       +            |
+                           |                       |                     |                             .....                  ......          |
+                   +-------+-------+        +------+------+       ++-----+-----+                 +--+---------+-+         ++-----------+      |    +---------------+
+                   |unsort,no repeat        | sortable ,repeatable +                 +              +         +            +                  |    |               |
+                   |   Set         +        |   List      +       +    Queue   +                 + HashMap      +         +  SortMap   +      |    |  Dictionary   |
+                   +------+--------+        +-----+-------+       +-------+----+                 +-------+------+         +-------+----+      |    +---------------+
+                          ^                       ^                       ^                              ^                        ^           |
+       +--------------->  +                       + <---------------------+                              |                        |           |            ^
+    .......           .......                   ....                      |                              |                        |           |            |
++--------------+   +---------------+  +-----------+  +---------+    +-----+-----------+         +--------+--------+        +------+------+    |  . +-------+--------+
+|              |   |               |  |           |  |         |    |                 |         |                 |        |             |    |  . |                |
+|  TreeSet     |   |   HashSet     |  | ArrayList |  | Vector  |    |   LinkedList    |         |   LinkedHashMap |        |   TreeMap   |    +--.-+   HashTable    |
++--------------+   +---------------+  +-----------+  +---------+    +-----------------+         +-----------------+        +-------------+       . +----------------+
+
 
 
 ```
@@ -548,7 +554,34 @@ java.util.ArrayList object internals:
 Instance size: 24 bytes
 Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
+#### LinkedList
+```
+java.util.LinkedList object internals:
+ OFFSET  SIZE                        TYPE DESCRIPTION                               VALUE
+      0     4                             (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                             (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                         int AbstractList.modCount                     0
+     12     4                         int LinkedList.size                           0
+     16     4   java.util.LinkedList.Node LinkedList.first                          null //数据存放在双向链表
+     20     4   java.util.LinkedList.Node LinkedList.last                           null
+     24     8                             (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
 
+java.util.LinkedList$ListItr object internals:
+ OFFSET  SIZE                        TYPE DESCRIPTION                               VALUE
+      0     4                             (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                             (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                         int ListItr.nextIndex                         0
+     12     4                         int ListItr.expectedModCount                  0
+     16     4   java.util.LinkedList.Node ListItr.lastReturned                      null
+     20     4   java.util.LinkedList.Node ListItr.next                              null
+     24     4        java.util.LinkedList ListItr.this$0                            (object)
+     28     4                             (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+```
 #### Vector
 
 ```
@@ -579,12 +612,74 @@ Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
 
 初始容量 10
 加载因子（0.0~1.0）  超过容量1.0，执行扩容
-扩容增量 增加一倍，或者自定义
+扩容增量 增加一倍，或者自定义。ArrayList比较省空间。
 ```
  int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
                                          capacityIncrement : oldCapacity);
 
 ```
+
+与ArrayList区别是，所有方法都加Synchronized，性能没有ArrayList高
+#### HashSet
+```
+java.util.HashSet object internals:
+ OFFSET  SIZE                TYPE DESCRIPTION                               VALUE
+      0     4                     (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                     (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.HashMap HashSet.map                               (object)
+     12     4                     (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.HashMap$KeyIterator object internals:
+ OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
+      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                      int HashIterator.expectedModCount             0
+     12     4                      int HashIterator.index                        0
+     16     4   java.util.HashMap.Node HashIterator.next                         null
+     20     4   java.util.HashMap.Node HashIterator.current                      null
+     24     4        java.util.HashMap HashIterator.this$0                       (object)
+     28     4        java.util.HashMap KeyIterator.this$0                        (object)
+     32     8                          (loss due to the next object alignment)
+Instance size: 40 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+初始容量 （HashMap决定）16
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍
+```
+
+newCap = oldCap << 1
+```
+#### TreeSet
+```
+java.util.TreeSet object internals:
+ OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
+      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   java.util.NavigableMap TreeSet.m                                 (object) //默认TreeMap实现
+     12     4                          (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.TreeMap$KeyIterator object internals:
+ OFFSET  SIZE                      TYPE DESCRIPTION                               VALUE
+      0     4                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                       int PrivateEntryIterator.expectedModCount     0
+     12     4   java.util.TreeMap.Entry PrivateEntryIterator.next                 null
+     16     4   java.util.TreeMap.Entry PrivateEntryIterator.lastReturned         null
+     20     4         java.util.TreeMap PrivateEntryIterator.this$0               (object)
+     24     4         java.util.TreeMap KeyIterator.this$0                        (object)
+     28     4                           (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+```
+初始容量 （HashMap决定）16
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍
+
 #### HashMap
 ```
 java.util.HashMap object internals:
@@ -647,39 +742,6 @@ hash bucket 大小设置为 length=2^n。
 3. 再哈希法
 4. 建立一个公共溢出区
 ```
-#### HashSet
-```
-java.util.HashSet object internals:
- OFFSET  SIZE                TYPE DESCRIPTION                               VALUE
-      0     4                     (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                     (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.HashMap HashSet.map                               (object)
-     12     4                     (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.HashMap$KeyIterator object internals:
- OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
-      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                      int HashIterator.expectedModCount             0
-     12     4                      int HashIterator.index                        0
-     16     4   java.util.HashMap.Node HashIterator.next                         null
-     20     4   java.util.HashMap.Node HashIterator.current                      null
-     24     4        java.util.HashMap HashIterator.this$0                       (object)
-     28     4        java.util.HashMap KeyIterator.this$0                        (object)
-     32     8                          (loss due to the next object alignment)
-Instance size: 40 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-```
-初始容量 （HashMap决定）16
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍
-```
-
-newCap = oldCap << 1
-```
-
 
 #### HashTable
 开放地址法解决Hash冲突
@@ -717,7 +779,12 @@ Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
 
 int newCapacity = (oldCapacity << 1) + 1;
 ```
+#### TreeMap
+红黑树排序
 
+初始容量 11
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍+1
 
 #### LinkedHashMap
 
@@ -1372,11 +1439,12 @@ typedef enum _jobjectType {
 
 #### JNI签名
 **JNICALL**表示调用约定，相当于C++的stdcall，说明调用的是本地方法
-**JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数 
+**JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数
 
 
 
 ## 4 算法与数据结构
+《Intruduce arthrigsim》
 KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半数值计算，组合算法（枚举与回溯-图论-最优化与递归），造句算法
 - 线性表
 - 栈和队列
