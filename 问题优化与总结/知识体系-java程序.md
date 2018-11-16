@@ -422,7 +422,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 4. Java垃圾回收算法及垃圾收集器
    标记-清除算法(mark-sweep), dalvikvm
    标记-压缩算法(mark-compact),
-   复制算法(copying)
+   复制算法(copying)  hotspot
    引用计数算法(reference counting)
 5. JVM判断对象是否已死（根节点没有引用）
 >《Inside the Java Virtual Machine》
@@ -1644,7 +1644,7 @@ PRF（伪随机数函数），用于生成“master secret”。
 MAC算法（这里就是哈希算法）是SHA。
 ``` 
 [密钥协商类型一，RSA](https://blog.csdn.net/andylau00j/article/details/54583769)
-
+[RSA 证明过程](https://www.di-mgt.com.au/rsa_theory.html)
 ``
 1. 客户端连上服务端
 2. 服务端发送 CA 证书给客户端
