@@ -1602,8 +1602,14 @@ SYN_SENT  |                                                  |                  
 
 SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加密是合适的。
 
+##### 基础
+欧拉公式、费马小定理、中国剩余定理，可以说是三大加密算法的基础
 
+三大公钥加密算法（RSA、离散对数、椭圆曲线）都依赖数论与群论的知识
+
+常见 MD5,DES,RSA 算法
 #### SSL/TLS
+
 **Content Type**指示SSL通信处于哪个阶段，分为 ：握手(Handshake)，开始加密传输(ChangeCipherSpec)，正常通信(Application)，（EncryptedAlert）四种
 
 **version** 
@@ -1645,7 +1651,73 @@ MAC算法（这里就是哈希算法）是SHA。
 ``` 
 [密钥协商类型一，RSA](https://blog.csdn.net/andylau00j/article/details/54583769)
 [RSA 证明过程](https://www.di-mgt.com.au/rsa_theory.html)
-``
+[RSA key生成过程 RSAKeyPairGenerator](openjdk/jdk/src/share/classes/sun/security/rsa/RSAKeyPairGenerator.java)介绍 n,p,q（p > q）,φ(n),e（RSAKeyGenParameterSpec.F4=65537）,d的胜场
+
+```
+public KeyPair generateKeyPair() {
+        // accommodate odd key sizes in case anybody wants to use them
+        int lp = (keySize + 1) >> 1;
+        int lq = keySize - lp;
+        if (random == null) {
+            random = JCAUtil.getSecureRandom();
+        }
+        BigInteger e = publicExponent;
+        while (true) {
+            // generate two random primes of size lp/lq
+            BigInteger p = BigInteger.probablePrime(lp, random);
+            BigInteger q, n;
+            do {
+                q = BigInteger.probablePrime(lq, random);
+                // convention is for p > q
+                if (p.compareTo(q) < 0) {
+                    BigInteger tmp = p;
+                    p = q;
+                    q = tmp;
+                }
+                // modulus n = p * q
+                n = p.multiply(q);
+                // even with correctly sized p and q, there is a chance that
+                // n will be one bit short. re-generate the smaller prime if so
+            } while (n.bitLength() < keySize);
+
+            // phi = (p - 1) * (q - 1) must be relative prime to e
+            // otherwise RSA just won't work ;-)
+            BigInteger p1 = p.subtract(BigInteger.ONE);
+            BigInteger q1 = q.subtract(BigInteger.ONE);
+            BigInteger phi = p1.multiply(q1);
+            // generate new p and q until they work. typically
+            // the first try will succeed when using F4
+            if (e.gcd(phi).equals(BigInteger.ONE) == false) {//不是互质，重新找p,q
+                continue;
+            }
+
+            // private exponent d is the inverse of e mod phi
+            BigInteger d = e.modInverse(phi);  //e*d 与phi欧拉函数互质
+
+            // 1st prime exponent pe = d mod (p - 1)
+            BigInteger pe = d.mod(p1);
+            // 2nd prime exponent qe = d mod (q - 1)
+            BigInteger qe = d.mod(q1);
+
+            // crt coefficient coeff is the inverse of q mod p
+            BigInteger coeff = q.modInverse(p);
+
+            try {
+                PublicKey publicKey = new RSAPublicKeyImpl(n, e);
+                PrivateKey privateKey =
+                        new RSAPrivateCrtKeyImpl(n, e, d, p, q, pe, qe, coeff);
+                return new KeyPair(publicKey, privateKey);
+            } catch (InvalidKeyException exc) {
+                // invalid key exception only thrown for keys < 512 bit,
+                // will not happen here
+                throw new RuntimeException(exc);
+            }
+        }
+    }
+
+```
+
+```
 1. 客户端连上服务端
 2. 服务端发送 CA 证书给客户端
 3. 客户端验证该证书的可靠性
@@ -1655,18 +1727,27 @@ MAC算法（这里就是哈希算法）是SHA。
 7. 服务端收到 k' 后用自己的私钥解密得到 k
 8. 此时双方都得到了密钥 k，协商完成。
 ```
+
 密钥协商类型二，hm（离散对数问题）
 ```
 1. 客户端先连上服务端
-2. 服务端生成一个随机数 s 作为自己的私钥，然后根据算法参数计算出公钥 S（算法参数通常是固定的）
-3. 服务端使用某种签名算法把“算法参数（模数p，基数g）和服务端公钥S”作为一个整体进行签名
-4. 服务端把“算法参数（模数p，基数g）、服务端公钥S、签名”发送给客户端
+2. 服务端生成一个随机数 y1 作为自己的私钥，然后根据算法参数计算出公钥 b1（算法参数通常是固定的）
+3. 服务端使用某种签名算法把“算法参数（模数p，基数g）和服务端公钥b1”作为一个整体进行签名
+4. 服务端把“算法参数（模数p，基数a）、服务端公钥b1、签名”发送给客户端
 5. 客户端收到后验证签名是否有效
-6. 客户端生成一个随机数 c 作为自己的私钥，然后根据算法参数计算出公钥 C
-7. 客户端把 C 发送给服务端
+6. 客户端生成一个随机数 y2 作为自己的私钥，然后根据算法参数计算出公钥 b2
+7. 客户端把 b2 发送给服务端
 8. 客户端和服务端（根据上述 DH 算法）各自计算出 k 作为会话密钥
 
 
+定义（数论中同余，指数，原根等概念）：
+a^y1≡b1 (mod p)
+a^y2≡b2 (mod p)
+
+计算：
+K=(b2)^y1 mod p
+或
+K=(b1)^y2 mod p
 ```
 密钥协商类型三，ECDH（ 依赖的是——求解“椭圆曲线离散对数问题”的困难。）
 密钥协商类型四，PSK 
@@ -1760,6 +1841,8 @@ Client RN          |              encrypted handshake msg     |
 7.1 用户进程
 7.2 内核（进程，内存，设备驱动，系统调用 System Call）
 7.3 硬件（CPU，内存，磁盘，网络端口 ）
+
+32位系统的最大寻址空间是2 的32次方= 4294967296（bit）= 4（GB）左右
 
 ## 8 数据库与SQL
 三大范式
