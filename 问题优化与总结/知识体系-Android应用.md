@@ -281,7 +281,7 @@ semi_space算法:
 - popupwindow 非阻塞浮层
 - Dialog 阻塞式对话框
 ### 3.3 开源框架
-#### OkHttp
+#### OkHttp2
 
 #### Retrofit
 

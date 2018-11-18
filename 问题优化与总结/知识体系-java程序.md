@@ -847,7 +847,7 @@ Charset#availableCharsets():SortedMap
 UTF-8 
 RandomAccessFile
 
-BUffer,Channel ,Selector
+#### NIO（BUffer,Channel ,Selector）
 
 - 文件（xml,json）
 
@@ -1080,6 +1080,13 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 #### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
   - ConcurrentHashMap。有并发要求，使用该类替换HashTable
   - 并发框架 Fork/Join
+
+### 数据展示 - 图形化及用户组件
+awt/swing
+
+#### 多媒体
+[图形化](知识体系-多媒体.md)
+
 ### 数据 - 类实现面向对象与设计模式
  五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 
@@ -1467,6 +1474,9 @@ KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半
     2.3. 如果节点是红色的，则它的子节点必须是黑色的（反之不一定成立）
     2.4. 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点。
 
+### 人工智能
+[见 知识体系-人工智能.md](知识体系-人工智能.md)
+
 ## 6 计算机网络
 网络数据：报文格式
 - Socket 
@@ -1601,6 +1611,10 @@ SYN_SENT  |                                                  |                  
 > SSL更新到3.0时，IETF对SSL3.0进行了标准化，并添加了少数机制(但是几乎和SSL3.0无差异)，标准化后的IETF更名为TLS1.0(Transport Layer Security 安全传输层协议)，可以说TLS就是SSL的新版本3.1。
 
 SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加密是合适的。
+
+### XMPP/MQTT
+见[知识总结-im篇](./知识体系-im.md)
+### RPC
 
 ##### 基础
 欧拉公式、费马小定理、中国剩余定理，可以说是三大加密算法的基础
