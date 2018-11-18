@@ -1176,4 +1176,7 @@ ffmpeg -re -i ./big_buck_bunny.mp4 -vcodec copy -acodec copy -f flv rtmp://local
 
 [点播与直播协议介绍文章](https://blog.csdn.net/caoshangpa/article/details/79543916)
 [视频样本](https://archive.blender.org/features-gallery/movies/)
+[模板视频](https://www.mediacollege.com/adobe/flash/video/tutorial/example-flv.html)
+
 ## [经典教程](http://dranger.com/ffmpeg/)
+[ffmpeg doxygen](https://ffmpeg.org/doxygen/trunk/examples.html)

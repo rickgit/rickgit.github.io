@@ -68,6 +68,7 @@ uintptr_t value() const { return (uintptr_t) this; }//方法在markOopDesc内中
 
 如果没有从 mark word获取到 hash值，调用 **get_next_hash** 生成新的Hash值，包含[五种不同的hashCode生成策略](https://blog.csdn.net/topc2000/article/details/79454064?utm_source=blogxgwz6)
 [OpenJDK 默认算法](https://srvaroa.github.io/jvm/java/openjdk/biased-locking/2017/01/30/hashCode.html)
+[常见Hash算法介绍](https://blog.csdn.net/wolf96/article/details/41309303)
 ```
 0. A randomly generated number.                                                         （Park-Miller伪随机数生成器 jdk 6,7）
 1. A function of memory address of the object.
