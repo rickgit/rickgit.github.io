@@ -853,17 +853,14 @@ Charset#availableCharsets():SortedMap
 
  
 ### 2.3 数据访问 - 流（IO, NIO）
+文件（xml,json），内存，网络，数据库
+
 字符与字节
 UTF-8 
 RandomAccessFile
 
 #### NIO（BUffer,Channel ,Selector）
 
-- 文件（xml,json）
-
-- 网络
-查看 **计算机网络**
-- 数据库
   
 ### 2.4 数据并发访问 - 线程与并发
 线程初始化 Thread,Runnable
