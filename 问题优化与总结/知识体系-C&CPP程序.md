@@ -27,7 +27,7 @@ C data type |            |  functionType
             |  Type      |               +   Array
             |            |               |
             |            |  AggregateType|
-            |            |               +   Struct // 结构是 C 编程中另一种用户自定义的可用的数据类型，它允许您存储不同类型的数据项。
+            |            |               +   Struct // 结构是 C 
             |            |
             |            +  union                   // 共用体是一种特殊的数据类型，允许您在相同的内存位置存储不同的数据类型。任何时候只能有一个成员带有值。
             | 
@@ -40,7 +40,7 @@ C data type |            |  functionType
 
 
                                   +IntegerType      int
-                                  | +short
+                                  | +short  （修饰符类型）  
                                   | |long
                                   | |sign
                          +  Number| +unsign
@@ -320,6 +320,8 @@ shared_ptr
 ### 类的生命周期
 
 ## 数据访问
+文件，内存，网络，数据库
+
 ### 标准IO
 - C 
 stdin 键盘 
@@ -327,7 +329,7 @@ stdout 屏幕
 stderr 您的屏幕
 
 - C++
-  ```
+```
 <iostream>
 该文件定义了 cin、cout、cerr 和 clog 对象，分别对应于标准输入流、标准输出流、非缓冲标准错误流和缓冲标准错误流。
 <iomanip>
@@ -375,6 +377,25 @@ std::logic_error
 理论上可以通过读取代码来检测到的异常。
 
 
+## 系统数据
+
+信号处理
+
+``` s
+SIGABRT
+程序的异常终止，如调用 abort。
+SIGFPE
+错误的算术运算，比如除以零或导致溢出的操作。
+SIGILL
+检测非法指令。
+SIGINT
+接收到交互注意信号。
+SIGSEGV
+非法访问内存。
+SIGTERM
+发送到程序的终止请求。
+```
+
 ## 数据并发 -多线程
 
 ```
@@ -390,22 +411,7 @@ c++11有了标准的线程库
 
 
 ```
-## 系统数据
-信号处理
-```
-SIGABRT
-程序的异常终止，如调用 abort。
-SIGFPE
-错误的算术运算，比如除以零或导致溢出的操作。
-SIGILL
-检测非法指令。
-SIGINT
-接收到交互注意信号。
-SIGSEGV
-非法访问内存。
-SIGTERM
-发送到程序的终止请求。
-```
+
 ## 网络数据
 
 CGI

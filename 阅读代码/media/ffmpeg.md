@@ -1172,6 +1172,8 @@ ffmpeg -f gdigrab -i desktop -vcodec libx264 -preset ultrafast -acodec libmp3lam
 4.将视频文件推流到rtmp（Linux）
 ```
 ffmpeg -re -i ./big_buck_bunny.mp4 -vcodec copy -acodec copy -f flv rtmp://localhost:1935/live/stream
+
+ffmpeg.exe -re -i d://test1-t.ts -vcodec copy -acodec copy -f flv rtmp://localhost:1935/live/stream
 ```
 
 [点播与直播协议介绍文章](https://blog.csdn.net/caoshangpa/article/details/79543916)

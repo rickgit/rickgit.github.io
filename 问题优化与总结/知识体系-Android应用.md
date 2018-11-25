@@ -23,9 +23,9 @@
 |                                                 |  +----------------+ |
 |  Surface Mgr     Media Framework    Sqlite      |  | core Libraries | |
 |                                                 |  | dalvik vm      | |
-|  OpenGL|ES       FreeType           Webkit      |  +----------------+ |
+|  OpenGL|ES (3d)  FreeType           Webkit      |  +----------------+ |
 |                                                 +---------------------|
-|  SGL             SSL/TLS            libc                              |
+|  SGL(Skia 2d)    SSL/TLS            libc                              |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
@@ -109,7 +109,7 @@ framework/base/core/jni/
                         BnServiceManager          BnInterface               BBinder（server, onTransact()）
 
 
-                        IserviceManager           IInterface                ProcessState(create binder,bbinder,BpBinder)
+                        IserviceManager           IInterface                ProcessState(create binder,)))(bbinder,BpBinder)
 
 
   C Layer               BpRefBase                 IBinder                   IPCThreadState
@@ -142,7 +142,11 @@ public class Binder implements IBinder {//三个非静态字段
 - socket（ Zygote通信）
 ## C
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
-[图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
+### [图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
+Canvas是一个2D的概念，是在Skia中定义的
+Skia 2D和OpenGL/ES 3D
+
+OpengGL/ES两个基本Java类： GLSurfaceView,Renderer
 
 ## dalvik
 [支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
@@ -420,6 +424,8 @@ AIDL
 ### 3.2 Android 开发模式
 
 #### 性能优化总结
+>《Android开发艺术探索》
+方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
     1. 布局优化（include merge, viewstub）
     分析工具，不必要不加载（include merge, viewstub），ConstaintLayout，Lint
@@ -438,7 +444,8 @@ AIDL
         3.5 集合类未销毁
 
 - 其他性能优化的建议
-
+工具：profile，eclipse mat
+可维护性：组件化
 #### 内存泄漏
  
 #### 架构之模块化（插件化及组件化）
