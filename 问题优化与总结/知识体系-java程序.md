@@ -209,7 +209,8 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 
 
 
-常见构造大数方法，指数，阶乘，高德纳箭头
+常见构造大数方法，指数，阶乘，高德纳箭头，葛立恒数和Tree(3)
+3^3=3
 
 - BigInteger、BigDecimal
 [-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
@@ -424,19 +425,34 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 
 
-- 虚拟机，垃圾回收器，回收算法
+- 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
 1. 对象的创建
 2. Java内存区域与内存模型
-3. Java类加载机制及类加载器
-4. Java垃圾回收算法及垃圾收集器
-   标记-清除算法(mark-sweep), dalvikvm
-   标记-压缩算法(mark-compact),
-   复制算法(copying)  hotspot
-   引用计数算法(reference counting)
-5. JVM判断对象是否已死（根节点没有引用）
->《Inside the Java Virtual Machine》
+```
++--------------------------------+--------------------------------------------+
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|     +------------------+       |  +--------------+   +-------------------+  |
+|     |                  |       |  |              |   |                   |  |
+|     |  Heap            |       |  |  VM Stack    |   |  Native Method    |  |
+|     |                  |       |  |              |   |  Stack            |  |
+|     +------------------+       |  +--------------+   +-------------------+  |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|     +------------------+       |  +--------------------------------------+  |
+|     |                  |       |  |                                      |  |
+|     |  Method Area     |       |  |  Program Couter Register             |  |
+|     |                  |       |  |                                      |  |
+|     +------------------+       |  +--------------------------------------+  |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
++--------------------------------+--------------------------------------------+
 
-
+```
 ```
 运行时数据区
 
@@ -468,6 +484,17 @@ Method Zone  |     |
                           +------------------> nativeStack
 
 ```
+3. Java类加载机制及类加载器
+4. Java垃圾回收算法及垃圾收集器
+   标记-清除算法(mark-sweep), dalvikvm
+   标记-压缩算法(mark-compact),
+   复制算法(copying)  hotspot
+   引用计数算法(reference counting)
+5. JVM判断对象是否已死（根节点没有引用）
+>《Inside the Java Virtual Machine》
+
+
+
 [HotSpot 虚拟机](http://openjdk.java.net/groups/hotspot/docs/HotSpotGlossary.html)
 
 Generational Collection（分代收集）算法
@@ -486,7 +513,7 @@ this,super
 
 equals()，hashcode()，toString()
 ##### [hashcode() 基础知识](https://www.cnblogs.com/mengfanrong/p/4034950.html)
-混合hashcode（MD5）
+混合hash （MD5）
 
 自动装箱和拆箱
 

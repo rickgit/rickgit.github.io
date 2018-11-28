@@ -45,6 +45,7 @@ Serializable->Parcelable->Binder->{AIDL,Messenger}
 AIDL 文件，方向指示符包括in、out、和inout；
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
 binder是C/S架构，分为Bn端(Server)和Bp端(Client)
+Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
 ```
 framework/base/core/java/android/os/
   - IInterface.java
@@ -117,7 +118,7 @@ framework/base/core/jni/
  +----------------------------------------------------------------------------------------------------------+
 
   Kernel dev
-  driver layer          /dev/binder
+  driver layer          /dev/binder（open/mmap/ioctl指令）
 
  +-----------------------------------------------------------------------------------------------------------+
 
