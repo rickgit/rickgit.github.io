@@ -282,9 +282,422 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
 
 ```
+- 启动模式
+Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
+```
+adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
+adb shell dumpsys activity activities----------查看Activity组件信息
+adb shell dumpsys activity services-----------查看Service组件信息
+adb shell dumpsys activity providers----------产看ContentProvider组件信息
+adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
+adb shell dumpsys activity intents--------------查看Intent信息
+adb shell dumpsys activity processes---------查看进程信息
+
+
+adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
+```
+```ActivityStarter的启动模式代码阅读
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
+```
+```
+class ActivityDisplay extends ConfigurationContainer<ActivityStack>
+        implements WindowContainerListener {
+**
+     * Counter for next free stack ID to use for dynamic activity stacks. Unique across displays.
+     */
+    private static int sNextFreeStackId = 0;
+
+    private ActivityStackSupervisor mSupervisor;
+    /** Actual Display this object tracks. */
+    int mDisplayId;
+    Display mDisplay;
+
+    /**
+     * All of the stacks on this display. Order matters, topmost stack is in front of all other
+     * stacks, bottommost behind. Accessed directly by ActivityManager package classes. Any calls
+     * changing the list should also call {@link #onStackOrderChanged()}.
+     */
+    private final ArrayList<ActivityStack> mStacks = new ArrayList<>();
+    private ArrayList<OnStackOrderChangedListener> mStackOrderChangedCallbacks = new ArrayList<>();
+
+    /** Array of all UIDs that are present on the display. */
+    private IntArray mDisplayAccessUIDs = new IntArray();
+
+    /** All tokens used to put activities on this stack to sleep (including mOffToken) */
+    final ArrayList<ActivityManagerInternal.SleepToken> mAllSleepTokens = new ArrayList<>();
+    /** The token acquired by ActivityStackSupervisor to put stacks on the display to sleep */
+    ActivityManagerInternal.SleepToken mOffToken;
+
+    private boolean mSleeping;
+
+    // Cached reference to some special stacks we tend to get a lot so we don't need to loop
+    // through the list to find them.
+    private ActivityStack mHomeStack = null;
+    private ActivityStack mRecentsStack = null;
+    private ActivityStack mPinnedStack = null;
+    private ActivityStack mSplitScreenPrimaryStack = null;
+
+    // Used in updating the display size
+    private Point mTmpDisplaySize = new Point();
+}
+```
+ActivityStack
+```
+class ActivityStack<T extends StackWindowController> extends ConfigurationContainer
+        implements StackWindowListener {
+   final ActivityManagerService mService;
+    private final WindowManagerService mWindowManager;
+    T mWindowContainerController;
+
+    /**
+     * The back history of all previous (and possibly still
+     * running) activities.  It contains #TaskRecord objects.
+     */
+    private final ArrayList<TaskRecord> mTaskHistory = new ArrayList<>();
+
+    /**
+     * List of running activities, sorted by recent usage.
+     * The first entry in the list is the least recently used.
+     * It contains HistoryRecord objects.
+     */
+    final ArrayList<ActivityRecord> mLRUActivities = new ArrayList<>();
+
+    /**
+     * When we are in the process of pausing an activity, before starting the
+     * next one, this variable holds the activity that is currently being paused.
+     */
+    ActivityRecord mPausingActivity = null;
+
+    /**
+     * This is the last activity that we put into the paused state.  This is
+     * used to determine if we need to do an activity transition while sleeping,
+     * when we normally hold the top activity paused.
+     */
+    ActivityRecord mLastPausedActivity = null;
+
+    /**
+     * Activities that specify No History must be removed once the user navigates away from them.
+     * If the device goes to sleep with such an activity in the paused state then we save it here
+     * and finish it later if another activity replaces it on wakeup.
+     */
+    ActivityRecord mLastNoHistoryActivity = null;
+
+    /**
+     * Current activity that is resumed, or null if there is none.
+     */
+    ActivityRecord mResumedActivity = null;
+
+    // The topmost Activity passed to convertToTranslucent(). When non-null it means we are
+    // waiting for all Activities in mUndrawnActivitiesBelowTopTranslucent to be removed as they
+    // are drawn. When the last member of mUndrawnActivitiesBelowTopTranslucent is removed the
+    // Activity in mTranslucentActivityWaiting is notified via
+    // Activity.onTranslucentConversionComplete(false). If a timeout occurs prior to the last
+    // background activity being drawn then the same call will be made with a true value.
+    ActivityRecord mTranslucentActivityWaiting = null;
+    ArrayList<ActivityRecord> mUndrawnActivitiesBelowTopTranslucent = new ArrayList<>();
+
+    /**
+     * Set when we know we are going to be calling updateConfiguration()
+     * soon, so want to skip intermediate config checks.
+     */
+    boolean mConfigWillChange;
+
+    /**
+     * When set, will force the stack to report as invisible.
+     */
+    boolean mForceHidden = false;
+
+    private boolean mUpdateBoundsDeferred;
+    private boolean mUpdateBoundsDeferredCalled;
+    private final Rect mDeferredBounds = new Rect();
+    private final Rect mDeferredTaskBounds = new Rect();
+    private final Rect mDeferredTaskInsetBounds = new Rect();
+
+    int mCurrentUser;
+
+    final int mStackId;
+    /** The attached Display's unique identifier, or -1 if detached */
+    int mDisplayId;
+
+    private final SparseArray<Rect> mTmpBounds = new SparseArray<>();
+    private final SparseArray<Rect> mTmpInsetBounds = new SparseArray<>();
+    private final Rect mTmpRect2 = new Rect();
+    private final ActivityOptions mTmpOptions = ActivityOptions.makeBasic();
+
+    /** List for processing through a set of activities */
+    private final ArrayList<ActivityRecord> mTmpActivities = new ArrayList<>();
+
+    /** Run all ActivityStacks through this */
+    protected final ActivityStackSupervisor mStackSupervisor;
+
+    private boolean mTopActivityOccludesKeyguard;
+    private ActivityRecord mTopDismissingKeyguardActivity;
+
+    final Handler mHandler;
+
+
+}
+```
+ActivityRecord
+```
+final class ActivityRecord extends ConfigurationContainer implements AppWindowContainerListener {
+    final ActivityManagerService service; // owner
+    final IApplicationToken.Stub appToken; // window manager token
+    AppWindowContainerController mWindowContainerController;
+    final ActivityInfo info; // all about me
+    // TODO: This is duplicated state already contained in info.applicationInfo - remove
+    ApplicationInfo appInfo; // information about activity's app
+    final int launchedFromPid; // always the pid who started the activity.
+    final int launchedFromUid; // always the uid who started the activity.
+    final String launchedFromPackage; // always the package who started the activity.
+    final int userId;          // Which user is this running for?
+    final Intent intent;    // the original intent that generated us
+    final ComponentName realActivity;  // the intent component, or target of an alias.
+    final String shortComponentName; // the short component name of the intent
+    final String resolvedType; // as per original caller;
+    final String packageName; // the package implementing intent's component
+    final String processName; // process where this component wants to run
+    final String taskAffinity; // as per ActivityInfo.taskAffinity
+    final boolean stateNotNeeded; // As per ActivityInfo.flags
+    boolean fullscreen; // The activity is opaque and fills the entire space of this task.
+    // TODO: See if it possible to combine this with the fullscreen field.
+    final boolean hasWallpaper; // Has a wallpaper window as a background.
+    final boolean noDisplay;  // activity is not displayed?
+    private final boolean componentSpecified;  // did caller specify an explicit component?
+    final boolean rootVoiceInteraction;  // was this the root activity of a voice interaction?
+
+    private CharSequence nonLocalizedLabel;  // the label information from the package mgr.
+    private int labelRes;           // the label information from the package mgr.
+    private int icon;               // resource identifier of activity's icon.
+    private int logo;               // resource identifier of activity's logo.
+    private int theme;              // resource identifier of activity's theme.
+    private int realTheme;          // actual theme resource we will use, never 0.
+    private int windowFlags;        // custom window flags for preview window.
+    private TaskRecord task;        // the task this is in.
+    private long createTime = System.currentTimeMillis();
+    long displayStartTime;  // when we started launching this activity
+    long fullyDrawnStartTime; // when we started launching this activity
+    private long startTime;         // last time this activity was started
+    long lastVisibleTime;   // last time this activity became visible
+    long cpuTimeAtResume;   // the cpu time of host process at the time of resuming activity
+    long pauseTime;         // last time we started pausing the activity
+    long launchTickTime;    // base time for launch tick messages
+    // Last configuration reported to the activity in the client process.
+    private MergedConfiguration mLastReportedConfiguration;
+    private int mLastReportedDisplayId;
+    private boolean mLastReportedMultiWindowMode;
+    private boolean mLastReportedPictureInPictureMode;
+    CompatibilityInfo compat;// last used compatibility mode
+    ActivityRecord resultTo; // who started this entry, so will get our reply
+    final String resultWho; // additional identifier for use by resultTo.
+    final int requestCode;  // code given by requester (resultTo)
+    ArrayList<ResultInfo> results; // pending ActivityResult objs we have received
+    HashSet<WeakReference<PendingIntentRecord>> pendingResults; // all pending intents for this act
+    ArrayList<ReferrerIntent> newIntents; // any pending new intents for single-top mode
+    ActivityOptions pendingOptions; // most recently given options
+    ActivityOptions returningOptions; // options that are coming back via convertToTranslucent
+    AppTimeTracker appTimeTracker; // set if we are tracking the time in this app/task/activity
+    HashSet<ConnectionRecord> connections; // All ConnectionRecord we hold
+    UriPermissionOwner uriPermissions; // current special URI access perms.
+    ProcessRecord app;      // if non-null, hosting application
+    private ActivityState mState;    // current state we are in
+    Bundle  icicle;         // last saved activity state
+    PersistableBundle persistentState; // last persistently saved activity state
+    // TODO: See if this is still needed.
+    boolean frontOfTask;    // is this the root activity of its task?
+    boolean launchFailed;   // set if a launched failed, to abort on 2nd try
+    boolean haveState;      // have we gotten the last activity state?
+    boolean stopped;        // is activity pause finished?
+    boolean delayedResume;  // not yet resumed because of stopped app switches?
+    boolean finishing;      // activity in pending finish list?
+    boolean deferRelaunchUntilPaused;   // relaunch of activity is being deferred until pause is
+                                        // completed
+    boolean preserveWindowOnDeferredRelaunch; // activity windows are preserved on deferred relaunch
+    int configChangeFlags;  // which config values have changed
+    private boolean keysPaused;     // has key dispatching been paused for it?
+    int launchMode;         // the launch mode activity attribute.
+    int lockTaskLaunchMode; // the lockTaskMode manifest attribute, subject to override
+    boolean visible;        // does this activity's window need to be shown?
+    boolean visibleIgnoringKeyguard; // is this activity visible, ignoring the fact that Keyguard
+                                     // might hide this activity?
+    private boolean mDeferHidingClient; // If true we told WM to defer reporting to the client
+                                        // process that it is hidden.
+    boolean sleeping;       // have we told the activity to sleep?
+    boolean nowVisible;     // is this activity's window visible?
+    boolean mClientVisibilityDeferred;// was the visibility change message to client deferred?
+    boolean idle;           // has the activity gone idle?
+    boolean hasBeenLaunched;// has this activity ever been launched?
+    boolean frozenBeforeDestroy;// has been frozen but not yet destroyed.
+    boolean immersive;      // immersive mode (don't interrupt if possible)
+    boolean forceNewConfig; // force re-create with new config next time
+    boolean supportsEnterPipOnTaskSwitch;  // This flag is set by the system to indicate that the
+        // activity can enter picture in picture while pausing (only when switching to another task)
+    PictureInPictureParams pictureInPictureArgs = new PictureInPictureParams.Builder().build();
+        // The PiP params used when deferring the entering of picture-in-picture.
+    int launchCount;        // count of launches since last state
+    long lastLaunchTime;    // time of last launch of this activity
+    ComponentName requestedVrComponent; // the requested component for handling VR mode.
+
+    String stringName;      // for caching of toString().
+
+    private boolean inHistory;  // are we in the history stack?
+    final ActivityStackSupervisor mStackSupervisor;
+int mStartingWindowState = STARTING_WINDOW_NOT_SHOWN;
+    boolean mTaskOverlay = false; // Task is always on-top of other activities in the task.
+
+    TaskDescription taskDescription; // the recents information for this activity
+    boolean mLaunchTaskBehind; // this activity is actively being launched with
+        // ActivityOptions.setLaunchTaskBehind, will be cleared once launch is completed.
+
+    // These configurations are collected from application's resources based on size-sensitive
+    // qualifiers. For example, layout-w800dp will be added to mHorizontalSizeConfigurations as 800
+    // and drawable-sw400dp will be added to both as 400.
+    private int[] mVerticalSizeConfigurations;
+    private int[] mHorizontalSizeConfigurations;
+    private int[] mSmallestSizeConfigurations;
+
+    boolean pendingVoiceInteractionStart;   // Waiting for activity-invoked voice session
+    IVoiceInteractionSession voiceSession;  // Voice interaction session for this activity
+
+    // A hint to override the window specified rotation animation, or -1
+    // to use the window specified value. We use this so that
+    // we can select the right animation in the cases of starting
+    // windows, where the app hasn't had time to set a value
+    // on the window.
+    int mRotationAnimationHint = -1;
+
+    private boolean mShowWhenLocked;
+    private boolean mTurnScreenOn;
+
+    /**
+     * Temp configs used in {@link #ensureActivityConfiguration(int, boolean)}
+     */
+    private final Configuration mTmpConfig = new Configuration();
+    private final Rect mTmpBounds = new Rect();
+}
+
+```
+
+
+```
+class TaskRecord extends ConfigurationContainer implements TaskWindowContainerListener {
+    final int taskId;       // Unique identifier for this task.
+    String affinity;        // The affinity name for this task, or null; may change identity.
+    String rootAffinity;    // Initial base affinity, or null; does not change from initial root.
+    final IVoiceInteractionSession voiceSession;    // Voice interaction session driving task
+    final IVoiceInteractor voiceInteractor;         // Associated interactor to provide to app
+    Intent intent;          // The original intent that started the task. Note that this value can
+                            // be null.
+    Intent affinityIntent;  // Intent of affinity-moved activity that started this task.
+    int effectiveUid;       // The current effective uid of the identity of this task.
+    ComponentName origActivity; // The non-alias activity component of the intent.
+    ComponentName realActivity; // The actual activity component that started the task.
+    boolean realActivitySuspended; // True if the actual activity component that started the
+                                   // task is suspended.
+    boolean inRecents;      // Actually in the recents list?
+    long lastActiveTime;    // Last time this task was active in the current device session,
+                            // including sleep. This time is initialized to the elapsed time when
+                            // restored from disk.
+    boolean isAvailable;    // Is the activity available to be launched?
+    boolean rootWasReset;   // True if the intent at the root of the task had
+                            // the FLAG_ACTIVITY_RESET_TASK_IF_NEEDED flag.
+    boolean autoRemoveRecents;  // If true, we should automatically remove the task from
+                                // recents when activity finishes
+    boolean askedCompatMode;// Have asked the user about compat mode for this task.
+    boolean hasBeenVisible; // Set if any activities in the task have been visible to the user.
+
+    String stringName;      // caching of toString() result.
+    int userId;             // user for which this task was created
+    boolean mUserSetupComplete; // The user set-up is complete as of the last time the task activity
+                                // was changed.
+
+    int numFullscreen;      // Number of fullscreen activities.
+
+    int mResizeMode;        // The resize mode of this task and its activities.
+                            // Based on the {@link ActivityInfo#resizeMode} of the root activity.
+    private boolean mSupportsPictureInPicture;  // Whether or not this task and its activities
+            // support PiP. Based on the {@link ActivityInfo#FLAG_SUPPORTS_PICTURE_IN_PICTURE} flag
+            // of the root activity.
+    int mLockTaskAuth = LOCK_TASK_AUTH_PINNABLE;
+
+    int mLockTaskUid = -1;  // The uid of the application that called startLockTask().
+
+    // This represents the last resolved activity values for this task
+    // NOTE: This value needs to be persisted with each task
+    TaskDescription lastTaskDescription = new TaskDescription();
+
+    /** List of all activities in the task arranged in history order */
+    final ArrayList<ActivityRecord> mActivities;
+
+    /** Current stack. Setter must always be used to update the value. */
+    private ActivityStack mStack;
+
+    /** The process that had previously hosted the root activity of this task.
+     * Used to know that we should try harder to keep this process around, in case the
+     * user wants to return to it. */
+    private ProcessRecord mRootProcess;
+
+    /** Takes on same value as first root activity */
+    boolean isPersistable = false;
+    int maxRecents;
+
+    /** Only used for persistable tasks, otherwise 0. The last time this task was moved. Used for
+     * determining the order when restoring. Sign indicates whether last task movement was to front
+     * (positive) or back (negative). Absolute value indicates time. */
+    long mLastTimeMoved = System.currentTimeMillis();
+
+    /** If original intent did not allow relinquishing task identity, save that information */
+    private boolean mNeverRelinquishIdentity = true;
+
+    // Used in the unique case where we are clearing the task in order to reuse it. In that case we
+    // do not want to delete the stack when the task goes empty.
+    private boolean mReuseTask = false;
+
+    CharSequence lastDescription; // Last description captured for this item.
+
+    int mAffiliatedTaskId; // taskId of parent affiliation or self if no parent.
+    int mAffiliatedTaskColor; // color of the parent task affiliation.
+    TaskRecord mPrevAffiliate; // previous task in affiliated chain.
+    int mPrevAffiliateTaskId = INVALID_TASK_ID; // previous id for persistence.
+    TaskRecord mNextAffiliate; // next task in affiliated chain.
+    int mNextAffiliateTaskId = INVALID_TASK_ID; // next id for persistence.
+
+    // For relaunching the task from recents as though it was launched by the original launcher.
+    int mCallingUid;
+    String mCallingPackage;
+
+    final ActivityManagerService mService;
+
+    private final Rect mTmpStableBounds = new Rect();
+    private final Rect mTmpNonDecorBounds = new Rect();
+    private final Rect mTmpRect = new Rect();
+
+    // Last non-fullscreen bounds the task was launched in or resized to.
+    // The information is persisted and used to determine the appropriate stack to launch the
+    // task into on restore.
+    Rect mLastNonFullscreenBounds = null;
+    // Minimal width and height of this task when it's resizeable. -1 means it should use the
+    // default minimal width/height.
+    int mMinWidth;
+    int mMinHeight;
+
+    // Ranking (from top) of this task among all visible tasks. (-1 means it's not visible)
+    // This number will be assigned when we evaluate OOM scores for all visible tasks.
+    int mLayerRank = -1;
+
+    /** Helper object used for updating override configuration. */
+    private Configuration mTmpConfig = new Configuration();
+
+    private TaskWindowContainerController mWindowContainerController;
+}
+```
 
 [四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
 [Activity启动模式](gityuan.com/2017/06/11/activity_record/)
+SingleTop：栈顶复用，如果处于栈顶，则生命周期不走onCreate()和onStart()，会调用onNewIntent()，适合推送消息详情页
+SingleTask：栈内复用，如果存在栈内，则在其上所有Activity全部出栈，使得其位于栈顶，生命周期和SingleTop一样，app首页基本是用这个
 
 [事件](https://blog.csdn.net/shareus/article/details/50763237)
 [Touch事件](http://gityuan.com/2016/12/10/input-manager/)
