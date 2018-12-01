@@ -1116,6 +1116,35 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 #### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
   - ConcurrentHashMap。有并发要求，使用该类替换HashTable
+锁分段技术
+```
+java.util.concurrent.ConcurrentHashMap object internals:
+ OFFSET  SIZE                                                   TYPE DESCRIPTION                               VALUE
+      0     4                                                        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                                                        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                                          java.util.Set AbstractMap.keySet                        null
+     12     4                                   java.util.Collection AbstractMap.values                        null
+     16     8                                                   long ConcurrentHashMap.baseCount               0
+     24     4                                                    int ConcurrentHashMap.sizeCtl                 0
+     28     4                                                    int ConcurrentHashMap.transferIndex           0
+     32     4                                                    int ConcurrentHashMap.cellsBusy               0
+     36     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.table                   null
+     40     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.nextTable               null
+     44     4   java.util.concurrent.ConcurrentHashMap.CounterCell[] ConcurrentHashMap.counterCells            null
+     48     4      java.util.concurrent.ConcurrentHashMap.KeySetView ConcurrentHashMap.keySet                  null
+     52     4      java.util.concurrent.ConcurrentHashMap.ValuesView ConcurrentHashMap.values                  null
+     56     4    java.util.concurrent.ConcurrentHashMap.EntrySetView ConcurrentHashMap.entrySet                null
+     60     4                                                        (loss due to the next object alignment)
+Instance size: 64 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+```
+桶初始容量  16
+加载因子（0.0~1.0）  0.75f
+扩容增量（扩容hash表）  一倍
+
+
+
   - 并发框架 Fork/Join
 
 ### 数据展示 - 图形化及用户组件

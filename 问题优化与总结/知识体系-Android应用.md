@@ -301,6 +301,50 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
 ```
+
+[Activity栈及任务记录结构](https://www.imooc.com/article/31922?block_id=tuijian_wz)
+```
+ActivityDisplay#0（一般只有一显示器） ActivityDisplay#1
++------------------------------+   +----------------------------------+
+|       ActivityStack          |   |   ActivityStack                  |
+|    +---------------------+   |   |                                  |
+|    |  TaskRecord         |   |   |                                  |
+|    +---------------------+   |   |                                  |
+|    |                     |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    |                     |   |   |                                  |
+|    +---------------------+   |   |                                  |
+|                              |   |                                  |
+|    +---------------------+   |   |                                  |
+|    |  TaskRecord         |   |   |                                  |
+|    +---------------------+   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    | |ActivityRecord  |  |   |   |                                  |
+|    | +----------------+  |   |   |                                  |
+|    |                     |   |   |                                  |
+|    |                     |   |   |                                  |
+|    +---------------------+   |   |                                  |
++------------------------------+   +----------------------------------+
+
+```
+
 ```
 class ActivityDisplay extends ConfigurationContainer<ActivityStack>
         implements WindowContainerListener {
@@ -440,6 +484,122 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
 
 }
 ```
+
+
+
+```
+class TaskRecord extends ConfigurationContainer implements TaskWindowContainerListener {
+    final int taskId;       // Unique identifier for this task.
+    String affinity;        // The affinity name for this task, or null; may change identity.
+    String rootAffinity;    // Initial base affinity, or null; does not change from initial root.
+    final IVoiceInteractionSession voiceSession;    // Voice interaction session driving task
+    final IVoiceInteractor voiceInteractor;         // Associated interactor to provide to app
+    Intent intent;          // The original intent that started the task. Note that this value can
+                            // be null.
+    Intent affinityIntent;  // Intent of affinity-moved activity that started this task.
+    int effectiveUid;       // The current effective uid of the identity of this task.
+    ComponentName origActivity; // The non-alias activity component of the intent.
+    ComponentName realActivity; // The actual activity component that started the task.
+    boolean realActivitySuspended; // True if the actual activity component that started the
+                                   // task is suspended.
+    boolean inRecents;      // Actually in the recents list?
+    long lastActiveTime;    // Last time this task was active in the current device session,
+                            // including sleep. This time is initialized to the elapsed time when
+                            // restored from disk.
+    boolean isAvailable;    // Is the activity available to be launched?
+    boolean rootWasReset;   // True if the intent at the root of the task had
+                            // the FLAG_ACTIVITY_RESET_TASK_IF_NEEDED flag.
+    boolean autoRemoveRecents;  // If true, we should automatically remove the task from
+                                // recents when activity finishes
+    boolean askedCompatMode;// Have asked the user about compat mode for this task.
+    boolean hasBeenVisible; // Set if any activities in the task have been visible to the user.
+
+    String stringName;      // caching of toString() result.
+    int userId;             // user for which this task was created
+    boolean mUserSetupComplete; // The user set-up is complete as of the last time the task activity
+                                // was changed.
+
+    int numFullscreen;      // Number of fullscreen activities.
+
+    int mResizeMode;        // The resize mode of this task and its activities.
+                            // Based on the {@link ActivityInfo#resizeMode} of the root activity.
+    private boolean mSupportsPictureInPicture;  // Whether or not this task and its activities
+            // support PiP. Based on the {@link ActivityInfo#FLAG_SUPPORTS_PICTURE_IN_PICTURE} flag
+            // of the root activity.
+    int mLockTaskAuth = LOCK_TASK_AUTH_PINNABLE;
+
+    int mLockTaskUid = -1;  // The uid of the application that called startLockTask().
+
+    // This represents the last resolved activity values for this task
+    // NOTE: This value needs to be persisted with each task
+    TaskDescription lastTaskDescription = new TaskDescription();
+
+    /** List of all activities in the task arranged in history order */
+    final ArrayList<ActivityRecord> mActivities;
+
+    /** Current stack. Setter must always be used to update the value. */
+    private ActivityStack mStack;
+
+    /** The process that had previously hosted the root activity of this task.
+     * Used to know that we should try harder to keep this process around, in case the
+     * user wants to return to it. */
+    private ProcessRecord mRootProcess;
+
+    /** Takes on same value as first root activity */
+    boolean isPersistable = false;
+    int maxRecents;
+
+    /** Only used for persistable tasks, otherwise 0. The last time this task was moved. Used for
+     * determining the order when restoring. Sign indicates whether last task movement was to front
+     * (positive) or back (negative). Absolute value indicates time. */
+    long mLastTimeMoved = System.currentTimeMillis();
+
+    /** If original intent did not allow relinquishing task identity, save that information */
+    private boolean mNeverRelinquishIdentity = true;
+
+    // Used in the unique case where we are clearing the task in order to reuse it. In that case we
+    // do not want to delete the stack when the task goes empty.
+    private boolean mReuseTask = false;
+
+    CharSequence lastDescription; // Last description captured for this item.
+
+    int mAffiliatedTaskId; // taskId of parent affiliation or self if no parent.
+    int mAffiliatedTaskColor; // color of the parent task affiliation.
+    TaskRecord mPrevAffiliate; // previous task in affiliated chain.
+    int mPrevAffiliateTaskId = INVALID_TASK_ID; // previous id for persistence.
+    TaskRecord mNextAffiliate; // next task in affiliated chain.
+    int mNextAffiliateTaskId = INVALID_TASK_ID; // next id for persistence.
+
+    // For relaunching the task from recents as though it was launched by the original launcher.
+    int mCallingUid;
+    String mCallingPackage;
+
+    final ActivityManagerService mService;
+
+    private final Rect mTmpStableBounds = new Rect();
+    private final Rect mTmpNonDecorBounds = new Rect();
+    private final Rect mTmpRect = new Rect();
+
+    // Last non-fullscreen bounds the task was launched in or resized to.
+    // The information is persisted and used to determine the appropriate stack to launch the
+    // task into on restore.
+    Rect mLastNonFullscreenBounds = null;
+    // Minimal width and height of this task when it's resizeable. -1 means it should use the
+    // default minimal width/height.
+    int mMinWidth;
+    int mMinHeight;
+
+    // Ranking (from top) of this task among all visible tasks. (-1 means it's not visible)
+    // This number will be assigned when we evaluate OOM scores for all visible tasks.
+    int mLayerRank = -1;
+
+    /** Helper object used for updating override configuration. */
+    private Configuration mTmpConfig = new Configuration();
+
+    private TaskWindowContainerController mWindowContainerController;
+}
+```
+
 ActivityRecord
 ```
 final class ActivityRecord extends ConfigurationContainer implements AppWindowContainerListener {
@@ -581,123 +741,13 @@ int mStartingWindowState = STARTING_WINDOW_NOT_SHOWN;
 ```
 
 
-```
-class TaskRecord extends ConfigurationContainer implements TaskWindowContainerListener {
-    final int taskId;       // Unique identifier for this task.
-    String affinity;        // The affinity name for this task, or null; may change identity.
-    String rootAffinity;    // Initial base affinity, or null; does not change from initial root.
-    final IVoiceInteractionSession voiceSession;    // Voice interaction session driving task
-    final IVoiceInteractor voiceInteractor;         // Associated interactor to provide to app
-    Intent intent;          // The original intent that started the task. Note that this value can
-                            // be null.
-    Intent affinityIntent;  // Intent of affinity-moved activity that started this task.
-    int effectiveUid;       // The current effective uid of the identity of this task.
-    ComponentName origActivity; // The non-alias activity component of the intent.
-    ComponentName realActivity; // The actual activity component that started the task.
-    boolean realActivitySuspended; // True if the actual activity component that started the
-                                   // task is suspended.
-    boolean inRecents;      // Actually in the recents list?
-    long lastActiveTime;    // Last time this task was active in the current device session,
-                            // including sleep. This time is initialized to the elapsed time when
-                            // restored from disk.
-    boolean isAvailable;    // Is the activity available to be launched?
-    boolean rootWasReset;   // True if the intent at the root of the task had
-                            // the FLAG_ACTIVITY_RESET_TASK_IF_NEEDED flag.
-    boolean autoRemoveRecents;  // If true, we should automatically remove the task from
-                                // recents when activity finishes
-    boolean askedCompatMode;// Have asked the user about compat mode for this task.
-    boolean hasBeenVisible; // Set if any activities in the task have been visible to the user.
-
-    String stringName;      // caching of toString() result.
-    int userId;             // user for which this task was created
-    boolean mUserSetupComplete; // The user set-up is complete as of the last time the task activity
-                                // was changed.
-
-    int numFullscreen;      // Number of fullscreen activities.
-
-    int mResizeMode;        // The resize mode of this task and its activities.
-                            // Based on the {@link ActivityInfo#resizeMode} of the root activity.
-    private boolean mSupportsPictureInPicture;  // Whether or not this task and its activities
-            // support PiP. Based on the {@link ActivityInfo#FLAG_SUPPORTS_PICTURE_IN_PICTURE} flag
-            // of the root activity.
-    int mLockTaskAuth = LOCK_TASK_AUTH_PINNABLE;
-
-    int mLockTaskUid = -1;  // The uid of the application that called startLockTask().
-
-    // This represents the last resolved activity values for this task
-    // NOTE: This value needs to be persisted with each task
-    TaskDescription lastTaskDescription = new TaskDescription();
-
-    /** List of all activities in the task arranged in history order */
-    final ArrayList<ActivityRecord> mActivities;
-
-    /** Current stack. Setter must always be used to update the value. */
-    private ActivityStack mStack;
-
-    /** The process that had previously hosted the root activity of this task.
-     * Used to know that we should try harder to keep this process around, in case the
-     * user wants to return to it. */
-    private ProcessRecord mRootProcess;
-
-    /** Takes on same value as first root activity */
-    boolean isPersistable = false;
-    int maxRecents;
-
-    /** Only used for persistable tasks, otherwise 0. The last time this task was moved. Used for
-     * determining the order when restoring. Sign indicates whether last task movement was to front
-     * (positive) or back (negative). Absolute value indicates time. */
-    long mLastTimeMoved = System.currentTimeMillis();
-
-    /** If original intent did not allow relinquishing task identity, save that information */
-    private boolean mNeverRelinquishIdentity = true;
-
-    // Used in the unique case where we are clearing the task in order to reuse it. In that case we
-    // do not want to delete the stack when the task goes empty.
-    private boolean mReuseTask = false;
-
-    CharSequence lastDescription; // Last description captured for this item.
-
-    int mAffiliatedTaskId; // taskId of parent affiliation or self if no parent.
-    int mAffiliatedTaskColor; // color of the parent task affiliation.
-    TaskRecord mPrevAffiliate; // previous task in affiliated chain.
-    int mPrevAffiliateTaskId = INVALID_TASK_ID; // previous id for persistence.
-    TaskRecord mNextAffiliate; // next task in affiliated chain.
-    int mNextAffiliateTaskId = INVALID_TASK_ID; // next id for persistence.
-
-    // For relaunching the task from recents as though it was launched by the original launcher.
-    int mCallingUid;
-    String mCallingPackage;
-
-    final ActivityManagerService mService;
-
-    private final Rect mTmpStableBounds = new Rect();
-    private final Rect mTmpNonDecorBounds = new Rect();
-    private final Rect mTmpRect = new Rect();
-
-    // Last non-fullscreen bounds the task was launched in or resized to.
-    // The information is persisted and used to determine the appropriate stack to launch the
-    // task into on restore.
-    Rect mLastNonFullscreenBounds = null;
-    // Minimal width and height of this task when it's resizeable. -1 means it should use the
-    // default minimal width/height.
-    int mMinWidth;
-    int mMinHeight;
-
-    // Ranking (from top) of this task among all visible tasks. (-1 means it's not visible)
-    // This number will be assigned when we evaluate OOM scores for all visible tasks.
-    int mLayerRank = -1;
-
-    /** Helper object used for updating override configuration. */
-    private Configuration mTmpConfig = new Configuration();
-
-    private TaskWindowContainerController mWindowContainerController;
-}
-```
-
 [四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
 [Activity启动模式](gityuan.com/2017/06/11/activity_record/)
-SingleTop：栈顶复用，如果处于栈顶，则生命周期不走onCreate()和onStart()，会调用onNewIntent()，适合推送消息详情页
-SingleTask：栈内复用，如果存在栈内，则在其上所有Activity全部出栈，使得其位于栈顶，生命周期和SingleTop一样，app首页基本是用这个
+android:launchMode：
+    SingleTop：栈顶复用，如果处于栈顶，则生命周期不走onCreate()和onStart()，会调用onNewIntent()，适合推送消息详情页
+    SingleTask：栈内复用，如果存在栈内，则在其上所有Activity全部出栈，使得其位于栈顶，生命周期和SingleTop一样，app首页基本是用这个。
+android:taskAffinity 属性主要和 singleTask 或者 allowTaskReparenting 属性配对使用，在其他情况下没有意义。
+android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
 
 [事件](https://blog.csdn.net/shareus/article/details/50763237)
 [Touch事件](http://gityuan.com/2016/12/10/input-manager/)
@@ -792,7 +842,22 @@ WindowManagerGlobal
 
 - Handler 消息机制
 - AsyncTask
+```
+
+public abstract class AsyncTask<Params, Progress, Result> {
+
+    private final WorkerRunnable<Params, Result> mWorker;
+    private final FutureTask<Result> mFuture;
+
+    private volatile Status mStatus = Status.PENDING;
     
+    private final AtomicBoolean mCancelled = new AtomicBoolean();
+    private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
+
+    private final Handler mHandler;
+
+}
+```        
     容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
     并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
 - HandlerThread
