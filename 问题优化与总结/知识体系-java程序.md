@@ -721,6 +721,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 扩容增量  一倍
 
 #### HashMap
+JDK7中HashMap采用的是位桶+链表的方式，即我们常说的散列链表的方式，而JDK8中采用的是位桶+链表/红黑树
 ```
 java.util.HashMap object internals:
  OFFSET  SIZE                       TYPE DESCRIPTION                               VALUE
@@ -1116,7 +1117,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 #### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
   - ConcurrentHashMap。有并发要求，使用该类替换HashTable
-锁分段技术
+java 7 锁分段技术,java 8 摒弃了Segment（锁段）的概念，采用CAS + synchronized保证并发更新的安全性，底层采用数组+链表+红黑树的存储结构。
 ```
 java.util.concurrent.ConcurrentHashMap object internals:
  OFFSET  SIZE                                                   TYPE DESCRIPTION                               VALUE
@@ -1125,12 +1126,12 @@ java.util.concurrent.ConcurrentHashMap object internals:
       8     4                                          java.util.Set AbstractMap.keySet                        null
      12     4                                   java.util.Collection AbstractMap.values                        null
      16     8                                                   long ConcurrentHashMap.baseCount               0
-     24     4                                                    int ConcurrentHashMap.sizeCtl                 0
+     24     4                                                    int ConcurrentHashMap.sizeCtl                 0 //volatile 并发利用CAS算法
      28     4                                                    int ConcurrentHashMap.transferIndex           0
      32     4                                                    int ConcurrentHashMap.cellsBusy               0
      36     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.table                   null
-     40     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.nextTable               null
-     44     4   java.util.concurrent.ConcurrentHashMap.CounterCell[] ConcurrentHashMap.counterCells            null
+     40     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.nextTable               null//用于迁移到table属性的临时属性
+     44     4   java.util.concurrent.ConcurrentHashMap.CounterCell[] ConcurrentHashMap.counterCells            null//用于并行计算每个bucket的元素数量。
      48     4      java.util.concurrent.ConcurrentHashMap.KeySetView ConcurrentHashMap.keySet                  null
      52     4      java.util.concurrent.ConcurrentHashMap.ValuesView ConcurrentHashMap.values                  null
      56     4    java.util.concurrent.ConcurrentHashMap.EntrySetView ConcurrentHashMap.entrySet                null
@@ -1141,7 +1142,9 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 桶初始容量  16
 加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash表）  一倍
+扩容增量（扩容hash桶）  增加一倍
+树化
+帮助数据迁移：将原来的 tab 数组的元素迁移到新的 nextTab 数组中。在多线程条件下，当前线程检测到其他线程正进行扩容操作（Thread.yield()），则协助其一起进行数据迁移。扩容后  sizeCtl = (n << 1) - (n >>> 1);
 
 
 
@@ -1371,6 +1374,16 @@ KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半
 [见 知识体系-人工智能.md](知识体系-人工智能.md)
 
 ## 6 计算机网络
+
+TCP使用内存
+```
+cat /proc/sys/net/ipv4/tcp_mem
+
+sysctl -a
+
+sudo tcpdump
+```
+
 网络数据：报文格式
 - Socket 
 ### TCP/IP

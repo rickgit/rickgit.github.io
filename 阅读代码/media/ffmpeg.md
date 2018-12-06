@@ -1176,6 +1176,16 @@ ffmpeg.exe -re -i ./big_buck_bunny.mp4 -vcodec copy -acodec copy -f flv rtmp://l
 ffmpeg.exe -re -i d://test1-t.ts -vcodec copy -acodec copy -f flv rtmp://localhost:1935/live/stream
 ```
 
+[ffprobe]
+
+查看视频流信息
+
+ffprobe -v quiet -show_streams  -select_streams v   -i  w.mp4
+
+查看音频流信息
+
+ffprobe -v quiet -show_streams  -select_streams a   -i  w.mp4 
+
 [点播与直播协议介绍文章](https://blog.csdn.net/caoshangpa/article/details/79543916)
 [视频样本](https://archive.blender.org/features-gallery/movies/)
 [模板视频](https://www.mediacollege.com/adobe/flash/video/tutorial/example-flv.html)
