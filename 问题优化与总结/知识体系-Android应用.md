@@ -30,7 +30,7 @@
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
 |  Display Driver      Camera Driver   Flash Driver   Bind (IPC) Driver |
-|                                                                       |
+|                      (V4L2)                                           |
 |  KeyPad Driver    WIFI Driver    Audio Driver   Power Management      |
 |                                                                       |
 +-----------------------------------------------------------------------+
@@ -38,8 +38,27 @@
 ```
 
 ## Linux kernel -ipc
+《Linux设备驱动程序》
 《Android 开发艺术探索》
 基础知识：序列化和Binder
+Binder是misc设备上进行注册,作为虚拟字符设备
+```
+ > ls -l /dev/
+ crw-rw-rw- root     root      10,  54 2018-12-03 20:23 binder //c代表字符设备文件
+
+
+LINUX中的七种文件类型
+d 目录文件。
+l 符号链接(指向另一个文件,类似于瘟下的快捷方式)。
+s 套接字文件。
+b 块设备文件,二进制文件。
+c 字符设备文件。
+p 命名管道文件。
+- 普通文件
+
+其中Linux中I/O设备分为两类:字符设备和块设备。
+[创建7种类型文件](https://blog.csdn.net/furzoom/article/details/77888131)
+```
 Serializable->Parcelable->Binder->{AIDL,Messenger}
 
 AIDL 文件，方向指示符包括in、out、和inout；
@@ -210,6 +229,139 @@ if (mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3) {
 
 
 ## 应用层
+Context
+```
+public abstract class Context {
+}
+
+public class ContextWrapper extends Context {
+    Context mBase;//ContextImpl
+}
+public class Application extends ContextWrapper implements ComponentCallbacks2 {
+    private ArrayList<ComponentCallbacks> mComponentCallbacks = new ArrayList<ComponentCallbacks>();
+    private ArrayList<ActivityLifecycleCallbacks> mActivityLifecycleCallbacks = new ArrayList<ActivityLifecycleCallbacks>();
+    private ArrayList<OnProvideAssistDataListener> mAssistCallbacks = null;
+
+    /** @hide */
+    public LoadedApk mLoadedApk;
+}
+public abstract class Service extends ContextWrapper implements ComponentCallbacks2 {
+    // set by the thread after the constructor and before onCreate(Bundle icicle) is called.
+    private ActivityThread mThread = null;
+    private String mClassName = null;
+    private IBinder mToken = null;
+    private Application mApplication = null;
+    private IActivityManager mActivityManager = null;
+    private boolean mStartCompatibility = false;
+}
+public class Activity extends ContextThemeWrapper
+        implements LayoutInflater.Factory2,
+        Window.Callback, KeyEvent.Callback,
+        OnCreateContextMenuListener, ComponentCallbacks2,
+        Window.OnWindowDismissedCallback, WindowControllerCallback,
+        AutofillManager.AutofillClient {
+ private SparseArray<ManagedDialog> mManagedDialogs;
+
+    // set by the thread after the constructor and before onCreate(Bundle savedInstanceState) is called.
+    private Instrumentation mInstrumentation;
+    private IBinder mToken;
+    private int mIdent;
+    /*package*/ String mEmbeddedID;
+    private Application mApplication;
+    /*package*/ Intent mIntent;
+    /*package*/ String mReferrer;
+    private ComponentName mComponent;
+    /*package*/ ActivityInfo mActivityInfo;
+    /*package*/ ActivityThread mMainThread;
+    Activity mParent;
+    boolean mCalled;
+    /*package*/ boolean mResumed;
+    /*package*/ boolean mStopped;
+    boolean mFinished;
+    boolean mStartedActivity;
+    private boolean mDestroyed;
+    private boolean mDoReportFullyDrawn = true;
+    private boolean mRestoredFromBundle;
+
+    /** {@code true} if the activity lifecycle is in a state which supports picture-in-picture.
+     * This only affects the client-side exception, the actual state check still happens in AMS. */
+    private boolean mCanEnterPictureInPicture = false;
+    /** true if the activity is going through a transient pause */
+    /*package*/ boolean mTemporaryPause = false;
+    /** true if the activity is being destroyed in order to recreate it with a new configuration */
+    /*package*/ boolean mChangingConfigurations = false;
+    /*package*/ int mConfigChangeFlags;
+    /*package*/ Configuration mCurrentConfig;
+    private SearchManager mSearchManager;
+    private MenuInflater mMenuInflater;
+
+    /** The autofill manager. Always access via {@link #getAutofillManager()}. */
+    @Nullable private AutofillManager mAutofillManager;
+
+    /* package */ NonConfigurationInstances mLastNonConfigurationInstances;
+
+    private Window mWindow;
+
+    private WindowManager mWindowManager;
+    /*package*/ View mDecor = null;
+    /*package*/ boolean mWindowAdded = false;
+    /*package*/ boolean mVisibleFromServer = false;
+    /*package*/ boolean mVisibleFromClient = true;
+    /*package*/ ActionBar mActionBar = null;
+    private boolean mEnableDefaultActionBarUp;
+
+    private VoiceInteractor mVoiceInteractor;
+
+    private CharSequence mTitle;
+    private int mTitleColor = 0;
+
+    // we must have a handler before the FragmentController is constructed
+    final Handler mHandler = new Handler();
+    final FragmentController mFragments = FragmentController.createController(new HostCallbacks());
+
+    @GuardedBy("mManagedCursors")
+    private final ArrayList<ManagedCursor> mManagedCursors = new ArrayList<>();
+
+    @GuardedBy("this")
+    int mResultCode = RESULT_CANCELED;
+    @GuardedBy("this")
+    Intent mResultData = null;
+
+    private TranslucentConversionListener mTranslucentCallback;
+    private boolean mChangeCanvasToTranslucent;
+
+    private SearchEvent mSearchEvent;
+
+    private boolean mTitleReady = false;
+    private int mActionModeTypeStarting = ActionMode.TYPE_PRIMARY;
+
+    private int mDefaultKeyMode = DEFAULT_KEYS_DISABLE;
+    private SpannableStringBuilder mDefaultKeySsb = null;
+
+    private ActivityManager.TaskDescription mTaskDescription =
+            new ActivityManager.TaskDescription();
+
+    @SuppressWarnings("unused")
+    private final Object mInstanceTracker = StrictMode.trackActivity(this);
+
+    private Thread mUiThread;
+
+    ActivityTransitionState mActivityTransitionState = new ActivityTransitionState();
+    SharedElementCallback mEnterTransitionListener = SharedElementCallback.NULL_CALLBACK;
+    SharedElementCallback mExitTransitionListener = SharedElementCallback.NULL_CALLBACK;
+
+    private boolean mHasCurrentPermissionsRequest;
+
+    private boolean mAutoFillResetNeeded;
+    private boolean mAutoFillIgnoreFirstResumePause;
+
+    /** The last autofill id that was returned from {@link #getNextAutofillId()} */
+    private int mLastAutofillId = View.LAST_APP_AUTOFILL_ID;
+
+    private AutofillPopupWindow mAutofillPopupWindow;
+}
+
+```
 
 ``` dot
 APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
@@ -346,12 +498,7 @@ ActivityDisplay#0（一般只有一显示器） ActivityDisplay#1
 ```
 
 ```
-class ActivityDisplay extends ConfigurationContainer<ActivityStack>
-        implements WindowContainerListener {
-**
-     * Counter for next free stack ID to use for dynamic activity stacks. Unique across displays.
-     */
-    private static int sNextFreeStackId = 0;
+class ActivityDisplay extends ConfigurationContainer<ActivityStack> implements WindowContainerListener {
 
     private ActivityStackSupervisor mSupervisor;
     /** Actual Display this object tracks. */
@@ -841,6 +988,102 @@ WindowManagerGlobal
 
 
 - Handler 消息机制
+public class Handler {
+    final Looper mLooper;
+    final MessageQueue mQueue;
+    final Callback mCallback;
+    final boolean mAsynchronous;
+    IMessenger mMessenger;
+}
+public final class Messenger implements Parcelable {
+    private final IMessenger mTarget;
+}
+oneway interface IMessenger {
+    void send(in Message msg);
+}
+public final class MessageQueue {
+
+    // True if the message queue can be quit.
+    private final boolean mQuitAllowed;
+
+    @SuppressWarnings("unused")
+    private long mPtr; // used by native code
+
+    Message mMessages;
+    private final ArrayList<IdleHandler> mIdleHandlers = new ArrayList<IdleHandler>();
+    private SparseArray<FileDescriptorRecord> mFileDescriptorRecords;
+    private IdleHandler[] mPendingIdleHandlers;
+    private boolean mQuitting;
+
+    // Indicates whether next() is blocked waiting in pollOnce() with a non-zero timeout.
+    private boolean mBlocked;
+
+    // The next barrier token.
+    // Barriers are indicated by messages with a null target whose arg1 field carries the token.
+    private int mNextBarrierToken;
+}
+
+public final class Message implements Parcelable {
+ /**
+     * User-defined message code so that the recipient can identify
+     * what this message is about. Each {@link Handler} has its own name-space
+     * for message codes, so you do not need to worry about yours conflicting
+     * with other handlers.
+     */
+    public int what;
+
+    /**
+     * arg1 and arg2 are lower-cost alternatives to using
+     * {@link #setData(Bundle) setData()} if you only need to store a
+     * few integer values.
+     */
+    public int arg1;
+
+    /**
+     * arg1 and arg2 are lower-cost alternatives to using
+     * {@link #setData(Bundle) setData()} if you only need to store a
+     * few integer values.
+     */
+    public int arg2;
+
+    /**
+     * An arbitrary object to send to the recipient.  When using
+     * {@link Messenger} to send the message across processes this can only
+     * be non-null if it contains a Parcelable of a framework class (not one
+     * implemented by the application).   For other data transfer use
+     * {@link #setData}.
+     *
+     * <p>Note that Parcelable objects here are not supported prior to
+     * the {@link android.os.Build.VERSION_CODES#FROYO} release.
+     */
+    public Object obj;
+
+    /**
+     * Optional Messenger where replies to this message can be sent.  The
+     * semantics of exactly how this is used are up to the sender and
+     * receiver.
+     */
+    public Messenger replyTo;
+
+    /**
+     * Optional field indicating the uid that sent the message.  This is
+     * only valid for messages posted by a {@link Messenger}; otherwise,
+     * it will be -1.
+     */
+    public int sendingUid = -1;
+    /*package*/ int flags;
+
+    /*package*/ long when;
+
+    /*package*/ Bundle data;
+
+    /*package*/ Handler target;
+
+    /*package*/ Runnable callback;
+
+    // sometimes we store linked lists of these things
+    /*package*/ Message next;
+}
 - AsyncTask
 ```
 
