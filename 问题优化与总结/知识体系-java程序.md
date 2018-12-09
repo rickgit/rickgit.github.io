@@ -219,7 +219,9 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 ```
 dx --dex --output=Hello.dex Hello.class
 
-javap -c -classpath . Hello
+javap -c  Hello.class
+
+javap –verbose Hello.class 可以看到更加清楚的信息
 ```
 运行时数据区：线程共用：方法区，堆；线程独立分配：栈，本地方法栈，程序计数器 
 ```
@@ -504,25 +506,95 @@ Generational Collection（分代收集）算法
 
 ####  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
 《Effect java》
-- 类与对象
-字段，方法，构造方法，方法参数
-包
-
-- 封装，继承，多态，父类与子类，重载与重写，与抽象类，访问修饰符
-this,super
+- 类与面向数据对象
+包，字段，方法名-返回值类型-参数列表，构造方法
 
 equals()，hashcode()，toString()
 ##### [hashcode() 基础知识](https://www.cnblogs.com/mengfanrong/p/4034950.html)
 混合hash （MD5）
 
-自动装箱和拆箱
+面向对象的三大特性，五大原则，23个设计模式
+- 封装（privated,protected,packaged,public,static,枚举类,内部类（静态，成员，局部，匿名），函数式接口（Lambda表达式），自动装箱和拆箱，日期）
+- 继承（extends,implements,this,super，final,抽象类，接口）
+- 多态 (继承,重写,父类引用指向子类对象)
+- 重载
 
-- 枚举类，接口，Lambda表达式，内部类
-- 反射，代理，注解接口，泛型
+```
+public enum NumEnum {
+ ONE;
+ }
+public final class NumEnum extends java.lang.Enum<NumEnum> {
+  public static final NumEnum ONE;
+  public static NumEnum[] values();
+  public static NumEnum valueOf(java.lang.String);
+  static {};
+}
+
+
+
+```
+- 反射（动态代理，注解接口），泛型
+
+
+1. 动态代理
+```
+public class Proxy implements java.io.Serializable {
+         /**
+     * the invocation handler for this proxy instance.
+     * @serial
+     */
+    protected InvocationHandler h;
+}
+
+sun.misc.ProxyGenerator#generateProxyClass(java.lang.String, java.lang.Class<?>[], int)//类信息转化为字节数组，在转化为代理Class对象。
+
+
+
+```
+
+```
+    static interface Animal{
+
+    }
+    static class Dog implements Animal{
+        @Override
+        public String toString() {
+            return "dog tostring()";
+        }
+    }
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        Animal proxy = (Animal) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Animal.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxyMethodNameLabel, Method method, Object[] args) throws Throwable {
+                System.out.println("before");
+                Object invoke = method.invoke(dog, args);
+                System.out.println(invoke);
+                System.out.println("after");
+                return invoke;
+            }
+        });
+//        System.out.println(proxy.toString());
+        proxy.toString();
+        System.out.println();
+    }
+
+```
+
+```
+@Retention(RetentionPolicy.RUNTIME)
+public @interface A {
+}
+
+编译后：
+
+public interface A extends java.lang.annotation.Annotation {
+}
+
+```
+
 1. 泛型：Generics in Java is similar to templates in C++.
 集合容器和网络请求经常用到
-
-2. 动态代理
 
 #### 异常，断言，日志
 
@@ -820,13 +892,6 @@ Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
 
 int newCapacity = (oldCapacity << 1) + 1;
 ```
-#### TreeMap
-红黑树排序
-
-初始容量 11
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍+1
-
 #### LinkedHashMap
 
 LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
@@ -875,24 +940,222 @@ newCap = oldCap << 1
 
 
 #### TreeMap
+红黑树排序
+
+初始容量 11
+加载因子（0.0~1.0）  0.75f
+扩容增量  一倍+1
+
 红黑树平衡调整
 二叉树搜索
-
-#### SortedMap
+```
+public class TreeMap<K, V> extends AbstractMap<K, V> implements NavigableMap<K, V>, Cloneable, Serializable {
+    private final Comparator<? super K> comparator;
+    private transient TreeMap.Entry<K, V> root;
+    private transient int size = 0;
+    private transient int modCount = 0;
+    private transient TreeMap<K, V>.EntrySet entrySet;
+    private transient TreeMap.KeySet<K> navigableKeySet;
+    private transient NavigableMap<K, V> descendingMap;
+}
+```
 Charset#availableCharsets():SortedMap
 
 
  
 ### 2.3 数据访问 - 流（IO, NIO）
 文件（xml,json），内存，网络，数据库
-
-字符与字节
+### BIO (阻塞 I/O)
+```
+基于字节操作的 I/O 接口：InputStream 和 OutputStream
+基于字符操作的 I/O 接口：Writer 和 Reader
+基于磁盘操作的 I/O 接口：File,RandomAccessFile
+基于网络操作的 I/O 接口：Socket
+```
 UTF-8 
-RandomAccessFile
+
+```
+public class FileInputStream extends InputStream
+{
+    /* File Descriptor - handle to the open file */
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private final FileDescriptor fd;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private FileChannel channel = null;
+
+    private final Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
+    private final boolean isFdOwner;
+
+    // Android-added: CloseGuard support.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+
+    // Android-added: Tracking of unbuffered I/O.
+    private final IoTracker tracker = new IoTracker();
+}
+
+
+public class FileOutputStream extends OutputStream
+{
+    /**
+     * The system dependent file descriptor.
+     */
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private final FileDescriptor fd;
+
+    /**
+     * True if the file is opened for append.
+     */
+    private final boolean append;
+
+    /**
+     * The associated channel, initialized lazily.
+     */
+    private FileChannel channel;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private final Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // Android-added: CloseGuard support: Log if the stream is not closed.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+
+    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
+    private final boolean isFdOwner;
+
+    // Android-added: Tracking of unbuffered I/O.
+    private final IoTracker tracker = new IoTracker();
+}
+public class InputStreamReader extends Reader {
+     private final StreamDecoder sd;//对FileInputStream编码
+}
+public class OutputStreamWriter extends Writer {
+    private final StreamEncoder se;
+}
+public class File implements Serializable, Comparable<File>
+{
+    /**
+     * This abstract pathname's normalized pathname string. A normalized
+     * pathname string uses the default name-separator character and does not
+     * contain any duplicate or redundant separators.
+     *
+     * @serial
+     */
+    private final String path;
+
+ 
+
+    /**
+     * The flag indicating whether the file path is invalid.
+     */
+    private transient PathStatus status = null;
+
+    /**
+     * The length of this abstract pathname's prefix, or zero if it has no
+     * prefix.
+     */
+    private final transient int prefixLength;
+
+    private volatile transient Path filePath;
+}
+public class RandomAccessFile implements DataOutput, DataInput, Closeable {
+
+    // BEGIN Android-added: CloseGuard and some helper fields for Android changes in this file.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+    private final byte[] scratch = new byte[8];
+
+    private int flushAfterWrite = FLUSH_NONE;
+
+    private int mode;
+    // END Android-added: CloseGuard and some helper fields for Android changes in this file.
+
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private FileDescriptor fd;
+    private FileChannel channel = null;
+    private boolean rw;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // BEGIN Android-added: IoTracker.
+    /**
+     * A single tracker to track both read and write. The tracker resets when the operation
+     * performed is different from the operation last performed.
+     */
+    private final IoTracker ioTracker = new IoTracker();
+    // END Android-added: IoTracker.
+}
+
+public class Socket implements Closeable {
+    private boolean created;
+    private boolean bound;
+    private boolean connected;
+    private boolean closed;
+    private Object closeLock;
+    private boolean shutIn;
+    private boolean shutOut;
+    SocketImpl impl;
+    private boolean oldImpl;
+}
+
+```
 
 #### NIO（BUffer,Channel ,Selector）
+IO是面向流的，NIO是面向缓冲区的。
 
-  
+Channel 和 Selector
+```
+public abstract class AbstractInterruptibleChannel
+    implements Channel, InterruptibleChannel
+{
+    private final Object closeLock = new Object();
+    private volatile boolean open = true;
+    private Interruptible interruptor;
+    private volatile Thread interrupted;
+
+}
+
+
+public abstract class AbstractSelector
+    extends Selector
+{
+    private AtomicBoolean selectorOpen = new AtomicBoolean(true);
+
+    // The provider that created this selector
+    private final SelectorProvider provider;
+    private final Set<SelectionKey> cancelledKeys = new HashSet<SelectionKey>();
+    private Interruptible interruptor = null;
+ []
+
+
+}
+
+```
 ### 2.4 数据并发访问 - 线程与并发
 线程初始化 Thread,Runnable
 线程的生命周期
