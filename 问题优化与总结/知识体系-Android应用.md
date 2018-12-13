@@ -11,34 +11,39 @@
 +-----------------------------------------------------------------------+
 |                       App Framework                                   |
 |                                                                       |
-|     Acti^ity Mgr        window Mgr    content pro^ider    View System |
 |                                                                       |
-|  Package Mgr     Tel Mgr      Res Mgr      Loc Mgr      Notify Mgr    |
+|  Activity Mgr    window Mgr    content provider       View System     |
 |                                                                       |
 |                                                                       |
+|  Package Mgr     Tel Mgr       Res Mgr     Loc Mgr    Notify Mgr      |
 |                                                                       |
 |                                                                       |
 +-------------------------------------------------+---------------------+
 |                  Libraries                      |  Android Runtime    |
 |                                                 |  +----------------+ |
 |  Surface Mgr     Media Framework    Sqlite      |  | core Libraries | |
-|                                                 |  | dal^ik ^m      | |
+|                                                 |  | dalvik vm      | |
 |  OpenGL+ES (3d)  FreeType           Webkit      |  +----------------+ |
 |                                                 +---------------------+
 |  SGL(Skia 2d)    SSL/TLS            libc                              |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
-|  Display Dri^er      Camera Dri^er   Flash Dri^er   Bind (IPC) Dri^er |
+|                                                                       |
+|  Display Driver   Camera Driver   Flash Driver   Bind (IPC) Driver    |
 |                      (V4L2)                                           |
-|  KeyPad Dri^er    WIFI Dri^er    Audio Dri^er   Power Management      |
+|                                                                       |
+|  KeyPad Driver    WIFI Driver    Audio Driver   Power Management      |
+|                                                                       |
+|  Bluetooth Driver   USB Driver                                        |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                                                                       |
-|                                  ^                                    |
-|  Loader +>Boot ROM+>Boot Loader+-+                                    |
+|                                        ^                              |
+|  Loader +--->Boot ROM+--->Boot Loader+-+                              |
 |                                                                       |
 +-----------------------------------------------------------------------+
+
 
 ```
 
@@ -47,15 +52,26 @@
 启动kthreadd进程（pid=2）：是Linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd，thermal等内核守护进程。kthreadd进程是所有内核进程的鼻祖
 --------------------- 
 [作者：硬刚平底锅 ] (https://blog.csdn.net/qq_30993595/article/details/82714409 )
-
+```
+>ps
+USER      PID   PPID  VSIZE  RSS   WCHAN            PC  NAME
+root      1     0     2732   1264     ep_poll 08126b05 S /init
+root      2     0     0      0       kthreadd 00000000 S kthreadd
+root      86    2     0      0     rescuer_th 00000000 S binder
+root      245   1     1543944 32436 poll_sched b72b7f70 S zygote
+system    618   245   1684724 70680    ep_poll b72b7ca5 S system_server （创建wms,ams,pms）
+system    231   1     4024   1360  binder_thr b753ae76 S /system/bin/servicemanager（管理service）
+root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflinger
+```
 《Linux设备驱动程序》
 《Android 开发艺术探索》
 基础知识：序列化和Binder
 Binder是misc设备上进行注册,作为虚拟字符设备。Binder transaction buffer，这块内存有一个大小限制，目前是1MB
 ```
  > ls -l /dev/
- crw-rw-rw- root     root      10,  54 2018-12-03 20:23 binder //c代表字符设备文件
-
+crw-rw-rw- root     root      10,  54 2018-12-03 20:23 binder //c代表字符设备文件
+drwxr-xr-x root     root              2018-12-13 15:15 input
+drwxr-xr-x root     root              2018-12-13 15:16 socket
 
 LINUX中的七种文件类型
 d 目录文件。
@@ -71,7 +87,7 @@ p 命名管道文件。
 ```
 Serializable->Parcelable->Binder->{AIDL,Messenger}
 
-AIDL 文件，方向指示符包括in、out、和inout；
+AIDL 文件，方向指示符包括in、out、和inout；AIDL 进程间通信,作用就是不同UID的 APP应用(也就是不同进程)可以实现通过 ADIL 生成的接口类,来调用对方APP的方法。
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
 binder是C/S架构，分为Bn端(Server)和Bp端(Client)
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
@@ -198,7 +214,29 @@ public class BaseBundle {
 - AIDL
 - Messenger(AIDL)
 - contentProvider（Binder）
-- socket（ Zygote通信）
+- socket（ 与Zygote通信）
+```
+root@x86:/ # ls /dev/socket/
+adbd
+cryptd
+dnsproxyd
+fwmarkd
+installd
+lmkd
+logd
+logdr
+logdw
+mdns
+netd
+property_service
+rild
+rild-debug
+sap_uim_socket1
+vold
+wpa_eth1
+zygote// zygote socket通信设备文件
+
+```
 ## Native Layer
 init进程会孵化出ueventd、logd、healthd、installd、adbd、lmkd等用户守护进程
 init进程还启动servicemanager(binder服务管家)、bootanim(开机动画)等重要服务
@@ -207,12 +245,139 @@ init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java�
 [作者：硬刚平底锅  ](https://blog.csdn.net/qq_30993595/article/details/82714409)
 
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
-### [图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
+
+
+
+### SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
 Canvas是一个2D的概念，是在Skia中定义的
 Skia 2D和OpenGL/ES 3D
 
 OpengGL/ES两个基本Java类： GLSurfaceView,Renderer
+[渲染流程线](https://blog.csdn.net/cpcpcp123/article/details/79942700?utm_source=blogxgwz8)
+UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU—-> GPU对图进行光栅化(Frame Rate ) —->硬件时钟(Refresh Rate)—-垂直同步—->投射到屏幕
+```
+root      229   1     46892  4392     ep_poll b749cca5 S /system/bin/surfaceflinger
+```
+SystemServer的RenderThread线程
+黄油计划：垂直同步(VSYNC 定时中断)、Triple Buffer和Choreographer（实现统一调度界面绘图。）
+黄油计划的核心VSYNC信号分为两种，一种是硬件生成（HardwareComposer）的信号，一种是软件模拟（VSyncThread来模拟）的信号。
+```
+                            VSync                 VSync                VSync           //Display为基准，VSync将其划分成16ms长度的时间段
+                               +                    +                    +
+          +-------------------------------------------------------------------------+
+          |                    |                    |                    |          |
+ Display  |                    |                    |                    |          |
+          +-------------------------------------------------------------------------+
+                               |                    |                    |
+                               |                    |                    |
+                               |                    |                    |
+          +-------+            +--------+           +------+             |
+CPU       | Frame1|            | Frame2 |           |Frame3|（GPU还熏染，CPU Frame占用中）|  //CPU/GPU的FPS不等同Display的FPS，需要三级缓存
+          +-------+            +--------+           +------+（使用第三块缓存）            |
+                               |                    |                    |
+                   +-----------+-+      +-----------+----+ +-----------+ |
+GPU                | Frame1      |      | Frame2         | | Frame3    | |
+                   +-----------+-+      +-----------+----+ +-----------+ |
+                               |                    |                    |
+                               |                    |                    |
+                               |                    |                    |
+                               |                    |                    |
+                               +                    +                    +
 
+```
+
+
+```
+    class EventHandler {
+        friend class HWComposer;
+    };
+```
+
+```
+base/core/java/android/view/ViewRootImpl.java:511:        mChoreographer = Choreographer.getInstance();
+
+public final class Choreographer {
+    private final Object mLock = new Object();
+
+    private final Looper mLooper;
+    private final FrameHandler mHandler;
+
+    // The display event receiver can only be accessed by the looper thread to which
+    // it is attached.  We take care to ensure that we post message to the looper
+    // if appropriate when interacting with the display event receiver.
+    private final FrameDisplayEventReceiver mDisplayEventReceiver;
+
+    private CallbackRecord mCallbackPool;
+
+    private final CallbackQueue[] mCallbackQueues;//"input", "animation", "traversal"（测量、布局、绘制流程）, "commit"（遍历完成的提交操作，用来修正动画启动时间）
+
+    private boolean mFrameScheduled;
+    private boolean mCallbacksRunning;
+    private long mLastFrameTimeNanos;
+    private long mFrameIntervalNanos;
+    private boolean mDebugPrintNextFrameTimeDelta;
+    private int mFPSDivisor = 1;
+
+    /**
+     * Contains information about the current frame for jank-tracking,
+     * mainly timings of key events along with a bit of metadata about
+     * view tree state
+     *
+     * TODO: Is there a better home for this? Currently Choreographer
+     * is the only one with CALLBACK_ANIMATION start time, hence why this
+     * resides here.
+     *
+     * @hide
+     */
+    FrameInfo mFrameInfo = new FrameInfo();
+}
+
+
+private static final class CallbackRecord {
+    public CallbackRecord next;
+    public long dueTime;
+    public Object action; // Runnable or FrameCallback
+    public Object token;
+}
+
+
+
+```
+
+
+```
+root@x86:/ # ls -l /dev/graphics/
+crw-rw---- root     graphics  29,   0 2018-12-13 15:15 fb0
+```
+
+
+```
+public class Surface implements Parcelable {
+
+    private final CloseGuard mCloseGuard = CloseGuard.get();
+
+    // Guarded state.
+    final Object mLock = new Object(); // protects the native state
+    private String mName;
+    long mNativeObject; // package scope only for SurfaceControl access
+    private long mLockedObject;
+    private int mGenerationId; // incremented each time mNativeObject changes
+    private final Canvas mCanvas = new CompatibleCanvas();
+
+    // A matrix to scale the matrix set by application. This is set to null for
+    // non compatibility mode.
+    private Matrix mCompatibleMatrix;
+
+    private HwuiContext mHwuiContext;
+
+    private boolean mIsSingleBuffered;
+    private boolean mIsSharedBufferModeEnabled;
+    private boolean mIsAutoRefreshEnabled;
+}
+
+```
+
+ 
 ## dalvik
 [支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
 Mark-sweep算法：还分为Sticky, Partial, Full，根据是否并行，又分为ConCurrent和Non-Concurrent
@@ -306,7 +471,53 @@ public class SparseArray<E> implements Cloneable {
 删除 数组设置为常量 DELETED（new Object()）
 gc  标记为DELETED，key,Value替换为有值的数据
 
-### Okio
+### 数据存储
+#### SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
+```
+final class SharedPreferencesImpl implements SharedPreferences {
+    private final File mFile;
+    private final File mBackupFile;
+    private final int mMode;
+    private final Object mLock = new Object();
+    private final Object mWritingToDiskLock = new Object();
+
+    @GuardedBy("mLock")
+    private Map<String, Object> mMap;
+    @GuardedBy("mLock")
+    private Throwable mThrowable;
+
+    @GuardedBy("mLock")
+    private int mDiskWritesInFlight = 0;
+
+    @GuardedBy("mLock")
+    private boolean mLoaded = false;
+
+    @GuardedBy("mLock")
+    private StructTimespec mStatTimestamp;
+
+    @GuardedBy("mLock")
+    private long mStatSize;
+
+    @GuardedBy("mLock")
+    private final WeakHashMap<OnSharedPreferenceChangeListener, Object> mListeners =
+            new WeakHashMap<OnSharedPreferenceChangeListener, Object>();
+
+    /** Current memory state (always increasing) */
+    @GuardedBy("this")
+    private long mCurrentMemoryStateGeneration;
+
+    /** Latest memory state that was committed to disk */
+    @GuardedBy("mWritingToDiskLock")
+    private long mDiskStateGeneration;
+
+    /** Time (and number of instances) of file-system sync requests */
+    @GuardedBy("mWritingToDiskLock")
+    private final ExponentiallyBucketedHistogram mSyncTimes = new ExponentiallyBucketedHistogram(16);
+    private int mNumSync = 0;
+}
+```
+#### RPC - Protocol Buffer
+#### OKIO
 Source（io InputStream）,Sink（io OutputStream）,Buffer（io BufferedInputStream,BufferedOutputStream）
 ```
 public class ByteString implements Serializable, Comparable<ByteString> {
@@ -330,10 +541,23 @@ Zygote进程启动后，加载ZygoteInit类，注册Zygote Socket服务端套接
 System Server进程，是由Zygote进程fork而来，System Server是Zygote孵化的第一个进程，System Server负责启动和管理整个Java framework，包含ActivityManager，PowerManager等服务
 Media Server进程，是由init进程fork而来，负责启动和管理整个C++ framework，包含AudioFlinger，Camera Service等服务
 
+### SystemServer - InputManagerService
+ [事件](https://www.jianshu.com/p/b7cef3b3e703)
+ InputDispatcher线程
+InputReader
+
+ANR 事件 resetANRTimeoutsLocked
+### SystemServer - ActivityManagerService
+### SystemServer - WindowsManagerService
+### SystemServer - PackageManagerService
 
 
 ## 应用层
-Context
+### 应用进程创建过程
+
+
+
+### Context
 ```
 public abstract class Context {
 }
@@ -1192,8 +1416,8 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
 ```
 
-[渲染流程线](https://blog.csdn.net/cpcpcp123/article/details/79942700?utm_source=blogxgwz8)
-UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU—-> GPU对图进行光栅化(Frame Rate ) —->硬件时钟(Refresh Rate)—-垂直同步—->投射到屏幕
+
+
 
 
 Activity->PhoneWindow
