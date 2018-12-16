@@ -33,7 +33,7 @@
 |  Display Driver   Camera Driver   Flash Driver   Bind (IPC) Driver    |
 |                      (V4L2)                                           |
 |                                                                       |
-|  KeyPad Driver    WIFI Driver    Audio Driver   Power Management      |
+|  KeyPad Driver    WIFI Driver     Audio Driver   Power Management      |
 |                                                                       |
 |  Bluetooth Driver   USB Driver                                        |
 |                                                                       |
@@ -245,8 +245,128 @@ init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java�
 [作者：硬刚平底锅  ](https://blog.csdn.net/qq_30993595/article/details/82714409)
 
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
+### OpenGL ES
+skia 图形引擎
+[Canvas的底层是用 Skia 的库，cpu绘制](https://zhuanlan.zhihu.com/p/30453831)
+[freetype 字体渲染](https://learnopengl-cn.readthedocs.io/zh/latest/06%20In%20Practice/02%20Text%20Rendering/)
+[基本数据类型](https://segmentfault.com/a/1190000017246734)
+[ OpenGL ES 和 OpenGL ES 库的区别](https://woshijpf.github.io/android/2017/09/05/Android系统图形栈OpenGLES和EGL库的加载过程.html)
+```
+public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
+    private final WeakReference<GLSurfaceView> mThisWeakRef = new WeakReference<GLSurfaceView>(this);
+    private GLThread mGLThread;
+    private Renderer mRenderer;
+    private boolean mDetached;
+    private EGLConfigChooser mEGLConfigChooser;
+    private EGLContextFactory mEGLContextFactory;
+    private EGLWindowSurfaceFactory mEGLWindowSurfaceFactory;
+    private GLWrapper mGLWrapper;
+    private int mDebugFlags;
+    private int mEGLContextClientVersion;
+    private boolean mPreserveEGLContextOnPause;
+}
+```
+### Media Framework
+
+```
++------------------------------------------------------+
+|                                                      |
+|        MediaPlayer.java                              |
+|                                                      |
++------------------------------------------------------+
+|                                                      |
+|        android_media_player.cpp  (libmedia_jni.so)   |
+|                                                      |
++------------------------------------------------------+
+|                                                      |
+|        MediaPlayer.cpp           (libmedia.so)       |
+|                                                      |
++------------------------------------------------------+
+|                                                      |
+|        HTTP / RTSP / HTTPLive                        |
+|                                                      |
++------------------------------------------------------+
+|                          +---------------------------+
+|        Stagefright       |       NuPlayer            |
+|                          |                           |
+|                          |                           |
++--------------------------+---------------------------+
+
+```
+
+```
+public class MediaPlayer extends PlayerBase
+                         implements SubtitleController.Listener
+                                  , VolumeAutomation
+                                  , AudioRouting
+{
+
+    private long mNativeContext; // accessed by native methods
+    private long mNativeSurfaceTexture;  // accessed by native methods
+    private int mListenerContext; // accessed by native methods
+    private SurfaceHolder mSurfaceHolder;
+    private EventHandler mEventHandler;
+    private PowerManager.WakeLock mWakeLock = null;
+    private boolean mScreenOnWhilePlaying;
+    private boolean mStayAwake;
+    private int mStreamType = AudioManager.USE_DEFAULT_STREAM_TYPE;
+    private int mUsage = -1;
+    private boolean mBypassInterruptionPolicy;
+
+    // Modular DRM
+    private UUID mDrmUUID;
+    private final Object mDrmLock = new Object();
+    private DrmInfo mDrmInfo;
+    private MediaDrm mDrmObj;
+    private byte[] mDrmSessionId;
+    private boolean mDrmInfoResolved;
+    private boolean mActiveDrmScheme;
+    private boolean mDrmConfigAllowed;
+    private boolean mDrmProvisioningInProgress;
+    private boolean mPrepareDrmInProgress;
+    private ProvisioningThread mDrmProvisioningThread;
+
+    private AudioDeviceInfo mPreferredDevice = null;
+    private ArrayMap<AudioRouting.OnRoutingChangedListener,
+            NativeRoutingEventHandlerDelegate> mRoutingChangeListeners = new ArrayMap<>();
+    // We would like domain specific classes with more informative names than the `first` and `second`
+    // in generic Pair, but we would also like to avoid creating new/trivial classes. As a compromise
+    // we document the meanings of `first` and `second` here:
+    //
+    // Pair.first - inband track index; non-null iff representing an inband track.
+    // Pair.second - a SubtitleTrack registered with mSubtitleController; non-null iff representing
+    //               an inband subtitle track or any out-of-band track (subtitle or timedtext).
+    private Vector<Pair<Integer, SubtitleTrack>> mIndexTrackPairs = new Vector<>();
+    private BitSet mInbandTrackIndices = new BitSet();
+
+    private SubtitleController mSubtitleController;
+    private int mSelectedSubtitleTrackIndex = -1;
+    private Vector<InputStream> mOpenSubtitleSources;
+
+    private final OnSubtitleDataListener mIntSubtitleDataListener = new OnSubtitleDataListener() ;
+ 
+    private TimeProvider mTimeProvider;
+    private OnPreparedListener mOnPreparedListener;
+    private OnCompletionListener mOnCompletionListener;
+   private final OnCompletionListener mOnCompletionInternalListener = new OnCompletionListener();
+
+       private OnBufferingUpdateListener mOnBufferingUpdateListener;
+    private OnSeekCompleteListener mOnSeekCompleteListener;
+    private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+    private OnTimedTextListener mOnTimedTextListener;
+    private boolean mSubtitleDataListenerDisabled;
+    /** External OnSubtitleDataListener, the one set by {@link #setOnSubtitleDataListener}. */
+    private OnSubtitleDataListener mExtSubtitleDataListener;
+    private Handler mExtSubtitleDataHandler;
+
+    private OnMediaTimeDiscontinuityListener mOnMediaTimeDiscontinuityListener;
+    private Handler mOnMediaTimeDiscontinuityHandler;
+        private OnTimedMetaDataAvailableListener mOnTimedMetaDataAvailableListener;
+    private OnErrorListener mOnErrorListener;
 
 
+}
+```
 
 ### SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
 Canvas是一个2D的概念，是在Skia中定义的
@@ -272,8 +392,8 @@ SystemServer的RenderThread线程
                                |                    |                    |
                                |                    |                    |
           +-------+            +--------+           +------+             |
-CPU       | Frame1|            | Frame2 |           |Frame3|（GPU还熏染，CPU Frame占用中）|  //CPU/GPU的FPS不等同Display的FPS，需要三级缓存
-          +-------+            +--------+           +------+（使用第三块缓存）            |
+CPU       | Frame1|            | Frame2 |           |Frame3|（前一个CPU Frame占用中）|  //CPU/GPU的FPS不等同Display的FPS，需要三级缓存
+          +-------+            +--------+           +------+（使用第三块缓存）       |
                                |                    |                    |
                    +-----------+-+      +-----------+----+ +-----------+ |
 GPU                | Frame1      |      | Frame2         | | Frame3    | |
@@ -542,16 +662,562 @@ System Server进程，是由Zygote进程fork而来，System Server是Zygote孵�
 Media Server进程，是由init进程fork而来，负责启动和管理整个C++ framework，包含AudioFlinger，Camera Service等服务
 
 ### SystemServer - InputManagerService
- [事件](https://www.jianshu.com/p/b7cef3b3e703)
- InputDispatcher线程
-InputReader
+ [事件](http://gityuan.com/2016/12/31/input-ipc/)
+- InputReader线程：通过EventHub从/dev/input节点获取事件，转换成EventEntry事件加入到InputDispatcher的mInboundQueue。EventHub采用INotify + epoll机制
+
+- InputDispatcher线程：从mInboundQueue队列取出事件，转换成DispatchEntry事件加入到connection的outboundQueue队列。再然后开始处理分发事件，取出outbound队列，放入waitQueue.InputChannel.sendMessage通过socket方式将消息发送给远程进程；
+
+- UI线程：创建socket pair，分别位于”InputDispatcher”线程和focused窗口所在进程的UI主线程，可相互通信。 
+UI主线程：通过setFdEvents()， 监听socket客户端，收到消息后回调NativeInputEventReceiver();【见小节2.1】
+“InputDispatcher”线程： 通过IMS.registerInputChannel()，监听socket服务端，收到消息后回调handleReceiveCallback；【见小节3.1】
+```
+
+ViewRootImpl的setView()过程:
+    创建socket pair，作为InputChannel: 
+        socket服务端保存到system_server中的WindowState的mInputChannel；
+        socket客户端通过binder传回到远程进程的UI主线程ViewRootImpl的mInputChannel；
+    IMS.registerInputChannel()注册InputChannel，监听socket服务端： 
+        Loop便是“InputDispatcher”线程的Looper;
+        回调方法handleReceiveCallback。
+
+```
+
+
+
 
 ANR 事件 resetANRTimeoutsLocked
-### SystemServer - ActivityManagerService
+
+
+```
+struct RawEvent {
+    nsecs_t when;
+    int32_t deviceId;
+    int32_t type;
+    int32_t code;
+    int32_t value;
+};
+
+
+```
 ### SystemServer - WindowsManagerService
+
+启动 涉及“android.display”（DisplayThread）, “android.ui”线程（PolicyHandler）
+```
+base/services/java/com/android/server/SystemServer.java:671:    private void startOtherServices() {
+}
+
+
+public class WindowManagerService extends IWindowManager.Stub
+        implements Watchdog.Monitor, WindowManagerPolicy.WindowManagerFuncs {
+    final WindowTracing mWindowTracing;
+
+    final private KeyguardDisableHandler mKeyguardDisableHandler;
+    // TODO: eventually unify all keyguard state in a common place instead of having it spread over
+    // AM's KeyguardController and the policy's KeyguardServiceDelegate.
+    boolean mKeyguardGoingAway;
+    boolean mKeyguardOrAodShowingOnDefaultDisplay;
+    // VR Vr2d Display Id.
+    int mVr2dDisplayId = INVALID_DISPLAY;
+
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()) {
+                case ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED:
+                    mKeyguardDisableHandler.sendEmptyMessage(KEYGUARD_POLICY_CHANGED);
+                    break;
+            }
+        }
+    };
+    final WindowSurfacePlacer mWindowPlacerLocked;
+
+    private final PriorityDump.PriorityDumper mPriorityDumper = new PriorityDump.PriorityDumper() {
+        @Override
+        public void dumpCritical(FileDescriptor fd, PrintWriter pw, String[] args,
+                boolean asProto) {
+            doDump(fd, pw, new String[] {"-a"}, asProto);
+        }
+
+        @Override
+        public void dump(FileDescriptor fd, PrintWriter pw, String[] args, boolean asProto) {
+            doDump(fd, pw, args, asProto);
+        }
+    };
+
+    /**
+     * Current user when multi-user is enabled. Don't show windows of
+     * non-current user. Also see mCurrentProfileIds.
+     */
+    int mCurrentUserId;
+    /**
+     * Users that are profiles of the current user. These are also allowed to show windows
+     * on the current user.
+     */
+    int[] mCurrentProfileIds = new int[] {};
+
+    final Context mContext;
+
+    final boolean mHaveInputMethods;
+
+    final boolean mHasPermanentDpad;
+    final long mDrawLockTimeoutMillis;
+    final boolean mAllowAnimationsInLowPowerMode;
+
+    final boolean mAllowBootMessages;
+
+    final boolean mLimitedAlphaCompositing;
+    final int mMaxUiWidth;
+
+    final WindowManagerPolicy mPolicy;
+
+    final IActivityManager mActivityManager;
+    final ActivityManagerInternal mAmInternal;
+
+    final AppOpsManager mAppOps;
+    final PackageManagerInternal mPmInternal;
+
+    final DisplaySettings mDisplaySettings;
+
+    /** If the system should display notifications for apps displaying an alert window. */
+    boolean mShowAlertWindowNotifications = true;
+
+    /**
+     * All currently active sessions with clients.
+     */
+    final ArraySet<Session> mSessions = new ArraySet<>();
+
+    /**
+     * Mapping from an IWindow IBinder to the server's Window object.
+     * This is also used as the lock for all of our state.
+     * NOTE: Never call into methods that lock ActivityManagerService while holding this object.
+     */
+    final WindowHashMap mWindowMap = new WindowHashMap();
+
+    /**
+     * List of window tokens that have finished starting their application,
+     * and now need to have the policy remove their windows.
+     */
+    final ArrayList<AppWindowToken> mFinishedStarting = new ArrayList<>();
+
+    /**
+     * List of app window tokens that are waiting for replacing windows. If the
+     * replacement doesn't come in time the stale windows needs to be disposed of.
+     */
+    final ArrayList<AppWindowToken> mWindowReplacementTimeouts = new ArrayList<>();
+
+    /**
+     * Windows that are being resized.  Used so we can tell the client about
+     * the resize after closing the transaction in which we resized the
+     * underlying surface.
+     */
+    final ArrayList<WindowState> mResizingWindows = new ArrayList<>();
+
+    /**
+     * Windows whose animations have ended and now must be removed.
+     */
+    final ArrayList<WindowState> mPendingRemove = new ArrayList<>();
+
+    /**
+     * Used when processing mPendingRemove to avoid working on the original array.
+     */
+    WindowState[] mPendingRemoveTmp = new WindowState[20];
+
+    /**
+     * Windows whose surface should be destroyed.
+     */
+    final ArrayList<WindowState> mDestroySurface = new ArrayList<>();
+
+    /**
+     * Windows with a preserved surface waiting to be destroyed. These windows
+     * are going through a surface change. We keep the old surface around until
+     * the first frame on the new surface finishes drawing.
+     */
+    final ArrayList<WindowState> mDestroyPreservedSurface = new ArrayList<>();
+
+    /**
+     * Windows that have lost input focus and are waiting for the new
+     * focus window to be displayed before they are told about this.
+     */
+    ArrayList<WindowState> mLosingFocus = new ArrayList<>();
+
+    /**
+     * This is set when we have run out of memory, and will either be an empty
+     * list or contain windows that need to be force removed.
+     */
+    final ArrayList<WindowState> mForceRemoves = new ArrayList<>();
+
+    /**
+     * Windows that clients are waiting to have drawn.
+     */
+    ArrayList<WindowState> mWaitingForDrawn = new ArrayList<>();
+    /**
+     * And the callback to make when they've all been drawn.
+     */
+    Runnable mWaitingForDrawnCallback;
+
+    /** List of window currently causing non-system overlay windows to be hidden. */
+    private ArrayList<WindowState> mHidingNonSystemOverlayWindows = new ArrayList<>();
+
+    IInputMethodManager mInputMethodManager;
+
+    AccessibilityController mAccessibilityController;
+    private RecentsAnimationController mRecentsAnimationController;
+
+    Watermark mWatermark;
+    StrictModeFlash mStrictModeFlash;
+    CircularDisplayMask mCircularDisplayMask;
+    EmulatorDisplayOverlay mEmulatorDisplayOverlay;
+
+    final float[] mTmpFloats = new float[9];
+    final Rect mTmpRect = new Rect();
+    final Rect mTmpRect2 = new Rect();
+    final Rect mTmpRect3 = new Rect();
+    final RectF mTmpRectF = new RectF();
+
+    final Matrix mTmpTransform = new Matrix();
+
+    boolean mDisplayReady;
+    boolean mSafeMode;
+    boolean mDisplayEnabled = false;
+    boolean mSystemBooted = false;
+    boolean mForceDisplayEnabled = false;
+    boolean mShowingBootMessages = false;
+    boolean mBootAnimationStopped = false;
+
+    // Following variables are for debugging screen wakelock only.
+    WindowState mLastWakeLockHoldingWindow = null;
+    WindowState mLastWakeLockObscuringWindow = null;
+
+    /** Dump of the windows and app tokens at the time of the last ANR. Cleared after
+     * LAST_ANR_LIFETIME_DURATION_MSECS */
+    String mLastANRState;
+
+    // The root of the device window hierarchy.
+    RootWindowContainer mRoot;
+
+    int mDockedStackCreateMode = SPLIT_SCREEN_CREATE_MODE_TOP_OR_LEFT;
+    Rect mDockedStackCreateBounds;
+
+    boolean mForceResizableTasks = false;
+    boolean mSupportsPictureInPicture = false;
+
+    boolean mDisableTransitionAnimation = false;
+
+
+    ArrayList<RotationWatcher> mRotationWatchers = new ArrayList<>();
+    int mDeferredRotationPauseCount;
+    final WallpaperVisibilityListeners mWallpaperVisibilityListeners =
+            new WallpaperVisibilityListeners();
+
+    int mSystemDecorLayer = 0;
+    final Rect mScreenRect = new Rect();
+
+    boolean mDisplayFrozen = false;
+    long mDisplayFreezeTime = 0;
+    int mLastDisplayFreezeDuration = 0;
+    Object mLastFinishedFreezeSource = null;
+    boolean mWaitingForConfig = false;
+    boolean mSwitchingUser = false;
+
+    int mWindowsFreezingScreen = WINDOWS_FREEZING_SCREENS_NONE;
+
+    boolean mClientFreezingScreen = false;
+    int mAppsFreezingScreen = 0;
+
+    // Last systemUiVisibility we received from status bar.
+    int mLastStatusBarVisibility = 0;
+    // Last systemUiVisibility we dispatched to windows.
+    int mLastDispatchedSystemUiVisibility = 0;
+
+    // State while inside of layoutAndPlaceSurfacesLocked().
+    boolean mFocusMayChange;
+
+    // This is held as long as we have the screen frozen, to give us time to
+    // perform a rotation animation when turning off shows the lock screen which
+    // changes the orientation.
+    private final PowerManager.WakeLock mScreenFrozenLock;
+
+    final AppTransition mAppTransition;
+    boolean mSkipAppTransitionAnimation = false;
+
+    final ArraySet<AppWindowToken> mOpeningApps = new ArraySet<>();
+    final ArraySet<AppWindowToken> mClosingApps = new ArraySet<>();
+
+    final UnknownAppVisibilityController mUnknownAppVisibilityController =
+            new UnknownAppVisibilityController(this);
+    final TaskSnapshotController mTaskSnapshotController;
+
+    boolean mIsTouchDevice;
+
+    final H mH = new H();
+
+    /**
+     * Handler for things to run that have direct impact on an animation, i.e. animation tick,
+     * layout, starting window creation, whereas {@link H} runs things that are still important, but
+     * not as critical.
+     */
+    final Handler mAnimationHandler = new Handler(AnimationThread.getHandler().getLooper());
+
+    WindowState mCurrentFocus = null;
+    WindowState mLastFocus = null;
+
+    /** Windows added since {@link #mCurrentFocus} was set to null. Used for ANR blaming. */
+    private final ArrayList<WindowState> mWinAddedSinceNullFocus = new ArrayList<>();
+    /** Windows removed since {@link #mCurrentFocus} was set to null. Used for ANR blaming. */
+    private final ArrayList<WindowState> mWinRemovedSinceNullFocus = new ArrayList<>();
+
+    /** This just indicates the window the input method is on top of, not
+     * necessarily the window its input is going to. */
+    WindowState mInputMethodTarget = null;
+
+    /** If true hold off on modifying the animation layer of mInputMethodTarget */
+    boolean mInputMethodTargetWaitingAnim;
+
+    WindowState mInputMethodWindow = null;
+
+    boolean mHardKeyboardAvailable;
+    WindowManagerInternal.OnHardKeyboardStatusChangeListener mHardKeyboardStatusChangeListener;
+    SettingsObserver mSettingsObserver;
+
+    /**
+     * A count of the windows which are 'seamlessly rotated', e.g. a surface
+     * at an old orientation is being transformed. We freeze orientation updates
+     * while any windows are seamlessly rotated, so we need to track when this
+     * hits zero so we can apply deferred orientation updates.
+     */
+    private int mSeamlessRotationCount = 0;
+    /**
+     * True in the interval from starting seamless rotation until the last rotated
+     * window draws in the new orientation.
+     */
+    private boolean mRotatingSeamlessly = false;
+ 
+
+    // TODO: Move to RootWindowContainer
+    AppWindowToken mFocusedApp = null;
+
+    PowerManager mPowerManager;
+    PowerManagerInternal mPowerManagerInternal;
+
+    private float mWindowAnimationScaleSetting = 1.0f;
+    private float mTransitionAnimationScaleSetting = 1.0f;
+    private float mAnimatorDurationScaleSetting = 1.0f;
+    private boolean mAnimationsDisabled = false;
+
+    final InputManagerService mInputManager;
+    final DisplayManagerInternal mDisplayManagerInternal;
+    final DisplayManager mDisplayManager;
+
+    // Indicates whether this device supports wide color gamut rendering
+    private boolean mHasWideColorGamutSupport;
+
+    // Who is holding the screen on.
+    private Session mHoldingScreenOn;
+    private PowerManager.WakeLock mHoldingScreenWakeLock;
+
+    // Whether or not a layout can cause a wake up when theater mode is enabled.
+    boolean mAllowTheaterModeWakeFromLayout;
+
+    final TaskPositioningController mTaskPositioningController;
+    final DragDropController mDragDropController;
+
+    // For frozen screen animations.
+    private int mExitAnimId, mEnterAnimId;
+
+    // The display that the rotation animation is applying to.
+    private int mFrozenDisplayId;
+
+    /** Skip repeated AppWindowTokens initialization. Note that AppWindowsToken's version of this
+     * is a long initialized to Long.MIN_VALUE so that it doesn't match this value on startup. */
+    int mTransactionSequence;
+
+    final WindowAnimator mAnimator;
+    final SurfaceAnimationRunner mSurfaceAnimationRunner;
+
+    /**
+     * Keeps track of which animations got transferred to which animators. Entries will get cleaned
+     * up when the animation finishes.
+     */
+    final ArrayMap<AnimationAdapter, SurfaceAnimator> mAnimationTransferMap = new ArrayMap<>();
+    final BoundsAnimationController mBoundsAnimationController;
+
+    private final PointerEventDispatcher mPointerEventDispatcher;
+
+    private WindowContentFrameStats mTempWindowRenderStats;
+
+    private final LatencyTracker mLatencyTracker;
+
+    /**
+     * Whether the UI is currently running in touch mode (not showing
+     * navigational focus because the user is directly pressing the screen).
+     */
+    boolean mInTouchMode;
+
+    private ViewServer mViewServer;
+    final ArrayList<WindowChangeListener> mWindowChangeListeners = new ArrayList<>();
+    boolean mWindowsChanged = false;
+
+    final Configuration mTempConfiguration = new Configuration();
+
+    // If true, only the core apps and services are being launched because the device
+    // is in a special boot mode, such as being encrypted or waiting for a decryption password.
+    // For example, when this flag is true, there will be no wallpaper service.
+    final boolean mOnlyCore;
+
+    // List of clients without a transtiton animation that we notify once we are done transitioning
+    // since they won't be notified through the app window animator.
+    final List<IBinder> mNoAnimationNotifyOnTransitionFinished = new ArrayList<>();
+
+    SurfaceBuilderFactory mSurfaceBuilderFactory = SurfaceControl.Builder::new;
+    TransactionFactory mTransactionFactory = SurfaceControl.Transaction::new;
+
+    private final SurfaceControl.Transaction mTransaction = mTransactionFactory.make();
+
+    final WindowManagerInternal.AppTransitionListener mActivityManagerAppTransitionNotifier
+            = new WindowManagerInternal.AppTransitionListener();
+
+    final ArrayList<AppFreezeListener> mAppFreezeListeners = new ArrayList<>();
+
+    final InputMonitor mInputMonitor = new InputMonitor(this);
+    private boolean mEventDispatchingEnabled;
+
+    MousePositionTracker mMousePositionTracker = new MousePositionTracker();
+}
+```
+### SystemServer - ActivityManagerService
+public class ActivityManagerService extends IActivityManager.Stub
+        implements Watchdog.Monitor, BatteryStatsImpl.BatteryCallback {
+    /** All system services */
+    SystemServiceManager mSystemServiceManager;
+
+    // Wrapper around VoiceInteractionServiceManager
+    private AssistUtils mAssistUtils;
+
+    // Keeps track of the active voice interaction service component, notified from
+    // VoiceInteractionManagerService
+    ComponentName mActiveVoiceInteractionServiceComponent;
+
+    private Installer mInstaller;
+
+    /** Run all ActivityStacks through this */
+    final ActivityStackSupervisor mStackSupervisor;
+    private final KeyguardController mKeyguardController;
+
+    private final ActivityStartController mActivityStartController;
+
+    private final ClientLifecycleManager mLifecycleManager;
+
+    final TaskChangeNotificationController mTaskChangeNotificationController;
+
+    final InstrumentationReporter mInstrumentationReporter = new InstrumentationReporter();
+
+    final ArrayList<ActiveInstrumentation> mActiveInstrumentation = new ArrayList<>();
+
+    public final IntentFirewall mIntentFirewall;
+
+    // Whether we should show our dialogs (ANR, crash, etc) or just perform their
+    // default action automatically.  Important for devices without direct input
+    // devices.
+    private boolean mShowDialogs = true;
+
+    private final VrController mVrController;
+
+    // VR Vr2d Display Id.
+    int mVr2dDisplayId = INVALID_DISPLAY;
+
+    // Whether we should use SCHED_FIFO for UI and RenderThreads.
+    private boolean mUseFifoUiScheduling = false;
+
+
+    BroadcastQueue mFgBroadcastQueue;
+    BroadcastQueue mBgBroadcastQueue;
+    // Convenient for easy iteration over the queues. Foreground is first
+    // so that dispatch of foreground broadcasts gets precedence.
+    final BroadcastQueue[] mBroadcastQueues = new BroadcastQueue[2];
+
+    BroadcastStats mLastBroadcastStats;
+    BroadcastStats mCurBroadcastStats;
+
+
+    /**
+     * The last resumed activity. This is identical to the current resumed activity most
+     * of the time but could be different when we're pausing one activity before we resume
+     * another activity.
+     */
+    private ActivityRecord mLastResumedActivity;
+
+    /**
+     * The activity that is currently being traced as the active resumed activity.
+     *
+     * @see #updateResumedAppTrace
+     */
+    private @Nullable ActivityRecord mTracedResumedActivity;
+
+    /**
+     * If non-null, we are tracking the time the user spends in the currently focused app.
+     */
+    private AppTimeTracker mCurAppTimeTracker;
+
+    /**
+     * List of intents that were used to start the most recent tasks.
+     */
+    private final RecentTasks mRecentTasks;
+
+    /**
+     * The package name of the DeviceOwner. This package is not permitted to have its data cleared.
+     */
+    String mDeviceOwnerName;
+
+    /**
+     * The controller for all operations related to locktask.
+     */
+    private final LockTaskController mLockTaskController;
+
+    final UserController mUserController;
+
+    /**
+     * Packages that are being allowed to perform unrestricted app switches.  Mapping is
+     * User -> Type -> uid.
+     */
+    final SparseArray<ArrayMap<String, Integer>> mAllowAppSwitchUids = new SparseArray<>();
+
+    final AppErrors mAppErrors;
+
+    final AppWarnings mAppWarnings;
+
+    /**
+     * Dump of the activity state at the time of the last ANR. Cleared after
+     * {@link WindowManagerService#LAST_ANR_LIFETIME_DURATION_MSECS}
+     */
+    String mLastANRState;
+
+    /**
+     * Indicates the maximum time spent waiting for the network rules to get updated.
+     */
+    @VisibleForTesting
+    long mWaitForNetworkTimeoutMs;
+
+    /** Total # of UID change events dispatched, shown in dumpsys. */
+    int mUidChangeDispatchCount;
+
+
+
+    /**
+     * Helper class which strips out priority and proto arguments then calls the dump function with
+     * the appropriate arguments. If priority arguments are omitted, function calls the legacy
+     * dump command.
+     * If priority arguments are omitted all sections are dumped, otherwise sections are dumped
+     * according to their priority.
+     */
+    private final PriorityDump.PriorityDumper mPriorityDumper = new PriorityDump.PriorityDumper()
+
+...
+...
+...
+}
 ### SystemServer - PackageManagerService
 
-
+   
 ## 应用层
 ### 应用进程创建过程
 
@@ -697,7 +1363,7 @@ public class Activity extends ContextThemeWrapper
         OnCreateContextMenuListener, ComponentCallbacks2,
         Window.OnWindowDismissedCallback, WindowControllerCallback,
         AutofillManager.AutofillClient {
- private SparseArray<ManagedDialog> mManagedDialogs;
+    private SparseArray<ManagedDialog> mManagedDialogs;
 
     // set by the thread after the constructor and before onCreate(Bundle savedInstanceState) is called.
     private Instrumentation mInstrumentation;
