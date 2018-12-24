@@ -12,10 +12,10 @@
 |                       App Framework                                   |
 |                                                                       |
 |                                                                       |
-|  Activity Mgr    window Mgr    content provider       View System     |
+|  AMS             WMS           content provider       View System     |
 |                                                                       |
 |                                                                       |
-|  Package Mgr     Tel Mgr       Res Mgr     Loc Mgr    Notify Mgr      |
+|  PMS             Tel Mgr       Res Mgr     Loc Mgr    Notify Mgr      |
 |                                                                       |
 |                                                                       |
 +-------------------------------------------------+---------------------+
@@ -25,7 +25,7 @@
 |                                                 |  | dalvik vm      | |
 |  OpenGL+ES (3d)  FreeType           Webkit      |  +----------------+ |
 |                                                 +---------------------+
-|  SGL(Skia 2d)    SSL/TLS            libc                              |
+|  SGL(Skia 2d)    SSL/TLS            libc(bionic)                      |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
@@ -62,7 +62,52 @@ root      245   1     1543944 32436 poll_sched b72b7f70 S zygote
 system    618   245   1684724 70680    ep_poll b72b7ca5 S system_server （创建wms,ams,pms）
 system    231   1     4024   1360  binder_thr b753ae76 S /system/bin/servicemanager（管理service）
 root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflinger
+
+
+
 ```
+
+[Android Init进程源码分析](https://blog.csdn.net/yangwen123/article/details/9029959)
+```
+   +---------------------+
+   |  start_kernel(void) |
+   +---------+-----------+
+             v
+
+   +---------------------+
+   |  reset_init(void)   +--------------+-----------------------------+
+   +---------------------+              |                             |
+                                        |                             |
+                                        v                             v
+
+                           +---------------------+      +---------------------------+
+                           | Init Process        |      |    KThread Process        |
+                           |                     |      |                           |
+                           |                     |      |                           |
++------------------+       |                     |      |                           |
+| zygote Process   |       |                     |      |                           |
+|                  |       |                     |      |                           |
+|                  |  <----+                     |      |                           |
+|                  |       |                     |      |                           |
+|                  |       |                     |      |                           |
+|                  |       |                     |      |                           |
+| +--------------+ |       |   +---------------+ |      |                           |
+| |system_server | |       |   |Service Manager| |      |                           |
+| +--------------+ |       |   +---------------+ |      |                           |
+| |              | |       |   +---------------+ |      |                           |
+| | AMS,WMS,PMS..| |       |   | mediaserver   | |      |                           |
+| | ServerThread | |       |   +---------------+ |      |                           |
+| +--------------+ |       |                     |      |                           |
+|                  |       |                     |      |                           |
+|                  |       |                     |      |                           |
+|                  |       |                     |      |                           |
++------------------+       +---------------------+      +---------------------------+
+
+  Java Process                 Native Process                Kernel Driver Thread
+
+
+```
+
 《Linux设备驱动程序》
 《Android 开发艺术探索》
 基础知识：序列化和Binder
@@ -179,6 +224,25 @@ public class Binder implements IBinder {//三个非静态字段
     private String mDescriptor;//表示AIDL的接口名：edu.ptu.java.aidl.IMyAidlInterface
 }
 
+
+public final class Parcel {
+    private long mNativePtr; // used by native code
+
+    /**
+     * Flag indicating if {@link #mNativePtr} was allocated by this object,
+     * indicating that we're responsible for its lifecycle.
+     */
+    private boolean mOwnsNativeParcelObject;
+    private long mNativeSize;
+
+    private ArrayMap<Class, Object> mClassCookies;
+
+    private RuntimeException mStack;
+
+    private ReadWriteHelper mReadWriteHelper = ReadWriteHelper.DEFAULT;
+
+
+}
 ```
 - Bundle(实现了接口Parcelable)
 ```
@@ -249,8 +313,8 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 skia 图形引擎
 [Canvas的底层是用 Skia 的库，cpu绘制](https://zhuanlan.zhihu.com/p/30453831)
 [freetype 字体渲染](https://learnopengl-cn.readthedocs.io/zh/latest/06%20In%20Practice/02%20Text%20Rendering/)
-[基本数据类型](https://segmentfault.com/a/1190000017246734)
-[ OpenGL ES 和 OpenGL ES 库的区别](https://woshijpf.github.io/android/2017/09/05/Android系统图形栈OpenGLES和EGL库的加载过程.html)
+[OpenGL 基本数据类型](https://segmentfault.com/a/1190000017246734)
+[OpenGL ES 和 OpenGL ES 库的区别](https://woshijpf.github.io/android/2017/09/05/Android系统图形栈OpenGLES和EGL库的加载过程.html)
 ```
 public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
     private final WeakReference<GLSurfaceView> mThisWeakRef = new WeakReference<GLSurfaceView>(this);
@@ -264,6 +328,47 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
     private int mDebugFlags;
     private int mEGLContextClientVersion;
     private boolean mPreserveEGLContextOnPause;
+}
+
+public class TextureView extends View {
+private TextureLayer mLayer;
+    private SurfaceTexture mSurface;
+    private SurfaceTextureListener mListener;
+    private boolean mHadSurface;
+
+    private boolean mOpaque = true;
+
+    private final Matrix mMatrix = new Matrix();
+    private boolean mMatrixChanged;
+
+    private final Object[] mLock = new Object[0];
+    private boolean mUpdateLayer;
+    private boolean mUpdateSurface;
+
+    private Canvas mCanvas;
+    private int mSaveCount;
+
+    private final Object[] mNativeWindowLock = new Object[0];
+    // Set by native code, do not write!
+    private long mNativeWindow;
+    private final SurfaceTexture.OnFrameAvailableListener mUpdateListener =
+            new SurfaceTexture.OnFrameAvailableListener();
+}
+
+public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
+    private final WeakReference<GLSurfaceView> mThisWeakRef =
+            new WeakReference<GLSurfaceView>(this);
+    private GLThread mGLThread;
+    private Renderer mRenderer;
+    private boolean mDetached;
+    private EGLConfigChooser mEGLConfigChooser;
+    private EGLContextFactory mEGLContextFactory;
+    private EGLWindowSurfaceFactory mEGLWindowSurfaceFactory;
+    private GLWrapper mGLWrapper;
+    private int mDebugFlags;
+    private int mEGLContextClientVersion;
+    private boolean mPreserveEGLContextOnPause;
+
 }
 ```
 ### Media Framework
@@ -663,6 +768,7 @@ Media Server进程，是由init进程fork而来，负责启动和管理整个C++
 
 ### SystemServer - InputManagerService
  [事件](http://gityuan.com/2016/12/31/input-ipc/)
+ [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
 - InputReader线程：通过EventHub从/dev/input节点获取事件，转换成EventEntry事件加入到InputDispatcher的mInboundQueue。EventHub采用INotify + epoll机制
 
 - InputDispatcher线程：从mInboundQueue队列取出事件，转换成DispatchEntry事件加入到connection的outboundQueue队列。再然后开始处理分发事件，取出outbound队列，放入waitQueue.InputChannel.sendMessage通过socket方式将消息发送给远程进程；
@@ -1085,6 +1191,7 @@ public class WindowManagerService extends IWindowManager.Stub
 }
 ```
 ### SystemServer - ActivityManagerService
+```
 public class ActivityManagerService extends IActivityManager.Stub
         implements Watchdog.Monitor, BatteryStatsImpl.BatteryCallback {
     /** All system services */
@@ -1129,7 +1236,7 @@ public class ActivityManagerService extends IActivityManager.Stub
     private boolean mUseFifoUiScheduling = false;
 
 
-    BroadcastQueue mFgBroadcastQueue;
+BroadcastQueue mFgBroadcastQueue;
     BroadcastQueue mBgBroadcastQueue;
     // Convenient for easy iteration over the queues. Foreground is first
     // so that dispatch of foreground broadcasts gets precedence.
@@ -1211,11 +1318,153 @@ public class ActivityManagerService extends IActivityManager.Stub
      */
     private final PriorityDump.PriorityDumper mPriorityDumper = new PriorityDump.PriorityDumper()
 
-...
-...
-...
+
+    /**
+     * Keeps track of all IIntentReceivers that have been registered for broadcasts.
+     * Hash keys are the receiver IBinder, hash value is a ReceiverList.
+     */
+final HashMap<IBinder, ReceiverList> mRegisteredReceivers = new HashMap<>();
+
+    /**
+     * Resolver for broadcast intents to registered receivers.
+     * Holds BroadcastFilter (subclass of IntentFilter).
+     */
+    final IntentResolver<BroadcastFilter, BroadcastFilter> mReceiverResolver
+            = new IntentResolver<BroadcastFilter, BroadcastFilter>() ;
+    /**
+     * State of all active sticky broadcasts per user.  Keys are the action of the
+     * sticky Intent, values are an ArrayList of all broadcasted intents with
+     * that action (which should usually be one).  The SparseArray is keyed
+     * by the user ID the sticky is for, and can include UserHandle.USER_ALL
+     * for stickies that are sent to all users.
+     */
+    final SparseArray<ArrayMap<String, ArrayList<Intent>>> mStickyBroadcasts =
+            new SparseArray<ArrayMap<String, ArrayList<Intent>>>();
+
+final ProviderMap mProviderMap;
+
+    /**
+     * List of content providers who have clients waiting for them.  The
+     * application is currently being launched and the provider will be
+     * removed from this list once it is published.
+     */
+    final ArrayList<ContentProviderRecord> mLaunchingProviders
+            = new ArrayList<ContentProviderRecord>();
+.....
+
 }
+```
+
+
+```
+public class ActivityStackSupervisor extends ConfigurationContainer implements DisplayListener,
+        RecentTasks.Callbacks {
+    private final SparseArray<ActivityDisplay> mActivityDisplays = new SparseArray<>();
+        
+}
+
+```
 ### SystemServer - PackageManagerService
+### SystemServer - LocationManagerService
+
+public class LocationManagerService extends ILocationManager.Stub {
+        private final Context mContext;
+    private final AppOpsManager mAppOps;
+
+    // used internally for synchronization
+    private final Object mLock = new Object();
+
+    // --- fields below are final after systemRunning() ---
+    private LocationFudger mLocationFudger;
+    private GeofenceManager mGeofenceManager;
+    private PackageManager mPackageManager;
+    private PowerManager mPowerManager;
+    private ActivityManager mActivityManager;
+    private UserManager mUserManager;
+    private GeocoderProxy mGeocodeProvider;
+    private IGnssStatusProvider mGnssStatusProvider;
+    private INetInitiatedListener mNetInitiatedListener;
+    private LocationWorkerHandler mLocationHandler;
+    private PassiveProvider mPassiveProvider;  // track passive provider for special cases
+    private LocationBlacklist mBlacklist;
+    private GnssMeasurementsProvider mGnssMeasurementsProvider;
+    private GnssNavigationMessageProvider mGnssNavigationMessageProvider;
+    private IGpsGeofenceHardware mGpsGeofenceProxy;
+    // --- fields below are protected by mLock ---
+    // Set of providers that are explicitly enabled
+    // Only used by passive, fused & test.  Network & GPS are controlled separately, and not listed.
+    private final Set<String> mEnabledProviders = new HashSet<>();
+
+    // Set of providers that are explicitly disabled
+    private final Set<String> mDisabledProviders = new HashSet<>();
+
+    // Mock (test) providers
+    private final HashMap<String, MockProvider> mMockProviders =
+            new HashMap<>();
+
+    // all receivers
+    private final HashMap<Object, Receiver> mReceivers = new HashMap<>();
+
+    // currently installed providers (with mocks replacing real providers)
+    private final ArrayList<LocationProviderInterface> mProviders =
+            new ArrayList<>();
+
+    // real providers, saved here when mocked out
+    private final HashMap<String, LocationProviderInterface> mRealProviders =
+            new HashMap<>();
+
+    // mapping from provider name to provider
+    private final HashMap<String, LocationProviderInterface> mProvidersByName =
+            new HashMap<>();
+
+    // mapping from provider name to all its UpdateRecords
+    private final HashMap<String, ArrayList<UpdateRecord>> mRecordsByProvider =
+            new HashMap<>();
+
+    private final LocationRequestStatistics mRequestStatistics = new LocationRequestStatistics();
+
+    // mapping from provider name to last known location
+    private final HashMap<String, Location> mLastLocation = new HashMap<>();
+
+    // same as mLastLocation, but is not updated faster than LocationFudger.FASTEST_INTERVAL_MS.
+    // locations stored here are not fudged for coarse permissions.
+    private final HashMap<String, Location> mLastLocationCoarseInterval =
+            new HashMap<>();
+
+    // all providers that operate over proxy, for authorizing incoming location and whitelisting
+    // throttling
+    private final ArrayList<LocationProviderProxy> mProxyProviders =
+            new ArrayList<>();
+
+    private final ArraySet<String> mBackgroundThrottlePackageWhitelist = new ArraySet<>();
+
+    private final ArrayMap<IBinder, Identity> mGnssMeasurementsListeners = new ArrayMap<>();
+
+    private final ArrayMap<IBinder, Identity>
+            mGnssNavigationMessageListeners = new ArrayMap<>();
+
+    // current active user on the device - other users are denied location data
+    private int mCurrentUserId = UserHandle.USER_SYSTEM;
+    private int[] mCurrentUserProfiles = new int[]{UserHandle.USER_SYSTEM};
+
+    private GnssLocationProvider.GnssSystemInfoProvider mGnssSystemInfoProvider;
+
+    private GnssLocationProvider.GnssMetricsProvider mGnssMetricsProvider;
+
+    private GnssBatchingProvider mGnssBatchingProvider;
+    private IBatchedLocationCallback mGnssBatchingCallback;
+    private LinkedCallback mGnssBatchingDeathCallback;
+    private boolean mGnssBatchingInProgress = false;
+    private final PackageMonitor mPackageMonitor = new PackageMonitor();
+}
+### SystemServer - NotificationManagerService
+```
+public class NotificationManager {
+    private Context mContext;
+
+}
+```
+
 
    
 ## 应用层
