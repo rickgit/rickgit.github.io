@@ -626,8 +626,8 @@ public interface A extends java.lang.annotation.Annotation {
 
 #### 异常，断言，日志
 
-### 2.1 数据集合 - Collection 类（List, Queue, Map）
-
+### 2.1 数据集合  - Collection 类（List, Queue, Map）
+数学-集合论
 ```text
                                             +--------------+                                          +----------------+
                                             |              |                                          |                |
