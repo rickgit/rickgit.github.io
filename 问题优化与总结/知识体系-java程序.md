@@ -40,7 +40,7 @@
 [unicode 及位置](https://unicode-table.com/en/#control-character)
 - 涉及类
   1. [Character.UnicodeBlock](https://en.wikipedia.org/wiki/Unicode_block)
-
+UCS-4 0组，17平面，(2^7-1)行，(2^7-1)单元
 - [Unicode与UTF-8转化](https://zh.wikipedia.org/wiki/UTF-8)
 - [UTF-16](https://en.wikipedia.org/wiki/UTF-16)
   超过三个字节 Unicode 用四个字节的UTF-16编码
@@ -186,6 +186,7 @@ Byte通过加法实现加减，移位和加法实现乘除法
   正数：原码，反码，补码一致
   负数：反码符号位不变其他位按位取反，补码为反码加1（取反加一，两个过程符号位都不变）
 ```
+或者换成时钟，0，1，2，3，4，5，-6，-1，-2，-3，-4，-5
 3bit有符号二进制
 +--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
 |        |           |           |         |        |         |          |         |        |
@@ -243,6 +244,9 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 - BigInteger、BigDecimal
 [-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
 
+
+### 控制语言
+if while goto
 ### 数据 - 引用类型
 ```
 dx --dex --output=Hello.dex Hello.class
@@ -533,6 +537,11 @@ Generational Collection（分代收集）算法
   3. 永久代（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：废弃常量和无用的类。
 
 ####  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
+强类型，静态语言，混合型语言（编译，解释）
+动态类型语言是指在运行期间才去做数据类型检查的语言，说的是数据类型，动态语言说的是运行是改变结构，说的是代码结构。
+强类型语言，一旦一个变量被指定了某个数据类型，如果不经过强制类型转换，那么它就永远是这个数据类型。
+静态语言的数据类型是在编译其间确定的或者说运行之前确定的，编写代码的时候要明确确定变量的数据类型。
+
 《Effect java》
 - 类与面向数据对象
 包，字段，方法名-返回值类型-参数列表，构造方法
@@ -545,7 +554,7 @@ equals()，hashcode()，toString()
 - 封装（privated,protected,packaged,public,static,枚举类,内部类（静态，成员，局部，匿名），函数式接口（Lambda表达式），自动装箱和拆箱，日期）
 - 继承（extends,implements,this,super，final,抽象类，接口）
 - 多态 (继承,重写,父类引用指向子类对象)
-- 重载
+- 重载（面向方法特性）
 
 ```
 public enum NumEnum {
@@ -561,7 +570,7 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 
 
 ```
-- 反射（动态代理，注解接口），泛型
+- 运行时数据解析 - 反射（动态代理，注解接口），泛型
 
 
 1. 动态代理
@@ -986,6 +995,39 @@ public class TreeMap<K, V> extends AbstractMap<K, V> implements NavigableMap<K, 
     private transient TreeMap.KeySet<K> navigableKeySet;
     private transient NavigableMap<K, V> descendingMap;
 }
+
+
+java.util.TreeMap object internals:
+ OFFSET  SIZE                         TYPE DESCRIPTION                               VALUE
+      0     4                              (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                              (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                java.util.Set AbstractMap.keySet                        null
+     12     4         java.util.Collection AbstractMap.values                        null
+     16     4                          int TreeMap.size                              0
+     20     4                          int TreeMap.modCount                          0
+     24     4         java.util.Comparator TreeMap.comparator                        null
+     28     4      java.util.TreeMap.Entry TreeMap.root                              null
+     32     4   java.util.TreeMap.EntrySet TreeMap.entrySet                          null
+     36     4     java.util.TreeMap.KeySet TreeMap.navigableKeySet                   null
+     40     4       java.util.NavigableMap TreeMap.descendingMap                     null
+     44     4                              (loss due to the next object alignment)
+Instance size: 48 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+java.util.TreeMap$EntryIterator object internals:
+ OFFSET  SIZE                      TYPE DESCRIPTION                               VALUE
+      0     4                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
+      4     4                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4                       int PrivateEntryIterator.expectedModCount     1
+     12     4   java.util.TreeMap.Entry PrivateEntryIterator.next                 (object)
+     16     4   java.util.TreeMap.Entry PrivateEntryIterator.lastReturned         null
+     20     4         java.util.TreeMap PrivateEntryIterator.this$0               (object)
+     24     4         java.util.TreeMap EntryIterator.this$0                      (object)
+     28     4                           (loss due to the next object alignment)
+Instance size: 32 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+
 ```
 Charset#availableCharsets():SortedMap
 
@@ -1356,8 +1398,8 @@ UNSAFE_END
 
   
 
-#### AQS
-重入锁 ReentrantLock/ReentrantReadWriteLock/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现公平锁和非公平锁，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
+#### AQS 实现 **乐观锁**
+**重入锁** ReentrantLock（**独享锁**,**互斥锁**）/ReentrantReadWriteLock（**读锁是共享锁，其写锁是独享锁**）/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现**公平锁和非公平锁**，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
 
 
 CountDownLatch，CyclicBarrier，Semaphore，Exchanger （这类使用AQS）
@@ -1408,7 +1450,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 #### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
   - ConcurrentHashMap。有并发要求，使用该类替换HashTable
-java 7 锁分段技术,java 8 摒弃了Segment（锁段）的概念，采用CAS + synchronized保证并发更新的安全性，底层采用数组+链表+红黑树的存储结构。
+java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用CAS + synchronized保证并发更新的安全性，底层采用数组+链表+红黑树的存储结构。
 ```
 java.util.concurrent.ConcurrentHashMap object internals:
  OFFSET  SIZE                                                   TYPE DESCRIPTION                               VALUE
