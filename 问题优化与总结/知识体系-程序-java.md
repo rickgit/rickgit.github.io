@@ -573,7 +573,7 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 - 运行时数据解析 - 反射（动态代理，注解接口），泛型
 
 
-1. 动态代理
+1. 动态代理（序列化与RPC）
 ```
 public class Proxy implements java.io.Serializable {
          /**
