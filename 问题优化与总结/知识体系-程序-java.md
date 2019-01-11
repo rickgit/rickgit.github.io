@@ -6,7 +6,7 @@
 ```
 +----------------------------------------------------------------+
 |                                                                |
-|                   Read File/Socket/Object/db                   |
+|                   Read File/Socket/Object（Serializable）/db   |
 +----------------------------------------------------------------+
 |                                                                |
 |                   concurrency access data                      |
@@ -70,7 +70,7 @@ UCS-4 0组，17平面，(2^7-1)行，(2^7-1)单元
 ## 2 Java 基础
 > 《Core Java》（延展阅读《C Primer Plus》《C++ Primer》）
 -- 基本语法
-注释，关键字、标识符、常量、字符串值，或者是一个符号
+注释，关键字、标识符、变量、常量、字符串值，或者是一个符号
 
 ```
                                                +   byte
@@ -179,7 +179,7 @@ Float.MIN_VALUE ~ Float.MAX_VALUE
 
 
 
-### 指令 - 运算符
+### 指令 - 运算符（算术，比较，赋值，自增减）
 Byte通过加法实现加减，移位和加法实现乘除法
 
 - 原码，反码，补码
@@ -245,9 +245,11 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 [-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
 
 
-### 控制语言
-if while goto
-### 数据 - 引用类型
+### 数据控制流
+if switch/case loop（while，for） goto
+### 函数(function 面向对象)/方法（method 面向方法）
+
+### 数据 - 引用类型/面向对象
 ```
 dx --dex --output=Hello.dex Hello.class
 
@@ -537,7 +539,7 @@ Generational Collection（分代收集）算法
   3. 永久代（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：废弃常量和无用的类。
 
 ####  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
-强类型，静态语言，混合型语言（编译，解释）
+高级特性：强类型，静态语言，混合型语言（编译，解释）
 动态类型语言是指在运行期间才去做数据类型检查的语言，说的是数据类型，动态语言说的是运行是改变结构，说的是代码结构。
 强类型语言，一旦一个变量被指定了某个数据类型，如果不经过强制类型转换，那么它就永远是这个数据类型。
 静态语言的数据类型是在编译其间确定的或者说运行之前确定的，编写代码的时候要明确确定变量的数据类型。
@@ -551,10 +553,31 @@ equals()，hashcode()，toString()
 混合hash （MD5）
 
 面向对象的三大特性，五大原则，23个设计模式
-- 封装（privated,protected,packaged,public,static,枚举类,内部类（静态，成员，局部，匿名），函数式接口（Lambda表达式），自动装箱和拆箱，日期）
-- 继承（extends,implements,this,super，final,抽象类，接口）
-- 多态 (继承,重写,父类引用指向子类对象)
+- 封装
+    1. privated,protected,packaged,public
+    2. static
+    3. instanceof，
+    4. 枚举类,内部类（静态，成员，局部，匿名）
+    5. 头等函数（匿名方法,匿名抽象/接口内部类实现）
+    6. 闭包/函数式接口（Lambda表达式）
+    7. 自动装箱和拆箱
+    8. 日期
+- 继承
+    1. extends,implements,this,super，final
+    3. 抽象类，接口
+- 多态 
+    1. 继承
+    2. 重写
+    3. 父类引用指向子类对象
 - 重载（面向方法特性）
+
+```
+
+匿名函数接口可以有多个抽象方法，不能有默认方法；lambda实现接口时对应的函数接口只能有一个抽象方法，但是可以有多个默认方法
+
+函数式接口指的是只定义了唯一的抽象方法的接口（除了隐含的Object对象的公共方法）， 因此最开始也就做SAM类型的接口（Single Abstract Method）
+
+```
 
 ```
 public enum NumEnum {
@@ -1031,7 +1054,105 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 Charset#availableCharsets():SortedMap
 
+### 2.3 数据匹配（正则）
+```
+public final class Pattern implements java.io.Serializable
+{
+    /**
+     * The original regular-expression pattern string.
+     *
+     * @serial
+     */
+    private final String pattern;
 
+    /**
+     * The original pattern flags.
+     *
+     * @serial
+     */
+    private final int flags;
+
+    @ReachabilitySensitive
+    transient long address;
+}
+
+
+public final class Matcher implements MatchResult {
+    /**
+     * The Pattern object that created this Matcher.
+     */
+    // Patterns also contain cleanup code and a ReachabilitySensitive field.
+    // This ensures that "this" and pattern remain reachable while we're using pattern.address
+    // directly.
+    @ReachabilitySensitive
+    private Pattern pattern;
+
+    /**
+     * The address of the native peer.
+     * Uses of this must be manually synchronized to avoid native crashes.
+     */
+    @ReachabilitySensitive
+    private long address;
+
+    /**
+     * If non-null, a Runnable that can be used to explicitly deallocate address.
+     */
+    private Runnable nativeFinalizer;
+
+    private static final NativeAllocationRegistry registry = new NativeAllocationRegistry(
+            Matcher.class.getClassLoader(), getNativeFinalizer(), nativeSize());
+
+    /**
+     * Holds the original CharSequence for use in {@link #reset}. {@link #input} is used during
+     * matching. Note that CharSequence is mutable while String is not, so reset can cause the input
+     * to match to change.
+     */
+    private CharSequence originalInput;
+
+    /**
+     * Holds the input text.
+     */
+    private String input;
+
+    /**
+     * Holds the start of the region, or 0 if the matching should start at the
+     * beginning of the text.
+     */
+    private int regionStart;
+
+    /**
+     * Holds the end of the region, or input.length() if the matching should
+     * go until the end of the input.
+     */
+    private int regionEnd;
+
+    /**
+     * Holds the position where the next append operation will take place.
+     */
+    private int appendPos;
+
+    /**
+     * Reflects whether a match has been found during the most recent find
+     * operation.
+     */
+    private boolean matchFound;
+
+    /**
+     * Holds the offsets for the most recent match.
+     */
+    private int[] matchOffsets;
+
+    /**
+     * Reflects whether the bounds of the region are anchoring.
+     */
+    private boolean anchoringBounds = true;
+
+    /**
+     * Reflects whether the bounds of the region are transparent.
+     */
+    private boolean transparentBounds;
+}
+```
  
 ### 2.3 数据访问 - 流（IO, NIO）
 文件（xml,json），内存，网络，数据库
@@ -1227,7 +1348,7 @@ public abstract class AbstractSelector
 
 ```
 ### 2.4 数据并发访问 - 线程与并发
-线程初始化 Thread,Runnable
+线程初始化三种方式： Thread,Runnable,Callable
 线程的生命周期
 ```
                                        +---------------+

@@ -2455,6 +2455,12 @@ public abstract class AsyncTask<Params, Progress, Result> {
 ```        
     容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
     并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
+
+
+### 编译，打包，签名，安装
+gradle,Transform的应用
+批量打包
+
 - HandlerThread
 - IntentService
 - LruCache
@@ -2467,6 +2473,7 @@ AIDL
 - Bitmap
 
 - 动画
+[动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
 1. 补间动画
    烟花效果
 2. 视图动画（Rotate,Scale,translate,alpha）
@@ -2498,6 +2505,7 @@ AIDL
 ### 3.2 Android 开发模式
 
 #### 性能优化总结
+[RelativeLayout的性能损耗](https://zhuanlan.zhihu.com/p/52386900?utm_source=androidweekly.io&utm_medium=website)
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
@@ -2509,6 +2517,7 @@ AIDL
     2. ListView/RecycleView及Bitmap优化
     3. 线程优化
 - 内存优化
+  [微信文章](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
 - 电量消耗
     3.内存泄漏优化
         3.1 单例
@@ -2518,6 +2527,7 @@ AIDL
         3.5 集合类未销毁
 
 - 其他性能优化的建议
+  [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 工具：profile，eclipse mat
 可维护性：组件化
 #### 内存泄漏
@@ -2529,7 +2539,7 @@ AIDL
 
 组件化
 - 组件间解耦
-  1. AAC 
+  1. MVVM-AAC 
    ViewModel LiveData
   2. MVP DI框架Dagger2解耦
 - 通信
@@ -2580,4 +2590,5 @@ AIDL
 #### ARouter
 控制反转和面向切面
 
-#### FLutter
+
+#### FLutter &Fuchsia & dart
