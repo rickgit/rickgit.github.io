@@ -29,8 +29,10 @@
 |                                                                |
 |                    Byte                                        |
 +----------------------------------------------------------------+
+```
 
-  ## 1 数据 - 通信
+## 1 数据 - 通信
+
 数据与二进制
 - 字长
   [字长](http://www.cnblogs.com/chakyu/p/7405275.html)
@@ -68,9 +70,96 @@ UCS-4 0组，17平面，(2^7-1)行，(2^7-1)单元
 ```
 
 ## 2 Java 基础
+关键字与操作符、分隔符，字面量（字符串值），标识符（Identifiers 变量与常量等）、或者是一个符号
+
+分隔符有空白符、注释和普通分隔符三种
+    空白符：空格符(Space)、制表符(Tab)、和回车(Enter)、换行 
+    注释:// 进行单行注释；/* */多行注释 
+    普通分隔包括分号（;），逗号（,）、圆点（.）、花括号（{}）、方括号（[]）、圆括号（()）、冒号（:）
+
+标识符是用来为程序中的类、方法、变量命名的符号。
+
+
+
+
+```
+keyword(53)
+
++-----------+-----------------------------------------------------------------------+
+|  special  |                                                                       |
+|identifiers|  var(Java 10)                                                         |
++-----------+-----------------------------------------------------------------------+
+|           |                                                                       |
+|  reserved |  goto    const                                                        |
+|           |                                                                       |
++-----------------------------------------------------------------------------------+
+|  exception|  try    catch    finally    throw    throws                           |
+|  debug    |                                                                       |
+|           |  assert                                                               |
++-----------------------------------------------------------------------------------+
+|  Access   |                                                                       |
+|  modifiers|  public protected    private                                          |
++-----------------------------------------------------------------------------------+
+|  package  |  package    import                                                    |
+|  control  |                                                                       |
++-----------------------------------------------------------------------------------+
+|           |  class  enum    interface                                             |
+|  class    |  extends   implements                                                 |
+| interface |  new                                                                  |
+| modifiers |  this    super                                                        |
++-----------------------------------------------------------------------------------+
+|  variable |  void                                                                 |
+|  method   |  final    static     abstract   synchronized                          |
+|  modifiers|  volatile    native     transient     strictfp                        |
+|           |                                                                       |
++-----------+-----------------------------------------------------------------------+
+|  Flow     |  if     else                                                          |
+|  control  |  do    while    for                                                   |
+|  keyword  |  switch    case    default                                            |
+|           |  break    continue    return                                          |
+|           |  instanceof                                                           |
++-----------------------------------------------------------------------------------+
+| Primitive |                                                                       |
+| types     |  byte    short     int    long    float    double    boolean    char  |
+| keyword   |                                                                       |
++-----------------------------------------------------------------------------------+
+|           |                                                                       |
+| literals  |  true false null                                                      |
++-----------+-----------------------------------------------------------------------+
+
+
+```
+``` Operators
++-------------+--------------------------------------------------------------+
+|             |                                                              |
+|  Misc       |  (? :)  instanceof                                           |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
+|             |                                                             ++
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Logical    |  && || !                                                     |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Relational |  == != > < >= <=                                             |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Arithmetic |  + - * / % ++ --                                             |
+|             |                                                              |
++-------------+--------------------------------------------------------------+
+
+
+```
 > 《Core Java》（延展阅读《C Primer Plus》《C++ Primer》）
 -- 基本语法
-注释，关键字、标识符、变量、常量、字符串值，或者是一个符号
 
 ```
                                                +   byte
@@ -177,7 +266,20 @@ Float.MIN_VALUE ~ Float.MAX_VALUE
 - Boolean
 - Byte
 
+### 数据关键词与符号
 
+```
+类 class、enum、interface、extends、implements
+对象 new、instanceof、this、super
+包 package、import
+数据类型 byte、short、int、long、float、double、char、boolean
+分支 if、 else、switch、case、break、continue
+循环 do、while、for
+方法 void、return
+异常 throw、throws、try、catch、finally
+修饰符 Abstract、final、private、protected、public、、static、synchronized、strictfp、native、assert、transient、volatile
+保留字 const、goto
+```
 
 ### 指令 - 运算符（算术，比较，赋值，自增减）
 Byte通过加法实现加减，移位和加法实现乘除法
@@ -593,8 +695,8 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 
 
 ```
-- 运行时数据解析 - 反射（动态代理，注解接口），泛型
-
+- 类创建/运行时数据解析 - 反射（动态代理，注解接口），泛型
+对象创建方式：new ，反射（Class#newInstance，Constructor#newInstance),clone，反序列化
 
 1. 动态代理（序列化与RPC）
 ```
@@ -1394,7 +1496,7 @@ public abstract class AbstractSelector
   3. 性能（上下文切换，死锁，资源限制）
 
 #### 并发底层实现
-  1. volatile（内存可见性，其他线程看到的value值都是最新的value值，即修改之后的volatile的值） + cas 原子操作(atomic operation)是不需要synchronized，不会被线程调度机制打断的操作。
+  1. volatile（内存可见性，其他线程看到的value值都是最新的value值，即修改之后的volatile的值; 指令有序序，解决重排序） + cas 原子操作(atomic operation)是不需要synchronized，不会被线程调度机制打断的操作。
   2. synchronized
 上下文切换查看工具 **vmstat**,**LMbench**
 
