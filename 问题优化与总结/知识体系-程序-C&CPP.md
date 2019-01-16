@@ -1,3 +1,64 @@
+## 关键字与符号
+[关键词](https://blog.csdn.net/weibo_dm/article/details/81629693)
+```
++----+---------------------------------------------------+
+|    | _Alignas _Alignof _Atomic _Static_assert          |
+|    |                                                   |
+|C11 | _Noreturn  _Generic     _Thread_local              |
+|    |                                                   |
++--------------------------------------------------------+
+|    |                                                   |
+|C99 | _Bool inline restrict _Complex _Imaginary         |
+|    |                                                   |
++--------------------------------------------------------+
+|    | continue break return goto                        |
+|    |                                                   |
+|    | if else switch  case default for  do while        |
+|    |                                                   |
+|    | typedef volatile  sizeof                          |
+|ANSI|                                                   |
+|  C | const static extern register auto                 |
+|(32)|                                                   |
+|    | union struct enum  void                           |
+|    |                                                   |
+|    | char short long int float double unsigned signed  |
+|    |                                                   |
+|----+---------------------------------------------------|
+
++---------+-----------------------------------------------------------------------+
+|         |                                                                       |
+|         | alignas alignof constexpr decltype noexcept  static_assert thread_loca|
+| c++ 11  |                                                                       |
+|         | char16_t char32_t  nullptr                                             |
+| (10)    |                                                                       |
+|         |                                                                       |
++---------------------------------------------------------------------------------+
+|         | try   catch    throw                                                  |
+|         |                                                                       |
+|         | typeid typename static_cast dynamic_cast const_cast reinterpret_cast  |
+|         |                                                                       |
+|         | const   static extern register auto  typedef volatile sizeof          |
+|         |                                                                       |
+|         | namespace  using export asm                                           |
+|         |                                                                       |
+| C++ 98  | Template explicit inline new delete  operator this  virtual   mutable |
+|         |                                                                       |
+| (63)    | private protected  friend public                                      |
+|         |                                                                       |
+|         | continue  goto   break      return                                    |
+|         |                                                                       |
+|         | if  else   switch case default for do while                           |
+|         |                                                                       |
+|         | union  enum struct   class  void                                      |
+|         |                                                                       |
+|         | bool char wchar_t short int  long float double signed unsigned        |
+|         |                                                                       |
+|         | false true                                                            |
++---------+-----------------------------------------------------------------------+
+
+
+```
+
 ## 数据类型与内存结构
 [C内存模型](https://blog.csdn.net/ufolr/article/details/52833736)
 ```
