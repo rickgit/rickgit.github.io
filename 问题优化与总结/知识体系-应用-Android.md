@@ -7,6 +7,12 @@
 +-----------------------------------------------------------------------+
 |                                AppS                                   |
 |                                                                       |
++-----------------------------------------------------------------------+
+|                              component                                |
+|                                                                       |
+|  Fragments   Views  Layouts Controls  Intents    Resources    Manifest|
+|                                                                       |
+|  Activities     Services     Broadcast Receivers     Content Providers|
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                       App Framework                                   |
@@ -484,7 +490,10 @@ UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU
 root      229   1     46892  4392     ep_poll b749cca5 S /system/bin/surfaceflinger
 ```
 SystemServer的RenderThread线程
-黄油计划：垂直同步(VSYNC 定时中断)、Triple Buffer和Choreographer（实现统一调度界面绘图。）
+黄油计划：
+- 垂直同步(VSYNC 定时中断)、
+- Triple Buffer
+- Choreographer（ViewRootImpl实现统一调度界面绘图。）
 黄油计划的核心VSYNC信号分为两种，一种是硬件生成（HardwareComposer）的信号，一种是软件模拟（VSyncThread来模拟）的信号。
 ```
                             VSync                 VSync                VSync           //Display为基准，VSync将其划分成16ms长度的时间段
@@ -1468,6 +1477,8 @@ public class NotificationManager {
 
    
 ## 应用层
+
+
 ### 应用进程创建过程
 
 
@@ -1734,7 +1745,7 @@ Service->数据操作,传递前台显示->Activity交互->AIDL等跨进程通信
 
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 ```
-- 四大组件，Fragment
+### 四大组件-Activity
 ```
                                             +--------+
                                             | Start  |
@@ -2248,6 +2259,8 @@ android:launchMode：
 android:taskAffinity 属性主要和 singleTask 或者 allowTaskReparenting 属性配对使用，在其他情况下没有意义。
 android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
 
+
+### 其他组件 View（ 测量，布局及绘制,事件，动画），controls,layouts
 [事件](https://blog.csdn.net/shareus/article/details/50763237)
 [Touch事件](http://gityuan.com/2016/12/10/input-manager/)
 ```
@@ -2455,8 +2468,39 @@ public abstract class AsyncTask<Params, Progress, Result> {
 ```        
     容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
     并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
+#### 布局- CoordinatorLayout
+public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
 
+    private final List<View> mDependencySortedChildren = new ArrayList<>();
+    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
 
+    private final List<View> mTempList1 = new ArrayList<>();
+    private final List<View> mTempDependenciesList = new ArrayList<>();
+    private final int[] mTempIntPair = new int[2];
+    private Paint mScrimPaint;
+
+    private boolean mDisallowInterceptReset;
+
+    private boolean mIsAttachedToWindow;
+
+    private int[] mKeylines;
+
+    private View mBehaviorTouchView;
+    private View mNestedScrollingTarget;
+
+    private OnPreDrawListener mOnPreDrawListener;
+    private boolean mNeedsPreDrawListener;
+
+    private WindowInsetsCompat mLastInsets;
+    private boolean mDrawStatusBarBackground;
+    private Drawable mStatusBarBackground;
+
+    OnHierarchyChangeListener mOnHierarchyChangeListener;
+    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
+
+    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
+            new NestedScrollingParentHelper(this);
+}
 ### 编译，打包，优化，签名，安装
 gradle,Transform的应用
 批量打包
@@ -2465,12 +2509,13 @@ G: gradle build tools
 B: android build tools
 J: JDK tools
 
+
 +--------------------------------------------------------------------------------------+
 |G                                                                                     |
 |    multiple agent tool                                                               |
 |                                                                                      |
 |                                                                                      |
-+--------------------------------------------------------------------------------------++
++---------------------------------------------------------------------------------------+
 |B                                                                                     |
 |   zipalign                                                                           |
 |                                                                                      |
@@ -2493,16 +2538,16 @@ J: JDK tools
 |                    |                          |              |          Obfuscate    |
 |                    |                          |              |          Optimize     |
 |                    |                          |              |          Shrink       |
-|                    |                          +-------+      +-----------------------+
+|                    |                          |              +-----------------------+
+|                    |                          |                                      |
++--------------------+                          +--------------------------------------+
+|B                   |                          |        J                             |
+|  llvm-rs-cc        |                          +-------+    javac                     |
 |                    |                          | R.java|                              |
-+-----------------------------------------------+--------------------------------------+
-|B                   |G                                 |J                             |
-|  llvm-rs-cc        |   menifest/assets/resource merger|    javac                     |
-|                    |                                  |                              |
-|                    |                                  |       +----------------------+
-|                    |                                  |       |B                     |
-|                    |                                  |       |    aidl              |
-+--------------------+----------------------------------+-------+----------------------+
+|                    +--------------------------+--------------------------------------+
+|                    |G                                 |B                             |
+|                    |   menifest/assets/resource merger|    aidl                      |
++--------------------+-----------------------------------------------------------------+
 
                                                                                               
 
