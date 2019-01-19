@@ -29,7 +29,7 @@
 |         |                                                                       |
 |         | alignas alignof constexpr decltype noexcept  static_assert thread_loca|
 | c++ 11  |                                                                       |
-|         | char16_t char32_t  nullptr                                             |
+|         | char16_t char32_t  nullptr                                            |
 | (10)    |                                                                       |
 |         |                                                                       |
 +---------------------------------------------------------------------------------+
@@ -37,42 +37,88 @@
 |         |                                                                       |
 |         | typeid typename static_cast dynamic_cast const_cast reinterpret_cast  |
 |         |                                                                       |
-|         | const   static extern register auto  typedef volatile sizeof          |
-|         |                                                                       |
+|         |                           typedef  sizeof                             |
 |         | namespace  using export asm                                           |
 |         |                                                                       |
-| C++ 98  | Template explicit inline new delete  operator this  virtual   mutable |
+|         | Template explicit inline new delete  operator this  virtual           |
 |         |                                                                       |
-| (63)    | private protected  friend public                                      |
+|         | pri^ate protected  friend public                                      |
 |         |                                                                       |
-|         | continue  goto   break      return                                    |
+|         +----------+------------------------------------------------------------+
+|         |          |                                                            |
+|         | Storage  |    auto register static extern mutable                     |
+|         | Class    |                                                            |
+|         +-----------------------------------------------------------------------+
+|         |          |   signed unsigned   long  short                            |
+| C++ 98  | Modifier +------------------+-----------------------------------------+
+|         | Types    | Type Qualifiers  |   const  volatile restrict              |
+| (63)    +----------+------------------+-----------------------------------------+
+|         |                                                                       |
+|         | break  continue  goto  return                                         |
 |         |                                                                       |
 |         | if  else   switch case default for do while                           |
 |         |                                                                       |
-|         | union  enum struct   class  void                                      |
+|         | union  enum struct   class                                            |
 |         |                                                                       |
-|         | bool char wchar_t short int  long float double signed unsigned        |
+|         | bool char wchar_t   int  float double   void                          |
 |         |                                                                       |
 |         | false true                                                            |
 +---------+-----------------------------------------------------------------------+
 
 
 ```
+``` Operators
++-------------+--------------------------------------------------------------+
+|  C++        |  sizeof                                                      |
+|  Misc       |  (? :)                                                       |
+|             |  ,(comma operator)                                           |
+|             |  .(dot)and->(arrow)                                          |
+|             |  cast                                                        |
+|             |  &(pointer operator)                                         |
+|             |  *(pointer operator)                                         |
++-------------+--------------------------------------------------------------+
+|  C          |  sizeof                                                      |
+|  Misc       |  & (return address)                                          |
+|             |  *(pointer operator)                                         |
+|             |  (? :)                                                       |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
+|             |                                                             ++
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Logical    |  && || !                                                     |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Bitwise    |  & | ^  ~    < <   > >                                       |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Relational |  == != > < >= <=                                             |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Arithmetic |  + - * / % ++ --                                             |
+|             |                                                              |
++-------------+--------------------------------------------------------------+
 
+
+```
 ## 数据类型与内存结构
 [C内存模型](https://blog.csdn.net/ufolr/article/details/52833736)
 ```
-                                               ++   char
-                                               |
-                                  +IntegerType ++   int
-                                  | +short
-                                  | |long
-                                  | |sign
-                         +  Number| +unsign
+                                                 ++   char
+                                                 |
+                                  +IntegerType   ++   int
+                                  |  +short
+                                  |  |long
+                                  |  |sign
+                         +  Number|  +unsign
                          |  Type  |
-                         |        |            +    Float
-                         |        +DecimalType |
-                         |                     ++   Long
+                         |        |               +    Float
+                         |        +floating-point |
+                         |             +long      ++   double
                          |
                          |
                          |
@@ -82,13 +128,13 @@
             |
             |            +  pointerType
             |            |
-            |            |
-C data type |            |  functionType
-            |  derived   |
-            |  Type      |               +   Array
-            |            |               |
-            |            |  AggregateType|
-            |            |               +   Struct // 结构是 C 
+            |            |                +   Array
+C data type |            |                |
+            |  derived   |  AggregateType |
+            |  Type      |                +   Struct // 结构是 C
+            |            |               
+            |            |  functionType
+            |            |                
             |            |
             |            +  union                   // 共用体是一种特殊的数据类型，允许您在相同的内存位置存储不同的数据类型。任何时候只能有一个成员带有值。
             | 
@@ -97,7 +143,7 @@ C data type |            |  functionType
             |
             |
             |
-           ++ VoidType
+            + VoidType
 
 
                                   +IntegerType      int
@@ -108,13 +154,13 @@ C data type |            |  functionType
                          |  Type  |
                          |        |            +    Float
                          |        +DecimalType |
-                         |                     ++   Long
+                         |                     ++   double
                          |
                          |
                          |
                          |
-            ++Predifine  ++ Char  +  Char
-            | Typeifine  |  Type  |
+            ++Primitive  ++ Char  +  Char
+            |  Built-in  |  Type  |
             |            | +sign  +  wchar_t
             |            | +unsign
             |            |
