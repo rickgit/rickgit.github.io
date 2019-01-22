@@ -1258,6 +1258,16 @@ public final class Matcher implements MatchResult {
  
 ### 2.3 数据访问 - 流（IO, NIO）
 文件（xml,json），内存，网络，数据库
+
+
+Unix 5种I/O模型
+```
+阻塞I/O
+非阻塞I/O
+多路复用I/O，Java NIO
+信号驱动I/O
+异步I/O
+```
 ### BIO (阻塞 I/O)
 ```
 基于字节操作的 I/O 接口：InputStream 和 OutputStream
