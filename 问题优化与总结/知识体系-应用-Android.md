@@ -39,7 +39,7 @@
 |  Display Driver   Camera Driver   Flash Driver   Bind (IPC) Driver    |
 |                      (V4L2)                                           |
 |                                                                       |
-|  KeyPad Driver    WIFI Driver     Audio Driver   Power Management      |
+|  KeyPad Driver    WIFI Driver     Audio Driver   Power Management     |
 |                                                                       |
 |  Bluetooth Driver   USB Driver                                        |
 |                                                                       |
@@ -58,6 +58,7 @@
 启动kthreadd进程（pid=2）：是Linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd，thermal等内核守护进程。kthreadd进程是所有内核进程的鼻祖
 --------------------- 
 [作者：硬刚平底锅 ] (https://blog.csdn.net/qq_30993595/article/details/82714409 )
+
 ```
 >ps
 USER      PID   PPID  VSIZE  RSS   WCHAN            PC  NAME
@@ -142,7 +143,7 @@ AIDL 文件，方向指示符包括in、out、和inout；AIDL 进程间通信,�
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
 binder是C/S架构，分为Bn端(Server)和Bp端(Client)
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
-```
+```java
 framework/base/core/java/android/os/
   - IInterface.java
   - IServiceManager.java
@@ -180,8 +181,8 @@ framework/base/core/jni/
     - binder.h
 ```
 [Binder系统分析](http://gityuan.com/2014/01/01/binder-gaishu/)
-```
- +-------------------------------------------------------------------------------------------------------+
+```java
+ +-----------------------------------------------------------------------------------------------------------+
                         ServiceManager            IInterface                Binder
 
 
@@ -190,12 +191,12 @@ framework/base/core/jni/
 
   Framework layer       ServiceManagerProxy       IBinder(DeathRecipient)   BinderInternal(GcWathcer)
                         (aidl->stub,have BpBinder)
- +--------------------------------------------------------------------------------------------------------+
+ +-----------------------------------------------------------------------------------------------------------+
 
 
   JNI Layer             Android_util_Binder       android_os_Parcel         AndroidRuntime
 
-+--------------------------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------------------+
 
                         JavaBBinder              JavaBBinderHolder
 
@@ -211,7 +212,7 @@ framework/base/core/jni/
 
   C Layer               BpRefBase                 IBinder                   IPCThreadState
                         (base class)
- +----------------------------------------------------------------------------------------------------------+
+ +-----------------------------------------------------------------------------------------------------------+
 
   Kernel dev
   driver layer          /dev/binder（open/mmap/ioctl指令）
@@ -221,7 +222,7 @@ framework/base/core/jni/
 ```
 AIDL 文件生成对应类，类里包含继承Binder的内部类和实现AIDL的内部类；
 
-```
+```java
 public class Binder implements IBinder {//三个非静态字段
 
     private final long mObject;//BpBinder对象地址
@@ -251,7 +252,7 @@ public final class Parcel {
 }
 ```
 - Bundle(实现了接口Parcelable)
-```
+```java
 public class BaseBundle {
     // Invariant - exactly one of mMap / mParcelledData will be null
     // (except inside a call to unparcel)
@@ -285,6 +286,8 @@ public class BaseBundle {
 - Messenger(AIDL)
 - contentProvider（Binder）
 - socket（ 与Zygote通信）
+
+
 ```
 root@x86:/ # ls /dev/socket/
 adbd
@@ -315,13 +318,415 @@ init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java�
 [作者：硬刚平底锅  ](https://blog.csdn.net/qq_30993595/article/details/82714409)
 
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
-### OpenGL ES
+
+
+### 数据显示 SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
+
+SystemServer的RenderThread线程
+黄油计划,用于提升系统流畅度：
+- 垂直同步（Vertical Synchronized ） 即 VSYNC 定时中断
+- 三重缓存（Triple Buffer ）,跳帧保证不帧
+- 编舞者/编排器（Choreographer ）, 起到调度作用（ViewRootImpl实现统一调度界面绘图），绘制速度和屏幕刷新速度保持一致
+黄油计划的核心VSYNC信号分为两种，一种是硬件生成（HardwareComposer）的信号，一种是软件模拟（VSyncThread来模拟）的信号。
+1. 解决撕裂问题，CPU/GPU调度快于Display，保证双缓冲;
+2. 2.janking问题，CPU来不及处理，Display显示前一帧，帧延迟。
+
+CPU：负责 Measure、Layout、Record、Execute 的计算操作。CPU 负责把 UI组件计算成 Polygons（多边形）和 Texture（纹理），然后交给 GPU 进行栅格化。
+GPU：负责 Rasterization（栅格化）操作。GPU 的栅格化过程是绘制 Button、Shape、Path、String、Bitmap 等组件最基础的操作。
+```java
++--------------------------------------------------------------------+
+|                                                                    |
+|                                                                    |
++--------------------+                 +-----------------------------+
+|                    |                 |                             |
+| App process        |                 |  SurfaceFlinger             |
+|   +----------------+                 |                             |
+|   |   Measure()    |                 |  +---------+----------+     |
+|   |   layout()     |                 |  |         |          |     |
+|   |   draw()       |                 |  |  client |  client  |     |
+|   |                |                 |  |         |          |     |
+|   +----------------+                 |  +---------+----------+     |
+|   |   Choreographer|                 |                             |
++---+----------------------------------+-----------------------------+
+|                                                                    |
+|  SharedClient (Tmpfs Ashmem)                                       |
+|         +---------------------------------+--------------------+   |
+|         |                                 |                    |   |
+|         |  SharedBufferStack              |  SharedBufferStack |   |
+|         |      +--------------------------+                    |   |
+|         |      | Front Buffer             |                    |   |
+|         |      | (Display)                |                    |   |
+|         |      +--------------------------+                    |   |
+|         |      | Back Buffer| Back Buffer |                    |   |
+|         |      | (CPU,GPU)  | (CPU,GPU)   |                    |   |
+|         +------+------------+----------------------------------+   |
+|         |                                 |                    |   |
+|         |  SharedBufferStack              |  ...(31)           |   |
+|         |                                 |                    |   |
+|         +---------------------------------+--------------------+   |
+|                                                                    |
++--------------------------------------------------------------------+
+|                   Vertical Synchronized                            |
+|                                                                    |
++--------------------------------------------------------------------+
+```
+```java
+                            VSync                 VSync                VSync           //Display为基准，VSync将其划分成16ms长度的时间段
+                               +                    +                    +
+          +-------------------------------------------------------------------------+
+          |                    |                    |                    |          |
+ Display  |                    |                    |                    |          |
+          +-------------------------------------------------------------------------+
+                               |                    |                    |
+                               |                    |                    |
+                   +-----------+-+      +-----------+----+ +-----------+ |
+GPU                | Frame1      |      | Frame2         | | Frame3    | |
+                   +-----------+-+      +-----------+----+ +-----------+ |
+                               |                    |                    |
+                               |                    |                    |
+                               |                    |                    |
+          +-------+            +--------+           +------+             |
+CPU       | Frame1|            | Frame2 |           |Frame3|（前一个CPU Frame占用中）|  //CPU/GPU的FPS不等同Display的FPS，需要三级缓存
+          +-------+            +--------+           +------+（使用第三块缓存）       |
+                               |                    |                    |
+                               |                    |                    |
+                               |                    |                    |
+                               +                    +                    +
+
+```
+
+
+```java
+    class EventHandler {
+        friend class HWComposer;
+    };
+```
+
+```java
+base/core/java/android/view/ViewRootImpl.java:511:        mChoreographer = Choreographer.getInstance();
+
+public final class Choreographer {
+...
+...
+...
+    private final FrameHandler mHandler;
+
+    // The display event receiver can only be accessed by the looper thread to which
+    // it is attached.  We take care to ensure that we post message to the looper
+    // if appropriate when interacting with the display event receiver.
+    private final FrameDisplayEventReceiver mDisplayEventReceiver;
+
+    private CallbackRecord mCallbackPool;
+
+    private final CallbackQueue[] mCallbackQueues;//"input", "animation", "traversal"（测量、布局、绘制流程）, "commit"（遍历完成的提交操作，用来修正动画启动时间）
+
+    private boolean mFrameScheduled;
+    private boolean mCallbacksRunning;
+    private long mLastFrameTimeNanos;
+    private long mFrameIntervalNanos;
+    private boolean mDebugPrintNextFrameTimeDelta;
+    private int mFPSDivisor = 1;
+
+    /**
+     * Contains information about the current frame for jank-tracking,
+     * mainly timings of key events along with a bit of metadata about
+     * view tree state
+     *
+     * TODO: Is there a better home for this? Currently Choreographer
+     * is the only one with CALLBACK_ANIMATION start time, hence why this
+     * resides here.
+     *
+     * @hide
+     */
+    FrameInfo mFrameInfo = new FrameInfo();
+}
+
+
+private static final class CallbackRecord {
+    public CallbackRecord next;
+    public long dueTime;
+    public Object action; // Runnable or FrameCallback
+    public Object token;
+}
+
+
+
+```
+
+
+```
+root@x86:/ # ls -l /dev/graphics/
+crw-rw---- root     graphics  29,   0 2018-12-13 15:15 fb0
+```
+
+
+```java
+public class Surface implements Parcelable {
+
+    private final CloseGuard mCloseGuard = CloseGuard.get();
+
+    // Guarded state.
+    final Object mLock = new Object(); // protects the native state
+    private String mName;
+    long mNativeObject; // package scope only for SurfaceControl access
+    private long mLockedObject;
+    private int mGenerationId; // incremented each time mNativeObject changes
+    private final Canvas mCanvas = new CompatibleCanvas();
+
+    // A matrix to scale the matrix set by application. This is set to null for
+    // non compatibility mode.
+    private Matrix mCompatibleMatrix;
+
+    private HwuiContext mHwuiContext;
+
+    private boolean mIsSingleBuffered;
+    private boolean mIsSharedBufferModeEnabled;
+    private boolean mIsAutoRefreshEnabled;
+}
+
+```
+#### 绘制事件 - ViewRootImpl#traversal
+
+#### 动画事件 
+[动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
+```
+ +-------------+-------------------------------+------------------+-------------------+
+ |  layout     |                               | request layout   |  requestLayout()  |
+ |  Animation  |                               |                  |  draw Command     |
+ +------------------------------------------------------------------------------------+
+ |Drawble/Frame|   webp/gif                    |                  |                   |
+ | Animation   |                               |                  |                   |
+ +---------------------------------------------+  invalidate draw |  draw command     |
+ |             |                               |                  |                   |
+ |             |   draw() + invalidate()       |                  |                   |
+ |  Draw       +-------------------------------+                  |                   |
+ |  Animation  |                               |                  |                   |
+ |             |   computeScroll()+invalidate()|                  |                   |
+ +------------------------------------------------------------------------------------+
+ |             |                               |                  |                   |
+ |  View/Tween |  translate/rotate/scale/alpha |  parent          |  View Property    |
+ |             |                               |                  |                   |
+ |  Animation  |  Fragment compat Transition   |  Render Node     |                   |
+ |             |                               |                  |                   |
+ +------------------------------------------------------------------------------------+
+ |             |   View.animate()              |                  |                   |
+ |  Animator   |                               |                  |                   |
+ |             |   offsetChildrenTopAndBottom  |  Render Property |  View Property    |
+ |             |                               |                  |                   |
+ |             |   ActivityOptions Transition  |                  |                   |
+ +------------------------------------------------------------------------------------+
+ |  Render     |   AnimatedVectorDrawable      |                  |                   |
+ |  Thread     |   RippleCompount              |  Inter-Process   | view property     |
+ |  Amimation  |   Revel Animation             |                  |                   |
+ +------------------------------------------------------------------------------------+
+ |  Window     |                               | SystemServer     |                   |
+ |  Transition |   Window Transition Animation | WindowManager    | some view property|
+ |  Animation  |                               |                  |                   |
+ +-------------+-------------------------------+------------------+-------------------+
+
+```
+- 视图动画 Animation（Rotate,Scale,translate,alpha）
+  +android.view.View#draw(android.graphics.Canvas, android.view.ViewGroup, long)
+    +android.view.View#applyLegacyAnimation
+   箭头动画
+   启动图片放大动画
+   弹窗动画
+```java
+public class View implements Drawable.Callback, KeyEvent.Callback,
+        AccessibilityEventSource {
+    /**
+     * The animation currently associated with this view.
+     * @hide
+     */
+    protected Animation mCurrentAnimation = null;
+```
+```java
+public class View implements Drawable.Callback, KeyEvent.Callback,
+        AccessibilityEventSource {
+    /**
+     * The animation currently associated with this view.
+     * @hide
+     */
+    protected Animation mCurrentAnimation = null;
+```
+
+```java
+final class BackStackRecord extends FragmentTransaction implements
+        FragmentManager.BackStackEntry, FragmentManagerImpl.OpGenerator {
+
+    int mEnterAnim;
+    int mExitAnim;
+    int mPopEnterAnim;
+    int mPopExitAnim;
+}
+
+```
+
+- 帧动画 AnimationDrawable
+     烟花效果
+    +android.graphics.drawable.Drawable#scheduleSelf
+        +android.view.View#scheduleDrawable //mChoreographer.postCallbackDelayed( Choreographer.CALLBACK_ANIMATION...)
+- 属性动画 Animator
+    +android.animation.ValueAnimator#start(boolean)
+          +android.animation.AnimationHandler#addAnimationFrameCallback// Choreographer#postCallbackDelayedInternal(CALLBACK_ANIMATION
+```java
+public class View implements Drawable.Callback, KeyEvent.Callback,
+        AccessibilityEventSource {
+    /**
+     * Object that handles automatic animation of view properties.
+     */
+    private ViewPropertyAnimator mAnimator = null;
+}
+```
+估值器自定义滑动效果
+插值器（Interpolator）和估值器（TypeEvaluator）
+
+- 窗口转场
+  [窗口转场](https://www.jianshu.com/p/c3217053d18d)
+  +com.android.server.wm.WindowManagerService#relayoutWindow
+        +com.android.server.wm.WindowManagerService#windowForClientLocked(com.android.server.wm.Session, IWindow, boolean)
+        +com.android.server.wm.WindowState#prepareWindowToDisplayDuringRelayout
+1. Viewpager转化动画
+
+2. Camera 3D动画
+3. AR沉浸式效果（ARCore）
+#### 输入事件 - Input
+
+```
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|                                                                                         |
++------------------------------+           +----------------------------------------------+
+|                              |           |                                              |
+|  App process                 |           | SystemServer IMS         +-----------------+ |
+|                              |           |                          |  InputReader    | |
+|                              |           |                          |                 | |
+|                              |           |                          |                 | |
+|                              |           |                          | +------+        | |
+|  +---------------------------+           +--------------------+     | |input |        | |
+|  |  ViewRootImpl             |           | InputDispatcher    |     | |mapper|        | |
+|  |  +------------------------+           +------------------+ |     | +------+        | |
+|  |  |  InputEventReceiver    |           | InputPublisher   | |     |      +--------+ | |
+|  |  |    +-------------------+           +---------------+  | |     |      |eventhub| | |
+|  |  |    |   InputChannel    | <------>  | Inputchannel  |  | |     |      +--------+ | |
+|  |  |    |                   |           |               |  | |     +-----------------+ |
++--+--+----+-------------------+-----------+---------------+--+-+-------------------------+
+
+
+```
+
+```java
+android.view.ViewRootImpl.WindowInputEventReceiver extends InputEventReceiver{
+    
+}
+
+
+public abstract class InputEventReceiver {
+    private final CloseGuard mCloseGuard = CloseGuard.get();
+
+    private long mReceiverPtr;
+
+    // We keep references to the input channel and message queue objects here so that
+    // they are not GC'd while the native peer of the receiver is using them.
+    private InputChannel mInputChannel;
+    private MessageQueue mMessageQueue;
+
+    // Map from InputEvent sequence numbers to dispatcher sequence numbers.
+    private final SparseIntArray mSeqMap = new SparseIntArray();
+
+}
+```
+
+
+[事件](https://blog.csdn.net/shareus/article/details/50763237)
+[Touch事件](http://gityuan.com/2016/12/10/input-manager/)
+```java
+public final class MotionEvent extends InputEvent implements Parcelable {
+    private long mNativePtr;
+    private MotionEvent mNext;
+
+    protected int mSeq;
+    /** @hide */
+    protected boolean mRecycled;
+    private RuntimeException mRecycledLocation;
+
+}
+```
+事件传递由 **Activity#dispatchTouchEvent**开始，有PhoneWindow传到Decorview进行遍历
+```
+                                    +-------------------------+        +-----------------+
+                                    |        Activity         |        | ACTION_DOWN     |
+                                    |  +------------------+   |  <---+ |                 |
+              +---------------------+  |dispatchTouchEvent|   |        +-----------------+
+              |                     |  |                  |   |
+              |            +------> |  +------------------+   |
+              |            | True   |                         |
+              |            |        |  +------------------+   |
+              |            |        |  |onTouchEvent      |   |
+              |            +----->  |  |                  |   |
+              |            | False  |  +------------------+   |
+              |            |        +-------------------------+
+              |            |
+              |            |                        True
+              v            |             +---------------------------------+
+                           |             |                                 |
+       +-------------------+-------+     |                     +-----------+-----------------+
+       |         ViewGroup         |     |                     |          View               |
+       |    +-----------------+    |     |                     |     +-----------------+     |
++----> | +--+dispatchTouchEvent    |     |             +-----> |  +--+dispatchTouchEvent <-+ |
+|      | |  |                 +    | <---+             |       |  |  |                 |   | |
+|      | |  +-----------------+    |                   |       |  |  +-----------------+   | | True
+|      | |                         |            False  |       |  |                        | |
++----+ | |  +-----------------+    |                   |       |  |  +-----------------+   | |
+       | +> |onIntercept      |    |                   |       |  |  |onTouchEvent     |   | |
+       |    |TouchE^ent       |  +---------------------+       |  +> |                 | +-+ |
+       |    +-----------------+    |                           |     +-----------------+     |
+       |                           |                           |                             |
+       |    +-----------------+    |                           |                             |
+       |    |onTouchEvent     |    |                           |                             |
+       |    |                 |    |                           |                             |
+       |    +-----------------+    |                           |                             |
+       +---------------------------+                           +-----------------------------+
+
+
+```
+
+### 数据渲染 - OpenGL ES 栅格化
+```
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  App                                                                        |
+|                                                                             |
+|                                                                             |
++-----------------------------------+-----------------------------------------+
+|                                   |                                         |
+|   View/Graphic/Widget             |   OpenGL ES                             |
+|                                   |                                         |
++-----------------------------------+                                         |
+|   Skia                            |                                         |
+|                                   |                                         |
++-----------------------------------+-----------------------------------------+
+|                                                                             |
+|   Surface                                                                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+```
+Canvas是一个2D的概念，是在Skia中定义的
+Skia 2D和OpenGL/ES 3D
+
+OpengGL/ES两个基本Java类： GLSurfaceView,Renderer
+[渲染流程线](https://blog.csdn.net/cpcpcp123/article/details/79942700?utm_source=blogxgwz8)
+UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU—-> GPU对图进行光栅化(Frame Rate ) —->硬件时钟(Refresh Rate)—-垂直同步—->投射到屏幕
+```
+root      229   1     46892  4392     ep_poll b749cca5 S /system/bin/surfaceflinger
+```
 skia 图形引擎
 [Canvas的底层是用 Skia 的库，cpu绘制](https://zhuanlan.zhihu.com/p/30453831)
 [freetype 字体渲染](https://learnopengl-cn.readthedocs.io/zh/latest/06%20In%20Practice/02%20Text%20Rendering/)
 [OpenGL 基本数据类型](https://segmentfault.com/a/1190000017246734)
 [OpenGL ES 和 OpenGL ES 库的区别](https://woshijpf.github.io/android/2017/09/05/Android系统图形栈OpenGLES和EGL库的加载过程.html)
-```
+```java
 public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback2 {
     private final WeakReference<GLSurfaceView> mThisWeakRef = new WeakReference<GLSurfaceView>(this);
     private GLThread mGLThread;
@@ -405,7 +810,7 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
 
 ```
 
-```
+```java
 public class MediaPlayer extends PlayerBase
                          implements SubtitleController.Listener
                                   , VolumeAutomation
@@ -479,139 +884,7 @@ public class MediaPlayer extends PlayerBase
 }
 ```
 
-### SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
-Canvas是一个2D的概念，是在Skia中定义的
-Skia 2D和OpenGL/ES 3D
 
-OpengGL/ES两个基本Java类： GLSurfaceView,Renderer
-[渲染流程线](https://blog.csdn.net/cpcpcp123/article/details/79942700?utm_source=blogxgwz8)
-UI对象—->CPU处理为多维图形,纹理 —–通过OpeGL ES接口调用GPU—-> GPU对图进行光栅化(Frame Rate ) —->硬件时钟(Refresh Rate)—-垂直同步—->投射到屏幕
-```
-root      229   1     46892  4392     ep_poll b749cca5 S /system/bin/surfaceflinger
-```
-SystemServer的RenderThread线程
-黄油计划：
-- 垂直同步(VSYNC 定时中断)、
-- Triple Buffer
-- Choreographer（ViewRootImpl实现统一调度界面绘图。）
-黄油计划的核心VSYNC信号分为两种，一种是硬件生成（HardwareComposer）的信号，一种是软件模拟（VSyncThread来模拟）的信号。
-```
-                            VSync                 VSync                VSync           //Display为基准，VSync将其划分成16ms长度的时间段
-                               +                    +                    +
-          +-------------------------------------------------------------------------+
-          |                    |                    |                    |          |
- Display  |                    |                    |                    |          |
-          +-------------------------------------------------------------------------+
-                               |                    |                    |
-                               |                    |                    |
-                               |                    |                    |
-          +-------+            +--------+           +------+             |
-CPU       | Frame1|            | Frame2 |           |Frame3|（前一个CPU Frame占用中）|  //CPU/GPU的FPS不等同Display的FPS，需要三级缓存
-          +-------+            +--------+           +------+（使用第三块缓存）       |
-                               |                    |                    |
-                   +-----------+-+      +-----------+----+ +-----------+ |
-GPU                | Frame1      |      | Frame2         | | Frame3    | |
-                   +-----------+-+      +-----------+----+ +-----------+ |
-                               |                    |                    |
-                               |                    |                    |
-                               |                    |                    |
-                               |                    |                    |
-                               +                    +                    +
-
-```
-
-
-```
-    class EventHandler {
-        friend class HWComposer;
-    };
-```
-
-```
-base/core/java/android/view/ViewRootImpl.java:511:        mChoreographer = Choreographer.getInstance();
-
-public final class Choreographer {
-    private final Object mLock = new Object();
-
-    private final Looper mLooper;
-    private final FrameHandler mHandler;
-
-    // The display event receiver can only be accessed by the looper thread to which
-    // it is attached.  We take care to ensure that we post message to the looper
-    // if appropriate when interacting with the display event receiver.
-    private final FrameDisplayEventReceiver mDisplayEventReceiver;
-
-    private CallbackRecord mCallbackPool;
-
-    private final CallbackQueue[] mCallbackQueues;//"input", "animation", "traversal"（测量、布局、绘制流程）, "commit"（遍历完成的提交操作，用来修正动画启动时间）
-
-    private boolean mFrameScheduled;
-    private boolean mCallbacksRunning;
-    private long mLastFrameTimeNanos;
-    private long mFrameIntervalNanos;
-    private boolean mDebugPrintNextFrameTimeDelta;
-    private int mFPSDivisor = 1;
-
-    /**
-     * Contains information about the current frame for jank-tracking,
-     * mainly timings of key events along with a bit of metadata about
-     * view tree state
-     *
-     * TODO: Is there a better home for this? Currently Choreographer
-     * is the only one with CALLBACK_ANIMATION start time, hence why this
-     * resides here.
-     *
-     * @hide
-     */
-    FrameInfo mFrameInfo = new FrameInfo();
-}
-
-
-private static final class CallbackRecord {
-    public CallbackRecord next;
-    public long dueTime;
-    public Object action; // Runnable or FrameCallback
-    public Object token;
-}
-
-
-
-```
-
-
-```
-root@x86:/ # ls -l /dev/graphics/
-crw-rw---- root     graphics  29,   0 2018-12-13 15:15 fb0
-```
-
-
-```
-public class Surface implements Parcelable {
-
-    private final CloseGuard mCloseGuard = CloseGuard.get();
-
-    // Guarded state.
-    final Object mLock = new Object(); // protects the native state
-    private String mName;
-    long mNativeObject; // package scope only for SurfaceControl access
-    private long mLockedObject;
-    private int mGenerationId; // incremented each time mNativeObject changes
-    private final Canvas mCanvas = new CompatibleCanvas();
-
-    // A matrix to scale the matrix set by application. This is set to null for
-    // non compatibility mode.
-    private Matrix mCompatibleMatrix;
-
-    private HwuiContext mHwuiContext;
-
-    private boolean mIsSingleBuffered;
-    private boolean mIsSharedBufferModeEnabled;
-    private boolean mIsAutoRefreshEnabled;
-}
-
-```
-
- 
 ## dalvik
 [支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
 Mark-sweep算法：还分为Sticky, Partial, Full，根据是否并行，又分为ConCurrent和Non-Concurrent
@@ -631,7 +904,7 @@ public class Object {
 
 **ArrayMap**
 相比HashMap使用了两个小的容量的数组
-```
+```java
 public final class ArrayMap<K, V> implements Map<K, V> {
     final boolean mIdentityHashCode;// 1byte，default false
     int[] mHashes;//4 byte，存储key的hash值
@@ -687,7 +960,7 @@ if (mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3) {
 [SparseArray与HashMap<Integer,Object>对比](https://stackoverflow.com/questions/25560629/sparsearray-vs-hashmap)
 [SparseArray与ArrayMap对比，解决基本数据类型自动封箱问题](https://android.jlelse.eu/app-optimization-with-arraymap-sparsearray-in-android-c0b7de22541a)
   稀疏数组问题就是数组中的大部分的内容值都未被使用或者都为0，在数组中仅有少部分的空间使用。
-```
+```java
 public class SparseArray<E> implements Cloneable {
     private boolean mGarbage = false;// 1byte
     private int[] mKeys;//4 byte
@@ -707,7 +980,7 @@ gc  标记为DELETED，key,Value替换为有值的数据
 
 ### 数据存储
 #### SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
-```
+```java
 final class SharedPreferencesImpl implements SharedPreferences {
     private final File mFile;
     private final File mBackupFile;
@@ -753,7 +1026,7 @@ final class SharedPreferencesImpl implements SharedPreferences {
 #### RPC - Protocol Buffer
 #### OKIO
 Source（io InputStream）,Sink（io OutputStream）,Buffer（io BufferedInputStream,BufferedOutputStream）
-```
+```java
 public class ByteString implements Serializable, Comparable<ByteString> {
 
   final byte[] data;
@@ -803,7 +1076,7 @@ ViewRootImpl的setView()过程:
 ANR 事件 resetANRTimeoutsLocked
 
 
-```
+```C
 struct RawEvent {
     nsecs_t when;
     int32_t deviceId;
@@ -817,7 +1090,7 @@ struct RawEvent {
 ### SystemServer - WindowsManagerService
 
 启动 涉及“android.display”（DisplayThread）, “android.ui”线程（PolicyHandler）
-```
+```java
 base/services/java/com/android/server/SystemServer.java:671:    private void startOtherServices() {
 }
 
@@ -1200,7 +1473,7 @@ public class WindowManagerService extends IWindowManager.Stub
 }
 ```
 ### SystemServer - ActivityManagerService
-```
+```java
 public class ActivityManagerService extends IActivityManager.Stub
         implements Watchdog.Monitor, BatteryStatsImpl.BatteryCallback {
     /** All system services */
@@ -1365,7 +1638,7 @@ final ProviderMap mProviderMap;
 ```
 
 
-```
+```java
 public class ActivityStackSupervisor extends ConfigurationContainer implements DisplayListener,
         RecentTasks.Callbacks {
     private final SparseArray<ActivityDisplay> mActivityDisplays = new SparseArray<>();
@@ -1375,7 +1648,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 ```
 ### SystemServer - PackageManagerService
 ### SystemServer - LocationManagerService
-
+```java
 public class LocationManagerService extends ILocationManager.Stub {
         private final Context mContext;
     private final AppOpsManager mAppOps;
@@ -1466,8 +1739,9 @@ public class LocationManagerService extends ILocationManager.Stub {
     private boolean mGnssBatchingInProgress = false;
     private final PackageMonitor mPackageMonitor = new PackageMonitor();
 }
-### SystemServer - NotificationManagerService
 ```
+### SystemServer - NotificationManagerService
+```java
 public class NotificationManager {
     private Context mContext;
 
@@ -1484,7 +1758,7 @@ public class NotificationManager {
 
 
 ### Context
-```
+```java
 public abstract class Context {
 }
 
@@ -1860,7 +2134,7 @@ ActivityDisplay#0（一般只有一显示器） ActivityDisplay#1
 
 ```
 
-```
+```java
 class ActivityDisplay extends ConfigurationContainer<ActivityStack> implements WindowContainerListener {
 
     private ActivityStackSupervisor mSupervisor;
@@ -1898,7 +2172,7 @@ class ActivityDisplay extends ConfigurationContainer<ActivityStack> implements W
 }
 ```
 ActivityStack
-```
+```java
 class ActivityStack<T extends StackWindowController> extends ConfigurationContainer
         implements StackWindowListener {
    final ActivityManagerService mService;
@@ -1997,7 +2271,7 @@ class ActivityStack<T extends StackWindowController> extends ConfigurationContai
 
 
 
-```
+```java
 class TaskRecord extends ConfigurationContainer implements TaskWindowContainerListener {
     final int taskId;       // Unique identifier for this task.
     String affinity;        // The affinity name for this task, or null; may change identity.
@@ -2111,7 +2385,7 @@ class TaskRecord extends ConfigurationContainer implements TaskWindowContainerLi
 ```
 
 ActivityRecord
-```
+```java
 final class ActivityRecord extends ConfigurationContainer implements AppWindowContainerListener {
     final ActivityManagerService service; // owner
     final IApplicationToken.Stub appToken; // window manager token
@@ -2261,21 +2535,7 @@ android:noHistory： “true”值意味着Activity不会留下历史痕迹。�
 
 
 ### 其他组件 View（ 测量，布局及绘制,事件，动画），controls,layouts
-[事件](https://blog.csdn.net/shareus/article/details/50763237)
-[Touch事件](http://gityuan.com/2016/12/10/input-manager/)
-```
-public final class MotionEvent extends InputEvent implements Parcelable {
-    private long mNativePtr;
-    private MotionEvent mNext;
 
-    protected int mSeq;
-    /** @hide */
-    protected boolean mRecycled;
-    private RuntimeException mRecycledLocation;
-
-}
-```
-事件传递由 **Activity#dispatchTouchEvent**开始，有PhoneWindow传到Decorview进行遍历
 ``` 
 +-----------------------------------+
 |               Activity            |
@@ -2306,44 +2566,42 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 +-----------------------------------+
 
 ```
+#### 布局- CoordinatorLayout
+
+```java
+public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
+
+    private final List<View> mDependencySortedChildren = new ArrayList<>();
+    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
+
+    private final List<View> mTempList1 = new ArrayList<>();
+    private final List<View> mTempDependenciesList = new ArrayList<>();
+    private final int[] mTempIntPair = new int[2];
+    private Paint mScrimPaint;
+
+    private boolean mDisallowInterceptReset;
+
+    private boolean mIsAttachedToWindow;
+
+    private int[] mKeylines;
+
+    private View mBehaviorTouchView;
+    private View mNestedScrollingTarget;
+
+    private OnPreDrawListener mOnPreDrawListener;
+    private boolean mNeedsPreDrawListener;
+
+    private WindowInsetsCompat mLastInsets;
+    private boolean mDrawStatusBarBackground;
+    private Drawable mStatusBarBackground;
+
+    OnHierarchyChangeListener mOnHierarchyChangeListener;
+    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
+
+    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
+            new NestedScrollingParentHelper(this);
+}
 ```
-                                    +-------------------------+        +-----------------+
-                                    |        Activity         |        | ACTION_DOWN     |
-                                    |  +------------------+   |  <---+ |                 |
-              +---------------------+  |dispatchTouchEvent|   |        +-----------------+
-              |                     |  |                  |   |
-              |            +------> |  +------------------+   |
-              |            | True   |                         |
-              |            |        |  +------------------+   |
-              |            |        |  |onTouchEvent      |   |
-              |            +----->  |  |                  |   |
-              |            | False  |  +------------------+   |
-              |            |        +-------------------------+
-              |            |
-              |            |                        True
-              v            |             +---------------------------------+
-                           |             |                                 |
-       +-------------------+-------+     |                     +-----------+-----------------+
-       |         ViewGroup         |     |                     |          View               |
-       |    +-----------------+    |     |                     |     +-----------------+     |
-+----> | +--+dispatchTouchEvent    |     |             +-----> |  +--+dispatchTouchEvent <-+ |
-|      | |  |                 +    | <---+             |       |  |  |                 |   | |
-|      | |  +-----------------+    |                   |       |  |  +-----------------+   | | True
-|      | |                         |            False  |       |  |                        | |
-+----+ | |  +-----------------+    |                   |       |  |  +-----------------+   | |
-       | +> |onIntercept      |    |                   |       |  |  |onTouchEvent     |   | |
-       |    |TouchE^ent       |  +---------------------+       |  +> |                 | +-+ |
-       |    +-----------------+    |                           |     +-----------------+     |
-       |                           |                           |                             |
-       |    +-----------------+    |                           |                             |
-       |    |onTouchEvent     |    |                           |                             |
-       |    |                 |    |                           |                             |
-       |    +-----------------+    |                           |                             |
-       +---------------------------+                           +-----------------------------+
-
-
-```
-
 
 
 
@@ -2353,6 +2611,8 @@ WindowManagerGlobal
 
 
 - Handler 消息机制
+
+```java
 public class Handler {
     final Looper mLooper;
     final MessageQueue mQueue;
@@ -2449,8 +2709,9 @@ public final class Message implements Parcelable {
     // sometimes we store linked lists of these things
     /*package*/ Message next;
 }
-- AsyncTask
 ```
+- AsyncTask
+```java
 
 public abstract class AsyncTask<Params, Progress, Result> {
 
@@ -2468,39 +2729,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
 ```        
     容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
     并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
-#### 布局- CoordinatorLayout
-public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
 
-    private final List<View> mDependencySortedChildren = new ArrayList<>();
-    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
-
-    private final List<View> mTempList1 = new ArrayList<>();
-    private final List<View> mTempDependenciesList = new ArrayList<>();
-    private final int[] mTempIntPair = new int[2];
-    private Paint mScrimPaint;
-
-    private boolean mDisallowInterceptReset;
-
-    private boolean mIsAttachedToWindow;
-
-    private int[] mKeylines;
-
-    private View mBehaviorTouchView;
-    private View mNestedScrollingTarget;
-
-    private OnPreDrawListener mOnPreDrawListener;
-    private boolean mNeedsPreDrawListener;
-
-    private WindowInsetsCompat mLastInsets;
-    private boolean mDrawStatusBarBackground;
-    private Drawable mStatusBarBackground;
-
-    OnHierarchyChangeListener mOnHierarchyChangeListener;
-    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
-
-    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
-            new NestedScrollingParentHelper(this);
-}
 ### 编译，打包，优化，签名，安装
 gradle,Transform的应用
 批量打包
@@ -2564,21 +2793,7 @@ AIDL
 文件
 - Bitmap
 
-- 动画
-[动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
-1. 补间动画
-   烟花效果
-2. 视图动画（Rotate,Scale,translate,alpha）
-   箭头动画
-   启动图片放大动画
-   弹窗动画
-3. 属性动画，插值器（Interpolator）和估值器（TypeEvaluator）
-   估值器自定义滑动效果
-4. Viewpager转化动画
-5. SVG动画
-6. Activity转场动画
-7. Camera 3D动画
-8. AR沉浸式效果（ARCore）
+
 
 - 图形及用户界面
 1. 界面及事件
@@ -2601,11 +2816,11 @@ AIDL
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
-    1. 布局优化（include merge, viewstub）
+    1. 布局优化（layoutInspector include merge, viewstub）
     分析工具，不必要不加载（include merge, viewstub），ConstaintLayout，Lint
-    1. 绘制优化
+    1. 绘制优化(profiler)
     尽量用Drawable
-    1. 响应速度优化
+    1. 响应速度优化(profiler)
     2. ListView/RecycleView及Bitmap优化
     3. 线程优化
 - 内存优化
@@ -2620,7 +2835,7 @@ AIDL
 
 - 其他性能优化的建议
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
-工具：profile，eclipse mat
+工具：profiler，eclipse mat
 可维护性：组件化
 #### 内存泄漏
  
