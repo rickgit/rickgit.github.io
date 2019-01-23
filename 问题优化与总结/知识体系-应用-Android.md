@@ -27,11 +27,10 @@
 +-------------------------------------------------+---------------------+
 |                  Libraries                      |  Android Runtime    |
 |                                                 |  +----------------+ |
-|  Surface Mgr     Media Framework    Sqlite      |  | core Libraries | |
 |                                                 |  | dalvik vm      | |
-|  OpenGL+ES (3d)  FreeType           Webkit      |  +----------------+ |
+|  OpenGL+ES (3d)  SSL/TLS           Webkit       |  +----------------+ |
 |                                                 +---------------------+
-|  SGL(Skia 2d)    SSL/TLS            libc(bionic)                      |
+|  SGL(Skia 2d)    FreeType            libc(bionic)                     |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
@@ -46,6 +45,7 @@
 +-----------------------------------------------------------------------+
 |                                                                       |
 |                                        ^                              |
+|                                        |                              |
 |  Loader +--->Boot ROM+--->Boot Loader+-+                              |
 |                                                                       |
 +-----------------------------------------------------------------------+
@@ -54,11 +54,13 @@
 ```
 
 ## Linux kernel -ipc
-启动Kernel的swapper进程(pid=0)：该进程又称为idle进程, 系统初始化过程Kernel由无到有开创的第一个进程, 用于初始化进程管理、内存管理，加载Display,Camera Driver，Binder Driver等相关工作
-启动kthreadd进程（pid=2）：是Linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd，thermal等内核守护进程。kthreadd进程是所有内核进程的鼻祖
---------------------- 
+
+>启动Kernel的swapper进程(pid=0)：该进程又称为idle进程, 系统初始化过程Kernel由无到有开创的第一个进程, 用于初始化进程管理、内存管理，加载Display,Camera Driver，Binder Driver等相关工作。
+启动kthreadd进程（pid=2）：是Linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd，thermal等内核守护进程。kthreadd进程是所有内核进程的鼻祖。
 [作者：硬刚平底锅 ] (https://blog.csdn.net/qq_30993595/article/details/82714409 )
 
+
+[Android Init进程源码分析](https://blog.csdn.net/yangwen123/article/details/9029959)
 ```
 >ps
 USER      PID   PPID  VSIZE  RSS   WCHAN            PC  NAME
@@ -70,19 +72,14 @@ system    618   245   1684724 70680    ep_poll b72b7ca5 S system_server （创�
 system    231   1     4024   1360  binder_thr b753ae76 S /system/bin/servicemanager（管理service）
 root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflinger
 
-
-
-```
-
-[Android Init进程源码分析](https://blog.csdn.net/yangwen123/article/details/9029959)
-```
+-----------------------------------
    +---------------------+
-   |  start_kernel(void) |
+   |  start_kernel(^oid) |
    +---------+-----------+
              v
 
    +---------------------+
-   |  reset_init(void)   +--------------+-----------------------------+
+   |  reset_init(^oid)   +--------------+-----------------------------+
    +---------------------+              |                             |
                                         |                             |
                                         v                             v
@@ -99,18 +96,20 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 |                  |       |                     |      |                           |
 |                  |       |                     |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
-| |system_server | |       |   |Service Manager| |      |                           |
+| |system_ser^er | |       |   |Ser^ice Manager| |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
 | |              | |       |   +---------------+ |      |                           |
-| | AMS,WMS,PMS..| |       |   | mediaserver   | |      |                           |
-| | ServerThread | |       |   +---------------+ |      |                           |
-| +--------------+ |       |                     |      |                           |
+| | AMS,WMS,PMS..| |       |   | mediaser^er   | |      |                           |
+| | Ser^erThread | |       |   +---------------+ |      |                           |
+| |   JSS        | |       |   +---------------+ |      |                           |
+| | AlarmManager | |       |   |SurfaceFlinger | |      |                           |
+| +--------------+ |       |   +---------------+ |      |                           |
 |                  |       |                     |      |                           |
 |                  |       |                     |      |                           |
 |                  |       |                     |      |                           |
 +------------------+       +---------------------+      +---------------------------+
 
-  Java Process                 Native Process                Kernel Driver Thread
+  Ja^a Process                 Nati^e Process                Kernel Dri^er Thread
 
 
 ```
@@ -119,11 +118,12 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 《Android 开发艺术探索》
 基础知识：序列化和Binder
 Binder是misc设备上进行注册,作为虚拟字符设备。Binder transaction buffer，这块内存有一个大小限制，目前是1MB
-```
+```c
  > ls -l /dev/
 crw-rw-rw- root     root      10,  54 2018-12-03 20:23 binder //c代表字符设备文件
 drwxr-xr-x root     root              2018-12-13 15:15 input
 drwxr-xr-x root     root              2018-12-13 15:16 socket
+crw-rw-rw- 1 root   root      10,  62 2019-01-17 09:44 ashmem
 
 LINUX中的七种文件类型
 d 目录文件。
@@ -137,88 +137,177 @@ p 命名管道文件。
 其中Linux中I/O设备分为两类:字符设备和块设备。
 [创建7种类型文件](https://blog.csdn.net/furzoom/article/details/77888131)
 ```
+**IPC机制与方法**
+Linux中的RPC方式有管道，消息队列，共享内存等。
+消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
+Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
+```java
+性能，并发，一对多
+                         +-----------+---------+---------------------+
+                         |           |         |                     |
+                         |           | Messager|  Content Pro^ider   |
+                         | Bundle    |         |                     |
+                         |           |         |                     |
+         +---------------------------+---------+--------------------------------------+-----------------+
+         |               |                                           |                |                 |
+         | ashmem        |   AIDL    +-------------------------------+                |                 |
+         |               |           | byte, char, short, int, long, |                |                 |
+         |               |           | float, double, boolean        |                |                 |
+         |               |           | String, CharSequence          |                |                 |
+         |               |           | Parcelable                    |                |                 |
+         |               |           | List<>, Map<>                 |                |                 |
+         |               |           | aidl interface                |                |                 |
+         |               |           |                               |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | import Parcelable package     |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | in out inout                  |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | oneway                        |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |                                           |                |                 |
+         +-----------------------------------------------------------+                |                 |
+         |               |                                           |  Socket        |  File           |
+         | Shared memory |   Binder                                  |  pipe          | SharedPreference|
+         |               |                                           |  messagequeue  |                 |
+         +----------------------------------------------------------------------------------------------+
+         |               |                                           |                |                 |
+copy     |      0        |                 1                         |       2        |                 |
+times    |               |                                           |                |                 |
+         +---------------+-------------------------------------------+----------------+-----------------+
+
+public class Intent implements Parcelable, Cloneable {
+    private String mAction;
+    private Uri mData;
+    private String mType;
+    private String mPackage;
+    private ComponentName mComponent;
+    private int mFlags;
+    private ArraySet<String> mCategories;
+    private Bundle mExtras;
+    private Rect mSourceBounds;
+    private Intent mSelector;
+    private ClipData mClipData;
+    private int mContentUserHint = UserHandle.USER_CURRENT;
+    /** Token to track instant app launches. Local only; do not copy cross-process. */
+    private String mLaunchToken;
+}
+public final class Messenger implements Parcelable {
+    private final IMessenger mTarget;
+}
+
+import android.os.Message;
+/** @hide */
+oneway interface IMessenger {
+    void send(in Message msg);
+}
+```
+
+
+```
+root@x86:/ # ls /dev/socket/
+adbd
+cryptd
+dnsproxyd
+fwmarkd
+installd
+lmkd
+logd
+logdr
+logdw
+mdns
+netd
+property_service
+rild
+rild-debug
+sap_uim_socket1
+vold
+wpa_eth1
+zygote// zygote socket通信设备文件
+
+```
 Serializable->Parcelable->Binder->{AIDL,Messenger}
 
-AIDL 文件，方向指示符包括in、out、和inout；AIDL 进程间通信,作用就是不同UID的 APP应用(也就是不同进程)可以实现通过 ADIL 生成的接口类,来调用对方APP的方法。
+
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
-binder是C/S架构，分为Bn端(Server)和Bp端(Client)
+binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
+[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/)
 ```java
-framework/base/core/java/android/os/
-  - IInterface.java
-  - IServiceManager.java
-  - ServiceManager.java
-  - ServiceManagerNative.java(包含内部类ServiceManagerProxy)
+n：native
+p：proxy
 
-framework/base/core/java/android/os/
-  - IBinder.java
-  - Binder.java(包含内部类BinderProxy)
-  - Parcel.java
+SystemServer
++----------------+------------+-------------------------+--------------------------------------+
+|                |            |                         |                                      |
+|                |            | +---------------------+ |  BinderProxy   Ser^iceManagerProxy   |
+|                |            | | IInterface          | |  Ser^iceManager                      |  binder(0)/binders
+|                |  Client    | | IBinder             | +--------------------------------------+ +-----------------+
+|                |            | | IServiceManager     | |   BpBinder/BpRefBase   BpInterface   |                   |
+|                |  process   | |                     | |                                      |                   |
+|                |            | +---------------------+ |   BpServiceManager                   |                   |
+|                |            | | Android_util_Binder | |                                      |                   |
+|                |            | | android_os_Parcel   | |  frameworks//IPCThreadState.cpp      |                   |
+|                +------------+ | AndroidRuntime.cpp  | +--------------------------------------+                   |
+|                |            | +---------------------+ | Binder    ServiceManagerNative       |  binder(0)/binders|
+|                |            | | IInterface          | | BinderInternal                       | +-----------+     |
+|  user space    |  Server    | | IBinder             | +--------------------------------------+             |     |
+|                |            | | IserviceManager     | | BBinder/JavaBBinder/JavaBBinderHolder|             |     |
+|                |  process   | | ProcessState        | | BnInterface                          |             |     |
+|                |            | | IPCThreadState      | |                                      |             |     |
+|                |            | +---------------------+ | BnServiceManager                     |             |     |
+|                |            |                         | frameworks//IPCThreadState.cpp       |             |     |
+|                +--------------------------------------+--------------------------------------+  binder(0)  |     |
+|                |  Service   |                                                                | +------+    |     |
+|                |            |  servicemanager/binder.c                                       | binders|    |     |
+|                |  Manager   |                                                                |        |    |     |
+|                |            |  service_manager.c                                             |        |    |     |
+|                |  process   |                                                                |   +----+----+-----+--+
++----------------+------------+----------------------------------------------------------------+   |                  |
+                                                                                                   |  open/mmap/ioctl |
+                                                                                                   |                  |
+                                                                                                   +----+----+-----+--+
++----------------+------------+----------------------------------------------------------------+        |    |     |
+|                |            |                                                                | <------+    |     |
+|                |  Binder    |                                                                |             |     |
+|  kernel space  |            |   dri^ers/staging/android/binder.c                             | <-----------+     |
+|                |  Dri^er    |                                                                |                   |
+|                |            |                                                                | <-----------------+
++----------------+------------+----------------------------------------------------------------+
 
-framework/base/core/java/com/android/internal/os/
-  - BinderInternal.java
+                                                                                  +       ^
+                                                                                  |       |
+                                                                                  v       +
 
-framework/base/core/jni/
-  - AndroidRuntime.cpp
-  - android_os_Parcel.cpp
-  - android_util_Binder.cpp
+                                                                               +---------------+
+                                                                               |               |
+                                                                               |  kernel memory|
+                                                                               |               |
+                                                                               +---------------+
 
-/framework/native/libs/binder         
-    - IServiceManager.cpp
-    - Interface.cpp
-    - Binder.cpp
-    - BpBinder.cpp
-    - Parcel.cpp
-    - IPCThreadState.cpp
-    - ProcessState.
+----
 
-/kernel/drivers/android/
-    - binder.c
-    - binder_alloc.c
-    - binder_alloc.h
+binder的服务实体
++------------+-------------------------+-------------------------------+
+|            |   System Service        |    Local Service(bindService) |
+|            |                         |                               |
++----------------------------------------------------------------------+
+|            |                         |                               |
+|  launch    | SystemServer            |  bindService                  |
+|            |                         |                               |
++----------------------------------------------------------------------+
+|            |                         |                               |
+| regist and |ServiceManager#addService|  ActivityManagerService       |
+| manager    |                         |                               |
+|            |                         |                               |
+|------------+-------------------------+-------------------------------+
+|            |                         |                               |
+| communicate| SystemServer#getService |  ServiceConnection            |
+|            |                         |  (binder.asInterface)         |
+|------------+-------------------------+-------------------------------+
 
-/kernel/include/uapi/linux/android/
-    - binder.h
-```
-[Binder系统分析](http://gityuan.com/2014/01/01/binder-gaishu/)
-```java
- +-----------------------------------------------------------------------------------------------------------+
-                        ServiceManager            IInterface                Binder
-
-
-                        ServiceManagerNative      IServiceManager(aidl)     BinderProxy
-                         (hava BinderProxy)                                  (have BpBinder address) 
-
-  Framework layer       ServiceManagerProxy       IBinder(DeathRecipient)   BinderInternal(GcWathcer)
-                        (aidl->stub,have BpBinder)
- +-----------------------------------------------------------------------------------------------------------+
-
-
-  JNI Layer             Android_util_Binder       android_os_Parcel         AndroidRuntime
-
-+-----------------------------------------------------------------------------------------------------------+
-
-                        JavaBBinder              JavaBBinderHolder
-
-
-                        BpServiceManager          BpInterface               BpBinder（client, transact()）
-                        (extends Bpinterface)
-
-                        BnServiceManager          BnInterface               BBinder（server, onTransact()）
-
-
-                        IserviceManager           IInterface                ProcessState(create binder,)))(bbinder,BpBinder)
-
-
-  C Layer               BpRefBase                 IBinder                   IPCThreadState
-                        (base class)
- +-----------------------------------------------------------------------------------------------------------+
-
-  Kernel dev
-  driver layer          /dev/binder（open/mmap/ioctl指令）
-
- +-----------------------------------------------------------------------------------------------------------+
-
+通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
+通过bindService开启服务，Service和调用者之间可以通讯。
 ```
 AIDL 文件生成对应类，类里包含继承Binder的内部类和实现AIDL的内部类；
 
@@ -251,6 +340,7 @@ public final class Parcel {
 
 }
 ```
+
 - Bundle(实现了接口Parcelable)
 ```java
 public class BaseBundle {
@@ -281,35 +371,9 @@ public class BaseBundle {
     public int mFlags;
 }
 ```
-- 文件共享
-- AIDL
-- Messenger(AIDL)
-- contentProvider（Binder）
-- socket（ 与Zygote通信）
 
 
-```
-root@x86:/ # ls /dev/socket/
-adbd
-cryptd
-dnsproxyd
-fwmarkd
-installd
-lmkd
-logd
-logdr
-logdw
-mdns
-netd
-property_service
-rild
-rild-debug
-sap_uim_socket1
-vold
-wpa_eth1
-zygote// zygote socket通信设备文件
 
-```
 ## Native Layer
 init进程会孵化出ueventd、logd、healthd、installd、adbd、lmkd等用户守护进程
 init进程还启动servicemanager(binder服务管家)、bootanim(开机动画)等重要服务
@@ -334,48 +398,50 @@ SystemServer的RenderThread线程
 CPU：负责 Measure、Layout、Record、Execute 的计算操作。CPU 负责把 UI组件计算成 Polygons（多边形）和 Texture（纹理），然后交给 GPU 进行栅格化。
 GPU：负责 Rasterization（栅格化）操作。GPU 的栅格化过程是绘制 Button、Shape、Path、String、Bitmap 等组件最基础的操作。
 ```java
-+--------------------------------------------------------------------+
-|                                                                    |
-|                                                                    |
-+--------------------+                 +-----------------------------+
-|                    |                 |                             |
-| App process        |                 |  SurfaceFlinger             |
-|   +----------------+                 |                             |
-|   |   Measure()    |                 |  +---------+----------+     |
-|   |   layout()     |                 |  |         |          |     |
-|   |   draw()       |                 |  |  client |  client  |     |
-|   |                |                 |  |         |          |     |
-|   +----------------+                 |  +---------+----------+     |
-|   |   Choreographer|                 |                             |
-+---+----------------------------------+-----------------------------+
-|                                                                    |
-|  SharedClient (Tmpfs Ashmem)                                       |
-|         +---------------------------------+--------------------+   |
-|         |                                 |                    |   |
-|         |  SharedBufferStack              |  SharedBufferStack |   |
-|         |      +--------------------------+                    |   |
-|         |      | Front Buffer             |                    |   |
-|         |      | (Display)                |                    |   |
-|         |      +--------------------------+                    |   |
-|         |      | Back Buffer| Back Buffer |                    |   |
-|         |      | (CPU,GPU)  | (CPU,GPU)   |                    |   |
-|         +------+------------+----------------------------------+   |
-|         |                                 |                    |   |
-|         |  SharedBufferStack              |  ...(31)           |   |
-|         |                                 |                    |   |
-|         +---------------------------------+--------------------+   |
-|                                                                    |
-+--------------------------------------------------------------------+
-|                   Vertical Synchronized                            |
-|                                                                    |
-+--------------------------------------------------------------------+
++--------------------------------------------------------------------------------------------------------------+
+|                                                                                                              |
++---------------------+                                                          +-----------------------------+
+| App process         |              +------------------------+                  | SurfaceFlinger              |
+|                     |              |  wms                   |                  |                             |
+|                     |              |                        |                  |                             |
+|                     | <----------> | SurfaceComposerClient  |  <------------>  |                             |
+|   +-----------------+              |                        |                  |                             |
+|   |   Measure()     |              |                        |                  |  +---------+----------+     |
+|   |   layout()      |              |                        |                  |  |         |          |     |
+|   |   draw()        |              +------------------------+                  |  |  client |  client  |     |
+|   |                 |                                                          |  |         |          |     |
+|   +-----------------+                                                          |  +---------+----------+     |
+|   |   Choreographer |                                                          |                             |
++---+-----------------+----------------------------------------------------------+-----------------------------+
+|                                                                                                              |
+|  SharedClient (Tmpfs Ashmem)                                                                                 |
+|         +---------------------------------+--------------------+                                             |
+|         |                                 |                    |                                             |
+|         |  SharedBufferStack              |  SharedBufferStack |                                             |
+|         |      +--------------------------+                    |                                             |
+|         |      | Front Buffer             |                    |                                             |
+|         |      | (Display)                |                    |                                             |
+|         |      +--------------------------+                    |                                             |
+|         |      | Back Buffer| Back Buffer |                    |                                             |
+|         |      | (CPU,GPU)  | (CPU,GPU)   |                    |                                             |
+|         +------+------------+----------------------------------+                                             |
+|         |                                 |                    |                                             |
+|         |  SharedBufferStack              |  ...(31)           |                                             |
+|         |                                 |                    |                                             |
+|         +---------------------------------+--------------------+                                             |
+|                                                                                                              |
++--------------------------------------------------------------------------------------------------------------+
+|                   Vertical Synchronized                                                                      |
++--------------------------------------------------------------------------------------------------------------+
+
+
 ```
 ```java
                             VSync                 VSync                VSync           //Display为基准，VSync将其划分成16ms长度的时间段
                                +                    +                    +
           +-------------------------------------------------------------------------+
           |                    |                    |                    |          |
- Display  |                    |                    |                    |          |
+Display   |                    |                    |                    |          |
           +-------------------------------------------------------------------------+
                                |                    |                    |
                                |                    |                    |
@@ -693,23 +759,60 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
 ### 数据渲染 - OpenGL ES 栅格化
 ```
-+-----------------------------------------------------------------------------+
-|                                                                             |
-|  App                                                                        |
-|                                                                             |
-|                                                                             |
-+-----------------------------------+-----------------------------------------+
-|                                   |                                         |
-|   View/Graphic/Widget             |   OpenGL ES                             |
-|                                   |                                         |
-+-----------------------------------+                                         |
-|   Skia                            |                                         |
-|                                   |                                         |
-+-----------------------------------+-----------------------------------------+
-|                                                                             |
-|   Surface                                                                   |
-|                                                                             |
-+-----------------------------------------------------------------------------+
+             +-----------------------------------------------------------------------------+
+             |                                                                             |
+             |  App                                                                        |
+             |                                                                             |
+             +-----------------------------------+-----------------------------------------+
+             |                                   |                                         |
+             |   View/Graphic/Widget             |   OpenGL ES                             |
+             |                                   |                                         |
+             +-----------------------------------+                                         |
+             |   Skia                            |                                         |
+             |                                   |                                         |
+             |     +-----------------------------+        +--------------------------------+
+             |     |                             |        |                                |
+             |     | libjpeg/libpng/libgif/libft2|        |  libagl/libhgl                 |
+             |     |                             |        |                                |
+             +-----+-----------------------------+--------+--------------------------------+
+             |                                                                             |
+             |   Surface                                                                   |
+   Client    |                                                                             |
+             +-----------------------------------------------------------------------------+
+                                                     wms     SurfaceComposerClient
+                                      +-----------------------+
++-------------------------------------+       Binder dri^er   +--------------------------------------------+
+                                      +-----------------------+
+   Server
+                         +------------+     +------------+      +------------+
+                         |   Surface  |     |  Surface   |      |   Surface  |
+                         +-----+------+     +------+-----+      +-----+------+
+                               |                   |                  |
+                               |                   |                  |
+             +-----------------+-------------------+------------------+--------------------+
+             |                                                                             |
+             |                                Surfaceflinger                               |
+             |           main_surfaceflinger.cpp     SurfaceFlinger.cpp                    |
+             +-----------------------------------------------------------------------------+
+             |                                                  +--------------------------+
+             |                               EGLDisplaySurface  |           | back buffer  |
+             |                                                  |frontbuffer+--------------+
+             |                                                  |           | back buffer  |
+             +--------------------------------------------------+-----------+--------------+
+             | HAL                        FramebufferNativeWindow                          |
+             |                                                                             |
+             +-----------------------------------------------------------------------------+
+             |                                                                             |
+             |                               Gralloc                                       |
+             |                              gpu0 fb0                                       |
+             +-----------------------------------------------------------------------------+
+
+             +-----------------------------------------------------------------------------+
+    kernel   |                       /dev/graphics/fb*                                     |
+             |                                                                             |
+             +-----------------------------------------------------------------------------+
+
+
 
 ```
 Canvas是一个2D的概念，是在Skia中定义的
@@ -979,7 +1082,7 @@ public class SparseArray<E> implements Cloneable {
 gc  标记为DELETED，key,Value替换为有值的数据
 
 ### 数据存储
-#### SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
+#### 文件存储,SharedPreferences,SQLite数据库方式,内容提供器（Content provider）,网络
 ```java
 final class SharedPreferencesImpl implements SharedPreferences {
     private final File mFile;
@@ -2847,7 +2950,7 @@ AIDL
 组件化
 - 组件间解耦
   1. MVVM-AAC 
-   ViewModel LiveData
+  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
   2. MVP DI框架Dagger2解耦
 - 通信
 1. 对象持有
@@ -2896,6 +2999,3 @@ AIDL
 
 #### ARouter
 控制反转和面向切面
-
-
-#### FLutter &Fuchsia & dart
