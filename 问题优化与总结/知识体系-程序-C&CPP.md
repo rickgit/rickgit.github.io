@@ -392,7 +392,7 @@ C++中的struct与类区别
 ### 抽象，封装，继承（重载），多态
 
 - 数据封装是一种把数据和操作数据的函数捆绑在一起的机制，数据抽象是一种仅向用户暴露接口而把具体的实现细节隐藏起来的机制。
-- 继承类型
+- 继承类型（class DeriveClass:acess-label BaseClassName）
 [继承中的内存布局](http://blog.csdn.net/randyjiawenjie/article/details/6693337)
 1. 虚函数指针(vptr)放最前，之后放变量。
 2. 多个父类排着放，再放子类
