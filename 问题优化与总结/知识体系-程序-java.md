@@ -1,27 +1,27 @@
 # Android 高级工程师知识体系
 程序：一些列数据结构和指令（《计算机程序设计艺术》）
 软件：计算机系统中程序和文档的总称。
-文档：需求开发计划（排期）及进度，设计说明书（架构图，项目结构图），规范文档（命名，注释），功能预演文档，开发总结文档，用户指南(使用手册)
+文档：需求开发计划（排期）及进度，设计说明书（架构图，项目结构图，类图），规范文档（命名，注释），功能预演文档，开发总结文档，用户指南(使用手册)
 
 ```
 +----------------------------------------------------------------------------------------------------+
 |                                                                                                    |
-|                                           Read File/Socket/Object(Serializable)/db                 |
+|                            ReadWrite Object(String,Serializable)/File/Socket/db                    |
 +-------------------------------------------+------------+---------+-----------+-------+-------------+
-|Class|based|concurrency|Aspect|            |            |         |           |       |             |
+|Class-based|concurrency|Aspect|            |            |         |           |       |             |
 |           |           |      |            |            |         |           |       |             |
 +-----------+-----------+------+------+     |            |         |           |       |             |
-|                    oop              | pop | Functional |Reactive |Reflective |Generic|             |
-+------------------------------+------+------------------------------------------------+Event+driven |
-|            Structured        | Imperative |  Declarative         |Metaprogramming    |             |
+|                    oop              | pop | Functional | FRP     |Reflective |Generic|             |
++------------------------------+------+------------------------------------------------+Event-driven |
+|            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
 +------------------------------+------------+------------------------------------------+-------------+
 |                                                                                                    |
-|                                           conditon/loops                                           |
+|                             conditional/decision-making/loops                                      |
 +----------------------------------+------------+---------------+-+-----------+-------------+--------+
-|            Whitespace(tab space) |            |               | |           |             |        |
-|            comment               |            | Base Data Type| |           |             | other  |
-|            separator sign(;)     |            |               | |           |             | symbol/|
-+----------------------------------+            +---------------+-+           |             | token  |
+|            Whitespace(tab space) |    0b1     |               | |           |             |        |
+|            comment               |    01      | Base Data Type| |           |             | other  |
+|            separator sign(;)     |    1       |               | |           |             | symbol/|
++----------------------------------+    0x1     +---------------+-+           |             | token  |
 |              separator           |   Literals |  keywords       |Operators  | Identifiers |        |
 +----------------------------------+------------+-----------------------------+-------------+--------+
 |                                                                                                    |
@@ -32,9 +32,6 @@
 +----------------------------------------------------------------------------------------------------+
 
 
-
-
-
 ```
 
 ## 1 数据 - 通信
@@ -43,21 +40,74 @@
 - 字长
   [字长](http://www.cnblogs.com/chakyu/p/7405275.html)
   [进制转化](https://www.branah.com/ascii-converter)
-- 字节与字符编码
+- 字节，编码，字符集 
+sun.jnu.encoding是指操作系统的默认编码，
+file.encoding是指JAVA文件的编码
+```java
+javac -encoding utf-8 TextFileEncoding.java  //必须设置和文件编码一直的编码
+
+java -Dfile.encoding=utf-8 TextFileEncoding
+```
+
 《The Unicode® Standard Version 9.0 》
+BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
+```
+                            256
+                   128
+              16
+            +------+---------+------------+
+        16  | 128  |         |            |
+            | 0xf  |         |            |
+            +------+         |            |
+            |       256      |            |
+    128     |      0xff      |            |
+            |                |            |
+256         +----------------+            |
+            |               65536         |
+            |               0xffff        |
+            |                             |
+            |                             |
+            |                             |
+            |                             |
+            +-----------------------------+
+17个0xffff，即0x10ffff
+```
 [unicode 及位置](https://unicode-table.com/en/#control-character)
+UCS-4 第1个字节2^7=128个group，第2个字节2^8=256个平面（plane）,第3个字节分为256行 （row），第4个字节代表每行有256个码位（cell）
+unicode 有0x10FFFF个cell，分为 17平面，(2^8=256)行，(2^8=256)单元
+
+```
+              2^8=256 cells
+          +----------------+
+
+          128 ascii
+          +-------+
+
+      +   +----------------+----------------+----------------+       +----------------+----------------+----------------+
+      |   ++ascii++        |                |                |       |                |                |                |
+256   |   |                |                |                |  ...  |                |                |                |
+lines |   |    plane 0     |    plane 1     |    plane 2     |       |     plane 14   |    plane 15    |    plane 16    |
+      |   |     BMP        |      SMP       |      SIP       |       |       SSP      |     SPUA-A     |     SPUA-B     |
+      +   |                |                |                |       |                |                |                |
+          +----------------+----------------+----------------+       +----------------+----------------+----------------+
+
+          +-------------------------------------------------------------------------------------------------------------+
+
+
+                                                            17 panes   (0x10FFFF cells)
+
+```
 - 涉及类
   1. [Character.UnicodeBlock](https://en.wikipedia.org/wiki/Unicode_block)
-UCS-4 0组，17平面，(2^7-1)行，(2^7-1)单元
 - [Unicode与UTF-8转化](https://zh.wikipedia.org/wiki/UTF-8)
-- [UTF-16](https://en.wikipedia.org/wiki/UTF-16)
+- [UTF-16](https://en.wikipedia.org/wiki/UTF-16) UTF-16编码（二进制）就是：110110yyyyyyyyyy 110111xxxxxxxxxx
   超过三个字节 Unicode 用四个字节的UTF-16编码
   
-```
+```java
   System.out.println("a".getBytes(StandardCharsets.UTF_16).length);//结果为4，是因为加上BOM(字节顺序标记(ByteOrderMark))大端序，用FEFF表示，FEFF占用两个字节。
 ```
 
-  大端，高位字节存储在内存地址的低位地址
+  BOM大端，高位字节存储在内存地址的低位地址
 
 ```
     0x CC AA 88 66
@@ -85,10 +135,7 @@ UCS-4 0组，17平面，(2^7-1)行，(2^7-1)单元
 
 标识符是用来为程序中的类、方法、变量命名的符号。
 
-
-
-
-```
+```java
 keyword(53)
 
 +-----------+-----------------------------------------------------------------------+
@@ -133,8 +180,8 @@ keyword(53)
 | literals  |  true false null                                                      |
 +-----------+-----------------------------------------------------------------------+
 
-
 ```
+
 ``` Operators
 +-------------+--------------------------------------------------------------+
 |             |                                                              |
@@ -142,19 +189,19 @@ keyword(53)
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
-|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
-|             |                                                             ++
-+----------------------------------------------------------------------------+
-|             |                                                              |
 |  Logical    |  && || !                                                     |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
-|  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
+|  Relational |  == != > < >= <=                                             |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
-|  Relational |  == != > < >= <=                                             |
+|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
@@ -185,7 +232,7 @@ keyword(53)
                          |
                          |
                          |
-            ++primitive  ++ Char
+            ++primitive  ++ char 
             | Typeifine  |
             |            |
             |            |
@@ -267,27 +314,12 @@ Float.MIN_VALUE ~ Float.MAX_VALUE
 2^(-1022-52) ~~ 2-2^-52)*(2^((2^10)-1))
 
 - Char
-  jdk 9采用压缩字符串，都是 Iso-8891，使用一个字节，否则用 UTF-16 编码。
+  jdk 9采用压缩字符串，Iso-8891，使用一个字节，否则用 UTF-16 编码。
 
 - Boolean
 - Byte
 
-### 数据关键词与符号
-
-```
-类 class、enum、interface、extends、implements
-对象 new、instanceof、this、super
-包 package、import
-数据类型 byte、short、int、long、float、double、char、boolean
-分支 if、 else、switch、case、break、continue
-循环 do、while、for
-方法 void、return
-异常 throw、throws、try、catch、finally
-修饰符 Abstract、final、private、protected、public、、static、synchronized、strictfp、native、assert、transient、volatile
-保留字 const、goto
-```
-
-### 指令 - 运算符（算术，比较，赋值，自增减）
+### 指令 - 运算符（算术，位运算，赋值，比较，逻辑）
 Byte通过加法实现加减，移位和加法实现乘除法
 
 - 原码，反码，补码
@@ -337,77 +369,100 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
     取补求值，相当于（a+b） mod 128，保证不会溢出
 ```
 
-- 位运算
-**~** 按位取反
-
+- 位运算 **& | ~ ^**
+ 
 
 ### 数据 - 大数操作
-只要你的计算机的内存足够大，可以有无限位的
+只要你的计算机的内存足够大，可以有无限位的。
 
-
-
-常见构造大数方法，指数，阶乘，高德纳箭头，葛立恒数和Tree(3)
+常见构造大数方法：指数，阶乘，高德纳箭头，葛立恒数和Tree(3)
 3^3=3
 
 - BigInteger、BigDecimal
 [-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
 
 
-### 数据控制流
-if switch/case loop（while，for） goto
-### 声明式编程-函数式编程/响应式编程（java 1.8） 
-1. 函数接口/SAM接口 **@FunctionalInterface**
+## 面向过程（命令式编程）
+方法（函数）
+## 数据 -   基于类的面向对象（命令式编程）
+
+#### JVM 类加载机制及类加载器
+
+加载，连接，初始化
 ```java
-@FunctionalInterface 注释的约束：
-
-1、接口有且只能有个一个抽象方法，只有方法定义，没有方法体
-
-2、在接口中覆写Object类中的public方法，不算是函数式接口的方法。
-```
-- Supplier：用来创建对象的。（**Supplier<MyClass> c=()->new MyClass();** 省略为 **Myclass::new**）
-- Consumer、
-- Predicate、
-- Function、
-- UnaryOperator
-
-2. **Lambda 表达式**
-lambda表达式实例化函数接口
-```java
-(参数) -> 表达式
-```
-
-**闭包**的定义是: 引用了自由变量的函数。
-
-3. 方法引用 **::**
-
-4. 增强接口方法
-- Default Methods
-- 静态方法
-
-5. Stream API 详解 (Map-reduce、Collectors收集器、并行流)
-
-
-### 面向过程（命令式式编程）
-
-### 数据 -   基于类的面向对象（命令式式编程）
-```
 dx --dex --output=Hello.dex Hello.class
 
 javap -c  Hello.class
 
 javap –verbose Hello.class 可以看到更加清楚的信息
 ```
-运行时数据区：线程共用：方法区，堆；线程独立分配：栈，本地方法栈，程序计数器 
+#### JVM 对象的创建
+```java
+运行时数据区
+
+        JavaStack  Heap
+            ^     ^
+            |     |  Method Zone
+            |     |     ^
+            |     |     |
+            +     +     +
+        Object o = new Object()    +-----------> ProgramCounter//放执行当前指令的地址
+
+
+
+      int    i = 0
+
+                 +
+                 |
+                 v
+                 JavaStack
+
+
+      Object.java
+          public final native void notify();
+                          +
+                          |
+                          |
+                          |
+                          +------------------> nativeStack
+
 ```
+#### JVM 内存区域与内存模型
+```java
++--------------------------------+--------------------------------------------+
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|     +------------------+       |  +--------------+   +-------------------+  |
+|     |                  |       |  |              |   |                   |  |
+|     |  Heap            |       |  |  VM Stack    |   |  Native Method    |  |
+|     |                  |       |  |              |   |  Stack            |  |
+|     +------------------+       |  +--------------+   +-------------------+  |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
+|     +------------------+       |  +--------------------------------------+  |
+|     |                  |       |  |                                      |  |
+|     |  Method Area     |       |  |  Program Couter Register             |  |
+|     |    +-------------|       |  |                                      |  |
+|     |    |  const pool |       |  |                                      |  |
+|     +------------------+       |  +--------------------------------------+  |
+|                                |                                            |
+|                                |                                            |
+|                                |                                            |
++--------------------------------+--------------------------------------------+
 
 
 ```
+
 [jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)
 - 数组 
   
 Arrays.sort 双轴快排算法（包含归并排序算法，经典快速排序算法，插入排序算法混用，及**jdk 1.7**废弃掉的归并排序和插入排序混用）
 
-```ObjectHeader64Coops
+```java
+ObjectHeader64Coops
           +-            +------------------------+
           |             |                        |
           |             |     Mark Word          |   8Byte
@@ -433,7 +488,8 @@ Header    |             +------------------------+
 
 - [类的内存大小](https://segmentfault.com/a/1190000007183623)
 
-```ObjectHeader64Coops
+```java
+ObjectHeader64Coops
           +-            +------------------------+
           |             |                        |
           |             |     Mark Word          |   8Byte
@@ -461,7 +517,7 @@ Header    |             +------------------------+
 [内存占用查看工具](https://segmentfault.com/a/1190000007183623)
 
 以下是 64bit电脑，打印的信息。markword 8bytes,
-```
+```java
 edu.ptu.java.lib.RefType object internals:
  OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
       0    12        (object header)                           N/A
@@ -474,7 +530,7 @@ Footprint{Objects=1, References=0, Primitives=[]}
 ```
 
 [ObjectHeader64Coops 内存结构](https://gist.github.com/arturmkrtchyan/43d6135e8a15798cc46c)
-```
+```java
 ObjectHeader32
 |----------------------------------------------------------------------------------------|--------------------|
 
@@ -573,7 +629,7 @@ ObjectHeader64Coops
 ```
 - 字符串
 
-```
+```java
 
 java.lang.String object internals:
  OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
@@ -601,75 +657,44 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 
 
-- 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
-1. 对象的创建
-2. Java内存区域与内存模型
-```
-+--------------------------------+--------------------------------------------+
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
-|     +------------------+       |  +--------------+   +-------------------+  |
-|     |                  |       |  |              |   |                   |  |
-|     |  Heap            |       |  |  VM Stack    |   |  Native Method    |  |
-|     |                  |       |  |              |   |  Stack            |  |
-|     +------------------+       |  +--------------+   +-------------------+  |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
-|     +------------------+       |  +--------------------------------------+  |
-|     |                  |       |  |                                      |  |
-|     |  Method Area     |       |  |  Program Couter Register             |  |
-|     |                  |       |  |                                      |  |
-|     +------------------+       |  +--------------------------------------+  |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
-+--------------------------------+--------------------------------------------+
-
-```
-```
-运行时数据区
-
-        JavaStack  Heap
-             ^     ^
-Method Zone  |     |
-        ^    |     |
-        |    |     |
-        +    +     +
-      Object o = new Object()    +-----------> ProgramCounter//放执行当前指令的地址
-
-
-
-      int    i = 0
-
-                 +
-                 |
-                 |
-                 v
-                 JavaStack
-
-
-      Object.java
-          public final native void notify();
-                          +
-                          |
-                          |
-                          |
-                          +------------------> nativeStack
-
-```
-3. Java类加载机制及类加载器
-4. Java垃圾回收算法及垃圾收集器
+#### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
+ 
+3. Java垃圾回收算法及垃圾收集器
    标记-清除算法(mark-sweep), dalvikvm
    标记-压缩算法(mark-compact),
    复制算法(copying)  hotspot
    引用计数算法(reference counting)
-5. JVM判断对象是否已死（根节点没有引用）
+   分代收集算法（Generational Collection）
+4. JVM判断对象是否已死（根节点没有引用）
 >《Inside the Java Virtual Machine》
 
+```
++---------------------------------------------------------------------+
+|                                                                     |
+|  new gen                                                            |
+|                                                                     |
+|                +--------+    +--------+     +------------------+    |
+|                |        |    |        |     |                  |    |
+|                | Serial |    | ParNew |     | Parallel Scavenge|    |
+|                |        |    |        |     |                  |    |
+|                +--+--+--+    +--+-+---+     +-----+----+-------+    |
+|                   |  |          | |               |    |            |
+|                   |  |          | |               |    |            |
+|                +--+  +-----+    | |   +-----------+    |            |
+|                |           |    | |   |                |    +-----+ |
++---------------- ----------- ---- - --- ---------------- ----+ G1  +-+
+|                | +---------+----+ |   |                |    +-----+ |
+|  old gen       | |         |      |   |                |            |
+|                | |         |      |   |                |            |
+|            +---+-+        ++------+---+--+    +--------+-----+      |
+|            |     |        |              |    |              |      |
+|            | CMS +--------+ Parallel Old |    | Serial Old   |      |
+|            |     |        |              |    |              |      |
+|            +-----+        +--------------+    +--------------+      |
+|                                                                     |
++---------------------------------------------------------------------+
 
+```
 
 [HotSpot 虚拟机](http://openjdk.java.net/groups/hotspot/docs/HotSpotGlossary.html)
 
@@ -677,6 +702,10 @@ Generational Collection（分代收集）算法
   1. 新生代都采取Copying算法
   2. 老年代的特点是每次回收都只回收少量对象，一般使用的是Mark-Compact算法
   3. 永久代（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：废弃常量和无用的类。
+
+
+JVM给了三种选择收集器：串行收集器、并行收集器、并发收集器
+
 
 ####  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
 高级特性：强类型，静态语言，混合型语言（编译，解释）
@@ -1194,310 +1223,109 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 Charset#availableCharsets():SortedMap
 
-### 2.3 数据匹配（正则）
-```
-public final class Pattern implements java.io.Serializable
-{
-    /**
-     * The original regular-expression pattern string.
-     *
-     * @serial
-     */
-    private final String pattern;
-
-    /**
-     * The original pattern flags.
-     *
-     * @serial
-     */
-    private final int flags;
-
-    @ReachabilitySensitive
-    transient long address;
-}
 
 
-public final class Matcher implements MatchResult {
-    /**
-     * The Pattern object that created this Matcher.
-     */
-    // Patterns also contain cleanup code and a ReachabilitySensitive field.
-    // This ensures that "this" and pattern remain reachable while we're using pattern.address
-    // directly.
-    @ReachabilitySensitive
-    private Pattern pattern;
+### 数据类结构 - 类实现面向对象与设计模式
+ 五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 
-    /**
-     * The address of the native peer.
-     * Uses of this must be manually synchronized to avoid native crashes.
-     */
-    @ReachabilitySensitive
-    private long address;
+- 创建型
+  - 构建者模式
+  
+  Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
 
-    /**
-     * If non-null, a Runnable that can be used to explicitly deallocate address.
-     */
-    private Runnable nativeFinalizer;
+  - 单例模式
+  
+  Application，LayoutInflater 
+  - 工厂方法
+  
+  BitmapFactory
+  - 原型模式
+  - 抽象工厂
+- 结构型
+  - 适配器模式（Adapter）
+  - 装饰模式（Retrofit）
+  - 享元模式
 
-    private static final NativeAllocationRegistry registry = new NativeAllocationRegistry(
-            Matcher.class.getClassLoader(), getNativeFinalizer(), nativeSize());
+    Message.obtainMessage
+  - 代理模式
 
-    /**
-     * Holds the original CharSequence for use in {@link #reset}. {@link #input} is used during
-     * matching. Note that CharSequence is mutable while String is not, so reset can cause the input
-     * to match to change.
-     */
-    private CharSequence originalInput;
+    静态代理：封装ImageLoader、Glide；动态代理：面向切面。AIDL
+  - 组合模式
 
-    /**
-     * Holds the input text.
-     */
-    private String input;
+    View和ViewGroup的组合
 
-    /**
-     * Holds the start of the region, or 0 if the matching should start at the
-     * beginning of the text.
-     */
-    private int regionStart;
+  - 外观模式
+   
+    ContextImpl
+  - 桥接模式
 
-    /**
-     * Holds the end of the region, or input.length() if the matching should
-     * go until the end of the input.
-     */
-    private int regionEnd;
+    Window和WindowManager之间的关系
+- 行为型
+  - 命令模式
+    
+    EventBus，Handler.post后Handler.handleMessage
+  - 观察者模式
+  
+    RxAndroid，BaseAdapter.registerDataSetObserver
+  - 模板方法
+  - 策略模式
 
-    /**
-     * Holds the position where the next append operation will take place.
-     */
-    private int appendPos;
+    时间插值器，如LinearInterpolator
+  - 状态模式
+  - 责任链
 
-    /**
-     * Reflects whether a match has been found during the most recent find
-     * operation.
-     */
-    private boolean matchFound;
+    对事件的分发处理，很多启动弹窗
+  - 备忘录模式
 
-    /**
-     * Holds the offsets for the most recent match.
-     */
-    private int[] matchOffsets;
+    onSaveInstanceState和onRestoreInstanceState
+  - 迭代器模式（集合迭代器）
+  - 解释器模式
 
-    /**
-     * Reflects whether the bounds of the region are anchoring.
-     */
-    private boolean anchoringBounds = true;
+    PackageParser
+  - 访问者模式
+  - 中介者模式
 
-    /**
-     * Reflects whether the bounds of the region are transparent.
-     */
-    private boolean transparentBounds;
-}
-```
- 
-### 2.3 数据访问 - 流（IO, NIO）
-文件（xml,json），内存，网络，数据库
-
-
-Unix 5种I/O模型
-```
-阻塞I/O
-非阻塞I/O
-多路复用I/O，Java NIO
-信号驱动I/O
-异步I/O
-```
-### BIO (阻塞 I/O)
-```
-基于字节操作的 I/O 接口：InputStream 和 OutputStream
-基于字符操作的 I/O 接口：Writer 和 Reader
-基于磁盘操作的 I/O 接口：File,RandomAccessFile
-基于网络操作的 I/O 接口：Socket
-```
-UTF-8 
-
-```
-public class FileInputStream extends InputStream
-{
-    /* File Descriptor - handle to the open file */
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private final FileDescriptor fd;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private FileChannel channel = null;
-
-    private final Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
-    private final boolean isFdOwner;
-
-    // Android-added: CloseGuard support.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-
-    // Android-added: Tracking of unbuffered I/O.
-    private final IoTracker tracker = new IoTracker();
-}
-
-
-public class FileOutputStream extends OutputStream
-{
-    /**
-     * The system dependent file descriptor.
-     */
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private final FileDescriptor fd;
-
-    /**
-     * True if the file is opened for append.
-     */
-    private final boolean append;
-
-    /**
-     * The associated channel, initialized lazily.
-     */
-    private FileChannel channel;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private final Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // Android-added: CloseGuard support: Log if the stream is not closed.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-
-    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
-    private final boolean isFdOwner;
-
-    // Android-added: Tracking of unbuffered I/O.
-    private final IoTracker tracker = new IoTracker();
-}
-public class InputStreamReader extends Reader {
-     private final StreamDecoder sd;//对FileInputStream编码
-}
-public class OutputStreamWriter extends Writer {
-    private final StreamEncoder se;
-}
-public class File implements Serializable, Comparable<File>
-{
-    /**
-     * This abstract pathname's normalized pathname string. A normalized
-     * pathname string uses the default name-separator character and does not
-     * contain any duplicate or redundant separators.
-     *
-     * @serial
-     */
-    private final String path;
-
+    Binder机制
  
 
-    /**
-     * The flag indicating whether the file path is invalid.
-     */
-    private transient PathStatus status = null;
+## 声明式编程-函数式编程/响应式编程（java 1.8） 
+函数是一等公民
+1. 函数接口/SAM接口 **@FunctionalInterface**
+```java
+@FunctionalInterface 注释的约束：
 
-    /**
-     * The length of this abstract pathname's prefix, or zero if it has no
-     * prefix.
-     */
-    private final transient int prefixLength;
+1、接口有且只能有个一个抽象方法，只有方法定义，没有方法体
 
-    private volatile transient Path filePath;
-}
-public class RandomAccessFile implements DataOutput, DataInput, Closeable {
+2、在接口中覆写Object类中的public方法，不算是函数式接口的方法。
+```
+- Supplier：用来创建对象的。（**Supplier<MyClass> c=()->new MyClass();** 省略为 **Myclass::new**）
+- Consumer、
+- Predicate、
+- Function、
+- UnaryOperator
 
-    // BEGIN Android-added: CloseGuard and some helper fields for Android changes in this file.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-    private final byte[] scratch = new byte[8];
-
-    private int flushAfterWrite = FLUSH_NONE;
-
-    private int mode;
-    // END Android-added: CloseGuard and some helper fields for Android changes in this file.
-
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private FileDescriptor fd;
-    private FileChannel channel = null;
-    private boolean rw;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // BEGIN Android-added: IoTracker.
-    /**
-     * A single tracker to track both read and write. The tracker resets when the operation
-     * performed is different from the operation last performed.
-     */
-    private final IoTracker ioTracker = new IoTracker();
-    // END Android-added: IoTracker.
-}
-
-public class Socket implements Closeable {
-    private boolean created;
-    private boolean bound;
-    private boolean connected;
-    private boolean closed;
-    private Object closeLock;
-    private boolean shutIn;
-    private boolean shutOut;
-    SocketImpl impl;
-    private boolean oldImpl;
-}
-
+2. **Lambda 表达式**
+lambda表达式实例化函数接口
+```java
+(参数) -> 表达式
 ```
 
-#### NIO（BUffer,Channel ,Selector）
-IO是面向流的，NIO是面向缓冲区的。
+**闭包**的定义是: 引用了自由变量的函数。
 
-Channel 和 Selector
-```
-public abstract class AbstractInterruptibleChannel
-    implements Channel, InterruptibleChannel
-{
-    private final Object closeLock = new Object();
-    private volatile boolean open = true;
-    private Interruptible interruptor;
-    private volatile Thread interrupted;
+3. 方法引用 **::**
 
-}
+4. 增强接口方法
+- Default Methods
+- 静态方法
+ 
 
+### 响应式编程（FRP）
+ 
+响应式编程是一种面向数据流和变化传播的编程范式
 
-public abstract class AbstractSelector
-    extends Selector
-{
-    private AtomicBoolean selectorOpen = new AtomicBoolean(true);
+ Stream API 详解 (Map-reduce、Collectors收集器、并行流)
 
-    // The provider that created this selector
-    private final SelectorProvider provider;
-    private final Set<SelectionKey> cancelledKeys = new HashSet<SelectionKey>();
-    private Interruptible interruptor = null;
- []
-
-
-}
-
-```
-### 2.4 数据并发访问 - 线程与并发
+## 2.4 数据并发访问 - 线程与并发
 线程初始化三种方式： Thread,Runnable,Callable
 线程的生命周期
 ```
@@ -1753,75 +1581,450 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 
   - 并发框架 Fork/Join
+## 2.3 数据访问 - 流（IO, NIO）
+字符串，类，文件（xml,json），内存，网络，数据库
 
+### 2.3.1 数据匹配（正则）
+《Java编程思想-14章》
+
+[Java正则教程](https://www.tutorialspoint.com/javaregex/javaregex_characters.htm)
+[Java官网正则教程](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)
+
+```Regex Quantifiers
+                                                                   {n,}
+                                                            +------------------------------------------>
+            *
+                                                                   {n,m}
++------------------------------------------------->         +------------------->
+
+      ?                    +
+
+<----------- ------------------------------------->        {n}
+
+|           |                                               |                   |
++-----------+-----------------------------------------------+-------------------+------------------------>
+
+0           1                                               n                   m
+
+```
+
+```Regex
++---------------+----------------------------------------------------------------------------------------------------------------------+
+|  flags        |  CASE_INSENSITIVE MULTILINE DOTALL  UNICODE_CASE  CANON_EQ  UNIX_LINES  LITERAL  UNICODE_CHARACTER_CLASS  COMMENTS   |
+|               |                                                                                                                      |
++---------------+---------------------------------------------+------------------------------------------------------------------------+
+|  Quotation    |   \                                                                                                                  |转义
+|               |   \Q...\E                                                                                                            |
++--------------------------------------------------------------------------------------------------------------------------------------+
+| Back          |  \n                                  \k<name>                                                                        |
+| references    |  nth capturing group matched         named-capturing group "name" matched                                            |
++-------------------------------------------------------------+------------------------------------------------------------------------+
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?<name>X) a named-capturing group                  |
+|               |                                             |              |     (?:X) a non-capturing group                         |
+|               |                                             |              |     (?>X) an independent, non-capturing group           |
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?idmsuxU-idmsuxU)                                  |
+|               |                                             |              |     turns match flags i d m s u x U on - off            |
+|               |                                             |              |     (?idmsux-idmsux:X)                                  |
+|               |                                             | Special      |     non-capturing group                                 |
+|               |                                             |              |     with the given flags i d m s u x on - off           |
+|               |                                             | Constructs   |                                                         |
+|               |                                             |              +---------------------------------------------------------+
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?=X)   via zero-width positive look ahead          |
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?!X)   via zero-width negative lookahead           |
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?<=X)  via zero-width positive lookbehind          |
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?<!X)  via zero-width negative lookbehind          |
+|               |                                             |              |                                                         |
+|               |                                             |              |     (?>X)   as an independent, non-capturing group      |
+|               +                                             +------------------------------------------------------------------------+
+|  Logical      | XY                          X|Y             |  (X)                                                                   |
+|  Operators    | X followed by Y             Either X or Y   |  group                                                                 |
++--------------------------------------------------------------------------------------------------------------------------------------+
+|               |  X?                       X{n}                                    |                     |                            |
+|               |  X, once or not at all    X, exactly n times                      |                     |                            |
+|               |                                                                   |                     |                            |
+|               |  X*                       X{n,}                                   |                     |                            |
+|               |  X, zero or more times    X, at least n times                     |                     |                            |
+|               |                                                                   |                     |                            |
+|               |   X+                      X{n,m}                                  |       ?             |                 +          |
+| Quantifiers   |  {X,mone or more times    X, at least n but not more than m times |                     |                            |
+|               +----------------------------------------------------------------------------------------------------------------------+
+|               |         Greedy                                                    |     Reluctant       |              Possessive    |
+|               |       (matches entire input,then backtrack)                       | (matches as little) | (Greedy, doesn't backtrack)|
++--------------------------------------------------------------------------------------------------------------------------------------+
+|               | ^                           \b                          \A                           \G                              |
+|               | The beginning of a line     A word boundary             The beginning of the input   The end of the previous match   |
+| Boundary      |                                                                                                                      |
+|               | $                           \B                          \z                                                           |
+| Matchers      | The end of a line            A non-word boundary        The end of the input                                         |
+|               |                                                                                                                      |
+|               |                                                         \Z                                                           |
+|               |                                                         The end of the input but for the final terminator, if any    |
++---------------+-------------------------------------------------------+-------------------------------+------------------------------+
+|               | \p{Lower}              \p{Upper}                      |   \p{javaLowerCase}           | \p{IsLatin}                  |
+|               | char:[a+z].            char:[A+Z]                     |   Character.isLowerCase()     | A Latin script char          |
+|               |                                                       |                               |                              |
+|               |                                                       |                               | \p{InGreek}                  |
+|               | \p{ASCII}               \p{Alpha}                     |    \p{javaUpperCase}          | A char in the Greek block    |
+|               | All ASCII:[\x00+\x7F]   char:[\p{Lower}\p{Upper}]     |    Character.isUpperCase()    |                              |
+|               |                                                       |                               | \p{Lu}                       |
+|               | \p{Digit}               \p{Alnum}                     |                               | An uppercase letter          |
+|               | [0+9]                   [\p{Alpha}\p{Digit}]          |                               |                              |
+|  char classes |                                                       |    \p{javaWhitespace}         |  \p{IsAlphabetic}            |
+|               | \p{Punct}                                             |    Character.isWhitespace()   |  An alphabetic char          |
+|               | Punctuation:                                          |                               |                              |
+|  in java      | One of !"#$%&'()*+,+./:;^=^?@[\]^_^{+}^               |                               |  \p{Sc}                      |
+|               |                                                       |    \p{javaMirrored}           |  A currency symbol           |
+|               | \p{Graph}               \p{Print}                     |    Character.isMirrored()     |  (binary property)           |
+|               | A ^isible char:         A printable char:             |                               |                              |
+|               | [\p{Alnum}\p{Punct}]    [\p{Graph}\x20].              |                               |                              |
+|               |                                                       |                               |  \P{InGreek}                 |
+|               |                                                       |                               |  except one                  |
+|               |  \p{Blank}                                            |                               |  in the Greek block          |
+|               |  A space or a tab:                                    |                               |                              |
+|               |  [ \t]                                                |                               |  [\p{L}&&[^\p{Lu}]]          |
+|               |                                                       |                               |  except an uppercase letter  |
+|               |   \p{XDigit}             \p{Space}                    |                               |                              |
+|               |   A hexadecimal digit:   A whitespace char:           |                               |                              |
+|               |   [0+9a+fA+F]            [ \t\n\x0B\f\r]              |                               |                              |
+|               |                                                       |                               |                              |
+|               +-------------------------------------------------------+-------------------------------+------------------------------+
+|               |       POSIX                                           |              JAVA             |              Unicode         |
++--------------------------------------------------------------------------------------------------------------------------------------+
+|  predefined   |                                                                                                                      |
+|               |     .         \d              \D            \s                 \S                     \w            \W               |
+|  char classes |     Any char  A digit: [0-9]  A non-digit:  A whitespace char: A non-whitespace char: A word char:  A non-word char: |
+|               |                               [^0-9]        [ \t\n\x0B\f\r]    [^\s].                 [a-zA-Z_0-9]. [^\w]            |
+|  in java      |                                                                                                                      |
++--------------------------------------------------------------------------------------------------------------------------------------+
+|  Grouping     |                                                                                                                      |
+|               |     [abc]           [^abc]       [a-zA-Z]      [a-d[m-p]]      [a-z&&[def]]    [a-z&&[^bc]]    [a-z&&[^m-p]]         |
+|  char classes |     a, b, or c      (negation)   (range)       (union)         (intersection)  (subtraction)   (subtraction)         |
+|               |                                                                                                                      |
++--------------------------------------------------------------------------------------------------------------------------------------+
+|               |     x             \\                  \0n                     \0nn                     \0mnn                         |
+|               |     char x        backslash char      char with octal         char with octal         char with octal                |
+|               |                                       0n (0 ≤ n ≤ 7)          0nn (0 ≤ n ≤ 7)         0mnn (0 ≤ m ≤ 3, 0 ≤ n ≤ 7)    |
+|               |                                                                                                                      |
+|               |     \xhh                              \uhhhh                                                                         |
+| matching char |     char with hexadecimal             char with hexadecimal                                                          |
+|               |     0xhh                              0xhhhh                                                                         |
+(Literal escape)|                                                                                                                      |
+|               |     \t           \n                   \r                      \f                                                     |
+|               |     tab char     newline char         carriage-return char    form-feed char                                         |
+|               |     ('\u0009')   ('\u000A')           ('\u000D')              ('\u000C')                                             |
++---------------+----------------------------------------------------------------------------------------------------------------------+
+
+
+```
+```
+public final class Pattern implements java.io.Serializable
+{
+    /**
+     * The original regular-expression pattern string.
+     *
+     * @serial
+     */
+    private final String pattern;
+
+    /**
+     * The original pattern flags.
+     *
+     * @serial
+     */
+    private final int flags;
+
+    @ReachabilitySensitive
+    transient long address;
+}
+
+
+public final class Matcher implements MatchResult {
+    /**
+     * The Pattern object that created this Matcher.
+     */
+    // Patterns also contain cleanup code and a ReachabilitySensitive field.
+    // This ensures that "this" and pattern remain reachable while we're using pattern.address
+    // directly.
+    @ReachabilitySensitive
+    private Pattern pattern;
+
+    /**
+     * The address of the native peer.
+     * Uses of this must be manually synchronized to avoid native crashes.
+     */
+    @ReachabilitySensitive
+    private long address;
+
+    /**
+     * If non-null, a Runnable that can be used to explicitly deallocate address.
+     */
+    private Runnable nativeFinalizer;
+
+    private static final NativeAllocationRegistry registry = new NativeAllocationRegistry(
+            Matcher.class.getClassLoader(), getNativeFinalizer(), nativeSize());
+
+    /**
+     * Holds the original CharSequence for use in {@link #reset}. {@link #input} is used during
+     * matching. Note that CharSequence is mutable while String is not, so reset can cause the input
+     * to match to change.
+     */
+    private CharSequence originalInput;
+
+    /**
+     * Holds the input text.
+     */
+    private String input;
+
+    /**
+     * Holds the start of the region, or 0 if the matching should start at the
+     * beginning of the text.
+     */
+    private int regionStart;
+
+    /**
+     * Holds the end of the region, or input.length() if the matching should
+     * go until the end of the input.
+     */
+    private int regionEnd;
+
+    /**
+     * Holds the position where the next append operation will take place.
+     */
+    private int appendPos;
+
+    /**
+     * Reflects whether a match has been found during the most recent find
+     * operation.
+     */
+    private boolean matchFound;
+
+    /**
+     * Holds the offsets for the most recent match.
+     */
+    private int[] matchOffsets;
+
+    /**
+     * Reflects whether the bounds of the region are anchoring.
+     */
+    private boolean anchoringBounds = true;
+
+    /**
+     * Reflects whether the bounds of the region are transparent.
+     */
+    private boolean transparentBounds;
+}
+```
+### Unix 5种I/O模型
+```
+阻塞I/O
+非阻塞I/O
+多路复用I/O，Java NIO
+信号驱动I/O
+异步I/O
+```
+### BIO (阻塞 I/O)
+```
+基于字节操作的 I/O 接口：InputStream 和 OutputStream
+基于字符操作的 I/O 接口：Writer 和 Reader
+基于磁盘操作的 I/O 接口：File,RandomAccessFile
+基于网络操作的 I/O 接口：Socket
+```
+UTF-8 
+
+```
+public class FileInputStream extends InputStream
+{
+    /* File Descriptor - handle to the open file */
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private final FileDescriptor fd;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private FileChannel channel = null;
+
+    private final Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
+    private final boolean isFdOwner;
+
+    // Android-added: CloseGuard support.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+
+    // Android-added: Tracking of unbuffered I/O.
+    private final IoTracker tracker = new IoTracker();
+}
+
+
+public class FileOutputStream extends OutputStream
+{
+    /**
+     * The system dependent file descriptor.
+     */
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private final FileDescriptor fd;
+
+    /**
+     * True if the file is opened for append.
+     */
+    private final boolean append;
+
+    /**
+     * The associated channel, initialized lazily.
+     */
+    private FileChannel channel;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private final Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // Android-added: CloseGuard support: Log if the stream is not closed.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+
+    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
+    private final boolean isFdOwner;
+
+    // Android-added: Tracking of unbuffered I/O.
+    private final IoTracker tracker = new IoTracker();
+}
+public class InputStreamReader extends Reader {
+     private final StreamDecoder sd;//对FileInputStream编码
+}
+public class OutputStreamWriter extends Writer {
+    private final StreamEncoder se;
+}
+public class File implements Serializable, Comparable<File>
+{
+    /**
+     * This abstract pathname's normalized pathname string. A normalized
+     * pathname string uses the default name-separator character and does not
+     * contain any duplicate or redundant separators.
+     *
+     * @serial
+     */
+    private final String path;
+
+ 
+
+    /**
+     * The flag indicating whether the file path is invalid.
+     */
+    private transient PathStatus status = null;
+
+    /**
+     * The length of this abstract pathname's prefix, or zero if it has no
+     * prefix.
+     */
+    private final transient int prefixLength;
+
+    private volatile transient Path filePath;
+}
+public class RandomAccessFile implements DataOutput, DataInput, Closeable {
+
+    // BEGIN Android-added: CloseGuard and some helper fields for Android changes in this file.
+    @ReachabilitySensitive
+    private final CloseGuard guard = CloseGuard.get();
+    private final byte[] scratch = new byte[8];
+
+    private int flushAfterWrite = FLUSH_NONE;
+
+    private int mode;
+    // END Android-added: CloseGuard and some helper fields for Android changes in this file.
+
+    // Android-added: @ReachabilitySensitive
+    @ReachabilitySensitive
+    private FileDescriptor fd;
+    private FileChannel channel = null;
+    private boolean rw;
+
+    /**
+     * The path of the referenced file
+     * (null if the stream is created with a file descriptor)
+     */
+    private final String path;
+
+    private Object closeLock = new Object();
+    private volatile boolean closed = false;
+
+    // BEGIN Android-added: IoTracker.
+    /**
+     * A single tracker to track both read and write. The tracker resets when the operation
+     * performed is different from the operation last performed.
+     */
+    private final IoTracker ioTracker = new IoTracker();
+    // END Android-added: IoTracker.
+}
+
+public class Socket implements Closeable {
+    private boolean created;
+    private boolean bound;
+    private boolean connected;
+    private boolean closed;
+    private Object closeLock;
+    private boolean shutIn;
+    private boolean shutOut;
+    SocketImpl impl;
+    private boolean oldImpl;
+}
+
+```
+
+#### NIO（BUffer,Channel ,Selector）
+IO是面向流的，NIO是面向缓冲区的。
+
+Channel 和 Selector
+```
+public abstract class AbstractInterruptibleChannel
+    implements Channel, InterruptibleChannel
+{
+    private final Object closeLock = new Object();
+    private volatile boolean open = true;
+    private Interruptible interruptor;
+    private volatile Thread interrupted;
+
+}
+
+
+public abstract class AbstractSelector
+    extends Selector
+{
+    private AtomicBoolean selectorOpen = new AtomicBoolean(true);
+
+    // The provider that created this selector
+    private final SelectorProvider provider;
+    private final Set<SelectionKey> cancelledKeys = new HashSet<SelectionKey>();
+    private Interruptible interruptor = null;
+ []
+
+
+}
+
+```
 ### 数据展示 - 图形化及用户组件
 awt/swing
 
 #### 多媒体
 [图形化](知识体系-多媒体.md)
 
-### 数据类结构 - 类实现面向对象与设计模式
- 五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
-
-- 创建型
-  - 构建者模式
-  
-  Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
-
-  - 单例模式
-  
-  Application，LayoutInflater 
-  - 工厂方法
-  
-  BitmapFactory
-  - 原型模式
-  - 抽象工厂
-- 结构型
-  - 适配器模式（Adapter）
-  - 装饰模式（Retrofit）
-  - 享元模式
-
-    Message.obtainMessage
-  - 代理模式
-
-    静态代理：封装ImageLoader、Glide；动态代理：面向切面。AIDL
-  - 组合模式
-
-    View和ViewGroup的组合
-
-  - 外观模式
-   
-    ContextImpl
-  - 桥接模式
-
-    Window和WindowManager之间的关系
-- 行为型
-  - 命令模式
-    
-    EventBus，Handler.post后Handler.handleMessage
-  - 观察者模式
-  
-    RxAndroid，BaseAdapter.registerDataSetObserver
-  - 模板方法
-  - 策略模式
-
-    时间插值器，如LinearInterpolator
-  - 状态模式
-  - 责任链
-
-    对事件的分发处理，很多启动弹窗
-  - 备忘录模式
-
-    onSaveInstanceState和onRestoreInstanceState
-  - 迭代器模式（集合迭代器）
-  - 解释器模式
-
-    PackageParser
-  - 访问者模式
-  - 中介者模式
-
-    Binder机制
- 
 
 
 
@@ -1974,10 +2177,10 @@ KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半
     2.3. 如果节点是红色的，则它的子节点必须是黑色的（反之不一定成立）
     2.4. 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点。
 
-### 人工智能
+### 数据学习 - 人工智能
 [见 知识体系-人工智能.md](知识体系-人工智能.md)
 
-## 6 计算机网络
+## 数据传输 - 计算机网络
 
 TCP使用内存
 ```
