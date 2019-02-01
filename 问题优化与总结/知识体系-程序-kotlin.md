@@ -1,8 +1,38 @@
-
-
 ## 
- [kotlin文档地址](http://kotlinlang.org/docs/reference/basic-types.html)
 ```
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|                            ReadWrite Object(String,Serializable)/File/Socket/db                    |
++-------------------------------------------+------------+---------+-----------+-------+-------------+
+|Class-based|concurrency|Aspect|            |            |         |           |       |             |
+|           |           |      |            |            |         |           |       |             |
++-----------+-----------+------+            |            |         |           |       |             |
+|                    oop                    | Functional | FRP     |Reflective |Generic|             |
++------------------------------+------+------------------------------------------------|             |      
+|            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
++------------------------------+------------+------------------------------------------+-------------+
+|                                                                                                    |
+|                             conditional/decision-making/loops                                      |
++----------------------------------+------------+---------------+-+-----------+-------------+--------+
+|            Whitespace(tab space) |    0b1     |               | |           |             |        |
+|            comment               |    01      | Base Data Type| |           |             | other  |
+|            separator sign(; )    |    1       |               | |           |             | symbol/|
++----------------------------------+    0x1     +---------------+-+           |             | token  |
+|              separator           |   Literals |  keywords       |Operators  | Identifiers |        |
++----------------------------------+------------+-----------------------------+-------------+--------+
+|                                                                                                    |
+|                                            Character set (Unicode,UTF+8)                           |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|                                            Byte                                                    |
++----------------------------------------------------------------------------------------------------+
+
+
+ [kotlin文档地址](http://kotlinlang.org/docs/reference/basic-types.html)
+```kotlin
+硬关键字：这些关键字无论在什么情况下都不能作为标识符。
+软关键字：这些关键字可以在它们不起作用的上下文中用作标识符。
+修饰符关键字：这些关键字也可以在代码中用作标识符。
 +----------------+----------------------------------------------------------------+
 |   Special      |                                                                |
 | Identifiers    |  field it                                                      |
@@ -25,23 +55,20 @@
 |                |             | dynamic                                          |
 +---------------------------------------------------------------------------------+
 |                |  exception  |  throw  try                                      |
-|                |             |                                                  |
-|                |             |                                                  |
 |                +----------------------------------------------------------------+
-|                |  func       |  func class interface  package                   |
-|                |  class      |                                                  |
+|                |  func       |  func                                            |
+|                |  class      |  package class interface                         |
 | Hard Keywords  |  package    |  super this                                      |
 |                +----------------------------------------------------------------+
 |                |  Flow       |   if  else  when while  do  for                  |  
 |                |  Control    |   break continue  return                         |
-|                |             |   as as? in !in  is !is                          |
-|                |             |                                                  |
+|                |             |   (type casts) as as?                            |
+|                |             |   (type checks)  in !in  is !is                  |
 |                +----------------------------------------------------------------+
 |                |  special    |  typealias var val                               |
 |                |  identifiers|                                                  |
 |                +----------------------------------------------------------------+
 |                |  literals   |  false true null object                          |
-|                |             |                                                  |
 +----------------+-------------+--------------------------------------------------+
 
 
@@ -49,23 +76,21 @@
 
 ``` Operators
 +-------------+--------------------------------------------------------------+
-|             |                                                              |
-|  Misc       |                                                              |
-|             |                                                              |
-|             |  [] !! ?. ?:(elvis operator)   ::  ..  :   ?    ->   @   ;   |
-|             |  $   _                                                       |
-|             |                                                              |
-+----------------------------------------------------------------------------+
-|             |                                                              |
-|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
-|             |                                                             ++
+|             | ?:(elvis operator)  []( indexed access operator)  ..(Range)  |
+| Misc        | ;(separates on same lines)                                   |
+|             | :(separates from a type in declarations)                     |
+|             |--------------------------------------------------------------|
+|             | ?(nullable types)  ?.(safe call)   !!(non-null asserts)      |
+|             |--------------------------------------------------------------|
+|             | ::(reference)                                                |
+|             | @ (references outer superclass/'this'/loop/lambda)           |
+|             | $ (references in a string template )                         |
+|             |--------------------------------------------------------------|
+|             | -> (lambda ,function type, when expression)                  |
+|             | _  ( lambda/destructuring declaration)                       |
 +----------------------------------------------------------------------------+
 |             |                                                              |
 |  Logical    |  && || !                                                     |
-|             |                                                              |
-+----------------------------------------------------------------------------+
-|             |                                                              |
-|  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
@@ -74,17 +99,25 @@
 |             |  === !==                                                     |
 +----------------------------------------------------------------------------+
 |             |                                                              |
+|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
 |  Arithmetic |  + - * / % ++ --                                             |
 |             |                                                              |
 +-------------+--------------------------------------------------------------+
 
 
 ```
-##   数据类型
+## 数据类型
 kotlin 静态强类型的显式类型语言
 - 字面量
 Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言
-```
+```kotlin 
 Kotlin 内置数字类型：
 Type    Bit width
 Double   64
@@ -109,18 +142,62 @@ $ character or ${ }
 
 
 ## 数据控制流
+```java
 if ,when ,for/while loops
 break;continue;return;
 lablels（@ sign）
-## 数据操作
+
+``` 
+**==** 数值是否相等
+
+**===** 两个对象的地址是否相等
+
+
+## 编程泛型 - 函数式编程范式
+  1.  函数，inline fun，lambda
+
+### 扩展函数
+```
++---------+----------------+-------------------+-----------------+
+|         | object as param|  object as return |  extension fun  |
++----------------------------------------------------------------+
+|  also   |  √             |  √                |  √              |
++----------------------------------------------------------------+
+|  let    |  √             |  x                |  √              |
++----------------------------------------------------------------+
+|  apply  |  x             |  √                |  √              |
++----------------------------------------------------------------+
+|  run    |  x             |  x                |  √              |
++----------------------------------------------------------------+
+|  with   |  x             |  x                |  x              |
++---------+----------------+-------------------+-----------------+
+```
+
+```java
+@kotlin.internal.InlineOnly public inline fun TODO(): kotlin.Nothing { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun TODO(reason: kotlin.String): kotlin.Nothing { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun repeat(times: kotlin.Int, action: (kotlin.Int) -> kotlin.Unit): kotlin.Unit { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <R> run(block: () -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> with(receiver: T, block: T.() -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.also(block: (T) -> kotlin.Unit): T { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T> T.apply(block: T.() -> kotlin.Unit): T { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> T.let(block: (T) -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> T.run(block: T.() -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeIf(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeUnless(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
 
 ```
-== 数值是否相等
-
-=== 两个对象的地址是否相等
-```
-
-## 数据类型 - 面向对象-类
+## 编程泛型 - 面向对象-类
 Kotlin 中所有类都继承该 Any 类。
 
 Any?可空类型。Any?是Any的超集，Any?是整个类型体系的顶部，Nothing是底部
@@ -130,17 +207,15 @@ Any?可空类型。Any?是Any的超集，Any?是整个类型体系的顶部，No
   2. func,get,set
   3. interface 
   4. private, protected, internal ,public
-  5. 扩展函数（let、with、run、apply、also）
-  6. data class
-  7. sealed class
-  8. 泛型
-  9. 内部类（inner ），super@Outer，this@label
-  10. enum class 
-  11. 对象表达式与对象声明 object
-  12. Inline Class（类内联化）
-  13. 函数，inline fun，lambda
-  14. 类型别名
-  15. companion object （伴生对象）
+  5. data class
+  6. sealed class
+  7. 泛型
+  8. 内部类（inner ），super@Outer，this@label
+  9.  enum class 
+  10. 对象表达式与对象声明 object
+  11. Inline Class（类内联化）
+  12. 类型别名
+  13. companion object （伴生对象）
 - 继承
   1. abstract，open/：,is （类似instanseof） 
   2. super
@@ -187,4 +262,4 @@ Collections: List, Set, Map
 
 
 ## 数据并发
-\
+## 声明式编程-函数编程范式
