@@ -30,15 +30,15 @@
 |                                                 |  | dalvik vm      | |
 |  OpenGL+ES (3d)  SSL/TLS           Webkit       |  +----------------+ |
 |                                                 +---------------------+
-|  SGL(Skia 2d)    FreeType            libc(bionic)                     |
+|  SGL(Skia 2d)    FreeType          libc(bionic)                       |
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
 |                                                                       |
-|  Display Driver   Camera Driver   Flash Driver   Bind (IPC) Driver    |
-|                      (V4L2)                                           |
+|  Bind (IPC) Driver   Display Driver     Camera Driver   Flash Driver  |
+|                                           (V4L2)                      |
 |                                                                       |
-|  KeyPad Driver    WIFI Driver     Audio Driver   Power Management     |
+|  KeyPad Driver      Power Management    Audio Driver   WIFI Driver    |
 |                                                                       |
 |  Bluetooth Driver   USB Driver                                        |
 |                                                                       |
@@ -54,7 +54,7 @@
 ```
 
 ## Linux kernel -ipc
-
+### 进程启动
 >启动Kernel的swapper进程(pid=0)：该进程又称为idle进程, 系统初始化过程Kernel由无到有开创的第一个进程, 用于初始化进程管理、内存管理，加载Display,Camera Driver，Binder Driver等相关工作。
 启动kthreadd进程（pid=2）：是Linux系统的内核进程，会创建内核工作线程kworkder，软中断线程ksoftirqd，thermal等内核守护进程。kthreadd进程是所有内核进程的鼻祖。
 [作者：硬刚平底锅 ] (https://blog.csdn.net/qq_30993595/article/details/82714409 )
@@ -96,11 +96,11 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 |                  |       |                     |      |                           |
 |                  |       |                     |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
-| |system_ser^er | |       |   |Ser^ice Manager| |      |                           |
+| |system_server | |       |   |Service Manager| |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
 | |              | |       |   +---------------+ |      |                           |
-| | AMS,WMS,PMS..| |       |   | mediaser^er   | |      |                           |
-| | Ser^erThread | |       |   +---------------+ |      |                           |
+| | AMS,WMS,PMS..| |       |   | mediaserver   | |      |                           |
+| | ServerThread | |       |   +---------------+ |      |                           |
 | |   JSS        | |       |   +---------------+ |      |                           |
 | | AlarmManager | |       |   |SurfaceFlinger | |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
@@ -137,7 +137,7 @@ p 命名管道文件。
 其中Linux中I/O设备分为两类:字符设备和块设备。
 [创建7种类型文件](https://blog.csdn.net/furzoom/article/details/77888131)
 ```
-**IPC机制与方法**
+###  IPC机制与方法 
 Linux中的RPC方式有管道，消息队列，共享内存等。
 消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
 Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
@@ -145,7 +145,7 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
 性能，并发，一对多
                          +-----------+---------+---------------------+
                          |           |         |                     |
-                         |           | Messager|  Content Pro^ider   |
+                         |           | Messager|  Content Provider   |
                          | Bundle    |         |                     |
                          |           |         |                     |
          +---------------------------+---------+--------------------------------------+-----------------+
@@ -166,6 +166,8 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
          |               |           | oneway                        |                |                 |
          |               |           +-------------------------------+                |                 |
          |               |                                           |                |                 |
+         |               |-------------------------------------------|                |                 |
+         |               |   android.os.Binder                       |                |                 |
          +-----------------------------------------------------------+                |                 |
          |               |                                           |  Socket        |  File           |
          | Shared memory |   Binder                                  |  pipe          | SharedPreference|
@@ -204,7 +206,7 @@ oneway interface IMessenger {
 ```
 
 
-```
+```bash
 root@x86:/ # ls /dev/socket/
 adbd
 cryptd
@@ -228,7 +230,7 @@ zygote// zygote socket通信设备文件
 ```
 Serializable->Parcelable->Binder->{AIDL,Messenger}
 
-
+### Binder机制
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
 binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
@@ -237,7 +239,7 @@ Binder驱动不涉及任何外设，本质上只操作内存，负责将数据�
 n：native
 p：proxy
 
-SystemServer
+SystemServer，Binder机制
 +----------------+------------+-------------------------+--------------------------------------+
 |                |            |                         |                                      |
 |                |            | +---------------------+ |  BinderProxy   Ser^iceManagerProxy   |
@@ -270,8 +272,8 @@ SystemServer
 +----------------+------------+----------------------------------------------------------------+        |    |     |
 |                |            |                                                                | <------+    |     |
 |                |  Binder    |                                                                |             |     |
-|  kernel space  |            |   dri^ers/staging/android/binder.c                             | <-----------+     |
-|                |  Dri^er    |                                                                |                   |
+|  kernel space  |            |   drivers/staging/android/binder.c                             | <-----------+     |
+|                |  Driver    |                                                                |                   |
 |                |            |                                                                | <-----------------+
 +----------------+------------+----------------------------------------------------------------+
 
@@ -288,23 +290,23 @@ SystemServer
 ----
 
 binder的服务实体
-+------------+-------------------------+-------------------------------+
-|            |   System Service        |    Local Service(bindService) |
-|            |                         |                               |
-+----------------------------------------------------------------------+
-|            |                         |                               |
-|  launch    | SystemServer            |  bindService                  |
-|            |                         |                               |
-+----------------------------------------------------------------------+
-|            |                         |                               |
-| regist and |ServiceManager#addService|  ActivityManagerService       |
-| manager    |                         |                               |
-|            |                         |                               |
-|------------+-------------------------+-------------------------------+
-|            |                         |                               |
-| communicate| SystemServer#getService |  ServiceConnection            |
-|            |                         |  (binder.asInterface)         |
-|------------+-------------------------+-------------------------------+
++------------+----------------------------------+------------------------------+
+|            |   System Service                |    Local Service(bindService) |
+|            |                                 |                               |
++------------------------------------------------------------------------------+
+|            |                                 |                               |
+|  launch    | SystemServer                    |  bindService                  |
+|            |                                 |                               |
++------------------------------------------------------------------------------+
+|            |                                 |                               |
+| regist and |ServiceManager.addService        |  ActivityManagerService       |
+| manager    |                                 |                               |
+|            |SystemServiceManager.startService|                               |
+|------------+---------------------------------+-------------------------------+
+|            |                                 |                               |
+| communicate| SystemServer#getService         |  ServiceConnection            |
+|            |                                 |  (binder.asInterface)         |
+|------------+---------------------------------+-------------------------------+
 
 通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
 通过bindService开启服务，Service和调用者之间可以通讯。
@@ -1151,6 +1153,8 @@ Zygote进程启动后，加载ZygoteInit类，注册Zygote Socket服务端套接
 System Server进程，是由Zygote进程fork而来，System Server是Zygote孵化的第一个进程，System Server负责启动和管理整个Java framework，包含ActivityManager，PowerManager等服务
 Media Server进程，是由init进程fork而来，负责启动和管理整个C++ framework，包含AudioFlinger，Camera Service等服务
 
+相关系统服务 PMS（安装），AMS（启动），WMS（输出-显示），IMS（输入-事件），PowerMS,JSS,DMS,DisplayManagerService、BatteryService
+
 ### SystemServer - InputManagerService
  [事件](http://gityuan.com/2016/12/31/input-ipc/)
  [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
@@ -1189,557 +1193,7 @@ struct RawEvent {
 };
 
 
-```
-### SystemServer - WindowsManagerService
-
-启动 涉及“android.display”（DisplayThread）, “android.ui”线程（PolicyHandler）
-```java
-base/services/java/com/android/server/SystemServer.java:671:    private void startOtherServices() {
-}
-
-
-public class WindowManagerService extends IWindowManager.Stub
-        implements Watchdog.Monitor, WindowManagerPolicy.WindowManagerFuncs {
-    final WindowTracing mWindowTracing;
-
-    final private KeyguardDisableHandler mKeyguardDisableHandler;
-    // TODO: eventually unify all keyguard state in a common place instead of having it spread over
-    // AM's KeyguardController and the policy's KeyguardServiceDelegate.
-    boolean mKeyguardGoingAway;
-    boolean mKeyguardOrAodShowingOnDefaultDisplay;
-    // VR Vr2d Display Id.
-    int mVr2dDisplayId = INVALID_DISPLAY;
-
-    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED:
-                    mKeyguardDisableHandler.sendEmptyMessage(KEYGUARD_POLICY_CHANGED);
-                    break;
-            }
-        }
-    };
-    final WindowSurfacePlacer mWindowPlacerLocked;
-
-    private final PriorityDump.PriorityDumper mPriorityDumper = new PriorityDump.PriorityDumper() {
-        @Override
-        public void dumpCritical(FileDescriptor fd, PrintWriter pw, String[] args,
-                boolean asProto) {
-            doDump(fd, pw, new String[] {"-a"}, asProto);
-        }
-
-        @Override
-        public void dump(FileDescriptor fd, PrintWriter pw, String[] args, boolean asProto) {
-            doDump(fd, pw, args, asProto);
-        }
-    };
-
-    /**
-     * Current user when multi-user is enabled. Don't show windows of
-     * non-current user. Also see mCurrentProfileIds.
-     */
-    int mCurrentUserId;
-    /**
-     * Users that are profiles of the current user. These are also allowed to show windows
-     * on the current user.
-     */
-    int[] mCurrentProfileIds = new int[] {};
-
-    final Context mContext;
-
-    final boolean mHaveInputMethods;
-
-    final boolean mHasPermanentDpad;
-    final long mDrawLockTimeoutMillis;
-    final boolean mAllowAnimationsInLowPowerMode;
-
-    final boolean mAllowBootMessages;
-
-    final boolean mLimitedAlphaCompositing;
-    final int mMaxUiWidth;
-
-    final WindowManagerPolicy mPolicy;
-
-    final IActivityManager mActivityManager;
-    final ActivityManagerInternal mAmInternal;
-
-    final AppOpsManager mAppOps;
-    final PackageManagerInternal mPmInternal;
-
-    final DisplaySettings mDisplaySettings;
-
-    /** If the system should display notifications for apps displaying an alert window. */
-    boolean mShowAlertWindowNotifications = true;
-
-    /**
-     * All currently active sessions with clients.
-     */
-    final ArraySet<Session> mSessions = new ArraySet<>();
-
-    /**
-     * Mapping from an IWindow IBinder to the server's Window object.
-     * This is also used as the lock for all of our state.
-     * NOTE: Never call into methods that lock ActivityManagerService while holding this object.
-     */
-    final WindowHashMap mWindowMap = new WindowHashMap();
-
-    /**
-     * List of window tokens that have finished starting their application,
-     * and now need to have the policy remove their windows.
-     */
-    final ArrayList<AppWindowToken> mFinishedStarting = new ArrayList<>();
-
-    /**
-     * List of app window tokens that are waiting for replacing windows. If the
-     * replacement doesn't come in time the stale windows needs to be disposed of.
-     */
-    final ArrayList<AppWindowToken> mWindowReplacementTimeouts = new ArrayList<>();
-
-    /**
-     * Windows that are being resized.  Used so we can tell the client about
-     * the resize after closing the transaction in which we resized the
-     * underlying surface.
-     */
-    final ArrayList<WindowState> mResizingWindows = new ArrayList<>();
-
-    /**
-     * Windows whose animations have ended and now must be removed.
-     */
-    final ArrayList<WindowState> mPendingRemove = new ArrayList<>();
-
-    /**
-     * Used when processing mPendingRemove to avoid working on the original array.
-     */
-    WindowState[] mPendingRemoveTmp = new WindowState[20];
-
-    /**
-     * Windows whose surface should be destroyed.
-     */
-    final ArrayList<WindowState> mDestroySurface = new ArrayList<>();
-
-    /**
-     * Windows with a preserved surface waiting to be destroyed. These windows
-     * are going through a surface change. We keep the old surface around until
-     * the first frame on the new surface finishes drawing.
-     */
-    final ArrayList<WindowState> mDestroyPreservedSurface = new ArrayList<>();
-
-    /**
-     * Windows that have lost input focus and are waiting for the new
-     * focus window to be displayed before they are told about this.
-     */
-    ArrayList<WindowState> mLosingFocus = new ArrayList<>();
-
-    /**
-     * This is set when we have run out of memory, and will either be an empty
-     * list or contain windows that need to be force removed.
-     */
-    final ArrayList<WindowState> mForceRemoves = new ArrayList<>();
-
-    /**
-     * Windows that clients are waiting to have drawn.
-     */
-    ArrayList<WindowState> mWaitingForDrawn = new ArrayList<>();
-    /**
-     * And the callback to make when they've all been drawn.
-     */
-    Runnable mWaitingForDrawnCallback;
-
-    /** List of window currently causing non-system overlay windows to be hidden. */
-    private ArrayList<WindowState> mHidingNonSystemOverlayWindows = new ArrayList<>();
-
-    IInputMethodManager mInputMethodManager;
-
-    AccessibilityController mAccessibilityController;
-    private RecentsAnimationController mRecentsAnimationController;
-
-    Watermark mWatermark;
-    StrictModeFlash mStrictModeFlash;
-    CircularDisplayMask mCircularDisplayMask;
-    EmulatorDisplayOverlay mEmulatorDisplayOverlay;
-
-    final float[] mTmpFloats = new float[9];
-    final Rect mTmpRect = new Rect();
-    final Rect mTmpRect2 = new Rect();
-    final Rect mTmpRect3 = new Rect();
-    final RectF mTmpRectF = new RectF();
-
-    final Matrix mTmpTransform = new Matrix();
-
-    boolean mDisplayReady;
-    boolean mSafeMode;
-    boolean mDisplayEnabled = false;
-    boolean mSystemBooted = false;
-    boolean mForceDisplayEnabled = false;
-    boolean mShowingBootMessages = false;
-    boolean mBootAnimationStopped = false;
-
-    // Following variables are for debugging screen wakelock only.
-    WindowState mLastWakeLockHoldingWindow = null;
-    WindowState mLastWakeLockObscuringWindow = null;
-
-    /** Dump of the windows and app tokens at the time of the last ANR. Cleared after
-     * LAST_ANR_LIFETIME_DURATION_MSECS */
-    String mLastANRState;
-
-    // The root of the device window hierarchy.
-    RootWindowContainer mRoot;
-
-    int mDockedStackCreateMode = SPLIT_SCREEN_CREATE_MODE_TOP_OR_LEFT;
-    Rect mDockedStackCreateBounds;
-
-    boolean mForceResizableTasks = false;
-    boolean mSupportsPictureInPicture = false;
-
-    boolean mDisableTransitionAnimation = false;
-
-
-    ArrayList<RotationWatcher> mRotationWatchers = new ArrayList<>();
-    int mDeferredRotationPauseCount;
-    final WallpaperVisibilityListeners mWallpaperVisibilityListeners =
-            new WallpaperVisibilityListeners();
-
-    int mSystemDecorLayer = 0;
-    final Rect mScreenRect = new Rect();
-
-    boolean mDisplayFrozen = false;
-    long mDisplayFreezeTime = 0;
-    int mLastDisplayFreezeDuration = 0;
-    Object mLastFinishedFreezeSource = null;
-    boolean mWaitingForConfig = false;
-    boolean mSwitchingUser = false;
-
-    int mWindowsFreezingScreen = WINDOWS_FREEZING_SCREENS_NONE;
-
-    boolean mClientFreezingScreen = false;
-    int mAppsFreezingScreen = 0;
-
-    // Last systemUiVisibility we received from status bar.
-    int mLastStatusBarVisibility = 0;
-    // Last systemUiVisibility we dispatched to windows.
-    int mLastDispatchedSystemUiVisibility = 0;
-
-    // State while inside of layoutAndPlaceSurfacesLocked().
-    boolean mFocusMayChange;
-
-    // This is held as long as we have the screen frozen, to give us time to
-    // perform a rotation animation when turning off shows the lock screen which
-    // changes the orientation.
-    private final PowerManager.WakeLock mScreenFrozenLock;
-
-    final AppTransition mAppTransition;
-    boolean mSkipAppTransitionAnimation = false;
-
-    final ArraySet<AppWindowToken> mOpeningApps = new ArraySet<>();
-    final ArraySet<AppWindowToken> mClosingApps = new ArraySet<>();
-
-    final UnknownAppVisibilityController mUnknownAppVisibilityController =
-            new UnknownAppVisibilityController(this);
-    final TaskSnapshotController mTaskSnapshotController;
-
-    boolean mIsTouchDevice;
-
-    final H mH = new H();
-
-    /**
-     * Handler for things to run that have direct impact on an animation, i.e. animation tick,
-     * layout, starting window creation, whereas {@link H} runs things that are still important, but
-     * not as critical.
-     */
-    final Handler mAnimationHandler = new Handler(AnimationThread.getHandler().getLooper());
-
-    WindowState mCurrentFocus = null;
-    WindowState mLastFocus = null;
-
-    /** Windows added since {@link #mCurrentFocus} was set to null. Used for ANR blaming. */
-    private final ArrayList<WindowState> mWinAddedSinceNullFocus = new ArrayList<>();
-    /** Windows removed since {@link #mCurrentFocus} was set to null. Used for ANR blaming. */
-    private final ArrayList<WindowState> mWinRemovedSinceNullFocus = new ArrayList<>();
-
-    /** This just indicates the window the input method is on top of, not
-     * necessarily the window its input is going to. */
-    WindowState mInputMethodTarget = null;
-
-    /** If true hold off on modifying the animation layer of mInputMethodTarget */
-    boolean mInputMethodTargetWaitingAnim;
-
-    WindowState mInputMethodWindow = null;
-
-    boolean mHardKeyboardAvailable;
-    WindowManagerInternal.OnHardKeyboardStatusChangeListener mHardKeyboardStatusChangeListener;
-    SettingsObserver mSettingsObserver;
-
-    /**
-     * A count of the windows which are 'seamlessly rotated', e.g. a surface
-     * at an old orientation is being transformed. We freeze orientation updates
-     * while any windows are seamlessly rotated, so we need to track when this
-     * hits zero so we can apply deferred orientation updates.
-     */
-    private int mSeamlessRotationCount = 0;
-    /**
-     * True in the interval from starting seamless rotation until the last rotated
-     * window draws in the new orientation.
-     */
-    private boolean mRotatingSeamlessly = false;
- 
-
-    // TODO: Move to RootWindowContainer
-    AppWindowToken mFocusedApp = null;
-
-    PowerManager mPowerManager;
-    PowerManagerInternal mPowerManagerInternal;
-
-    private float mWindowAnimationScaleSetting = 1.0f;
-    private float mTransitionAnimationScaleSetting = 1.0f;
-    private float mAnimatorDurationScaleSetting = 1.0f;
-    private boolean mAnimationsDisabled = false;
-
-    final InputManagerService mInputManager;
-    final DisplayManagerInternal mDisplayManagerInternal;
-    final DisplayManager mDisplayManager;
-
-    // Indicates whether this device supports wide color gamut rendering
-    private boolean mHasWideColorGamutSupport;
-
-    // Who is holding the screen on.
-    private Session mHoldingScreenOn;
-    private PowerManager.WakeLock mHoldingScreenWakeLock;
-
-    // Whether or not a layout can cause a wake up when theater mode is enabled.
-    boolean mAllowTheaterModeWakeFromLayout;
-
-    final TaskPositioningController mTaskPositioningController;
-    final DragDropController mDragDropController;
-
-    // For frozen screen animations.
-    private int mExitAnimId, mEnterAnimId;
-
-    // The display that the rotation animation is applying to.
-    private int mFrozenDisplayId;
-
-    /** Skip repeated AppWindowTokens initialization. Note that AppWindowsToken's version of this
-     * is a long initialized to Long.MIN_VALUE so that it doesn't match this value on startup. */
-    int mTransactionSequence;
-
-    final WindowAnimator mAnimator;
-    final SurfaceAnimationRunner mSurfaceAnimationRunner;
-
-    /**
-     * Keeps track of which animations got transferred to which animators. Entries will get cleaned
-     * up when the animation finishes.
-     */
-    final ArrayMap<AnimationAdapter, SurfaceAnimator> mAnimationTransferMap = new ArrayMap<>();
-    final BoundsAnimationController mBoundsAnimationController;
-
-    private final PointerEventDispatcher mPointerEventDispatcher;
-
-    private WindowContentFrameStats mTempWindowRenderStats;
-
-    private final LatencyTracker mLatencyTracker;
-
-    /**
-     * Whether the UI is currently running in touch mode (not showing
-     * navigational focus because the user is directly pressing the screen).
-     */
-    boolean mInTouchMode;
-
-    private ViewServer mViewServer;
-    final ArrayList<WindowChangeListener> mWindowChangeListeners = new ArrayList<>();
-    boolean mWindowsChanged = false;
-
-    final Configuration mTempConfiguration = new Configuration();
-
-    // If true, only the core apps and services are being launched because the device
-    // is in a special boot mode, such as being encrypted or waiting for a decryption password.
-    // For example, when this flag is true, there will be no wallpaper service.
-    final boolean mOnlyCore;
-
-    // List of clients without a transtiton animation that we notify once we are done transitioning
-    // since they won't be notified through the app window animator.
-    final List<IBinder> mNoAnimationNotifyOnTransitionFinished = new ArrayList<>();
-
-    SurfaceBuilderFactory mSurfaceBuilderFactory = SurfaceControl.Builder::new;
-    TransactionFactory mTransactionFactory = SurfaceControl.Transaction::new;
-
-    private final SurfaceControl.Transaction mTransaction = mTransactionFactory.make();
-
-    final WindowManagerInternal.AppTransitionListener mActivityManagerAppTransitionNotifier
-            = new WindowManagerInternal.AppTransitionListener();
-
-    final ArrayList<AppFreezeListener> mAppFreezeListeners = new ArrayList<>();
-
-    final InputMonitor mInputMonitor = new InputMonitor(this);
-    private boolean mEventDispatchingEnabled;
-
-    MousePositionTracker mMousePositionTracker = new MousePositionTracker();
-}
-```
-### SystemServer - ActivityManagerService
-```java
-public class ActivityManagerService extends IActivityManager.Stub
-        implements Watchdog.Monitor, BatteryStatsImpl.BatteryCallback {
-    /** All system services */
-    SystemServiceManager mSystemServiceManager;
-
-    // Wrapper around VoiceInteractionServiceManager
-    private AssistUtils mAssistUtils;
-
-    // Keeps track of the active voice interaction service component, notified from
-    // VoiceInteractionManagerService
-    ComponentName mActiveVoiceInteractionServiceComponent;
-
-    private Installer mInstaller;
-
-    /** Run all ActivityStacks through this */
-    final ActivityStackSupervisor mStackSupervisor;
-    private final KeyguardController mKeyguardController;
-
-    private final ActivityStartController mActivityStartController;
-
-    private final ClientLifecycleManager mLifecycleManager;
-
-    final TaskChangeNotificationController mTaskChangeNotificationController;
-
-    final InstrumentationReporter mInstrumentationReporter = new InstrumentationReporter();
-
-    final ArrayList<ActiveInstrumentation> mActiveInstrumentation = new ArrayList<>();
-
-    public final IntentFirewall mIntentFirewall;
-
-    // Whether we should show our dialogs (ANR, crash, etc) or just perform their
-    // default action automatically.  Important for devices without direct input
-    // devices.
-    private boolean mShowDialogs = true;
-
-    private final VrController mVrController;
-
-    // VR Vr2d Display Id.
-    int mVr2dDisplayId = INVALID_DISPLAY;
-
-    // Whether we should use SCHED_FIFO for UI and RenderThreads.
-    private boolean mUseFifoUiScheduling = false;
-
-
-BroadcastQueue mFgBroadcastQueue;
-    BroadcastQueue mBgBroadcastQueue;
-    // Convenient for easy iteration over the queues. Foreground is first
-    // so that dispatch of foreground broadcasts gets precedence.
-    final BroadcastQueue[] mBroadcastQueues = new BroadcastQueue[2];
-
-    BroadcastStats mLastBroadcastStats;
-    BroadcastStats mCurBroadcastStats;
-
-
-    /**
-     * The last resumed activity. This is identical to the current resumed activity most
-     * of the time but could be different when we're pausing one activity before we resume
-     * another activity.
-     */
-    private ActivityRecord mLastResumedActivity;
-
-    /**
-     * The activity that is currently being traced as the active resumed activity.
-     *
-     * @see #updateResumedAppTrace
-     */
-    private @Nullable ActivityRecord mTracedResumedActivity;
-
-    /**
-     * If non-null, we are tracking the time the user spends in the currently focused app.
-     */
-    private AppTimeTracker mCurAppTimeTracker;
-
-    /**
-     * List of intents that were used to start the most recent tasks.
-     */
-    private final RecentTasks mRecentTasks;
-
-    /**
-     * The package name of the DeviceOwner. This package is not permitted to have its data cleared.
-     */
-    String mDeviceOwnerName;
-
-    /**
-     * The controller for all operations related to locktask.
-     */
-    private final LockTaskController mLockTaskController;
-
-    final UserController mUserController;
-
-    /**
-     * Packages that are being allowed to perform unrestricted app switches.  Mapping is
-     * User -> Type -> uid.
-     */
-    final SparseArray<ArrayMap<String, Integer>> mAllowAppSwitchUids = new SparseArray<>();
-
-    final AppErrors mAppErrors;
-
-    final AppWarnings mAppWarnings;
-
-    /**
-     * Dump of the activity state at the time of the last ANR. Cleared after
-     * {@link WindowManagerService#LAST_ANR_LIFETIME_DURATION_MSECS}
-     */
-    String mLastANRState;
-
-    /**
-     * Indicates the maximum time spent waiting for the network rules to get updated.
-     */
-    @VisibleForTesting
-    long mWaitForNetworkTimeoutMs;
-
-    /** Total # of UID change events dispatched, shown in dumpsys. */
-    int mUidChangeDispatchCount;
-
-
-
-    /**
-     * Helper class which strips out priority and proto arguments then calls the dump function with
-     * the appropriate arguments. If priority arguments are omitted, function calls the legacy
-     * dump command.
-     * If priority arguments are omitted all sections are dumped, otherwise sections are dumped
-     * according to their priority.
-     */
-    private final PriorityDump.PriorityDumper mPriorityDumper = new PriorityDump.PriorityDumper()
-
-
-    /**
-     * Keeps track of all IIntentReceivers that have been registered for broadcasts.
-     * Hash keys are the receiver IBinder, hash value is a ReceiverList.
-     */
-final HashMap<IBinder, ReceiverList> mRegisteredReceivers = new HashMap<>();
-
-    /**
-     * Resolver for broadcast intents to registered receivers.
-     * Holds BroadcastFilter (subclass of IntentFilter).
-     */
-    final IntentResolver<BroadcastFilter, BroadcastFilter> mReceiverResolver
-            = new IntentResolver<BroadcastFilter, BroadcastFilter>() ;
-    /**
-     * State of all active sticky broadcasts per user.  Keys are the action of the
-     * sticky Intent, values are an ArrayList of all broadcasted intents with
-     * that action (which should usually be one).  The SparseArray is keyed
-     * by the user ID the sticky is for, and can include UserHandle.USER_ALL
-     * for stickies that are sent to all users.
-     */
-    final SparseArray<ArrayMap<String, ArrayList<Intent>>> mStickyBroadcasts =
-            new SparseArray<ArrayMap<String, ArrayList<Intent>>>();
-
-final ProviderMap mProviderMap;
-
-    /**
-     * List of content providers who have clients waiting for them.  The
-     * application is currently being launched and the provider will be
-     * removed from this list once it is published.
-     */
-    final ArrayList<ContentProviderRecord> mLaunchingProviders
-            = new ArrayList<ContentProviderRecord>();
-.....
-
-}
-```
-
+``` 
 
 ```java
 public class ActivityStackSupervisor extends ConfigurationContainer implements DisplayListener,
@@ -1752,95 +1206,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 ### SystemServer - PackageManagerService
 ### SystemServer - LocationManagerService
 ```java
-public class LocationManagerService extends ILocationManager.Stub {
-        private final Context mContext;
-    private final AppOpsManager mAppOps;
-
-    // used internally for synchronization
-    private final Object mLock = new Object();
-
-    // --- fields below are final after systemRunning() ---
-    private LocationFudger mLocationFudger;
-    private GeofenceManager mGeofenceManager;
-    private PackageManager mPackageManager;
-    private PowerManager mPowerManager;
-    private ActivityManager mActivityManager;
-    private UserManager mUserManager;
-    private GeocoderProxy mGeocodeProvider;
-    private IGnssStatusProvider mGnssStatusProvider;
-    private INetInitiatedListener mNetInitiatedListener;
-    private LocationWorkerHandler mLocationHandler;
-    private PassiveProvider mPassiveProvider;  // track passive provider for special cases
-    private LocationBlacklist mBlacklist;
-    private GnssMeasurementsProvider mGnssMeasurementsProvider;
-    private GnssNavigationMessageProvider mGnssNavigationMessageProvider;
-    private IGpsGeofenceHardware mGpsGeofenceProxy;
-    // --- fields below are protected by mLock ---
-    // Set of providers that are explicitly enabled
-    // Only used by passive, fused & test.  Network & GPS are controlled separately, and not listed.
-    private final Set<String> mEnabledProviders = new HashSet<>();
-
-    // Set of providers that are explicitly disabled
-    private final Set<String> mDisabledProviders = new HashSet<>();
-
-    // Mock (test) providers
-    private final HashMap<String, MockProvider> mMockProviders =
-            new HashMap<>();
-
-    // all receivers
-    private final HashMap<Object, Receiver> mReceivers = new HashMap<>();
-
-    // currently installed providers (with mocks replacing real providers)
-    private final ArrayList<LocationProviderInterface> mProviders =
-            new ArrayList<>();
-
-    // real providers, saved here when mocked out
-    private final HashMap<String, LocationProviderInterface> mRealProviders =
-            new HashMap<>();
-
-    // mapping from provider name to provider
-    private final HashMap<String, LocationProviderInterface> mProvidersByName =
-            new HashMap<>();
-
-    // mapping from provider name to all its UpdateRecords
-    private final HashMap<String, ArrayList<UpdateRecord>> mRecordsByProvider =
-            new HashMap<>();
-
-    private final LocationRequestStatistics mRequestStatistics = new LocationRequestStatistics();
-
-    // mapping from provider name to last known location
-    private final HashMap<String, Location> mLastLocation = new HashMap<>();
-
-    // same as mLastLocation, but is not updated faster than LocationFudger.FASTEST_INTERVAL_MS.
-    // locations stored here are not fudged for coarse permissions.
-    private final HashMap<String, Location> mLastLocationCoarseInterval =
-            new HashMap<>();
-
-    // all providers that operate over proxy, for authorizing incoming location and whitelisting
-    // throttling
-    private final ArrayList<LocationProviderProxy> mProxyProviders =
-            new ArrayList<>();
-
-    private final ArraySet<String> mBackgroundThrottlePackageWhitelist = new ArraySet<>();
-
-    private final ArrayMap<IBinder, Identity> mGnssMeasurementsListeners = new ArrayMap<>();
-
-    private final ArrayMap<IBinder, Identity>
-            mGnssNavigationMessageListeners = new ArrayMap<>();
-
-    // current active user on the device - other users are denied location data
-    private int mCurrentUserId = UserHandle.USER_SYSTEM;
-    private int[] mCurrentUserProfiles = new int[]{UserHandle.USER_SYSTEM};
-
-    private GnssLocationProvider.GnssSystemInfoProvider mGnssSystemInfoProvider;
-
-    private GnssLocationProvider.GnssMetricsProvider mGnssMetricsProvider;
-
-    private GnssBatchingProvider mGnssBatchingProvider;
-    private IBatchedLocationCallback mGnssBatchingCallback;
-    private LinkedCallback mGnssBatchingDeathCallback;
-    private boolean mGnssBatchingInProgress = false;
-    private final PackageMonitor mPackageMonitor = new PackageMonitor();
+public class LocationManagerService extends ILocationManager.Stub { 
 }
 ```
 ### SystemServer - NotificationManagerService
@@ -1856,7 +1222,7 @@ public class NotificationManager {
 ## 应用层
 
 
-### 应用进程创建过程
+### 应用进程创建过程/应用安装过程
 
 
 
@@ -2234,396 +1600,6 @@ ActivityDisplay#0（一般只有一显示器） ActivityDisplay#1
 |    |                     |   |   |                                  |
 |    +---------------------+   |   |                                  |
 +------------------------------+   +----------------------------------+
-
-```
-
-```java
-class ActivityDisplay extends ConfigurationContainer<ActivityStack> implements WindowContainerListener {
-
-    private ActivityStackSupervisor mSupervisor;
-    /** Actual Display this object tracks. */
-    int mDisplayId;
-    Display mDisplay;
-
-    /**
-     * All of the stacks on this display. Order matters, topmost stack is in front of all other
-     * stacks, bottommost behind. Accessed directly by ActivityManager package classes. Any calls
-     * changing the list should also call {@link #onStackOrderChanged()}.
-     */
-    private final ArrayList<ActivityStack> mStacks = new ArrayList<>();
-    private ArrayList<OnStackOrderChangedListener> mStackOrderChangedCallbacks = new ArrayList<>();
-
-    /** Array of all UIDs that are present on the display. */
-    private IntArray mDisplayAccessUIDs = new IntArray();
-
-    /** All tokens used to put activities on this stack to sleep (including mOffToken) */
-    final ArrayList<ActivityManagerInternal.SleepToken> mAllSleepTokens = new ArrayList<>();
-    /** The token acquired by ActivityStackSupervisor to put stacks on the display to sleep */
-    ActivityManagerInternal.SleepToken mOffToken;
-
-    private boolean mSleeping;
-
-    // Cached reference to some special stacks we tend to get a lot so we don't need to loop
-    // through the list to find them.
-    private ActivityStack mHomeStack = null;
-    private ActivityStack mRecentsStack = null;
-    private ActivityStack mPinnedStack = null;
-    private ActivityStack mSplitScreenPrimaryStack = null;
-
-    // Used in updating the display size
-    private Point mTmpDisplaySize = new Point();
-}
-```
-ActivityStack
-```java
-class ActivityStack<T extends StackWindowController> extends ConfigurationContainer
-        implements StackWindowListener {
-   final ActivityManagerService mService;
-    private final WindowManagerService mWindowManager;
-    T mWindowContainerController;
-
-    /**
-     * The back history of all previous (and possibly still
-     * running) activities.  It contains #TaskRecord objects.
-     */
-    private final ArrayList<TaskRecord> mTaskHistory = new ArrayList<>();
-
-    /**
-     * List of running activities, sorted by recent usage.
-     * The first entry in the list is the least recently used.
-     * It contains HistoryRecord objects.
-     */
-    final ArrayList<ActivityRecord> mLRUActivities = new ArrayList<>();
-
-    /**
-     * When we are in the process of pausing an activity, before starting the
-     * next one, this variable holds the activity that is currently being paused.
-     */
-    ActivityRecord mPausingActivity = null;
-
-    /**
-     * This is the last activity that we put into the paused state.  This is
-     * used to determine if we need to do an activity transition while sleeping,
-     * when we normally hold the top activity paused.
-     */
-    ActivityRecord mLastPausedActivity = null;
-
-    /**
-     * Activities that specify No History must be removed once the user navigates away from them.
-     * If the device goes to sleep with such an activity in the paused state then we save it here
-     * and finish it later if another activity replaces it on wakeup.
-     */
-    ActivityRecord mLastNoHistoryActivity = null;
-
-    /**
-     * Current activity that is resumed, or null if there is none.
-     */
-    ActivityRecord mResumedActivity = null;
-
-    // The topmost Activity passed to convertToTranslucent(). When non-null it means we are
-    // waiting for all Activities in mUndrawnActivitiesBelowTopTranslucent to be removed as they
-    // are drawn. When the last member of mUndrawnActivitiesBelowTopTranslucent is removed the
-    // Activity in mTranslucentActivityWaiting is notified via
-    // Activity.onTranslucentConversionComplete(false). If a timeout occurs prior to the last
-    // background activity being drawn then the same call will be made with a true value.
-    ActivityRecord mTranslucentActivityWaiting = null;
-    ArrayList<ActivityRecord> mUndrawnActivitiesBelowTopTranslucent = new ArrayList<>();
-
-    /**
-     * Set when we know we are going to be calling updateConfiguration()
-     * soon, so want to skip intermediate config checks.
-     */
-    boolean mConfigWillChange;
-
-    /**
-     * When set, will force the stack to report as invisible.
-     */
-    boolean mForceHidden = false;
-
-    private boolean mUpdateBoundsDeferred;
-    private boolean mUpdateBoundsDeferredCalled;
-    private final Rect mDeferredBounds = new Rect();
-    private final Rect mDeferredTaskBounds = new Rect();
-    private final Rect mDeferredTaskInsetBounds = new Rect();
-
-    int mCurrentUser;
-
-    final int mStackId;
-    /** The attached Display's unique identifier, or -1 if detached */
-    int mDisplayId;
-
-    private final SparseArray<Rect> mTmpBounds = new SparseArray<>();
-    private final SparseArray<Rect> mTmpInsetBounds = new SparseArray<>();
-    private final Rect mTmpRect2 = new Rect();
-    private final ActivityOptions mTmpOptions = ActivityOptions.makeBasic();
-
-    /** List for processing through a set of activities */
-    private final ArrayList<ActivityRecord> mTmpActivities = new ArrayList<>();
-
-    /** Run all ActivityStacks through this */
-    protected final ActivityStackSupervisor mStackSupervisor;
-
-    private boolean mTopActivityOccludesKeyguard;
-    private ActivityRecord mTopDismissingKeyguardActivity;
-
-    final Handler mHandler;
-
-
-}
-```
-
-
-
-```java
-class TaskRecord extends ConfigurationContainer implements TaskWindowContainerListener {
-    final int taskId;       // Unique identifier for this task.
-    String affinity;        // The affinity name for this task, or null; may change identity.
-    String rootAffinity;    // Initial base affinity, or null; does not change from initial root.
-    final IVoiceInteractionSession voiceSession;    // Voice interaction session driving task
-    final IVoiceInteractor voiceInteractor;         // Associated interactor to provide to app
-    Intent intent;          // The original intent that started the task. Note that this value can
-                            // be null.
-    Intent affinityIntent;  // Intent of affinity-moved activity that started this task.
-    int effectiveUid;       // The current effective uid of the identity of this task.
-    ComponentName origActivity; // The non-alias activity component of the intent.
-    ComponentName realActivity; // The actual activity component that started the task.
-    boolean realActivitySuspended; // True if the actual activity component that started the
-                                   // task is suspended.
-    boolean inRecents;      // Actually in the recents list?
-    long lastActiveTime;    // Last time this task was active in the current device session,
-                            // including sleep. This time is initialized to the elapsed time when
-                            // restored from disk.
-    boolean isAvailable;    // Is the activity available to be launched?
-    boolean rootWasReset;   // True if the intent at the root of the task had
-                            // the FLAG_ACTIVITY_RESET_TASK_IF_NEEDED flag.
-    boolean autoRemoveRecents;  // If true, we should automatically remove the task from
-                                // recents when activity finishes
-    boolean askedCompatMode;// Have asked the user about compat mode for this task.
-    boolean hasBeenVisible; // Set if any activities in the task have been visible to the user.
-
-    String stringName;      // caching of toString() result.
-    int userId;             // user for which this task was created
-    boolean mUserSetupComplete; // The user set-up is complete as of the last time the task activity
-                                // was changed.
-
-    int numFullscreen;      // Number of fullscreen activities.
-
-    int mResizeMode;        // The resize mode of this task and its activities.
-                            // Based on the {@link ActivityInfo#resizeMode} of the root activity.
-    private boolean mSupportsPictureInPicture;  // Whether or not this task and its activities
-            // support PiP. Based on the {@link ActivityInfo#FLAG_SUPPORTS_PICTURE_IN_PICTURE} flag
-            // of the root activity.
-    int mLockTaskAuth = LOCK_TASK_AUTH_PINNABLE;
-
-    int mLockTaskUid = -1;  // The uid of the application that called startLockTask().
-
-    // This represents the last resolved activity values for this task
-    // NOTE: This value needs to be persisted with each task
-    TaskDescription lastTaskDescription = new TaskDescription();
-
-    /** List of all activities in the task arranged in history order */
-    final ArrayList<ActivityRecord> mActivities;
-
-    /** Current stack. Setter must always be used to update the value. */
-    private ActivityStack mStack;
-
-    /** The process that had previously hosted the root activity of this task.
-     * Used to know that we should try harder to keep this process around, in case the
-     * user wants to return to it. */
-    private ProcessRecord mRootProcess;
-
-    /** Takes on same value as first root activity */
-    boolean isPersistable = false;
-    int maxRecents;
-
-    /** Only used for persistable tasks, otherwise 0. The last time this task was moved. Used for
-     * determining the order when restoring. Sign indicates whether last task movement was to front
-     * (positive) or back (negative). Absolute value indicates time. */
-    long mLastTimeMoved = System.currentTimeMillis();
-
-    /** If original intent did not allow relinquishing task identity, save that information */
-    private boolean mNeverRelinquishIdentity = true;
-
-    // Used in the unique case where we are clearing the task in order to reuse it. In that case we
-    // do not want to delete the stack when the task goes empty.
-    private boolean mReuseTask = false;
-
-    CharSequence lastDescription; // Last description captured for this item.
-
-    int mAffiliatedTaskId; // taskId of parent affiliation or self if no parent.
-    int mAffiliatedTaskColor; // color of the parent task affiliation.
-    TaskRecord mPrevAffiliate; // previous task in affiliated chain.
-    int mPrevAffiliateTaskId = INVALID_TASK_ID; // previous id for persistence.
-    TaskRecord mNextAffiliate; // next task in affiliated chain.
-    int mNextAffiliateTaskId = INVALID_TASK_ID; // next id for persistence.
-
-    // For relaunching the task from recents as though it was launched by the original launcher.
-    int mCallingUid;
-    String mCallingPackage;
-
-    final ActivityManagerService mService;
-
-    private final Rect mTmpStableBounds = new Rect();
-    private final Rect mTmpNonDecorBounds = new Rect();
-    private final Rect mTmpRect = new Rect();
-
-    // Last non-fullscreen bounds the task was launched in or resized to.
-    // The information is persisted and used to determine the appropriate stack to launch the
-    // task into on restore.
-    Rect mLastNonFullscreenBounds = null;
-    // Minimal width and height of this task when it's resizeable. -1 means it should use the
-    // default minimal width/height.
-    int mMinWidth;
-    int mMinHeight;
-
-    // Ranking (from top) of this task among all visible tasks. (-1 means it's not visible)
-    // This number will be assigned when we evaluate OOM scores for all visible tasks.
-    int mLayerRank = -1;
-
-    /** Helper object used for updating override configuration. */
-    private Configuration mTmpConfig = new Configuration();
-
-    private TaskWindowContainerController mWindowContainerController;
-}
-```
-
-ActivityRecord
-```java
-final class ActivityRecord extends ConfigurationContainer implements AppWindowContainerListener {
-    final ActivityManagerService service; // owner
-    final IApplicationToken.Stub appToken; // window manager token
-    AppWindowContainerController mWindowContainerController;
-    final ActivityInfo info; // all about me
-    // TODO: This is duplicated state already contained in info.applicationInfo - remove
-    ApplicationInfo appInfo; // information about activity's app
-    final int launchedFromPid; // always the pid who started the activity.
-    final int launchedFromUid; // always the uid who started the activity.
-    final String launchedFromPackage; // always the package who started the activity.
-    final int userId;          // Which user is this running for?
-    final Intent intent;    // the original intent that generated us
-    final ComponentName realActivity;  // the intent component, or target of an alias.
-    final String shortComponentName; // the short component name of the intent
-    final String resolvedType; // as per original caller;
-    final String packageName; // the package implementing intent's component
-    final String processName; // process where this component wants to run
-    final String taskAffinity; // as per ActivityInfo.taskAffinity
-    final boolean stateNotNeeded; // As per ActivityInfo.flags
-    boolean fullscreen; // The activity is opaque and fills the entire space of this task.
-    // TODO: See if it possible to combine this with the fullscreen field.
-    final boolean hasWallpaper; // Has a wallpaper window as a background.
-    final boolean noDisplay;  // activity is not displayed?
-    private final boolean componentSpecified;  // did caller specify an explicit component?
-    final boolean rootVoiceInteraction;  // was this the root activity of a voice interaction?
-
-    private CharSequence nonLocalizedLabel;  // the label information from the package mgr.
-    private int labelRes;           // the label information from the package mgr.
-    private int icon;               // resource identifier of activity's icon.
-    private int logo;               // resource identifier of activity's logo.
-    private int theme;              // resource identifier of activity's theme.
-    private int realTheme;          // actual theme resource we will use, never 0.
-    private int windowFlags;        // custom window flags for preview window.
-    private TaskRecord task;        // the task this is in.
-    private long createTime = System.currentTimeMillis();
-    long displayStartTime;  // when we started launching this activity
-    long fullyDrawnStartTime; // when we started launching this activity
-    private long startTime;         // last time this activity was started
-    long lastVisibleTime;   // last time this activity became visible
-    long cpuTimeAtResume;   // the cpu time of host process at the time of resuming activity
-    long pauseTime;         // last time we started pausing the activity
-    long launchTickTime;    // base time for launch tick messages
-    // Last configuration reported to the activity in the client process.
-    private MergedConfiguration mLastReportedConfiguration;
-    private int mLastReportedDisplayId;
-    private boolean mLastReportedMultiWindowMode;
-    private boolean mLastReportedPictureInPictureMode;
-    CompatibilityInfo compat;// last used compatibility mode
-    ActivityRecord resultTo; // who started this entry, so will get our reply
-    final String resultWho; // additional identifier for use by resultTo.
-    final int requestCode;  // code given by requester (resultTo)
-    ArrayList<ResultInfo> results; // pending ActivityResult objs we have received
-    HashSet<WeakReference<PendingIntentRecord>> pendingResults; // all pending intents for this act
-    ArrayList<ReferrerIntent> newIntents; // any pending new intents for single-top mode
-    ActivityOptions pendingOptions; // most recently given options
-    ActivityOptions returningOptions; // options that are coming back via convertToTranslucent
-    AppTimeTracker appTimeTracker; // set if we are tracking the time in this app/task/activity
-    HashSet<ConnectionRecord> connections; // All ConnectionRecord we hold
-    UriPermissionOwner uriPermissions; // current special URI access perms.
-    ProcessRecord app;      // if non-null, hosting application
-    private ActivityState mState;    // current state we are in
-    Bundle  icicle;         // last saved activity state
-    PersistableBundle persistentState; // last persistently saved activity state
-    // TODO: See if this is still needed.
-    boolean frontOfTask;    // is this the root activity of its task?
-    boolean launchFailed;   // set if a launched failed, to abort on 2nd try
-    boolean haveState;      // have we gotten the last activity state?
-    boolean stopped;        // is activity pause finished?
-    boolean delayedResume;  // not yet resumed because of stopped app switches?
-    boolean finishing;      // activity in pending finish list?
-    boolean deferRelaunchUntilPaused;   // relaunch of activity is being deferred until pause is
-                                        // completed
-    boolean preserveWindowOnDeferredRelaunch; // activity windows are preserved on deferred relaunch
-    int configChangeFlags;  // which config values have changed
-    private boolean keysPaused;     // has key dispatching been paused for it?
-    int launchMode;         // the launch mode activity attribute.
-    int lockTaskLaunchMode; // the lockTaskMode manifest attribute, subject to override
-    boolean visible;        // does this activity's window need to be shown?
-    boolean visibleIgnoringKeyguard; // is this activity visible, ignoring the fact that Keyguard
-                                     // might hide this activity?
-    private boolean mDeferHidingClient; // If true we told WM to defer reporting to the client
-                                        // process that it is hidden.
-    boolean sleeping;       // have we told the activity to sleep?
-    boolean nowVisible;     // is this activity's window visible?
-    boolean mClientVisibilityDeferred;// was the visibility change message to client deferred?
-    boolean idle;           // has the activity gone idle?
-    boolean hasBeenLaunched;// has this activity ever been launched?
-    boolean frozenBeforeDestroy;// has been frozen but not yet destroyed.
-    boolean immersive;      // immersive mode (don't interrupt if possible)
-    boolean forceNewConfig; // force re-create with new config next time
-    boolean supportsEnterPipOnTaskSwitch;  // This flag is set by the system to indicate that the
-        // activity can enter picture in picture while pausing (only when switching to another task)
-    PictureInPictureParams pictureInPictureArgs = new PictureInPictureParams.Builder().build();
-        // The PiP params used when deferring the entering of picture-in-picture.
-    int launchCount;        // count of launches since last state
-    long lastLaunchTime;    // time of last launch of this activity
-    ComponentName requestedVrComponent; // the requested component for handling VR mode.
-
-    String stringName;      // for caching of toString().
-
-    private boolean inHistory;  // are we in the history stack?
-    final ActivityStackSupervisor mStackSupervisor;
-int mStartingWindowState = STARTING_WINDOW_NOT_SHOWN;
-    boolean mTaskOverlay = false; // Task is always on-top of other activities in the task.
-
-    TaskDescription taskDescription; // the recents information for this activity
-    boolean mLaunchTaskBehind; // this activity is actively being launched with
-        // ActivityOptions.setLaunchTaskBehind, will be cleared once launch is completed.
-
-    // These configurations are collected from application's resources based on size-sensitive
-    // qualifiers. For example, layout-w800dp will be added to mHorizontalSizeConfigurations as 800
-    // and drawable-sw400dp will be added to both as 400.
-    private int[] mVerticalSizeConfigurations;
-    private int[] mHorizontalSizeConfigurations;
-    private int[] mSmallestSizeConfigurations;
-
-    boolean pendingVoiceInteractionStart;   // Waiting for activity-invoked voice session
-    IVoiceInteractionSession voiceSession;  // Voice interaction session for this activity
-
-    // A hint to override the window specified rotation animation, or -1
-    // to use the window specified value. We use this so that
-    // we can select the right animation in the cases of starting
-    // windows, where the app hasn't had time to set a value
-    // on the window.
-    int mRotationAnimationHint = -1;
-
-    private boolean mShowWhenLocked;
-    private boolean mTurnScreenOn;
-
-    /**
-     * Temp configs used in {@link #ensureActivityConfiguration(int, boolean)}
-     */
-    private final Configuration mTmpConfig = new Configuration();
-    private final Rect mTmpBounds = new Rect();
-}
 
 ```
 
