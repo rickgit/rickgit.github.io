@@ -72,8 +72,8 @@
 |  C++        |  sizeof                                                      |
 |  Misc       |  (? :)                                                       |
 |             |  ,(comma operator)                                           |
-|             |  .(dot)and->(arrow)                                          |
-|             |  cast                                                        |
+|             |  .(dot)and->(arrow) (reference field)                        |
+|             |  cast               (type cast)                              |
 |             |  &(pointer operator)                                         |
 |             |  *(pointer operator)                                         |
 +-------------+--------------------------------------------------------------+
@@ -389,6 +389,10 @@ C++中的struct与类区别
 3. class还可以用于表示模板类型，struct则不行。
 
 ```
+### 对象的创建
+1. 栈上创建对象（Objects on the Stack）
+2. 在堆上创建对象（Objects on the Heap）
+使用new方法。可以用在反射
 ### 抽象，封装，继承（重载），多态
 
 - 数据封装是一种把数据和操作数据的函数捆绑在一起的机制，数据抽象是一种仅向用户暴露接口而把具体的实现细节隐藏起来的机制。

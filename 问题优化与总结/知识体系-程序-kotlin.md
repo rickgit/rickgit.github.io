@@ -29,7 +29,7 @@
 
 
  [kotlin文档地址](http://kotlinlang.org/docs/reference/basic-types.html)
-```kotlin
+```java
 硬关键字：这些关键字无论在什么情况下都不能作为标识符。
 软关键字：这些关键字可以在它们不起作用的上下文中用作标识符。
 修饰符关键字：这些关键字也可以在代码中用作标识符。

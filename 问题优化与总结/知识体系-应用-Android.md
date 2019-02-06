@@ -10,19 +10,18 @@
 +-----------------------------------------------------------------------+
 |                              component                                |
 |                                                                       |
-|  Fragments   Views  Layouts Controls  Intents    Resources    Manifest|
-|                                                                       |
+|  Resources                                                            |
+|  Views  Layouts Controls                                              |
+|  Fragments                                                            |
+|                          Intents   Manifest                           |
 |  Activities     Services     Broadcast Receivers     Content Providers|
 |                                                                       |
 +-----------------------------------------------------------------------+
 |                       App Framework                                   |
 |                                                                       |
-|                                                                       |
 |  AMS             WMS           content provider       View System     |
 |                                                                       |
-|                                                                       |
-|  PMS             Tel Mgr       Res Mgr     Loc Mgr    Notify Mgr      |
-|                                                                       |
+|  PMS            Notify Mgr     Tel Mgr       Res Mgr     Loc Mgr      |
 |                                                                       |
 +-------------------------------------------------+---------------------+
 |                  Libraries                      |  Android Runtime    |
@@ -52,7 +51,26 @@
 
 
 ```
+## 源码
+[源码](https://www.cnblogs.com/shenchanghui/p/8503623.html)
+```
++------------------------------------------------------------------------------+
+|                              packages/apps                                   |
++------------------------------------------------------------------------------+
+|                              frameworks                                      |
++-----------------------------------+------------------------------------------+
+|  libraries                        |  android runtime                         |
+|              bionic               |                  libcore                 |
+|                                   |                  dalvik   art  system    |
+|                                   +------------------------------------------|
+|                                                                              |
++-----------------------------------+------------------------------------------+
+|                              hardware                                        |
++------------------------------------------------------------------------------+
+|                              Kernel                                          |
++------------------------------------------------------------------------------+
 
+```
 ## Linux kernel -ipc
 ### 进程启动
 >启动Kernel的swapper进程(pid=0)：该进程又称为idle进程, 系统初始化过程Kernel由无到有开创的第一个进程, 用于初始化进程管理、内存管理，加载Display,Camera Driver，Binder Driver等相关工作。
@@ -74,12 +92,12 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 
 -----------------------------------
    +---------------------+
-   |  start_kernel(^oid) |
+   |  start_kernel(void) |
    +---------+-----------+
              v
 
-   +---------------------+
-   |  reset_init(^oid)   +--------------+-----------------------------+
+   +---------------------+swapper process
+   |  reset_init(void)   +--------------+-----------------------------+
    +---------------------+              |                             |
                                         |                             |
                                         v                             v
@@ -101,15 +119,15 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 | |              | |       |   +---------------+ |      |                           |
 | | AMS,WMS,PMS..| |       |   | mediaserver   | |      |                           |
 | | ServerThread | |       |   +---------------+ |      |                           |
-| |   JSS        | |       |   +---------------+ |      |                           |
-| | AlarmManager | |       |   |SurfaceFlinger | |      |                           |
+| |   JSS        | |       |   | AudioFlinger  | |      |                           |
+| | AlarmManager | |       |   |   MPS         | |      |                           |
 | +--------------+ |       |   +---------------+ |      |                           |
-|                  |       |                     |      |                           |
-|                  |       |                     |      |                           |
-|                  |       |                     |      |                           |
+|                  |       |   +---------------+ |      |                           |
+|                  |       |   |SurfaceFlinger | |      |                           |
+|                  |       |   +---------------+ |      |                           |
 +------------------+       +---------------------+      +---------------------------+
 
-  Ja^a Process                 Nati^e Process                Kernel Dri^er Thread
+  Ja^a Process                 Native Process                Kernel Dri^er Thread
 
 
 ```
@@ -242,14 +260,14 @@ p：proxy
 SystemServer，Binder机制
 +----------------+------------+-------------------------+--------------------------------------+
 |                |            |                         |                                      |
-|                |            | +---------------------+ |  BinderProxy   Ser^iceManagerProxy   |
-|                |            | | IInterface          | |  Ser^iceManager                      |  binder(0)/binders
+|                |            | +---------------------+ |  BinderProxy   ServiceManagerProxy   |
+|                |            | | IInterface          | |  ServiceManager                      |  binder(0)/binders
 |                |  Client    | | IBinder             | +--------------------------------------+ +-----------------+
-|                |            | | IServiceManager     | |   BpBinder/BpRefBase   BpInterface   |                   |
+|                |            | | IServiceManager     | | BpBinder/BpRefBase   BpInterface     |                   |
 |                |  process   | |                     | |                                      |                   |
-|                |            | +---------------------+ |   BpServiceManager                   |                   |
+|                |            | +---------------------+ | BpServiceManager                     |                   |
 |                |            | | Android_util_Binder | |                                      |                   |
-|                |            | | android_os_Parcel   | |  frameworks//IPCThreadState.cpp      |                   |
+|                |            | | android_os_Parcel   | | frameworks//IPCThreadState.cpp   77  |                   |
 |                +------------+ | AndroidRuntime.cpp  | +--------------------------------------+                   |
 |                |            | +---------------------+ | Binder    ServiceManagerNative       |  binder(0)/binders|
 |                |            | | IInterface          | | BinderInternal                       | +-----------+     |
@@ -260,7 +278,7 @@ SystemServer，Binder机制
 |                |            | +---------------------+ | BnServiceManager                     |             |     |
 |                |            |                         | frameworks//IPCThreadState.cpp       |             |     |
 |                +--------------------------------------+--------------------------------------+  binder(0)  |     |
-|                |  Service   |                                                                | +------+    |     |
+|                |  Service   |  (handle id = 0)                                               | +------+    |     |
 |                |            |  servicemanager/binder.c                                       | binders|    |     |
 |                |  Manager   |                                                                |        |    |     |
 |                |            |  service_manager.c                                             |        |    |     |
@@ -291,8 +309,8 @@ SystemServer，Binder机制
 
 binder的服务实体
 +------------+----------------------------------+------------------------------+
-|            |   System Service                |    Local Service(bindService) |
-|            |                                 |                               |
+|            |   System Service                |    anonymous binder           |
+|            |                                 |    (bindService)              |
 +------------------------------------------------------------------------------+
 |            |                                 |                               |
 |  launch    | SystemServer                    |  bindService                  |
@@ -310,6 +328,9 @@ binder的服务实体
 
 通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
 通过bindService开启服务，Service和调用者之间可以通讯。
+
+名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
+首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
 ```
 AIDL 文件生成对应类，类里包含继承Binder的内部类和实现AIDL的内部类；
 
@@ -675,11 +696,18 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 |  |  ViewRootImpl             |           | InputDispatcher    |     | |mapper|        | |
 |  |  +------------------------+           +------------------+ |     | +------+        | |
 |  |  |  InputEventReceiver    |           | InputPublisher   | |     |      +--------+ | |
-|  |  |    +-------------------+           +---------------+  | |     |      |eventhub| | |
+|  |  |    +-------------------+  socket   +---------------+  | |     |      |eventhub| | |
 |  |  |    |   InputChannel    | <------>  | Inputchannel  |  | |     |      +--------+ | |
-|  |  |    |                   |           |               |  | |     +-----------------+ |
+|  |  |    |                   |(low api pipe)|            |  | |     +-----------------+ |
 +--+--+----+-------------------+-----------+---------------+--+-+-------------------------+
-
+                                                                                 |  ^
+                                                                     Linux epoll |  | inotify
+                                                                                 v  |
+                                                                       ----------+--+-----+
+                                                                       |                  |
+                                                                       |   /dev/input     |
+                                                                       |                  |
+                                                                       +------------------+
 
 ```
 
@@ -1153,8 +1181,80 @@ Zygote进程启动后，加载ZygoteInit类，注册Zygote Socket服务端套接
 System Server进程，是由Zygote进程fork而来，System Server是Zygote孵化的第一个进程，System Server负责启动和管理整个Java framework，包含ActivityManager，PowerManager等服务
 Media Server进程，是由init进程fork而来，负责启动和管理整个C++ framework，包含AudioFlinger，Camera Service等服务
 
-相关系统服务 PMS（安装），AMS（启动），WMS（输出-显示），IMS（输入-事件），PowerMS,JSS,DMS,DisplayManagerService、BatteryService
+相关系统服务
+ PKMS（安装、卸载、更新以及解析AndroidManifest.xml），
+ AMS（（1）统一调度各应用程序的Activity
+      （2）内存管理
+      （3）进程管理），
+WMS（输出-显示,包括 Activity，Dialog，PopupWindow，Toast），IMS（输入-事件），NMS(通知,Toast),IMMS(输入法弹窗)
+PwMS,JSS,DMS,DisplayManagerService、BatteryService，MSM
+```
 
+                                                                    +------------------------------------------+
+                                                                    |                                          |
+                                                                    | SystemSer^er  Process                    |
+                                                                    |                                          |
+                                                                    |  +-----------------------------------+   |
+                                                                    |  |                                   |   |   install/permission
+                                                                    |  |  PMS                              |   |
+                                                                    |  |                                <-------------------------------+
+                                                                    |  |                                   |   |
+                                                                    |  |                                   |   |   ServiceManager
+                                                                    |  |                                   |   |                         +-------------------------------------+
+                                                                    |  +-----------------------------------+  ++                         |                                     |
+                                                                    |                                          |                         |  App Process                        |
+                                                                    |                                          |                         |                                     |
+                                                                    |  +------------------------------------+  |                         |    +------------------------------+ |
++-------------------------------------+         start process       |  |                                    |  |                         |    | ActivityThread               | |
+|                                     |                             |  |  AWS                               |  |      startActi^ity      |    |                              | |
+|  Zygote Process                     |      <------------------+   |  |                                    |  |       +------------------------+  Acti^ityRecord            | |
+|                                     |                             |  |      ProcessRecord                 |  |       |                 |    |                              | |
+|                                     |                             |  |                                    |  |       |                 |    |    ApplicationThread         | |
+|                                     |                             |  |        IApplicationThread   +-----------------+                 |    |                              | |
+|                                     |                             |  |                                    |  |                         |    +------------------------------+ |
+|                                     |                             |  |        HistoryRecord               |  |                         |                                     |
+|                                     |                             |  |        ZygoteProcess               |  |                         |                                     |
+|                                     |                             |  |        Ser^iceRecord               |  |                         |                                     |
++-------------------------------------+                             |  |                                    |  |                         |                                     |
+                                                                    |  |  +-------------------------------+ |  |                         |                                     |
+                                                                    |  |  |                               | |  |                         |                                     |
+                                                                    |  |  |   Acti^ityDisplay             | |  |                         |                                     |
+                                                                    |  |  |                               | |  |                         |                                     |
+                                                                    |  |  |       Acti^ityStack           | |  |                         |                                     |
+                                                                    |  |  |        +-------------------+  | |  |                         |                                     |
+                                                                    |  |  |        | TaskRecord        |  | |  |                         |                                     |
+                                                                    |  |  |        |                   |  | |  |  RootViewImpl#addWindow |                                     |
+                                                                    |  |  |        |    Acti^ityRecord |  | |  |                         |                                     |
+                                                                    |  |  |        |                   |  | |  |          +----------------+                                   |
+                                                                    |  |  |        |    Acti^ityRecord |  | |  |          |              |                                     |
+                                                                    |  |  |        +-------------------+  | |  |          |              |                                     |
+                                                                    |  |  |                               | |  |          |              |                                     |
+                                                                    |  |  |        +-------------------+  | |  |          |              |                                     |
+                                                                    |  |  |        | TaskRecord        |  | |  |          |              +-------------------------------------+
+                                                                    |  |  |        |                   |  | |  |          |
+                                                                    |  |  |        |    Acti^ityRecord |  | |  |          |
+                                                                    |  |  |        |                   |  | |  |          |
+                                                                    |  |  |        |    Acti^ityRecord |  | |  |          |
+                                                                    |  |  |        |                   |  | |  |          |
+                                                                    |  |  |        +-------------------+  | |  |          |
+                                                                    |  |  |                               | |  |          |
+                                                                    |  |  +-------------------------------+ |  |          |
+                                                                    |  |                                    |  |          |
+                                                                    |  +------------------------------------+  |          |
+                                                                    |                                          |          |
+ +-----------------------------------------+                        |   +------------------------------------+ |          |
+ |  Surface Flinger                        |                        |   |   WMS                              | |          |
+ |                                         |    <--------------------+  |                                <----------------+
+ |                                         |                        |   |                                    | |          |
+ +-----------------------------------------+                        |   +------------------------------------+ |
+                                                                    |                                          |
+                                                                    |                                          |
+                                                                    |                                          |
+                                                                    |                                          |
+                                                                    +------------------------------------------+
+
+
+```
 ### SystemServer - InputManagerService
  [事件](http://gityuan.com/2016/12/31/input-ipc/)
  [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
@@ -1220,8 +1320,51 @@ public class NotificationManager {
 
    
 ## 应用层
+Zygote 子线程
+```
+ps -t | grep -E "NAME| <zygote ps id> "
+```
+### 应用内消息-handler
+```
++------------------+     +------------------------------------+
+|                  |     |                                    |
+|  Handler      +-----+  |   Looper                           |
+|                  |  |  |                                    |
++------------------+  |  +------------------------------------+
+|                  |  |  |                                    |
+|  enqueueMessage  |  +----> loop()                           |
+|              |   |     |             +-------------------+  |
+|              |   |     |             |                   |  |
+|              +------------>          |  MessageQueue     |  |
+|                  |     |             |            epoll  |  |
+|                  |     |             +---------+---------+  |
+|                  |     |                       |            |
+|                  |     |                       |            |
+|                  |     |                       |            |
+|                  |     |                       v            |
+|                  |     |                                    |
+|                  |     |             +--------------------+ |
+|                  |     |             | Message            | |
+|  dispatchMessage<---------------+    |  Handler target    | |
+|                  |     |             |  Runnable callback | |
+|                  |     |             +--------------------+ |
++------------------+     |                                    |
+                         +------------------------------------+
 
 
+```
+[select/poll/epoll对比分析](http://gityuan.com/2015/12/06/linux_epoll/)
+ [源码解读poll/select内核机制](http://gityuan.com/2019/01/05/linux-poll-select/)
+
+[MessageQueue采用epoll](http://gityuan.com/2019/01/06/linux-epoll/)
+```bash
+ls /proc/<pid>/fd/  //可通过终端执行，看到该fd
+```
+1. 监视的描述符数量不受限制，所支持的FD上限是最大可以打开文件的数目，具体数目可以
+```    
+cat /proc/sys/fs/file-max
+```
+2. epoll不同于select和poll轮询的方式，而是通过每个fd定义的回调函数来实现的
 ### 应用进程创建过程/应用安装过程
 
 
@@ -1921,7 +2064,8 @@ Glide
  
 #### 架构之模块化（插件化及组件化）
 插件化
-- Dynamic-loader-apk
+- Dynamic-loader-apk0
+  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
 - Replugin
 
 组件化

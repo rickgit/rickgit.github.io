@@ -126,6 +126,13 @@ lines |   |    plane 0     |    plane 1     |    plane 2     |       |     plane
 ```
 
 ## 2 Java 基础
+### 特性
+x编译型语言/x解释型语言/√混合型语言	
+x动态语言/√静态语言	
+√静态/√动态类型(java 10 auto)	
+√强类型/x弱类型
+[](https://www.cnblogs.com/zy1987/p/3784753.html?utm_source=tuicool)
+### 语法
 分隔符，字面量（字符串值），关键字与操作符、标识符（Identifiers 变量与常量等）、或者是一个符号
 
 分隔符有空白符、注释和普通分隔符三种
@@ -185,7 +192,11 @@ keyword(53)
 ``` Operators
 +-------------+--------------------------------------------------------------+
 |             |                                                              |
-|  Misc       |  (? :)  instanceof                                           |
+|  Misc       |  (? :)  instanceof  ..(range operator)                       |
+|             |                                                              |
++----------------------------------------------------------------------------+
+|             |                                                              |
+|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
@@ -194,10 +205,6 @@ keyword(53)
 +----------------------------------------------------------------------------+
 |             |                                                              |
 |  Relational |  == != > < >= <=                                             |
-|             |                                                              |
-+----------------------------------------------------------------------------+
-|             |                                                              |
-|  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
 |             |                                                              |
 +----------------------------------------------------------------------------+
 |             |                                                              |
@@ -656,6 +663,53 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 ```
 
+#### Class文件格式及指令
+```operator
++-----------------+---------------------------------------+
+|  misc           | athrow                                |
+|                 | monitorenter,monitorexit              |
++---------------------------------------------------------+
+|                 |        load    store                  |
+|  stack operator |        const   push    ldc            |
+|                 |        pop     dup                    |
++---------------------------------------------------------+
+|   type          |  i2b, i2c,f2i                         |
++----------------------------+----------------------------+
+|  object operator|    field |  getstatic  putstatic      |
+|                 |          |  getfield   putfield       |
+|                 +---------------------------------------+
+|                 |    invoke|  invokevirtual invokestatic|
+|                 |    method|invokeinterface invokespecial|
+|                 |          |invokedynamic               |
+|                 +---------------------------------------+
+|                 |    method|  ireturn  lreturn   freturn|
+|                 |    return|  dreturn   areturn         |
+|                 +---------------------------------------+
+|                 |   object |  new                       |
+|                 |          |  newarray anewarray        |
+|                 |          |           multianewarray   |
+|                 |          |  xaload   xastore          |
+|                 |          |  arraylength               |
+|                 |          |  instanceof  checkcast     |
++----------------------------+----------------------------+
+|  decision       |  ifeq,iflt,ifnull,ifnonnull           |
+|                 |  tableswitch,lookupswitch             |
+|                 |  goto,goto_w,jsr,jsr_w,ret            |
++---------------------------------------------------------+
+|  alth           | -add -sub -mul -div -rem -neg  iin    |
+|                 |  ishl,ishr,iushr,lshl,lshr,lushr      |
+|                 |  ior,lor  iand, land  ixor, lxor      |
+|                 |  dcmpg,dcmpl,fcmpg,fcmpl,lcmp         |
++-----------------+---------------------------------------+
+
+```
+
+#### 类的加载与对象创建的方法
+new
+Class类的newInstance
+Constructor类的newInstance
+clone
+反序列化
 
 #### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
  
@@ -1822,11 +1876,26 @@ public final class Matcher implements MatchResult {
 ```
 ### Unix 5种I/O模型
 ```
-阻塞I/O
-非阻塞I/O
-多路复用I/O，Java NIO
-信号驱动I/O
-异步I/O
++---------------+------------------+--------------------------+--------------------+-----------------+
+|   blocking IO | nonblocking IO   |    IO multiplexing       |  signal driven IO  | asynchronous IO |
+|               |                  | select poll epoll(Linux) |                    |                 |
+|               |                  | Socket , javaNIO,javaRAF |                    |    Datagram     |
++----------------------------------------------------------------------------------------------------+   +
+|               |                  |                          |                    |                 |   |
+|initiate       |  initiate        |   check                  |                    |  initiate       |   |
+| |             |  check           |     +                    |                    |                 |   | wait data
+| |             |  check           |     |  block             |                    |                 |   |
+| |             |  check           |     |                    |                    |                 |   |
+| |             |    +             |     v                    |                    |                 |
+| | block       |    |  block      |  ready                   |    notification    |                 |   + recvfrom block
+| |             |    |             |  initiate                |    initiate        |                 |   |
+| |             |    |             |     +                    |         +          |                 |   | copy from kernel
+| |             |    |             |     |  block             |         | block    |                 |   | to user
+| |             |    |             |     |                    |         |          |                 |   | 
+| v complete    |    v complete    |     v  complete          |         v complete |  notification   |   +
+|               |                  |                          |                    |                 |
++---------------+------------------+--------------------------+--------------------+-----------------+
+
 ```
 ### BIO (阻塞 I/O)
 ```
