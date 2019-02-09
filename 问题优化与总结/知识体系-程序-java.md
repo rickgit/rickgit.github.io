@@ -4,25 +4,25 @@
 文档：需求开发计划（排期）及进度，设计说明书（架构图，项目结构图，类图），规范文档（命名，注释），功能预演文档，开发总结文档，用户指南(使用手册)
 
 ```
-+----------------------------------------------------------------------------------------------------+
-|                                                                                                    |
-|                            ReadWrite Object(String,Serializable)/File/Socket/db                    |
-+-------------------------------------------+------------+---------+-----------+-------+-------------+
++------------------+---------------------------------------------------------------------------------+
+|  comunicate      |                                                                                 |
+|                  |         ReadWrite Object(String,Serializable)/File/Socket/db                    |
++------------------+------------------------+------------+---------+-----------+-------+-------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |             |
-|           |           |      |            |            |         |           |       |             |
+|List/Date  |           |      |            |            |         |           |       |             |
 +-----------+-----------+------+------+     |            |         |           |       |             |
-|                    oop              | pop | Functional | FRP     |Reflective |Generic|             |
+|        oop                          | pop | Functional | FRP     |Reflective |Generic|             |
 +------------------------------+------+------------------------------------------------| Event-driven|      
 |            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
 +------------------------------+------------+------------------------------------------+-------------+
 |                                                                                                    |
 |                             conditional/decision-making/loops                                      |
 +----------------------------------+------------+---------------+-+-----------+-------------+--------+
-|            Whitespace(tab space) |    0b1     |               | |           |             |        |
-|            comment               |    01      | Base Data Type| |           |             | other  |
-|            separator sign(;)     |    1       |               | |           |             | symbol/|
-+----------------------------------+    0x1     +---------------+-+           |             | token  |
-|              separator           |   Literals |  keywords       |Operators  | Identifiers |        |
+|            Whitespace(tab space) |            |               | |           |             |        |
+|            comment               |            | Base Data Type| |           |             | other  |
+|            separator sign(;)     |10b 01 1 0x1|               | |           |             | symbol/|
++----------------------------------+            +---------------+-+           |             | token  |
+|              separator           |  Literals  |  keywords       | Operators | Identifiers |        |
 +----------------------------------+------------+-----------------------------+-------------+--------+
 |                                                                                                    |
 |                                            Character set (Unicode,UTF+8)                           |
@@ -34,7 +34,7 @@
 
 ```
 
-## 1 数据 - 通信
+## 1 数据 - 编码
 
 数据与二进制
 - 字长
@@ -705,9 +705,9 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 
 #### 类的加载与对象创建的方法
+
 new
-Class类的newInstance
-Constructor类的newInstance
+反射（Class#newInstance，Constructor#newInstance)
 clone
 反序列化
 
@@ -816,68 +816,7 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 
 
 ```
-- 类创建/运行时数据解析 - 反射（动态代理，注解接口），泛型
-对象创建方式：new ，反射（Class#newInstance，Constructor#newInstance),clone，反序列化
 
-1. 动态代理（序列化与RPC）
-```
-public class Proxy implements java.io.Serializable {
-         /**
-     * the invocation handler for this proxy instance.
-     * @serial
-     */
-    protected InvocationHandler h;
-}
-
-sun.misc.ProxyGenerator#generateProxyClass(java.lang.String, java.lang.Class<?>[], int)//类信息转化为字节数组，在转化为代理Class对象。
-
-
-
-```
-
-```
-    static interface Animal{
-
-    }
-    static class Dog implements Animal{
-        @Override
-        public String toString() {
-            return "dog tostring()";
-        }
-    }
-    public static void main(String[] args) {
-        Dog dog = new Dog();
-        Animal proxy = (Animal) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Animal.class}, new InvocationHandler() {
-            @Override
-            public Object invoke(Object proxyMethodNameLabel, Method method, Object[] args) throws Throwable {
-                System.out.println("before");
-                Object invoke = method.invoke(dog, args);
-                System.out.println(invoke);
-                System.out.println("after");
-                return invoke;
-            }
-        });
-//        System.out.println(proxy.toString());
-        proxy.toString();
-        System.out.println();
-    }
-
-```
-
-```
-@Retention(RetentionPolicy.RUNTIME)
-public @interface A {
-}
-
-编译后：
-
-public interface A extends java.lang.annotation.Annotation {
-}
-
-```
-
-1. 泛型：Generics in Java is similar to templates in C++.
-集合容器和网络请求经常用到
 
 #### 异常，断言，日志
 
@@ -1281,64 +1220,72 @@ Charset#availableCharsets():SortedMap
 
 ### 数据类结构 - 类实现面向对象与设计模式
  五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
+```
++----------------------+----------------------------------+---------------------------------------+
+|                      |                                  | Visitor                               |
+|                      |                                  |                                       |
+|                      |                                  | Template                              |
+|                      |                                  |                                       |
+|                      |                                  | Strategy                              |
+|                      |                                  |                                       |
+|                      |                                  |*Null Object                           |
+|                      | proxy pattern                    | State Pattern                         |
+|                      |                                  |                                       |
+|                      | Flyweight pattern                | Observer Pattern                      |
+|                      |  reduce num of objects created   |  one-to-many relationship             |
+| Prototype pattern    | Facade pattern                   | Memento Pattern                       |
+|  create duplicate obj|  hides complexities of the system|                                       |
+|                      | Decorator pattern                | Mediator Pattern                      |
+| Builder pattern      |   wrapper to existing class      |                                       |
+|  builds complex obj  |   add new functionality          | Iterator Pattern                      |
+|                      | Composite pattern                | Interpreter Pattern                   |
+| Singleton pattern    |                                  |  evaluate language grammar            |
+|                      |*Filter pattern                   |  or expression                        |
+| Abstract Factory     | Bridge Pattern                   | Command Pattern                       |
+|  creates factories   |  decouple abstraction            |  object as command                    |
+|                      |  from implementation             |                                       |
+| Factory pattern      | Adapter pattern                  | Chain of Responsibility               |
+|  hidin creation logic|  two incompatible interfaces     |  creates a chain of recei^er obj      |
++-------------------------------------------------------------------------------------------------+
+| Creational Patterns  | Structural Patterns              | Behavioral Patterns                   |
+|   create objects     |  class and object composition    |  communication                        |
+|                      |  obtain new functionalities      |  between objects                      |
++----------------------+----------------------------------+---------------------------------------+
 
-- 创建型
+```
+ 
   - 构建者模式
-  
   Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
 
   - 单例模式
-  
   Application，LayoutInflater 
   - 工厂方法
-  
   BitmapFactory
-  - 原型模式
-  - 抽象工厂
-- 结构型
-  - 适配器模式（Adapter）
-  - 装饰模式（Retrofit）
   - 享元模式
-
     Message.obtainMessage
   - 代理模式
-
     静态代理：封装ImageLoader、Glide；动态代理：面向切面。AIDL
   - 组合模式
-
     View和ViewGroup的组合
-
   - 外观模式
-   
     ContextImpl
   - 桥接模式
-
     Window和WindowManager之间的关系
 - 行为型
   - 命令模式
-    
     EventBus，Handler.post后Handler.handleMessage
   - 观察者模式
-  
     RxAndroid，BaseAdapter.registerDataSetObserver
-  - 模板方法
   - 策略模式
-
     时间插值器，如LinearInterpolator
   - 状态模式
   - 责任链
-
     对事件的分发处理，很多启动弹窗
   - 备忘录模式
-
     onSaveInstanceState和onRestoreInstanceState
-  - 迭代器模式（集合迭代器）
   - 解释器模式
-
     PackageParser
-  - 访问者模式
   - 中介者模式
-
     Binder机制
  
 
@@ -1352,32 +1299,84 @@ Charset#availableCharsets():SortedMap
 
 2、在接口中覆写Object类中的public方法，不算是函数式接口的方法。
 ```
-- Supplier：用来创建对象的。（**Supplier<MyClass> c=()->new MyClass();** 省略为 **Myclass::new**）
-- Consumer、
-- Predicate、
-- Function、
-- UnaryOperator
++----------------+---------+------------
+|                | param   | return    |
++--------------------------------------+
+|Function<T,R>   |   T     |  R        |功能型函数式接口
++--------------------------------------+
+|UnaryOperator<T>|   T     |  T        |继承Function
++--------------------------------------+
+|Predicate<T>    |   T     |  boolean  |断言型函数式接口
++--------------------------------------+
+|Consumer<T>     |   T     |  X        |消费型函数式接口
++--------------------------------------+
+|Supplier<R>     |   x     |  R        |供给型函数式接口
++----------------+---------+-----------+
 
-2. **Lambda 表达式**
-lambda表达式实例化函数接口
+1. 高阶函数
+
+2. 文件读写
+#### **Lambda 表达式**
+lambda表达式实例化函数接口，创建该接口的对象
 ```java
 (参数) -> 表达式
 ```
+- 可选参数类型定义
+- 单个参数定义，可选圆括号
+- 单个编码语句，可选大括号
+- 可选**returan**关键字
+
 
 **闭包**的定义是: 引用了自由变量的函数。
 
-3. 方法引用 **::**
-
-4. 增强接口方法
-- Default Methods
+1. 增强接口方法
+- Default Methods。List/Collection interface can have a default implementation of forEach method
 - 静态方法
  
+处理以上方法可以用，方法引用符号 **::**引用。构造方法也可以
 
-### 响应式编程（FRP）
+### 函数式编程
  
-响应式编程是一种面向数据流和变化传播的编程范式
+#### **java 8 Stream API** 详解 (Map-reduce、Collectors收集器、并行流)
+```
++------------------------------------------------------------+
+|  Pipelining       Automatic iterations                     |
++-------------+----------------------------------------------+
+|  Aggregate  |  filter, map, limit, reduce, find, match     |
+|  operations |                                              |
++------------------------------------------------------------+
+|  Source     |Collections, Arrays,     //List.stream()      |
+|             |or I/O resources as input source //stream.of()|
++-------------+----------------------------------------------+
+| Sequence of elements                                       |
++------------------------------------------------------------+
 
- Stream API 详解 (Map-reduce、Collectors收集器、并行流)
+```
+构造Stream对象
+```
+stream()
+parallelStream()
+```
+#### 应式编程（FRP）与Optional
+> Java 8中引入的Streams API非常适合处理数据流（map，reduce和所有变体），但Flow API会在通信方面（请求，减速，丢弃，阻塞等）发挥作用。[https://www.jdon.com/50854](https://www.jdon.com/50854)
+
+响应式编程是一种面向数据流和变化传播的编程范式；Reactive Streams主要解决背压（back-pressure）问题。当传入的任务速率大于系统处理能力时，数据处理将会对未处理数据产生一个缓冲区。
+
+- Reactive Streams由4个Java接口定义
+```
+Publisher<T>
+Subscriber<T>
+Subscription
+Processor<T,R>
+```
+java 9 Optional 可以直接转为 stream
+
+Stream,Optional,CompletableFuture
+Rxjava实现
+- JDK 9 Flow API，Flow和SubmissionPublisher<T>
+Java 9 为 Stream 新增了几个方法：dropWhile、takeWhile、ofNullable
+#### CompletableFuture
+
 
 ## 2.4 数据并发访问 - 线程与并发
 线程初始化三种方式： Thread,Runnable,Callable
@@ -1635,6 +1634,84 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 
 
   - 并发框架 Fork/Join
+
+## 元编程
+### 序列化Serializable
+
+### 类创建/运行时数据解析 - 反射（动态代理，注解接口）
+
+#### 1.动态代理（序列化与RPC）
+```
+public class Proxy implements java.io.Serializable {
+         /**
+     * the invocation handler for this proxy instance.
+     * @serial
+     */
+    protected InvocationHandler h;
+}
+
+sun.misc.ProxyGenerator#generateProxyClass(java.lang.String, java.lang.Class<?>[], int)//类信息转化为字节数组，在转化为代理Class对象。
+
+
+
+```
+
+```
+    static interface Animal{
+
+    }
+    static class Dog implements Animal{
+        @Override
+        public String toString() {
+            return "dog tostring()";
+        }
+    }
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        Animal proxy = (Animal) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Animal.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxyMethodNameLabel, Method method, Object[] args) throws Throwable {
+                System.out.println("before");
+                Object invoke = method.invoke(dog, args);
+                System.out.println(invoke);
+                System.out.println("after");
+                return invoke;
+            }
+        });
+//        System.out.println(proxy.toString());
+        proxy.toString();
+        System.out.println();
+    }
+
+```
+
+```
+@Retention(RetentionPolicy.RUNTIME)
+public @interface A {
+}
+
+编译后：
+
+public interface A extends java.lang.annotation.Annotation {
+}
+
+```
+#### 2.字节码增强
+- 加载时
+ASM
+cglib
+javassist
+
+- 运行时，动态加载
+#### 3.注解
+java 8 重复注解
+
+Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任何元素上：局部变量、接口类型、超类和接口实现类，甚至可以用在函数的异常定义上。
+### 类创建/运行时数据解析 - 泛型
+1. 泛型：Generics in Java is similar to templates in C++.
+集合容器和网络请求经常用到
+
+
 ## 2.3 数据访问 - 流（IO, NIO）
 字符串，类，文件（xml,json），内存，网络，数据库
 
@@ -1895,7 +1972,10 @@ public final class Matcher implements MatchResult {
 | v complete    |    v complete    |     v  complete          |         v complete |  notification   |   +
 |               |                  |                          |                    |                 |
 +---------------+------------------+--------------------------+--------------------+-----------------+
-
+|               |                  | select    poll   epoll   |                    |                 |
+|               |                  | fd-limit   x      x      |                    |                 |
+|               |                  | poll-ready √ notify-ready|                    |                 |
++---------------+------------------+--------------------------+--------------------+-----------------+
 ```
 ### BIO (阻塞 I/O)
 ```
@@ -2250,7 +2330,6 @@ KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半
 [见 知识体系-人工智能.md](知识体系-人工智能.md)
 
 ## 数据传输 - 计算机网络
-
 TCP使用内存
 ```
 cat /proc/sys/net/ipv4/tcp_mem
@@ -2262,6 +2341,28 @@ sudo tcpdump
 
 网络数据：报文格式
 - Socket 
+### 编码
+Java 8 Base64
+使用64个字符（2^6）编码内容
+```
+Simple： A-Za-z0-9+/.
+
+URL： A-Za-z0-9+_.
+
+MIME： A-Za-z0-9+/=
+```
+
+```java
+
+6bit as encode char
++--+
+             4 encode char uint
++--------------------------------------------------------+
+        Byte1               Byte2             Byte3
++-----------------+  +----------------+ +----------------+
+```
+
+
 ### TCP/IP
  TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。TCP是全双工模式，这就意味着，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了，主机1告诉主机2，它的数据已经全部发送完毕了
 

@@ -252,6 +252,32 @@ println "Hello from the shebang line"
 GPath  
 ### 类型
 
+##  元编程范式
+[官网地址](http://groovy-lang.org/metaprogramming.html)
+>groovy.lang.GroovyObject is the main interface in Groovy as the Object class is in Java. 
+
+```groovy
+package groovy.lang;
+
+public interface GroovyObject {
+
+    Object invokeMethod(String name, Object args);
+
+    Object getProperty(String propertyName);
+
+    void setProperty(String propertyName, Object newValue);
+
+    MetaClass getMetaClass();
+
+    void setMetaClass(MetaClass metaClass);
+}
+
+```
+
+### Runtime  metaprogramming
+###  compile-time metaprogramming
+AST转换
+
 ##  函数式编程范式
 
 闭包(与java/C++/python的lambda，oc的blocks是一个东西，只是不同语言的不同称呼,都是匿名函数
@@ -280,6 +306,8 @@ If a call is executed as a b c d, this will actually be equivalent to a(b).c(d).
 
 柯里化(currying):将多参数的函数转为单参数的形式
 Memoization/Composition/Trampoline/Method pointers
+## 面向对象编程
+
 
 ## 文件
 

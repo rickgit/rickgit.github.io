@@ -64,7 +64,7 @@
 |                |  Control    |   break continue  return                         |
 |                |             |   (type casts) as as?                            |
 |                |             |   (type checks)  in !in  is !is                  |
-|                +----------------------------------------------------------------+
+|                +-------------------------------------------- --------------------+
 |                |  special    |  typealias var val                               |
 |                |  identifiers|                                                  |
 |                +----------------------------------------------------------------+
@@ -154,8 +154,32 @@ lablels（@ sign）
 
 
 ## 编程泛型 - 函数式编程范式
-  1.  函数，inline fun，lambda
+### 一等公民 - 函数
+**函数字面量**
 
+  1.  函数，inline fun，lambda
+```Lambda expression
+
+
+val sum = { x: Int, y: Int -> x + y }
+```
+
+```Anonymous functions
+fun(x: Int, y: Int): Int = x + y
+
+fun(x: Int, y: Int): Int {
+    return x + y
+}
+```
+
+A **lambda expression** or **anonymous function** (as well as a **local function** and an **object expression**) can access its closure, i.e. the variables declared in the outer scope. 
+```Closures
+var sum = 0
+ints.filter { it > 0 }.forEach {
+    sum += it
+}
+print(sum)
+```
 ### 扩展函数
 ```
 +---------+----------------+-------------------+-----------------+

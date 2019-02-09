@@ -22,7 +22,7 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 |          | Project                                                          |                 |
 |          |     +-------------------------------------+----------------------+  Script         |
 |          |     |  properties                         | method               |                 |
-|          |     |      project                        |   apply plugins      |                 |
+|          |     |      project                        |   apply plugins(add task)|             |
 |          |     |      name                           |        script plugins|                 |
 |          |     |      path                           |        binary plugins|                 |
 |          |     |      description                    |                      |                 |
@@ -42,9 +42,10 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 +-----------------------------------------------------------------------------------------------+
 |                          Groovy comes with various AST transformations                        |
 +-----------------------------------------------------------------------------------------------+
-|               encoded UTF-8                                                                   |
+|                                    encoded UTF-8                                              |
 +-----------------------------------------------------------------------------------------------+
 
 
 ```
 
+[官方文档](https://docs.gradle.org/current/userguide/dependency_types.html)
