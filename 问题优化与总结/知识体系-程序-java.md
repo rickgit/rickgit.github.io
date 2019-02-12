@@ -6,10 +6,10 @@
 ```
 +------------------+---------------------------------------------------------------------------------+
 |  comunicate      |                                                                                 |
-|                  |         ReadWrite Object(String,Serializable)/File/Socket/db                    |
+|                  |         ReadWrite Object(String,List,Serializable)/File/Socket/db               |
 +------------------+------------------------+------------+---------+-----------+-------+-------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |             |
-|List/Date  |           |      |            |            |         |           |       |             |
+| Log/Date  |           |      |            |            |         |           |       |             |
 +-----------+-----------+------+------+     |            |         |           |       |             |
 |        oop                          | pop | Functional | FRP     |Reflective |Generic|             |
 +------------------------------+------+------------------------------------------------| Event-driven|      
@@ -1361,7 +1361,8 @@ parallelStream()
 > Java 8中引入的Streams API非常适合处理数据流（map，reduce和所有变体），但Flow API会在通信方面（请求，减速，丢弃，阻塞等）发挥作用。[https://www.jdon.com/50854](https://www.jdon.com/50854)
 
 响应式编程是一种面向数据流和变化传播的编程范式；Reactive Streams主要解决背压（back-pressure）问题。当传入的任务速率大于系统处理能力时，数据处理将会对未处理数据产生一个缓冲区。
-
+- JDK 9 Flow API，响应式流(Reactive Streams)类**Flow**和SubmissionPublisher<T>
+Java 9 为 Stream 新增了几个方法：dropWhile、takeWhile、ofNullable
 - Reactive Streams由4个Java接口定义
 ```
 Publisher<T>
@@ -1373,8 +1374,9 @@ java 9 Optional 可以直接转为 stream
 
 Stream,Optional,CompletableFuture
 Rxjava实现
-- JDK 9 Flow API，Flow和SubmissionPublisher<T>
-Java 9 为 Stream 新增了几个方法：dropWhile、takeWhile、ofNullable
+
+
+
 #### CompletableFuture
 
 
