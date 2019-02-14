@@ -6,6 +6,7 @@
 ```diagram
 +-----------------------------------------------------------------------+
 |                                AppS                                   |
+|  Home  Contacts  Phone   Browser                                      |
 +-----------------------------------------------------------------------+
 |                              component                                |
 |  Resources                                                            |
@@ -15,23 +16,24 @@
 |  Activities     Services     Broadcast Receivers     Content Providers|
 +-----------------------------------------------------------------------+
 |                       App Framework                                   |
-|  AMS             WMS           content provider       View System     |
-|  PMS            Notify Mgr     Tel Mgr       Res Mgr     Loc Mgr      |
+|  AMS             WMS    View System        content provider   XMPP    |
+|  PMS             NMS    ResourceManager    TelephonyManager   LMS     |
 +-------------------------------------------------+---------------------+
 |                  Libraries                      |  Android Runtime    |
 |                                                 |  +----------------+ |
-|                                                 |  | dalvik vm      | |
-|  OpenGL+ES (3d)  SSL/TLS           Webkit       |  +----------------+ |
-|                                                 +---------------------+
-|  SGL(Skia 2d)    FreeType          libc(bionic)                       |
+|  Surface Manager    Media       Webkit          |  | dalvik vm      | |
+|  OpenGL+ES (3d)                 SQLite          |  +----------------+ |
+|  SGL(Skia 2d)                   SSL/TLS         +---------------------+
+|  FreeType                       libc(bionic)                          |
 +-----------------------------------------------------------------------+
 |                      Linux kernel                                     |
 |                                                                       |
-|  Bind (IPC) Driver   Display Driver     Camera Driver     Audio Driver|
-|                      (FrameBuffer)        (V4L2)          (oss/alsa)  |
-|  Bluetooth Driver    WIFI Driver       KeyPad Driver  Power Management|
-|                                                                       |
-|  Flash Driver        USB Driver                                       |
+|  Bind (IPC) Driver   Display Driver   USB Driver     Power Management |
+|                      (FrameBuffer)                                    |
+|  Bluetooth Driver    Camera Driver    Flash Driver                    |
+|                        (V4L2)                                         |
+|  WIFI Driver         Audio Driver     KeyPad Driver                   |
+|                      (oss/alsa)                                       |
 +-----------------------------------------------------------------------+
 |                                                                       |
 |                                        ^                              |
@@ -112,7 +114,7 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 | |   JSS        | |       |  |   MPS         |  |      |                           |
 | | AlarmManager | |       |  +---------------+  |      |                           |
 | | bluetooth    | |       |                     |      |                           |
-| |              | |       |                     |      |                           |
+| |   NMS  LMS   | |       |                     |      |                           |
 | +--------------+ |       |                     |      |                           |
 |                  |       |  +---------------+  |      |                           |
 |                  |       |  |SurfaceFlinger |  |      |                           |
@@ -120,8 +122,8 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 |                  |       |                     |      |                           |
 +------------------+       +---------------------+      +---------------------------+
  
-
-  Ja^a Process                 Native Process                Kernel Driver Thread
+                            startservice from init.rc 
+  Java Process                 Native Process                Kernel Driver Thread
 
 
 ```
@@ -345,6 +347,7 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 
 
 ### Dispaly 系统
+
 ```
 显示数据类型
 1. UI界面的显示，这部分通常数据类型为RGB格式
@@ -352,6 +355,7 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 3. 和第一种类似，但在显示之前需要对数据进行2D、3D的处理（使用OpenGL、OpenVG、SVG、SKIA）。一般在Game、地图、Flash等应用中会用到。
 
 ```
+大致分为构建，绘制，渲染，显示
 ```
 +----------------------------------+
 |   GUI/View   draw                |
@@ -885,6 +889,14 @@ Media Server进程，是由init进程fork而来，负责启动和管理整个C++
       （3）进程管理），
 WMS（输出-显示,包括 Activity，Dialog，PopupWindow，Toast），IMS（输入-事件），NMS(通知,Toast),IMMS(输入法弹窗)
 PwMS,JSS,DMS,DisplayManagerService、BatteryService，MSM
+
+
+```
+IBinder b=ServiceManager.getService(Context.ACTIVITY_SERVICE) 获取远程服务
+
+
+Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对象
+```
 ```
                                           +------------------------------------------+
                                           |                                          |
@@ -998,7 +1010,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 }
 
 ```
-### SystemServer - PackageManagerService
+### SystemServer - PKMS(PackageManagerService)
 #### apk安装过程/应用进程创建过程/应用安装过程
 
 - [安装](http://gityuan.com/2016/11/13/android-installd/)
@@ -1014,18 +1026,87 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 
 ```
 - hind api
+
+### Resource Manager
+
+````
++--------------------------------------------+
+|   App                                      |
+|   +--------------------------------------+ |
+|   |  Resource                            | |
+|   |     AssetManager                     | |
+|   |     DisplayMetrics                   | |
+|   |     Configuration                    | |
+|   |     DisplayAdjustments               | |
+|   +--------------------------------------+ |
++--------------------------------------------+
+
+
+```
+
+
 ### SystemServer - LocationManagerService
 ```java
 public class LocationManagerService extends ILocationManager.Stub { 
 }
 ```
-### SystemServer - NotificationManagerService 通知
-```java
-public class NotificationManager {
-    private Context mContext;
 
+
+### SystemServer -NMS( NotificationManagerService) 通知
+**通知**是一个可以在应用程序正常的用户界面之外显示给用户的消息。
+
+```java
+
+public class NotificationManagerService extends SystemService {
+    private final IBinder mService = new INotificationManager.Stub();
+    private WorkerHandler mHandler;
 }
+}
+
+ protected class NotificationListenerWrapper extends INotificationListener.Stub {
 ```
+**NotificationListenerService** 获取系统通知相关信息，主要包含：通知的新增和删除，获取当前通知数量，通知内容相关信息
+NotificationManager/nofitycation
+```
++-----------------------------------+         +-------------------------------------+
+|  SystemServer                     |         |  SystemUI                           |
+|                                   |         |                                     |
+|                                   |         |                                     |
+|       +-------------------------+ |         |   +-------------------------+       |
+|       | NMS                     | |         |   | NotificationListener    |       |
+|       |                         | |         |   |                         |       |
+|       |   sound/vibrate/LIGHTS  | |         |   |                         +----+  |
+|       |                         | |         |   |                         |    |  |
+|       |   INotificationListener +<---------------->  onBind(Intent intent)|    |  |
+|       |                         | |         |   |                         |    |  |
+|       +-------------------------+ |         |   +-------------------------+    |  |
+|                                   |         |   +---------------------------+  |  |
+|                                   |         |   | NotificationEntryManager  |  |  |
+|                                   |         |   |       NotificationPanel   | <+  |
+|                                   |         |   |       Heads-up            |     |
+|                                   |         |   |       NotificationClicker |     |
+|                                   |         |   +---------------------------+     |
++-----------------------------------+         +-------------------------------------+
+
+```
+[SystemUI启动](https://www.jianshu.com/p/2e0f403e5299)
+```
+Status Bar状态栏信息显示，比如电池，wifi信号，3G/4G等icon显示
+Notification Panel 通知面板，比如系统消息，第三方应用消息
+Recents 近期任务栏显示面板，比如长按近期任务快捷键，显示近期使用的应用
+NavigationBar（导航栏）
+Keyguard（锁屏界面）
+Screenshot截图服务
+壁纸服务
+VolumeUI 音量调节对话框
+PowerUI 电源界面
+Ringtoneplayer 铃声播放器页面
+
+android 7.0:
+StackDriver分屏功能调节器
+PipUI画中画界面
+```
+
 ### SystemServer -wms
  popupwindow 与 Dialog
 - popupwindow 非阻塞浮层
@@ -1156,9 +1237,9 @@ ps -t | grep -E "NAME| <zygote ps id> "
 |                  |     |                                    |
 |                  |     |             +--------------------+ |
 |                  |     |             | Message            | |
-|  dispatchMessage<---------------+    |  Handler target    | |
-|                  |     |             |  Runnable callback | |
-|                  |     |             +--------------------+ |
+| dispatchMessage <---------------+    |  Handler target    | |
+|   mCallback      |     |             |  Runnable callback | |
+|   handleMessage()|     |             +--------------------+ |
 +------------------+     |                                    |
                          +------------------------------------+
 

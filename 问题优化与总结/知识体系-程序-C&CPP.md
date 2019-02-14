@@ -188,6 +188,8 @@ data type   | derived+-+ |  Struct
 ```
 ### 指针类型
 - C++ 引用
+
+智能指针在C++11版本之后提供，包含在头文件<memory>中，shared_ptr、unique_ptr、weak_ptr
 ### 函数类型
 - 函数指针变量的声明：
 ```

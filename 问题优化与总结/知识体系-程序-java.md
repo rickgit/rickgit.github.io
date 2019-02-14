@@ -73,6 +73,7 @@ BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
 17个0xffff，即0x10ffff
 ```
 [unicode 及位置](https://unicode-table.com/en/#control-character)
+ [emoji位置](https://unicode-table.com/en/#emoticons)  80个字符(1F600— 1F64F)
 UCS-4 第1个字节2^7=128个group，第2个字节2^8=256个平面（plane）,第3个字节分为256行 （row），第4个字节代表每行有256个码位（cell）
 unicode 有0x10FFFF个cell，分为 17平面，(2^8=256)行，(2^8=256)单元
 
