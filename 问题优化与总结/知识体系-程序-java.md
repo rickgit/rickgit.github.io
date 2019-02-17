@@ -150,29 +150,23 @@ keyword(53)
 |  special  |                                                                       |
 |identifiers|  var(Java 10)                                                         |
 +-----------+-----------------------------------------------------------------------+
-|           |                                                                       |
 |  reserved |  goto    const                                                        |
-|           |                                                                       |
 +-----------------------------------------------------------------------------------+
-|  exception|  try    catch    finally    throw    throws                           |
-|  debug    |                                                                       |
+|  exception|  try    catch    finally                                              |
+|  debug    |  throw    throws                                                      |
 |           |  assert                                                               |
 +-----------------------------------------------------------------------------------+
-|  Access   |                                                                       |
-|  modifiers|  public protected    private                                          |
-+-----------------------------------------------------------------------------------+
-|  package  |  package    import                                                    |
-|  control  |                                                                       |
+|  Access   |  public protected    private                                          |
+|  modifiers|  package    import                                                    |
 +-----------------------------------------------------------------------------------+
 |           |  class  enum    interface                                             |
 |  class    |  extends   implements                                                 |
-| interface |  new                                                                  |
-| modifiers |  this    super                                                        |
+| interface |                                                                       |
+| modifiers |  new  this    super   synchronized                                   |
 +-----------------------------------------------------------------------------------+
-|  variable |  void                                                                 |
-|  method   |  final    static     abstract   synchronized                          |
-|  modifiers|  volatile    native     transient     strictfp                        |
-|           |                                                                       |
+|  variable |  volatile final  static  transient                                    |
+|  method   |  void     native  abstract    strictfp                                |
+|  modifiers|                                                                       |
 +-----------+-----------------------------------------------------------------------+
 |  Flow     |  if     else                                                          |
 |  control  |  do    while    for                                                   |
@@ -1428,8 +1422,28 @@ Rxjava实现
   3. 性能（上下文切换，死锁，资源限制）
 
 #### 并发底层实现
+```
++----------+-----------------+------------------------------------------------------------------------------------------+
+|          |     CAS         |                                           AQS                                            |
+|          +----------------------------------------+------------------+------------------------+-----------------------+
+|          | AtomicInteger   |  ReentrantLock       |  Condition       |   CountDownLatch       |   ArrayBlockingQueue  |
+|          |                 |(Exclusive,optimistic)|                  |   CyclicBarrier        |                       |
+| volatile |                 |ReentrantReadWriteLock|                  |   Semaphore,Exchanger  |   LinkedBlockingQueue |
+|          |                 |(shared Read)         |                  |                        |                       |
+|          |                 |StampedLock           |                  |                        |   Fork/Join           |
++----------+------------------------------------------------------------------------------------------------------------+
+|                            |                      |                  |                        |                       |
+| Object                     |    synchronized      |  Object.wait()   |                        |                       |
+|                            | (Reentrant,unfair)   |  Object.notify() |                        |                       |
+|                            | (Exclusive,pessimism)|                  |                        |                       |
+|                            |                      |                  |                        |                       |
++----------------------------+----------------------+------------------+------------------------+-----------------------+
+
+```
+
   1. volatile（内存可见性，其他线程看到的value值都是最新的value值，即修改之后的volatile的值; 指令有序序，解决重排序） + cas 原子操作(atomic operation)是不需要synchronized，不会被线程调度机制打断的操作。
-  2. synchronized
+  2. synchronized。当synchronized锁住一个对象后，别的线程如果也想拿到这个对象的锁，就必须等待这个线程执行完成释放锁，才能再次给对象加锁，这样才达到线程同步的目的。
+  3. synchronized(Sync.class)/ static synchronized方法 为全局锁，相当于锁住了代码段。限制多线程中该类的**所有实例**同时访问jvm中该类所对应的代码块。
 上下文切换查看工具 **vmstat**,**LMbench**
 
 #### 内置锁（synchronized）
@@ -1707,11 +1721,15 @@ javassist
 
 - 运行时，动态加载
 #### 3.注解
+
+**@interface**
+
 java 8 重复注解
 
 Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任何元素上：局部变量、接口类型、超类和接口实现类，甚至可以用在函数的异常定义上。
 ### 类创建/运行时数据解析 - 泛型
 1. 泛型：Generics in Java is similar to templates in C++.
+特点：运行时类型擦除
 集合容器和网络请求经常用到
 
 
@@ -1747,13 +1765,11 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 |  flags        |  CASE_INSENSITIVE MULTILINE DOTALL  UNICODE_CASE  CANON_EQ  UNIX_LINES  LITERAL  UNICODE_CHARACTER_CLASS  COMMENTS   |
 |               |                                                                                                                      |
 +---------------+---------------------------------------------+------------------------------------------------------------------------+
-|  Quotation    |   \                                                                                                                  |转义
-|               |   \Q...\E                                                                                                            |
+|  Quotation    |   \             \Q...\E                                                                                               |转义
 +--------------------------------------------------------------------------------------------------------------------------------------+
 | Back          |  \n                                  \k<name>                                                                        |
 | references    |  nth capturing group matched         named-capturing group "name" matched                                            |
 +-------------------------------------------------------------+------------------------------------------------------------------------+
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?<name>X) a named-capturing group                  |
 |               |                                             |              |     (?:X) a non-capturing group                         |
 |               |                                             |              |     (?>X) an independent, non-capturing group           |
@@ -1765,40 +1781,30 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 |               |                                             |              |     with the given flags i d m s u x on - off           |
 |               |                                             | Constructs   |                                                         |
 |               |                                             |              +---------------------------------------------------------+
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?=X)   via zero-width positive look ahead          |
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?!X)   via zero-width negative lookahead           |
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?<=X)  via zero-width positive lookbehind          |
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?<!X)  via zero-width negative lookbehind          |
-|               |                                             |              |                                                         |
 |               |                                             |              |     (?>X)   as an independent, non-capturing group      |
 |               +                                             +------------------------------------------------------------------------+
 |  Logical      | XY                          X|Y             |  (X)                                                                   |
 |  Operators    | X followed by Y             Either X or Y   |  group                                                                 |
 +--------------------------------------------------------------------------------------------------------------------------------------+
-|               |  X?                       X{n}                                    |                     |                            |
-|               |  X, once or not at all    X, exactly n times                      |                     |                            |
-|               |                                                                   |                     |                            |
-|               |  X*                       X{n,}                                   |                     |                            |
-|               |  X, zero or more times    X, at least n times                     |                     |                            |
-|               |                                                                   |                     |                            |
-|               |   X+                      X{n,m}                                  |       ?             |                 +          |
-| Quantifiers   |  {X,mone or more times    X, at least n but not more than m times |                     |                            |
++--------------------------------------------------------------------------------------------------------------------------------------+
+|               |  X?   X, once or not at all     X{n}     X, exactly n times       |                     |                            |
+|  Quantifiers  |  X*   X, zero or more times     X{n,}    X, at least n times      |                     |                            | 
+|               |  X+   X,mone or more times      X{n,m}   X, at least n            |       ?             |                 +          |
+|               |                                         but not more than m times |                     |                            |
 |               +----------------------------------------------------------------------------------------------------------------------+
 |               |         Greedy                                                    |     Reluctant       |              Possessive    |
 |               |       (matches entire input,then backtrack)                       | (matches as little) | (Greedy, doesn't backtrack)|
 +--------------------------------------------------------------------------------------------------------------------------------------+
-|               | ^                           \b                          \A                           \G                              |
-|               | The beginning of a line     A word boundary             The beginning of the input   The end of the previous match   |
-| Boundary      |                                                                                                                      |
-|               | $                           \B                          \z                                                           |
-| Matchers      | The end of a line            A non-word boundary        The end of the input                                         |
-|               |                                                                                                                      |
-|               |                                                         \Z                                                           |
-|               |                                                         The end of the input but for the final terminator, if any    |
+|               |         Greedy                                                    |     Reluctant       |              Possessive    |
+|               |       (matches entire input,then backtrack)                       | (matches as little) | (Greedy, doesn't backtrack)|
++--------------------------------------------------------------------------------------------------------------------------------------+
+| Boundary      | ^ The beginning of a line          \b   A word boundary         \A   The beginning of the input                      |
+| Matchers      | $  The end of a line               \B   A non-word boundary     \z   The end of the input                            |
+|               | \G  The end of the previous match                     \Z  The end of the input but for the final terminator, if any  |
 +---------------+-------------------------------------------------------+-------------------------------+------------------------------+
 |               | \p{Lower}              \p{Upper}                      |   \p{javaLowerCase}           | \p{IsLatin}                  |
 |               | char:[a+z].            char:[A+Z]                     |   Character.isLowerCase()     | A Latin script char          |
@@ -1856,7 +1862,7 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 
 
 ```
-```
+```java
 public final class Pattern implements java.io.Serializable
 {
     /**
@@ -1989,7 +1995,7 @@ public final class Matcher implements MatchResult {
 ```
 UTF-8 
 
-```
+```java
 public class FileInputStream extends InputStream
 {
     /* File Descriptor - handle to the open file */
@@ -2144,7 +2150,7 @@ public class Socket implements Closeable {
 IO是面向流的，NIO是面向缓冲区的。
 
 Channel 和 Selector
-```
+```java
 public abstract class AbstractInterruptibleChannel
     implements Channel, InterruptibleChannel
 {
@@ -2357,8 +2363,7 @@ MIME： A-Za-z0-9+/=
 
 ```java
 
-6bit as encode char
-+--+
+ +--+
              4 encode char uint
 +--------------------------------------------------------+
         Byte1               Byte2             Byte3
