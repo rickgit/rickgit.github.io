@@ -115,6 +115,7 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 | | AlarmManager | |       |  +---------------+  |      |                           |
 | | bluetooth    | |       |                     |      |                           |
 | |   NMS  LMS   | |       |                     |      |                           |
+| |contentService| |       |                     |      |                           |
 | +--------------+ |       |                     |      |                           |
 |                  |       |  +---------------+  |      |                           |
 |                  |       |  |SurfaceFlinger |  |      |                           |
@@ -242,6 +243,7 @@ zygote// zygote socket通信设备文件
 binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
 [Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/)
+
 ```java
 n：native
 p：proxy
@@ -307,6 +309,7 @@ binder的服务实体
 
 名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
 首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
+
 ```
 AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
 
@@ -345,6 +348,7 @@ init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java�
 
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
 
+在Android中，RefBase结合sp（strong pointer）和wp（weak pointer），实现了一套通过引用计数的方法来控制对象生命周期的机制。
 
 ### Dispaly 系统
 
@@ -416,7 +420,7 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 |                                                      |        |         +------------------------------------------------------------+
 +-------------------------------------------------------        |
                                      wms   SurfaceComposerClient|         +------------------------------------------------------------+
-                                           +                    |  kernel |                /de^/graphics/fb*                           |
+                                           +                    |  kernel |                /dev/graphics/fb*                           |
                                            |                    |         +------------------------------------------------------------+
                                            |           Client   |
                                            +---------------->   |
@@ -775,7 +779,7 @@ public final class ArrayMap<K, V> implements Map<K, V> {
 初始容量  mKeys，mValues 0
 加载因子（0.0~1.0）  mSize>=mHashes长度
 扩容增量（扩容hash表）大于等于8,扩容原来的一半
-```
+```java
 final int osize = mSize;
 int n=osize >= (4*2) ? (osize+(osize>>1)): (osize >= 4 ? (4*2) : 4)
 ```
@@ -783,7 +787,7 @@ int n=osize >= (4*2) ? (osize+(osize>>1)): (osize >= 4 ? (4*2) : 4)
 查找 二分法mHashes表，
 插入 从mHashes二分法找key的hash，mHashes向后向前查找key，执行替换。没找到hash或key，System.arraycopy执行插入key,value（先判断扩容）
 删除  左移动mhash,mValue，根据情况调整新的大小后，填掉删除的位置
-```
+```java
 删除后调整大小
 final int osize = mSize;
 if (mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3) {
@@ -891,27 +895,22 @@ WMS（输出-显示,包括 Activity，Dialog，PopupWindow，Toast），IMS（�
 PwMS,JSS,DMS,DisplayManagerService、BatteryService，MSM
 
 
-```
+```java
 IBinder b=ServiceManager.getService(Context.ACTIVITY_SERVICE) 获取远程服务
 
 
 Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对象
 ```
+
 ```
                                           +------------------------------------------+
-                                          |                                          |
                                           | SystemSer^er  Process                    |
-                                          |                                          |
                                           |  +-----------------------------------+   |
-                                          |  |                                   |   |   install/permission
-                                          |  |  PMS                              |   |
+                                          |  |  PMS                              |   |   install/permission
                                           |  |                                <-------------------------------+
-                                          |  |                                   |   |
                                           |  |                                   |   |   Ser^iceManager
-                                          |  |                                   |   |                         +----------------------------+
-                                          |  +-----------------------------------+  ++                         |                            |
+                                          |  +-----------------------------------+   |                         +----------------------------+
                                           |                                          |                         |  App Process               |
-                                          |                                          |                         |                            |
                                           |  +------------------------------------+  |                         |    +---------------------+ |
  +-------------------+    start process   |  |                                    |  |                         |    | ActivityThread      | |
  |                   |                    |  |  AWS                               |  |      startActi^ity      |    |                     | |
@@ -922,42 +921,16 @@ Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对�
  |                   |                    |  |                                    |  |                         |    +---------------------+ |
  |                   |                    |  |        HistoryRecord               |  |                         |                            |
  |                   |                    |  |        ZygoteProcess               |  |                         |                            |
- |                   |                    |  |        Ser^iceRecord               |  |                         |                            |
- +-------------------+                    |  |                                    |  |                         |                            |
-                                          |  |  +-------------------------------+ |  |                         |                            |
-                                          |  |  |                               | |  |                         |                            |
-                                          |  |  |   Acti^ityDisplay             | |  |                         |                            |
-                                          |  |  |                               | |  |                         |                            |
-                                          |  |  |       Acti^ityStack           | |  |                         |                            |
-                                          |  |  |        +-------------------+  | |  |                         |                            |
-                                          |  |  |        | TaskRecord        |  | |  |                         |                            |
-                                          |  |  |        |                   |  | |  |  RootViewImpl#addWindow |                            |
-                                          |  |  |        |    Acti^ityRecord |  | |  |                         |                            |
-                                          |  |  |        |                   |  | |  |          +----------------+                          |
-                                          |  |  |        |    Acti^ityRecord |  | |  |          |              |                            |
-                                          |  |  |        +-------------------+  | |  |          |              |                            |
-                                          |  |  |                               | |  |          |              |                            |
-                                          |  |  |        +-------------------+  | |  |          |              |                            |
-                                          |  |  |        | TaskRecord        |  | |  |          |              +----------------------------+
-                                          |  |  |        |                   |  | |  |          |
-                                          |  |  |        |    Acti^ityRecord |  | |  |          |
-                                          |  |  |        |                   |  | |  |          |
-                                          |  |  |        |    Acti^ityRecord |  | |  |          |
-                                          |  |  |        |                   |  | |  |          |
-                                          |  |  |        +-------------------+  | |  |          |
-                                          |  |  |                               | |  |          |
-                                          |  |  +-------------------------------+ |  |          |
-                                          |  |                                    |  |          |
-                                          |  +------------------------------------+  |          |
-                                          |                                          |          |
+ +-------------------+                    |  |        Ser^iceRecord               |  |                         |                            |
+                                          |  |                                    |  |  RootViewImpl#addWindow |                            |
+                                          |  |                                    |  |          +----------------+                          |
+                                          |  |                                    |  |          |              +----------------------------+
+                                          +  +-----------------------------------++  +          +
 +-------------------+                     |   +------------------------------------+ |          |
 |  Surface Flinger  |                     |   |   WMS                              | |          |
 |                   |    <-----------------+  |                                <----------------+
 |                   |                     |   |                                    | |          +
 +-------------------+                     |   +------------------------------------+ |
-                                          |                                          |
-                                          |                                          |
-                                          |                                          |
                                           |                                          |
                                           +------------------------------------------+
 
@@ -972,7 +945,7 @@ Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对�
 - UI线程：创建socket pair，分别位于”InputDispatcher”线程和focused窗口所在进程的UI主线程，可相互通信。 
 UI主线程：通过setFdEvents()， 监听socket客户端，收到消息后回调NativeInputEventReceiver();【见小节2.1】
 “InputDispatcher”线程： 通过IMS.registerInputChannel()，监听socket服务端，收到消息后回调handleReceiveCallback；【见小节3.1】
-```
+```java
 
 ViewRootImpl的setView()过程:
     创建socket pair，作为InputChannel: 
@@ -1012,7 +985,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 ```
 ### SystemServer - PKMS(PackageManagerService)
 #### apk安装过程/应用进程创建过程/应用安装过程
-
+[Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
 - [安装](http://gityuan.com/2016/11/13/android-installd/)
 
 - 运行时权限
@@ -1029,7 +1002,7 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 
 ### Resource Manager
 
-````
+```
 +--------------------------------------------+
 |   App                                      |
 |   +--------------------------------------+ |
@@ -1128,7 +1101,7 @@ PipUI画中画界面
                                                                     |                         | |     CaptureRequest                            |
 +--------------------------------------+--------------------------+ |                         | |          Builder.addTarget()                  |
 |  AudioTrack/AudioRecorder            | MediaPlayer/MediaRecorder| |                         | |          CameraCaptureSession.CaptureCallback |
-|  AudioSystem                         |                          | |   CameraInfo            | |   CameraCharacteristics                       |
+|  AudioSystem                         | VideoView                | |   CameraInfo            | |   CameraCharacteristics                       |
 +-----------------------------------------------------------------+ +-------------------------+ +-----------------------------------------------+
 +-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
 | mediaserver                                                     | | mediaserver                                                               |
@@ -1184,6 +1157,48 @@ TEMPLATE_VIDEO_SNAPSHOT 在录制视频时创建适合静态图像捕获的请�
 
 
 #### 播放视频及视频渲染
+
+```
+State Diagram                                            +----+                                                          +-------+
+                                           reset()+----> |Idle|                                          release() +---->+ end   |
+                                                         +-+--+                                                          +-------+
+                        prepareAsync()     setDataSource() |  OnErrorListener.onError()  +-------------+
+                                                           |    +------------------------>  error      |
+          +-----------+                               +----v------+                      +-------------+
+          | preparing <-------------------------------+Initialized|
+          +---^---+---+                               +----+------+
+              |   |                                        |
+              |   | onPreparedListener.onPrepared()        |  prepare()
+              |   |                               +--------v-------+
+              |   +---------------------------->  |     prepared   <-----+
+              |   +--------------------------->   |                |     |
+              |   |             +--------------+  +--------+-------+     | seekTo()
+              |   |             |                          |    +--------+
+              |   |             |                          |
+prepareAsync()|   |prepare()    |                          | start()
+              |   |             <--------------------------v-----------------------+
+              |   |             |     +---->             started                   <---+
+              |   |             |     |    ++--------------+--^------------^--+---++   |  Looping==true&&playback completes
+              |   |             |     |     |              |  |            |  |   |    |
+              |   |             |     +-----+       pause()|  |start()     |  |  -+----+
+              |   |             |    seekTo()/start()      |  |            |  |
+              |   |             |                          |  |            |  |
+        +-----+---+-+           |                     +----v--+--+         |  | Looping==false&&OnCompletionListener.OnCompletion()
+  +-->  |  stoped   |           <---------------------+  paused  <-----+   |  +-----------------+
+  |     +-----+---^-+           |                     +---------++     |   +----------------+   |
+  |           |   |             |              seekTo()/Pause() |      |                    |   |
+  +-----------+   |             |                               +------+                    |   |
+stop()            |      stop() |                +--------------------+              start()|   |
+                  |             |                |                    +---------------------+   |
+                  +-------------v----------------+ PlayBackCompleted  <-------------------------+
+                                                 |                    <----+
+                                                 +--------------+-----+    |
+                                                                |          | seekTo()
+                                                                +----------+
+
+```
+
+
 ```
 +------------------------------------------------------+
 |        MediaPlayer.java                              |
@@ -1231,8 +1246,6 @@ ps -t | grep -E "NAME| <zygote ps id> "
 |                  |     |             |            epoll  |  |
 |                  |     |             +---------+---------+  |
 |                  |     |                       |            |
-|                  |     |                       |            |
-|                  |     |                       |            |
 |                  |     |                       v            |
 |                  |     |                                    |
 |                  |     |             +--------------------+ |
@@ -1240,8 +1253,7 @@ ps -t | grep -E "NAME| <zygote ps id> "
 | dispatchMessage <---------------+    |  Handler target    | |
 |   mCallback      |     |             |  Runnable callback | |
 |   handleMessage()|     |             +--------------------+ |
-+------------------+     |                                    |
-                         +------------------------------------+
++------------------+     +------------------------------------+
 
 
 ```
@@ -1306,20 +1318,28 @@ Context作用
 **/art/tools/veridex/appcompat.sh --dex-file=test.apk**
 ``` dot
 APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
-
-APK打包安装及加载流程->Android系统架构->[Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)->Dalvik及framework初始化（packagemanager,activitymanager,resourcemanager,viewsystem）
-
-
-Activity->启动模式与任务栈->Activity生命周期（back和home键）->onCreate->setContentView->常用控件与布局方式->View的绘制流程->"Context 概念"->View获取Res资源流程->动画
  
-
-常用控件与布局方式->SurfaceView
-
-Activity生命周期->onresume->View的事件响应流程
-
-
 ```
 ### 四大组件-Activity
+```
++---------------------------------------------------------------+
+|   AMS                                                         |
+|     +-------------------------------------------------------+ |
+|     |ProcessRecord                                          | |
+|     |                                                       | |
+|     |    ActivityRecord                                     | |
+|     |                                                       | |
+|     |    ServiceRecord   ConnectionRecord                   | |
+|     |                                                       | |
+|     |    BroadcastRecord  ReceiverList                      | |
+|     |                                                       | |
+|     |    ContentProviderRecord    ContentProviderConnection | |
+|     |                                                       | |
+|     +-------------------------------------------------------+ |
++---------------------------------------------------------------+
+
+```
+#### 生命周期
 ```
                                             +--------+
                                             | Start  |
@@ -1371,9 +1391,9 @@ Activity生命周期->onresume->View的事件响应流程
 
 
 ```
-- 启动模式
+#### 启动模式，任务栈，亲和度
 Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
-```
+```bash
 adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
 adb shell dumpsys activity activities----------查看Activity组件信息
 adb shell dumpsys activity services-----------查看Service组件信息
@@ -1384,65 +1404,181 @@ adb shell dumpsys activity processes---------查看进程信息
 
 
 adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
+adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 ```
-```ActivityStarter的启动模式代码阅读
+```java
+//ActivityStarter的启动模式代码阅读
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
 ```
 
-[Activity栈及任务记录结构](https://www.imooc.com/article/31922?block_id=tuijian_wz)
+ 
+ [ActivityStack](https://blog.csdn.net/guoqifa29/article/details/54863237)
+
+android N开始有5种窗口类型（窗口类型及ActivityType决定ActivityStack） ：
+全屏 FullScreenStack
+DockedStack（分屏Activity）
+PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
+freeformstack(自由模式Activity) ：FreeForm Stack
+homeStack（launcher和recents Activity）和其他
+```java
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_RECENTS;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_STANDARD;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_UNDEFINED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN_OR_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_PINNED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
 ```
-ActivityDisplay#0（一般只有一显示器） ActivityDisplay#1
-+------------------------------+   +----------------------------------+
-|       ActivityStack          |   |   ActivityStack                  |
-|    +---------------------+   |   |                                  |
-|    |  TaskRecord         |   |   |                                  |
-|    +---------------------+   |   |                                  |
-|    |                     |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    |                     |   |   |                                  |
-|    +---------------------+   |   |                                  |
-|                              |   |                                  |
-|    +---------------------+   |   |                                  |
-|    |  TaskRecord         |   |   |                                  |
-|    +---------------------+   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    | |ActivityRecord  |  |   |   |                                  |
-|    | +----------------+  |   |   |                                  |
-|    |                     |   |   |                                  |
-|    |                     |   |   |                                  |
-|    +---------------------+   |   |                                  |
-+------------------------------+   +----------------------------------+
+
+
+ 桌面Launcher、任务栏Recents属于id=HOME_STACK的栈中。多窗口不仅仅是控制Activity放入不同ActivityStack中，同时还要改变Activity的生命周期，即Focus Activity是resume状态，其他可见Activity是Pause状态，并不会进入Stop状态
+
+```
+ActivityDisplay#0（一般只有一显示器） 
++--------------------------------------------------------------------------------------+
+| ActivityStack#0                                                                      |
+|    +---------------------+                                                           |
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+| ActivityStack#1                                                                      |
+|    +---------------------+                                                           |
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
+
+
+
 
 ```
 
 
 [四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
 [Activity启动模式](gityuan.com/2017/06/11/activity_record/)
-android:launchMode：
-    SingleTop：栈顶复用，如果处于栈顶，则生命周期不走onCreate()和onStart()，会调用onNewIntent()，适合推送消息详情页
-    SingleTask：栈内复用，如果存在栈内，则在其上所有Activity全部出栈，使得其位于栈顶，生命周期和SingleTop一样，app首页基本是用这个。
-android:taskAffinity 属性主要和 singleTask 或者 allowTaskReparenting 属性配对使用，在其他情况下没有意义。
-android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
 
+```
++------------+-----------------------+------------------------------+
+|            |                       |newIntent()|taskAffinity      |
+|            +------------------------------------------------------+
+|            |        standard       |           |                  |
+|            +------------------------------------------------------+
+|            |        singleTop      |   √       |                  |
+| launch mode+------------------------------------------------------+
+|            |        singleTask     |   √       |choice  TaskRecord|
+|            +------------------------------------------------------+
+|            |        singleInstance |   √       |                  |
++-------------------------------------------------------------------+
+|  Flags     | FLAG_ACTIVITY_NEW_TASK|           |choice TaskRecord |
++-------------------------------------------------------------------+
+|            |   allowTaskReparenting|           |change affinity   |
++------------+------------------------------------------------------+
+
+```
+
+android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
+android:alwaysRetainTaskState触发时机在系统清理后台Task，且Activity实例为根Activity时。 
+android:finishOnTaskLaunch Task重新启动时(比如桌面上点击某一个应用图标)，会销销毁此Task中的该Activity实例。
+android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
+
+
+单任务无法内存回收。多任务，内存回收
+```
+单栈的进程，Activity跟进程声明周期一致
+多栈的，只有不可见栈的Activity可能被销毁（Java内存超过3/4,不可见）
+该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
+至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
+```
+### contentProvider
+
+ContentService扮演者ContentObserver的注册中心
+
+ContentProvider——内容提供者， 在android中的作用是对外共享数据，也就是说你可以通过ContentProvider把应用中的数据共享给其他应用访问，其他应用可以通过ContentProvider 对你应用中的数据进行添删改查。
+
+ContentResolver——内容解析者， 其作用是按照一定规则访问内容提供者的数据（其实就是调用内容提供者自定义的接口来操作它的数据）。
+ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的数据库的变化，继而做一些相应的处理，它类似于数据库技术中的触发器(Trigger)，当ContentObserver所观察的Uri发生变化时，便会触发它。 
+
+```java
+    private static final class ApplicationContentResolver extends ContentResolver {
+        private final ActivityThread mMainThread;
+    }
+ 
+
+    public class ContentProviderHolder implements Parcelable {
+            public final ProviderInfo info;
+        public IContentProvider provider;
+        public IBinder connection;// IContentProvider 通过这个对象传输数据,由ContentProvider#mTransport赋值
+        public boolean noReleaseNeeded;
+    }
+
+                                          +-------------------------------------------------------------+
+                                          |  SystemServer                                               |
+                                          |             +-------------------------------------+         |
+                   +---------------------------+        |   ContentService                    |   +----------------------+
+                   |                      |    |        |      ObserverNode                   |   |     |                |
+                   v                      |    +-------------+   IContentObserver      +----------+     |                v
+                                          |             |                                     |         |
++--------------------------------------+  |             +-------------------------------------+         |  +---------------------------------+
+|  App                                 |  |                                                             |  |  App2                           |
+|                     ActivityManager. |  |     +-------------------------------------------------------+  |                                 |
+|    mProviderMap       getService()   |  |     | AMS                 +->  mProviderMap                ||  |    +---->  mProviderMap         |
+|                                      |  |     +                     |         +                      ||  |    |                            |
+|      +  ^            +-------------------> getContentProvider()  +--+         v                      ||  |    |             +              |
+|      |  |                            |  |     +                                                      ||  |    |             |              |
+|      |  |                            |  |     |                         +-----------------------------+  |    |             v              |
+|      |  |                            |  |     |                         |        IApplicationThread  |   |    |                            |
+|      |  |                            |  |     +                         |                            +--------+   scheduleInstallProvider()|
+|      |  +---------------------------------+ ContentProviderHolder  <--+-+ContentPro^iderRecord.wait()||  |                                 |
+|      |                               |  |     +                       ^ +-----------------------------|  |                                 |
+|      |                               |  |     |               +-------+                              ||  |                                 |
+|      |                               |  |     |               |   +------------------------------+   ||  |          ActivityManager.       |
+|      |                               |  |     |               |   |     publishContentProviders()|  <--------------+  getService()         |
+|      |                               |  |     |               +---+ContentPro^iderRecord.notify()|   ||  |                                 |
+|      |                               |  |     |                   +------------------------------+   ||  | +-------------------------------+
+|      |                               |  |     +-------------------------------------------------------+  | |  ContentProvider             ||
+|      |                               |  |                                                             |  | |    Transport:IContentProvider||
+|      |                               |  |                                                             |  | +-------------------------------|
++--------------------------------------+  +-------------------------------------------------------------+  +---------------------------------+
+       |                                                                                                                  ^
+       +------------------------------------------------------------------------------------------------------------------+
+
+
+   URI = scheme:[//authority]path[?query][#fragment]
+
+   normal
+低风险权限，只要申请了就可以使用，安装时不需要用户确认。 
+dangerous
+高风险权限，安装时需要用户确认授权才可使用。 
+signature
+只有当申请权限应用与声明此权限应用的数字签名相同时才能将权限授给它。 
+signatureOrSystem
+签名相同或者申请权限的应用为系统应用才能将权限授给它 
+```
 
 ### 其他组件 View（ 测量，布局及绘制,事件，动画），controls,layouts
 
@@ -1560,13 +1696,6 @@ J: JDK tools
                                                                                               
 
 ```
-
-- HandlerThread/IntentService
-- LruCache
-  
-
-
-
 
 ## 函数式编程
 Glide
