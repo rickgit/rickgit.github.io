@@ -722,6 +722,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 ##### 绘制事件 - ViewRootImpl#traversal
 [Activity的显示之ViewRootImpl的预测量、窗口布局、最终测量、布局、绘制五大过程](http://segmentfault.com/a/1190000012018189)
 
+### 窗口，见WMS
 
 ## dalvik
 [支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
@@ -1016,6 +1017,36 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 
 
 ```
+APK文件中有一个文件resource.arsc。这个文件存放的是APK中资源的ID和资源类型，属性，文件名的读经关系表和所有的字符串，装载APK，就是解析该文件生成ResRTable对象
+
+
+```
++----------+-------------+-----------+----------+----------------
+|          |  make dirs  | compile   |   R.java |  access       |
++---------------------------------------------------------------+
+|  assets  |      √      |  x        |     x    | AssetManager  |
+|          |             |           |          |               |
++---------------------------------------------------------------+
+|  res/raw |      x      |  √        |     √    | Resource      |
+|          |             |           |          |               |
++----------+-------------+-----------+----------+---------------+
+
+
+```
+Dex加固
+```
+    +--------------------------------+
+    |  APK                           |
+    |         +----------------------+
+    |         | Assets               |
+    |         |         shell dex    |
+    |         |                      |
+    |         +----------------------+
+    |                                |
+    |                  Unpack dex    |
+    +--------------------------------+
+```
+脱壳dex文件的作用主要有两个，一个是解密加密后的dex文件；二是基于dexclassloader动态加载解密后的dex文件 
 
 
 ### SystemServer - LocationManagerService
@@ -1081,6 +1112,8 @@ PipUI画中画界面
 ```
 
 ### SystemServer -wms
+Activity、Dialog、PopWindow、Toast
+
  popupwindow 与 Dialog
 - popupwindow 非阻塞浮层
 - Dialog 阻塞式对话框
@@ -1231,6 +1264,24 @@ Zygote 子线程
 ```
 ps -t | grep -E "NAME| <zygote ps id> "
 ```
+### 广播
+```
+
+                                                      +---------------------------------------+
++---------------------+-----------+-----------+       | SystemServer                          |
+|                     | runtime   | location  |       |                                       |
+|                     |           |           |       |   PMS                                 |
++---------------------------------------------+       |     mReceivers:ActivityIntentResolver |
+|                     |           |           |       |                                       |
+|   mReceivers        |  install  |  WMS      |       |     mReceiverResolver                 |
+|                     |           |           |       |                                       |
++---------------------------------------------+       |   AMS                                 |
+|   mReisterdReceivers|  run app  |  AMS      |       |     mReisterdReceivers:IIntentReceiver|
+|                     |           |           |       |                                       |
++---------------------+-----------+-----------+       +---------------------------------------+
+
+```
+
 ### 应用内消息机制-handler
 ```
 +------------------+     +------------------------------------+
@@ -1496,7 +1547,7 @@ ActivityDisplay#0（一般只有一显示器）
 +-------------------------------------------------------------------+
 |  Flags     | FLAG_ACTIVITY_NEW_TASK|           |choice TaskRecord |
 +-------------------------------------------------------------------+
-|            |   allowTaskReparenting|           |change affinity   |
+|            |   allowTaskReparenting|           |change to affinity task|
 +------------+------------------------------------------------------+
 
 ```
