@@ -159,13 +159,13 @@ keyword(53)
 |  Access   |  public protected    private                                          |
 |  modifiers|  package    import                                                    |
 +-----------------------------------------------------------------------------------+
-|           |  class  enum    interface                                             |
+|           |  class  enum  interface  abstract                                     |
 |  class    |  extends   implements                                                 |
 | interface |                                                                       |
-| modifiers |  new  this    super   synchronized                                   |
+| modifiers |  new  this    super   synchronized                                    |
 +-----------------------------------------------------------------------------------+
-|  variable |  volatile final  static  transient                                    |
-|  method   |  void     native  abstract    strictfp                                |
+|  variable |  final  static  volatile transient                                    |
+|  method   |  void native  strictfp                                                |
 |  modifiers|                                                                       |
 +-----------+-----------------------------------------------------------------------+
 |  Flow     |  if     else                                                          |
@@ -432,27 +432,17 @@ javap –verbose Hello.class 可以看到更加清楚的信息
 #### JVM 内存区域与内存模型
 ```java
 +--------------------------------+--------------------------------------------+
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
 |     +------------------+       |  +--------------+   +-------------------+  |
 |     |                  |       |  |              |   |                   |  |
 |     |  Heap            |       |  |  VM Stack    |   |  Native Method    |  |
 |     |                  |       |  |              |   |  Stack            |  |
 |     +------------------+       |  +--------------+   +-------------------+  |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
 |     +------------------+       |  +--------------------------------------+  |
 |     |                  |       |  |                                      |  |
 |     |  Method Area     |       |  |  Program Couter Register             |  |
 |     |    +-------------|       |  |                                      |  |
 |     |    |  const pool |       |  |                                      |  |
 |     +------------------+       |  +--------------------------------------+  |
-|                                |                                            |
-|                                |                                            |
-|                                |                                            |
 +--------------------------------+--------------------------------------------+
 
 
@@ -773,13 +763,11 @@ equals()，hashcode()，toString()
 面向对象的三大特性，五大原则，23个设计模式
 - 封装
     1. privated,protected,packaged,public
-    2. static
-    3. instanceof，
+    2. static，final
+    3. 类型推断 instanceof，
     4. 枚举类,内部类（静态，成员，局部，匿名）
-    5. 头等函数（匿名方法,匿名抽象/接口内部类实现）
-    6. 闭包/函数式接口（Lambda表达式）
-    7. 自动装箱和拆箱
-    8. 日期
+    5. 自动装箱和拆箱
+    6. 日期
 - 继承
     1. extends,implements,this,super，final
     3. 抽象类，接口
@@ -1653,6 +1641,12 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
   - 并发框架 Fork/Join
 
 ## 元编程
+RTTI，即Run-Time Type Identification，运行时类型识别。RTTI能在运行时就能够自动识别每个编译时已知的类型。
+
+反射机制就是识别未知类型的对象。反射常用于动态代理中。
+
+
+
 ### 序列化Serializable
 
 ### 类创建/运行时数据解析 - 反射（动态代理，注解接口）

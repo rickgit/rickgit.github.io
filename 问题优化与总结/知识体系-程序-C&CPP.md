@@ -39,26 +39,29 @@
 +--------------------------------------------------------+
 |    | continue break return goto                        |
 |    | if else switch  case default for  do while        |
-|    | typedef volatile  sizeof                          |
+|    | typedef  sizeof volatile                          |
 |ANSI|                                                   |
 |  C | const static extern register auto                 |
 |(32)|                                                   |
 |    | union struct enum  void                           |
 |    | char  int float double                            |
-|    | short long    unsigned signed                     |
+|    | short long unsigned signed                        |
 |----+---------------------------------------------------|
 
 +---------+-----------------------------------------------------------------------+
-| c++ 11  | alignas alignof constexpr decltype noexcept  static_assert thread_loca|
+| c++ 11  | alignas alignof                                                       |
+| (10)    | constexpr decltype  thread_loca                                       |
+| (10)    | noexcept  static_assert                                               |
 | (10)    | char16_t char32_t  nullptr                                            |
 +---------------------------------------------------------------------------------+
 |         | try   catch    throw                                                  |
-|         | typeid typename static_cast dynamic_cast const_cast reinterpret_cast  |
-|         |                                                                       |
-|         |                           typedef  sizeof                             |
-|         | namespace  using export asm                                           |
-|         | Template explicit inline new delete  operator this  virtual           |
-|         | pri^ate protected  friend public                                      |
+|         | typedef  sizeof  typeid   Template    typename                        |
+|         | static_cast dynamic_cast const_cast reinterpret_cast                  |
+|         | namespace  using export                                               |
+|         | new delete  operator this                                             |
+|         | inline   virtual  explicit                                            |
+|         | private protected  friend public                                      |
+|         | asm                                                                   |
 |         +----------+------------------------------------------------------------+
 |         | Storage  |    auto register static extern mutable                     |
 |         | Class    |                                                            |
@@ -69,7 +72,9 @@
 | (63)    +----------+------------------+-----------------------------------------+
 |         | break  continue  goto  return                                         |
 |         | if  else   switch case default for do while                           |
+|         |                                                                       |
 |         | union  enum struct   class                                            |
+|         |                                                                       |
 |         | bool char wchar_t   int  float double   void                          |
 |         | false true                                                            |
 +---------+-----------------------------------------------------------------------+
@@ -203,7 +208,7 @@ weak_ptr shared_ptr的弱引用
 |                    |                    |                         |                      |
 | #error             |                    |                         |                      |
 |                    |                    |                         |                      |
-| #pragma            |                    |                         |                      |
+| #pragma            |                    |                         |  region，pack ，data_seg，disable   |
 +--------------------+--------------------+-------------------------+----------------------+
 ```  
 The #define preprocessor directive creates symbolic constants. The symbolic constant is called a macro 
@@ -444,12 +449,47 @@ shape1->calArea();//Circle#calArea没有用virtural修饰，会调用父类Shape
 - 命名空间
   区分不同库中相同名称的函数、类、变量等。
 
-  - 模板与泛型编程
-  模板是泛型编程的基础，泛型编程即以一种独立于任何特定类型的方式编写代码。
-### template
+
 ### 智能指针
 shared_ptr
 ### 类的生命周期
+
+
+### 类型转换
+```
++---------------------------------+-------------------------+
+|                    |class type  | base type|   other      |
++-----------------------------------------------------------+
+|  static_cast       |   √        |     √    |              |
+|                    |            |          |              |
++-----------------------------------------------------------+
+|  dynamic_cast      |   √        |          |              |
++-----------------------------------------------------------+
+|  reinterpert_cast  |            |          |  any pointer |
++-----------------------------------------------------------+
+|  const_cast        |            |          |  const       |
+|                    |            |          |  volatile    |
+|                    |            |          |  __unaligned |
+|                    |            |          |              |
++--------------------+------------+----------+--------------+
+
+```
+
+## 元编程
+### 反射
+C++11，运行时类型识别(RTTI)
+关于RTTI:dynamic_cast（动态强制转换）,typeid,type_info（类型信息）
+```c
+type_info = dynamic_cast < type-id > ( expression)
+
+```
+是专门用于具有继承关系的类之间转换的，尤其是向下类型转换，是安全的.RTTI 依赖于虚表,即dynamic_cast有虚函数
+
+
+### template
+- 模板与泛型编程
+  模板是泛型编程的基础，泛型编程即以一种独立于任何特定类型的方式编写代码。
+- typename:1.模板定义,2.使用嵌套依赖类型(nested depended name)
 
 ## 数据访问
 文件，内存，网络，数据库
