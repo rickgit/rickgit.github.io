@@ -6,7 +6,7 @@
 ```
 +------------------+---------------------------------------------------------------------------------+
 |  comunicate      |                                                                                 |
-|                  |         ReadWrite Object(String,List,Serializable)/File/Socket/db               |
+|                  |         ReadWrite Object(String,List,Serializable)/C&C++/File/Socket/db         |
 +------------------+------------------------+------------+---------+-----------+-------+-------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |             |
 | Log/Date  |           |      |            |            |         |           |       |             |
@@ -1281,7 +1281,8 @@ Charset#availableCharsets():SortedMap
 1、接口有且只能有个一个抽象方法，只有方法定义，没有方法体
 
 2、在接口中覆写Object类中的public方法，不算是函数式接口的方法。
-```
+
+
 +----------------+---------+------------
 |                | param   | return    |
 +--------------------------------------+
@@ -1295,7 +1296,7 @@ Charset#availableCharsets():SortedMap
 +--------------------------------------+
 |Supplier<R>     |   x     |  R        |供给型函数式接口
 +----------------+---------+-----------+
-
+```
 1. 高阶函数
 
 2. 文件读写
@@ -1336,7 +1337,7 @@ lambda表达式实例化函数接口，创建该接口的对象
 
 ```
 构造Stream对象
-```
+```java
 stream()
 parallelStream()
 ```
@@ -1364,6 +1365,8 @@ Rxjava实现
 
 
 ## 2.4 数据并发访问 - 线程与并发
+
+### 异步实现（多线程编程）
 线程初始化三种方式： Thread,Runnable,Callable
 线程的生命周期
 ```
@@ -1409,7 +1412,7 @@ Rxjava实现
   2. 跳跃性
   3. 性能（上下文切换，死锁，资源限制）
 
-#### 并发底层实现
+### 并发底层实现
 ```
 +----------+-----------------+------------------------------------------------------------------------------------------+
 |          |     CAS         |                                           AQS                                            |
@@ -1556,6 +1559,35 @@ UNSAFE_END
   
 
 #### AQS 实现 **乐观锁**
+```java
+public abstract class AbstractQueuedSynchronizer{
+    /**
+     * Head of the wait queue, lazily initialized.  Except for
+     * initialization, it is modified only via method setHead.  Note:
+     * If head exists, its waitStatus is guaranteed not to be
+     * CANCELLED.
+     */
+    private transient volatile Node head;
+
+    /**
+     * Tail of the wait queue, lazily initialized.  Modified only via
+     * method enq to add new wait node.
+     */
+    private transient volatile Node tail;
+
+    /**
+     * The synchronization state.
+     */
+    private volatile int state; 
+}
+```
+
+```
+1. 独占式获取与释放同步状态
+2. 共享式获取与释放同步状态
+3. 查询同步队列中的等待线程情况
+```
+
 **重入锁** ReentrantLock（**独享锁**,**互斥锁**）/ReentrantReadWriteLock（**读锁是共享锁，其写锁是独享锁**）/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现**公平锁和非公平锁**，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
 
 
@@ -2181,124 +2213,103 @@ awt/swing
 
 
 
-### 2.5 C语言，NDK，汇编及CPU处理二进制
+## 2.5 C语言，NDK，汇编及CPU处理二进制
 > [知识体系-C&CPP程序.md](./知识体系-C&CPP程序.md)
 ###jni
-####数据类型定义：
+(jni注册本地方法的两种方式](https://blog.csdn.net/zerokkqq/article/details/79143834)
+#### 数据类型定义：
+[JNI Types and Data Structures](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/types.html#wp9502)
 - jdk/src/share/javavm/export/jni.h:
 
 ```
-#ifdef __cplusplus
-extern "C" {
-#endif
++----------------------------------------------------------------------------+
+| Primitive Types                                                            |
+|                                                                            |
+|     Java Type    Native Type     Description                               | Type Signatures
+|                                                                            |
+|     boolean      jboolean        unsigned 8 bits      #define JNI_FALSE  0 |z
+|                                                       #define JNI_TRUE   1 |
+|     byte         jbyte           signed 8 bits                             |b
+|     char         jchar           unsigned 16 bits                          |c
+|     short        jshort          signed 16 bits                            |x
+|     int          jint            signed 32 bits                            |i
+|     long         jlong           signed 64 bits                            |j
+|     float        jfloat          32 bits                                   |f
+|     double       jdouble         64 bits                                   |d
+|     void         void            N/A                                       |
++----------------------------------------------------------------------------+//other 
+|  Reference Types                                                           |
+|     jobject                                                                |L fully-qualified-class ; fully-qualified-class
+|         jclass                                                             |
+|         jstring                                                            |
+|         jarray                                                             |[ type type[] 
+|              jobjectArray                                                  |
+|              jbooleanArray                                                 |
+|              jbyteArray                                                    |
+|              jshortArray                                                   |
+|              jcharArray                                                    |
+|              jintArray                                                     |
+|              jlongArray                                                    |
+|              jfloatArray                                                   |
+|              jdoubleArray                                                  |
+|         jthrowable                                                         |
++----------------------------------------------------------------------------+( arg-types ) ret-type method type
 
-/*
- * JNI Types
- */
-
-#ifndef JNI_TYPES_ALREADY_DEFINED_IN_JNI_MD_H
-
-typedef unsigned char   jboolean;
-typedef unsigned short  jchar;
-typedef short           jshort;
-typedef float           jfloat;
-typedef double          jdouble;
-
-typedef jint            jsize;
-
-#ifdef __cplusplus
-
-class _jobject {};
-class _jclass : public _jobject {};
-class _jthrowable : public _jobject {};
-class _jstring : public _jobject {};
-class _jarray : public _jobject {};
-class _jbooleanArray : public _jarray {};
-class _jbyteArray : public _jarray {};
-class _jcharArray : public _jarray {};
-class _jshortArray : public _jarray {};
-class _jintArray : public _jarray {};
-class _jlongArray : public _jarray {};
-class _jfloatArray : public _jarray {};
-class _jdoubleArray : public _jarray {};
-class _jobjectArray : public _jarray {};
-
-typedef _jobject *jobject;
-typedef _jclass *jclass;
-typedef _jthrowable *jthrowable;
-typedef _jstring *jstring;
-typedef _jarray *jarray;
-typedef _jbooleanArray *jbooleanArray;
-typedef _jbyteArray *jbyteArray;
-typedef _jcharArray *jcharArray;
-typedef _jshortArray *jshortArray;
-typedef _jintArray *jintArray;
-typedef _jlongArray *jlongArray;
-typedef _jfloatArray *jfloatArray;
-typedef _jdoubleArray *jdoubleArray;
-typedef _jobjectArray *jobjectArray;
-
-#else
-
-struct _jobject;
-
-typedef struct _jobject *jobject;
-typedef jobject jclass;
-typedef jobject jthrowable;
-typedef jobject jstring;
-typedef jobject jarray;
-typedef jarray jbooleanArray;
-typedef jarray jbyteArray;
-typedef jarray jcharArray;
-typedef jarray jshortArray;
-typedef jarray jintArray;
-typedef jarray jlongArray;
-typedef jarray jfloatArray;
-typedef jarray jdoubleArray;
-typedef jarray jobjectArray;
-
-#endif
-
-typedef jobject jweak;
-
-typedef union jvalue {
-    jboolean z;
-    jbyte    b;
-    jchar    c;
-    jshort   s;
-    jint     i;
-    jlong    j;
-    jfloat   f;
-    jdouble  d;
-    jobject  l;
-} jvalue;
-
-struct _jfieldID;
-typedef struct _jfieldID *jfieldID;
-
-struct _jmethodID;
-typedef struct _jmethodID *jmethodID;
-
-/* Return values from jobjectRefType */
-typedef enum _jobjectType {
-     JNIInvalidRefType    = 0,
-     JNILocalRefType      = 1,
-     JNIGlobalRefType     = 2,
-     JNIWeakGlobalRefType = 3
-} jobjectRefType;
-
-
-#endif /* JNI_TYPES_ALREADY_DEFINED_IN_JNI_MD_H */
-
-/*
- * jboolean constants
- */
-
-#define JNI_FALSE 0
-#define JNI_TRUE 1
 
 ```
 
+
+[jni methods](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html)
+```
+JavaVM *jvm;       /* denotes a Java VM */
+JNIEnv *env;       /* pointer to native method interface */ 当前线程有效
+(*env)->GetFieldID
++---------------------------------------------------------------------+-------------------------------------------------------------------------------------------+
+|  Weak Global   jweak NewWeakGlobalRef(JNIEnv *env, jobject obj);    |                                                                                           |
+|  References    void DeleteWeakGlobalRef(JNIEnv *env, jweak obj);    |   Java VM Interface   GetJavaVM                                                           |
+|                                                                     |   Reflection Support  FromReflectedMethod     FromReflectedField                          |
++---------------------------------------------------------------------+                                                                                           |
+|               jobject NewGlobalRef(JNIEn^ *en^, jobject obj);       |                       ToReflectedMethod       ToReflectedField                            |
+|               void DeleteGlobalRef(JNIEnv *env, jobject globalRef); |                                                                                           |
+|                                                                     |                                                                                           |
+|  Global\      void DeleteLocalRef(JNIEnv *en^, jobject localRef);   |  NIO Support         NewDirectByteBuffer    GetDirectBufferAddress                        |
+| Local         jint EnsureLocalCapacity(JNIEnv *env, jint capacity); |                      GetDirectBufferCapacity                                              |
+| References    jint PushLocalFrame(JNIEnv *env, jint capacity);      |                                                                                           |
+|               jobject PopLocalFrame(JNIEnv *env, jobject result);   |  Monitor             MonitorEnter           MonitorExit                                   |
+|               jobject NewLocalRef(JNIEnv *env, jobject ref);        |                                                                                           |
+|                                                                     |  Registering        RegisterNatives        UnregisterNatives                              |
++---------------------------------------------------------------------+  Native Methods                                                                           |
+| Exceptions     ExceptionClear         Throw         ThrowNew        |                                                                                           |
+|                FatalError             ExceptionOccurred             |                    GetArrayLength            Get<PrimitiveType>ArrayElements Routines     |
+|                ExceptionCheck         ExceptionDescribe             |  Array Operations  SetObjectArrayElement                                                  |
+|                                                                     |                    NewObjectArray            Release<PrimitiveType>ArrayElements Routines |
++---------------------------------------------------------------------+                    GetObjectArrayElement                                                  |
+| Accessing          GetFieldID                                       |                    GetPrimitiveArrayCritical      Get<PrimitiveType>ArrayRegion Routines  |
+| Fields of Objects  Get^type^Field Routines  Set^type^Field Routines |                    ReleasePrimitiveArrayCritical                                          |
++---------------------------------------------------------------------+                                                   Set<PrimitiveType>ArrayRegion Routines  |
+|  Object        GetObjectClass            AllocObject                |                    New<PrimitiveType>Array Routines                                       |
+|  Operations    GetObjectRefType          NewObject                  |                                                                                           |
+|                IsInstanceOf              NewObjectA                 |                     GetStaticMethodID                CallStatic<type>Method Routines      |
+|                IsSameObject              NewObjectV                 |  Calling                                                                                  |
++---------------------------------------------------------------------+  Static Methods     SetStatic<type>Field Routines    CallStatic<type>MethodA Routines     |
+|                                                                     |                                                                                           |
+|               GetMethodID      Call<type>Method Routines            |                                                      CallStatic<type>MethodV Routines     |
+|                               CallNonvirtual<type>Method Routines   |                                                                                           |
+| Calling                       CallNonvirtual<type>MethodA Routines  |  Accessing           GetStaticFieldID      GetStatic<type>Field Routines                  |
+| Instance                                                            |  Static Fields                                                                            |
+|  Methods                      CallNonvirtual<type>MethodV Routines  |                      NewStringUTF                                                         |
+|                               Call<type>MethodA Routines            |                      GetStringUTFLength         GetStringRegion                           |
+|                                         Call<type>MethodV Routines  |                      GetStringUTFChars                                                    |
+|                                                                     |   String             ReleaseStringUTFChars      GetStringUTFRegion                        |
+|               jclass DefineClass                                    |   Operations                                                                              |
+| Class         jclass FindClass(JNIEnv *env, const char *name);      |                      NewString                  GetStringCritical                         |
+| Operations    jclass GetSuperclass(JNIEnv *en^, jclass clazz);      |                      GetStringLength            ReleaseStringCritical                     |
+|               jboolean IsAssignableFrom                             |                      GetStringChars                                                       |
+| Version                                                             |                      ReleaseStringChars                                                   |
+| Information   jint GetVersion(JNIEn^ *en^);                         |                                                                                           |
++---------------------------------------------------------------------+-------------------------------------------------------------------------------------------+
+
+```
 #### JNI签名
 **JNICALL**表示调用约定，相当于C++的stdcall，说明调用的是本地方法
 **JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数
