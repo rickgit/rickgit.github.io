@@ -690,39 +690,52 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 ##### 动画事件 
 [动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
 ```
- +-------------+-------------------------------+------------------+-------------------+
- |  layout     |                               | request layout   |  requestLayout()  |
- |  Animation  |                               |                  |  draw Command     |
- +------------------------------------------------------------------------------------+
- |Drawble/Frame|   webp/gif                    |                  |                   |
- | Animation   |                               |                  |                   |
- +---------------------------------------------+  invalidate draw |  draw command     |
- |             |   draw() + invalidate()       |                  |                   |
- |  Draw       +-------------------------------+                  |                   |
- |  Animation  |                               |                  |                   |
- |             |   computeScroll()+invalidate()|                  |                   |
- +------------------------------------------------------------------------------------+
- |  View/Tween |  translate/rotate/scale/alpha |  parent          |  View Property    |
- |  Animation  |  Fragment compat Transition   |  Render Node     |                   |
- +------------------------------------------------------------------------------------+
- |             |   View.animate()              |                  |                   |
- |  Animator   |                               |                  |                   |
- |             |   offsetChildrenTopAndBottom  |  Render Property |  View Property    |
- |             |   ActivityOptions Transition  |                  |                   |
- +------------------------------------------------------------------------------------+
- |  Render     |   AnimatedVectorDrawable      |                  |                   |
- |  Thread     |   RippleComponet              |  Inter-Process   | view property     |
- |  Amimation  |   Revel Animation             |                  |                   |
- +------------------------------------------------------------------------------------+
- |  Window     |                               | SystemServer     |                   |
- |  Transition |   Window Transition Animation | WindowManager    | some view property|
- |  Animation  |                               |                  |                   |
- +-------------+-------------------------------+------------------+-------------------+
+ +-------------+-------------------------------+------------------+-------------------+-------------------+
+ |  layout     |                               | request layout   |  requestLayout()  |  target          |
+ |  Animation  |                               |                  |  draw Command     |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |Drawble/Frame|   webp/gif                    |                  |                   |                   |
+ | Animation   |                               |                  |                   |                   |
+ +---------------------------------------------+  invalidate draw |  draw command     |   views           |
+ |             |   draw() + invalidate()       |                  |                   |                   |
+ |  Draw       +-------------------------------+                  |                   |                   |
+ |  Animation  |                               |                  |                   |                   |
+ |             |   computeScroll()+invalidate()|                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  View/Tween |  translate/rotate/scale/alpha |  parent          |  View Property    |    views          |
+ |  Animation  |  Fragment compat Transition   |  Render Node     |                   |alpha,matrix(translate,scale,rotate)|
+ +------------------------------------------------------------------------------------+-------------------+
+ |             |   View.animate()              |                  |                   |                   |
+ |  Animator   |                               |                  |                   |    objects        |
+ |             |   offsetChildrenTopAndBottom  |  Render Property |  View Property    |                   |
+ |             |   ActivityOptions Transition  |                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  Render     |   AnimatedVectorDrawable      |                  |                   |                   |
+ |  Thread     |   RippleComponet              |  Inter-Process   | view property     |                   |
+ |  Amimation  |   Revel Animation             |                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  Window     |                               | SystemServer     |                   |                   |
+ |  Transition |   Window Transition Animation | WindowManager    | some view property|                   |
+ |  Animation  |                               |                  |                   |                   |
+ +-------------+-------------------------------+------------------+-------------------+-------------------+
 
 ```
-- 视图动画 Animation（Rotate,Scale,translate,alpha）
+
+插值器是时间的函数，定义了动画的变化规律
+
+- 补间动画  Animation（Rotate,Scale,translate,alpha）
+  动画的数据（Transformation/alpha,matrix/），计算（插值器），绘制，回调
+
+```java
+计算，回调
   +android.view.View#draw(android.graphics.Canvas, android.view.ViewGroup, long)
     +android.view.View#applyLegacyAnimation
+[插值器](http://cogitolearning.co.uk/2013/10/android-animations-tutorial-5-more-on-interpolators/)
+绘制
+canvas.concat(transformToApply.getMatrix());或
+renderNode.setAnimationMatrix(transformToApply.getMatrix());
+```
+
    箭头动画
    启动图片放大动画
    弹窗动画
@@ -730,14 +743,28 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
  
 
-- 帧动画 AnimationDrawable
+- 逐帧动画 AnimationDrawable
      烟花效果
+```java
+     AnimationDrawable.start()
     +android.graphics.drawable.Drawable#scheduleSelf
         +android.view.View#scheduleDrawable //mChoreographer.postCallbackDelayed( Choreographer.CALLBACK_ANIMATION...)
+```
 - 属性动画 Animator
+补间动画，动画作用目标单一，动画类型少，View只有绘制，属性没有改变
+  动画的数据（ValueAnimator#PropertyValuesHolder[]），计算（插值器），绘制，回调
+
+```java
+ValueAnimator,ObjectAnimator
+
+
     +android.animation.ValueAnimator#start(boolean)
           +android.animation.AnimationHandler#addAnimationFrameCallback// Choreographer#postCallbackDelayedInternal(CALLBACK_ANIMATION
-```java
+          +android.animation.ValueAnimator#addAnimationCallback //垂直同步回调
+          +android.animation.ValueAnimator#doAnimationFrame   //计算数据     
+          +android.animation.ValueAnimator#doAnimationFrame   //计算数据   
+          +android.animation.ValueAnimator#animateBasedOnTime
+          +android.view.ViewPropertyAnimator.AnimatorEventListener#onAnimationUpdate//mView.invalidateParentCaches(); 或更新RenderNode ,
 public class View implements Drawable.Callback, KeyEvent.Callback,
         AccessibilityEventSource {
     /**
@@ -782,7 +809,7 @@ public class Object {
 
 
 **ArrayMap**
-相比HashMap使用了两个小的容量的数组
+相比HashMap链表存储，使用了两个小的容量的数组
 ```java
 public final class ArrayMap<K, V> implements Map<K, V> {
     final boolean mIdentityHashCode;// 1byte，default false
@@ -854,11 +881,21 @@ public class SparseArray<E> implements Cloneable {
 
 查找 二分法（key 有已排序）
 插入 key为Integer，排序。找到key，替换掉原来的值。没找到，根据二分法返回的位置，插入有序key
-删除 数组设置为常量 DELETED（new Object()）
-gc  标记为DELETED，key,Value替换为有值的数据
+删除 数组设置为常量 DELETED（new Object()）每次 **remove** 操作都会**mGarbage**设置为**true**
+gc  标记为DELETED，key,Value替换为有值的数据。
 
 ### 数据存储
 #### 文件存储,SharedPreferences,SQLite数据库方式,内容提供器（Content provider）,网络
+
+```
++---------------------------------------+
+|         conent provider|              |
++---------------------------------------+
+|sharedpreference|SQLite |   network    |
++---------------------------------------+
+|              file      |              |
++------------------------+--------------+
+```
 ```java
 final class SharedPreferencesImpl implements SharedPreferences {
     private final File mFile;
