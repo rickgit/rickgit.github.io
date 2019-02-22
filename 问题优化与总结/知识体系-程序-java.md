@@ -2012,6 +2012,19 @@ public final class Matcher implements MatchResult {
 |               |                  | poll-ready √ notify-ready|                    |                 |
 +---------------+------------------+--------------------------+--------------------+-----------------+
 ```
+
+```
++---------+----------------------------------+----------------------+----------------------+
+|         | fd|limit      |copy_kernel_user  |  event               |  event handle        |
++-------------------------------------------------------------------+----------------------+
+|  select | Polling       |  copy fd         | polling fd structure |  sync handle  fd     |
++-------------------------------------------------------------------+----------------------+
+|  poll   | linklist      |  copy fd         | polling fd structure |   sync handle fd     |
++-------------------------------------------------------------------+----------------------+
+|  epoll  | epoll_create()|  epoll_ctl()     | epoll_wait()         |   epoll_wait() /1 fd |
++---------+----------------------------------+----------------------+----------------------+
+
+```
 ### BIO (阻塞 I/O)
 ```
 基于字节操作的 I/O 接口：InputStream 和 OutputStream
@@ -2021,156 +2034,7 @@ public final class Matcher implements MatchResult {
 ```
 UTF-8 
 
-```java
-public class FileInputStream extends InputStream
-{
-    /* File Descriptor - handle to the open file */
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private final FileDescriptor fd;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private FileChannel channel = null;
-
-    private final Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
-    private final boolean isFdOwner;
-
-    // Android-added: CloseGuard support.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-
-    // Android-added: Tracking of unbuffered I/O.
-    private final IoTracker tracker = new IoTracker();
-}
-
-
-public class FileOutputStream extends OutputStream
-{
-    /**
-     * The system dependent file descriptor.
-     */
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private final FileDescriptor fd;
-
-    /**
-     * True if the file is opened for append.
-     */
-    private final boolean append;
-
-    /**
-     * The associated channel, initialized lazily.
-     */
-    private FileChannel channel;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private final Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // Android-added: CloseGuard support: Log if the stream is not closed.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-
-    // Android-added: Field for tracking whether the stream owns the underlying FileDescriptor.
-    private final boolean isFdOwner;
-
-    // Android-added: Tracking of unbuffered I/O.
-    private final IoTracker tracker = new IoTracker();
-}
-public class InputStreamReader extends Reader {
-     private final StreamDecoder sd;//对FileInputStream编码
-}
-public class OutputStreamWriter extends Writer {
-    private final StreamEncoder se;
-}
-public class File implements Serializable, Comparable<File>
-{
-    /**
-     * This abstract pathname's normalized pathname string. A normalized
-     * pathname string uses the default name-separator character and does not
-     * contain any duplicate or redundant separators.
-     *
-     * @serial
-     */
-    private final String path;
-
  
-
-    /**
-     * The flag indicating whether the file path is invalid.
-     */
-    private transient PathStatus status = null;
-
-    /**
-     * The length of this abstract pathname's prefix, or zero if it has no
-     * prefix.
-     */
-    private final transient int prefixLength;
-
-    private volatile transient Path filePath;
-}
-public class RandomAccessFile implements DataOutput, DataInput, Closeable {
-
-    // BEGIN Android-added: CloseGuard and some helper fields for Android changes in this file.
-    @ReachabilitySensitive
-    private final CloseGuard guard = CloseGuard.get();
-    private final byte[] scratch = new byte[8];
-
-    private int flushAfterWrite = FLUSH_NONE;
-
-    private int mode;
-    // END Android-added: CloseGuard and some helper fields for Android changes in this file.
-
-    // Android-added: @ReachabilitySensitive
-    @ReachabilitySensitive
-    private FileDescriptor fd;
-    private FileChannel channel = null;
-    private boolean rw;
-
-    /**
-     * The path of the referenced file
-     * (null if the stream is created with a file descriptor)
-     */
-    private final String path;
-
-    private Object closeLock = new Object();
-    private volatile boolean closed = false;
-
-    // BEGIN Android-added: IoTracker.
-    /**
-     * A single tracker to track both read and write. The tracker resets when the operation
-     * performed is different from the operation last performed.
-     */
-    private final IoTracker ioTracker = new IoTracker();
-    // END Android-added: IoTracker.
-}
-
-public class Socket implements Closeable {
-    private boolean created;
-    private boolean bound;
-    private boolean connected;
-    private boolean closed;
-    private Object closeLock;
-    private boolean shutIn;
-    private boolean shutOut;
-    SocketImpl impl;
-    private boolean oldImpl;
-}
-
-```
 
 #### NIO（BUffer,Channel ,Selector）
 IO是面向流的，NIO是面向缓冲区的。
