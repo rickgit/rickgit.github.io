@@ -102,7 +102,7 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 +------------------+       |                     |      |                           |
 | zygote Process   |  <----+                     |      |                           |
 |                  |       |                     |      |                           |
-|                  |       |  +---------------+  |      |                           |
+|   Dvm instance   |       |  +---------------+  |      |                           |
 |                  |       |  |Service Manager|  |      |                           |
 |                  |       |  +---------------+  |      |                           |
 | +--------------+ |       |                     |      |                           |
@@ -340,6 +340,7 @@ AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AI
 
 
 ## Native Layer
+[jni方法注册方式](https://www.jianshu.com/p/1d6ec5068d05) 
 init进程会孵化出ueventd、logd、healthd、installd、adbd、lmkd等用户守护进程
 init进程还启动servicemanager(binder服务管家)、bootanim(开机动画)等重要服务
 init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java进程(即虚拟机进程)，Zygote是所有Java进程的父进程
@@ -349,6 +350,7 @@ init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java�
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
 
 在Android中，RefBase结合sp（strong pointer）和wp（weak pointer），实现了一套通过引用计数的方法来控制对象生命周期的机制。
+
 
 ### Dispaly 系统
 
@@ -791,7 +793,83 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
 ### 窗口，见WMS
 
-## dalvik
+## ART-dalvik
+```
+              |java compiler(javac)
+    +-----------------------+
+    | java byte code(.class)|
+    +---------+-------------+
+              |   Dex compiler
+              v   (dx.bat)
+     +--------+--------------+
+     | Dalvik byte code(.dex)|
+     +---+-----------------+-+
+         | dex2oat         |dexopt
++--------v---+       +-----+-------+
+|.oat(elf file)|     |    .odex    |
++---+--------+       +----+--------+
+    |                     |   Register-based
+    |  +---------+        |   +---------------+
+    |  | ART     |        |   |   Dalvik VM   |
+    |  |      AOT|        |   |           JIT |
+    |  +---------+        |   +---------------+
+    |                     |
+    |moving collector     | MarkSweep collector
+    v                     v
+
++--------+---------+------------------------+----------------------+
+|        | Active  |                        |                      |
+|        | Heap    |                        |    Live Bitmap       |
+|DalvikVM|         |                        |                      |
+|  Heap  |         |                        |                      |
+|(Ashmem)|         |   Mark-Sweep Collector +----------------------+
+| mspace |         |                        |                      |
+|        +---------+                        |                      |
+|        | Zygote  |                        |                      |
+|        | Heap    |                        |   Mark Bitmap        |
+|        | (shared)|                        |                      |
++----------------------+--------------------+----------------------+
+|        |             | Image Space                               |
+|        | Continuous  +---------------+---------------------------+
+|        |             | Zygote Space  | Zygote Space              |
+|  ART   | Space       |               +---------------------------+
+|        |             |               | Allocation Space          |
+|  Heap  |             |               |     ....                  |
+|        +-------------+---------------+---------------------------+
+|        |Discontinuous  Large Object                              |
+|        |    Space    | Space                                     |
++--------+-------------+-------------------------------------------+
+
+
+```
+
+### 类加载机制，类加载器，双亲委派
+```
+                 C++
+ +-----------------------+
+ | Bootstrap ClassLoader |  Framework classs
+ +----------^------------+
+            |
+  +---------+----------+
+  | BaseDexClassLoader |   <|-------------------+
+  +---------^----------+                        |
+            |                                   |
+            |                                   |
+            |                                   |
++-----------+-------------+                     |
+| PathClassLoader         | apk class           |
++-----------^-------------+                     |
+            |  parent                           |
++-----------+------------+           extends    |
+| DexClassLoader         | +--------------------+
++------------------------+
+
+
+
+```
+
+
+
 [支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
 Mark-sweep算法：还分为Sticky, Partial, Full，根据是否并行，又分为ConCurrent和Non-Concurrent
 MarkSweep::MarkSweep(Heap* heap, bool is_concurrent, const std::string& name_prefix)
@@ -1335,6 +1413,9 @@ stop()            |      stop() |                +--------------------+         
 - VideoView
 - FFmpeg
 
+#### 图片Bitmap
+[bitmap管理](https://developer.android.com/topic/performance/graphics/manage-memory.html)
+
 
 ## 应用层
 Zygote 子线程
@@ -1791,6 +1872,14 @@ J: JDK tools
 
 
 +--------------------------------------------------------------------------------------+
+| /META-INF                                                                             |
+| /assets                                                                                |
+| /res                                                                                  |
+| /libs                                                                                 |
+| class.dex                                                                            |
+| resources.arsc                                                                       |
+| AndroidManifest.xml                                                                  |
++--------------------------------------------------------------------------------------+
 |G                                                                                     |
 |    multiple agent tool                                                               |
 +--------------------------------------------------------------------------------------+
@@ -1833,6 +1922,7 @@ Glide
 ## Android 开发模式
 
 #### 性能优化总结
+[Android官网](https://developer.android.com/topic/performance/)
 [RelativeLayout的性能损耗](https://zhuanlan.zhihu.com/p/52386900?utm_source=androidweekly.io&utm_medium=website)
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
@@ -1842,7 +1932,6 @@ Glide
 ```
 +--------------------+---------------------------------------------+
 |  Swap Buffers      |  too much work on the GPU                   |
-|                    |                                             |
 +------------------------------------------------------------------+
 |  Command Issue     |  renderer issuing commands to OpenGL        |
 |                    |  to draw and redraw display lists           |
@@ -1873,9 +1962,9 @@ Glide
 +---------+--------+-------------------+---------+--------+------+------+--------+--------+-------+--------+------+-------+--------+
 |         |        | Wall clock time/  |         |        |      |      |        |        |       |        |      |       |        |
 |         |        |  Thread time      |         |        |      |      |        |        |       |        |      |       |        |
-| Call    | Flame  |---------+---------|         |        |      |      |        |        |       |        |      |       |        |
-| Chart   | Chart  |Top down |Bottom up|         |        |      |      |        |        |       |        |      |       |        |
-|         |        |         |         |         |        |      |      |        |        |       |        |      |       |        |
+| Call    | Flame  |---------+---------|         |  app   | image|zygote|        |        |       |        |      |       |        |
+| Chart   | Chart  |Top down |Bottom up|         |--------+------+------|        |        |       |        |      |       |        |
+|         |        |         |         |forece gc|      Dump javaHeap   |        |        |       |        |      |       |        |
 +---------+--------+---------+------------------------------------------+        |        |       |        |      |       |        |
 |             Threads                  | Image   | Zygote | app  |  JNI |        |        |       |        |      |       |        |
 |                                      | Heap    | Heap   | Heap |  Heap| timing |        |       |        |      |       |        |
@@ -1919,6 +2008,10 @@ LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有�
         3.4 ListView 未缓存
         3.5 集合类未销毁
 
+
+```sh
+adb shell dumpsys meminfo  com.ww.roxiesample
+```
 #### 包大小
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 
