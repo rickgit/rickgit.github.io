@@ -2,8 +2,9 @@
 dart 
 结构化程序设计语言
 
- class-based, optionally typed, and singlethreaded.
+强类型 class-based, optionally typed, and singlethreaded.
 
+强化虚拟机，支持JIT和AOT,单线程
 
 ```
 +------------------+---------------------------------------------------------------------------------+
@@ -36,21 +37,8 @@ dart
 
 ```
 +--------------+---------------------------------------------------------------+
-|              |      try  catch  finally    rethrow     throw    assert       |
-|              |                                                               |
-|              |      enum  class  extends     super  this    new              |
-|              |                                                               |
-|   reserved   |      void    final  const   var    in    is                   |
-|   words      |                                                               |
-|              |      if   else    while    do  for                            |
-|              |                                                               |
-|              |      switch  case  default  with   break    continue  return  |
-|              |                                                               |
-|              |      null   true  false                                       |
-+------------------------------------------------------------------------------+
-|  contextual  |      on 1    sync 1     show 1        hide 1                  |
-|  keywords    |      async 1                                                  |
-+------------------------------------------------------------------------------+
+|              |      await 3  yield 3                                         |
++--------------+---------------------------------------------------------------+
 |              |      deferred 2   covariant 2   factory 2     mixin 2         |
 |              |                                                               |
 | built-in     |      as 2             external 2                              |
@@ -63,9 +51,21 @@ dart
 |              |                                                               |
 |              |      typedef 2    static 2    operator 2     Function 2       |
 +------------------------------------------------------------------------------+
-|              |      await 3  yield 3                                         |
-+--------------+---------------------------------------------------------------+
-
+|  contextual  |      on 1    sync 1     show 1        hide 1                  |
+|  keywords    |      async 1                                                  |
++------------------------------------------------------------------------------+
+|              |      try  catch  finally    rethrow     throw    assert       |
+|              |                                                               |
+|              |      enum  class  extends     super  this    new              |
+|              |                                                               |
+|   reserved   |      void    final  const   var    in    is                   |
+|   words      |                                                               |
+|              |      if   else    while    do  for                            |
+|              |                                                               |
+|              |      switch  case  default  with   break    continue  return  |
+|              |                                                               |
+|              |      null   true  false                                       |
++------------------------------------------------------------------------------+
 
 1 are contextual keywords
 2 are built-in identifiers
@@ -137,6 +137,13 @@ You can also create a nameless function called an anonymous function, or sometim
 ```
 
 ## 纯面向对象编程
+
+### 虚拟机
+
+generational garbage collection
+
+
+###
 
 封装（class,library,import,part，）
 继承（abstract,extends ,implements,super）
