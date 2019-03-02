@@ -353,8 +353,19 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 
 
 ### Dispaly 系统
+```
+                           OpenGL/ES        Rasterization
+                           convert to
+                           polygons or textures
++---------+     +---------+         +---------+     +--------+
+|  xml/UI +----->  CPU    +-------->+  GPU    +---->+ SCREEN |
++---------+     +---------+         +---------+     +--------+
+
 
 ```
+
+```
+
 显示数据类型
 1. UI界面的显示，这部分通常数据类型为RGB格式
 2. 大块YUV数据的应用，如camera的preview、视频的播放等。该应用只针对特定的应用程序，开启时通过overlay直接把大块的YUV数据送到kernel显示。
@@ -508,8 +519,12 @@ SystemServer的RenderThread线程
 - 三重缓存（Triple Buffer ）,跳帧保证不帧
 - 编舞者/编排器（Choreographer ）, 起到调度作用（ViewRootImpl实现统一调度界面绘图），绘制速度和屏幕刷新速度保持一致
 黄油计划的核心VSYNC信号分为两种，一种是硬件生成（HardwareComposer）的信号，一种是软件模拟（VSyncThread来模拟）的信号。
-1. 解决撕裂问题，CPU/GPU调度快于Display，保证双缓冲;
+1. 解决撕裂(yield)问题，CPU/GPU调度快于Display，保证双缓冲(Back buffer,Frame Buffer); 
 2. 2.janking问题，CPU来不及处理，Display显示前一帧，帧延迟。
+
+ 
+[12fps 24fps 30fps 60fps](https://www.youtube.com/watch?v=CaMTIgxCSqU)
+
 
 CPU：负责 Measure、Layout、Record、Execute 的计算操作。CPU 负责把 UI组件计算成 Polygons（多边形）和 Texture（纹理），然后交给 GPU 进行栅格化。
 GPU：负责 Rasterization（栅格化）操作。GPU 的栅格化过程是绘制 Button、Shape、Path、String、Bitmap 等组件最基础的操作。
@@ -839,6 +854,23 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 |        |Discontinuous  Large Object                              |
 |        |    Space    | Space                                     |
 +--------+-------------+-------------------------------------------+
+
+
+                                                    +
+                                                    |new ArrayList
+                                                    |
+                                                    v
+      +--------+  +-------+  +---------+ +------+ +-+-----+ +-------+
+      |  ART   |  | Zygote|  | No      | | Image| | main  | | Large |
+Heap  |        |  | Space |  | Moving  | | Space| | alloc | | Object|
+      |  L+    |  |       |  | space   | |      | | space | | Space |
+      +--------+  +-------+  +---------+ +------+ +-------+ +-------+
+
+      +--------+  +-------+  +---------+ +------+
+      |DalvikVM|  | Linear|  | Zygote  | |Alloc |
+      |  <L    |  | Alloc |  | space   | |Space |
+      |        |  |       |  |         | |      |
+      +--------+  +-------+  +---------+ +------+
 
 
 ```
@@ -1365,7 +1397,7 @@ State Diagram                                            +----+                 
               |   |             |                          |
 prepareAsync()|   |prepare()    |                          | start()
               |   |             <--------------------------v-----------------------+
-              |   |             |     +---->             started                   <---+
+              |   |             |     +---->|            started                   <---+
               |   |             |     |    ++--------------+--^------------^--+---++   |  Looping==true&&playback completes
               |   |             |     |     |              |  |            |  |   |    |
               |   |             |     +-----+       pause()|  |start()     |  |  -+----+
@@ -1922,8 +1954,35 @@ Glide
 ## Android 开发模式
 
 #### 性能优化总结
+
+```
++-------------+---------------+--------------------------+---------------------------+
+|             |    info       |        tools             |  fix                      |
++-----------------------------+---+--------------------------------------------------+
+|  memory     |                   |                      |                           |
+|             | gc time>frame rate|     profiler cpu     |  ResourceCanary           |
+|             | leaks             |                      |                           |
+|             | Memory Churn      |                      |                           |
++-----------------------------+---+--------------------------------------------------+
+|  battery    | wakelock time |                          |   Doze /standby           |
+|             | gps time      |        battery-historian |   jobscheduler API        |
+|             | network time  |                          |                           |
++------------------------------------------------------------------------------------+
+|             |   vsync       |                          |                           |
+|  draw       |               |                          |  canvas.quickreject()     |
+|             |Refresh Rate/  +---------+----------------+                           |
+|             |frame Rate     |         | gpu overdraw   |  canvas.cliprect()        |
+|             |               |on-device| gpu render     |  hierachy viewer          |
+|             |               |  tools  | gup view update|                           |
+|             |               |         |                |                           |
+|             |               +---------+----------------+                           |
+|             |               |     profiler cpu/gpu     |                           |
++-------------+---------------+--------------------------+---------------------------+
+
+```
 [Android官网](https://developer.android.com/topic/performance/)
 [RelativeLayout的性能损耗](https://zhuanlan.zhihu.com/p/52386900?utm_source=androidweekly.io&utm_medium=website)
+[battery-history](https://www.cnblogs.com/jytian/p/5647798.html,https://yeasy.gitbooks.io/docker_practice/install/ubuntu.html)
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
