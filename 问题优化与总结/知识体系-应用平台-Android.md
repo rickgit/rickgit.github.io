@@ -875,6 +875,11 @@ Heap  |        |  | Space |  | Moving  | | Space| | alloc | | Object|
 
 ```
 
+### dalvik bytecode
+```
+dx --dex --output=Hello.dex Hello.class
+```
+
 ### 类加载机制，类加载器，双亲委派
 ```
                  C++
@@ -882,10 +887,10 @@ Heap  |        |  | Space |  | Moving  | | Space| | alloc | | Object|
  | Bootstrap ClassLoader |  Framework classs
  +----------^------------+
             |
-  +---------+----------+
+  +---------+----------+   
   | BaseDexClassLoader |   <|-------------------+
   +---------^----------+                        |
-            |                                   |
+            |  DexPathList                       |
             |                                   |
             |                                   |
 +-----------+-------------+                     |
@@ -909,8 +914,19 @@ mark_compact 算法：标记-压缩（整理)算法
 concurrent_copying算法：
 semi_space算法: 
 [android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
+### 类加载问题
+[pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
+QQ空间补丁
+```
+1. 阻止相关类打上Class_ispreverified标志
+2. 动态更改BaseDexClassLoader间接引用的dexElements
+```
+[Redex](https://blog.csdn.net/tencent_bugly/article/details/53375240)
 
-- **Object**
+### 关键类与对象
+
+
+ **Object**
 public class Object {
 
     private transient Class<?> shadow$_klass_;
@@ -1954,35 +1970,43 @@ Glide
 ## Android 开发模式
 
 #### 性能优化总结
-
+> <<Android High Performance Programming>>
 ```
-+-------------+---------------+--------------------------+---------------------------+
-|             |    info       |        tools             |  fix                      |
-+-----------------------------+---+--------------------------------------------------+
-|  memory     |                   |                      |                           |
-|             | gc time>frame rate|     profiler cpu     |  ResourceCanary           |
-|             | leaks             |                      |                           |
-|             | Memory Churn      |                      |                           |
-+-----------------------------+---+--------------------------------------------------+
-|  battery    | wakelock time |                          |   Doze /standby           |
-|             | gps time      |        battery-historian |   jobscheduler API        |
-|             | network time  |                          |                           |
-+------------------------------------------------------------------------------------+
-|             |   vsync       |                          |                           |
-|  draw       |               |                          |  canvas.quickreject()     |
-|             |Refresh Rate/  +---------+----------------+                           |
-|             |frame Rate     |         | gpu overdraw   |  canvas.cliprect()        |
-|             |               |on-device| gpu render     |  hierachy viewer          |
-|             |               |  tools  | gup view update|                           |
-|             |               |         |                |                           |
-|             |               +---------+----------------+                           |
-|             |               |     profiler cpu/gpu     |                           |
-+-------------+---------------+--------------------------+---------------------------+
++-------------+-------------------+----------------------+---------------------------+---------------+
+|             |    info           |    tools             |  fix                      |  extension    |
++----------------------------------------------------------------------------------------------------+
+|  memory     |                   |                      |                           |  keep alive   |
+|             | gc time>frame rate|     profiler cpu     |  ResourceCanary           |               |
+|             | leaks             |                      |  Bitmap&Activity          |               |
+|             | Memory Churn      |                      |  APKsize                  |    +----------+
++-----------------------------+---+-------------------------------------------------------+ network& |
+|  battery    | wakelock time |                          |   Doze /standby           |    | secure   |
+|             | gps time      |        battery-historian |   jobscheduler API        |    +----------+
+|             | network time  |                          |AlarmManager、Syncs Adapter|+              |
++----------------------------------------------------------------------------------------------------+
+|             |   vsync       |                          |                           |               |
+|  draw       |               |                          |  canvas.quickreject()     |               |
+|  (cpu)      |Refresh Rate/  +---------+----------------+                           |               |
+|             |frame Rate     |         | gpu overdraw   |  canvas.cliprect()        | multiThread&  |
+|             |               |on-device| gpu render     |  hierachy viewer          | mainThread    |
+|             |               |  tools  | gup view update|                           |               |
+|             | Activity      |         |                |                           |               |
+|             | LauchTime     +---------+----------------+                           |               |
+|             | (am start)    |     profiler cpu/gpu     |                           |               |
+|             |reportFullyDrawn|                          |                           |               |
++-------------+---------------+--------------------------+---------------------------+---------------+
+|   secure    |    debug      |   apktool                |                           |               |
+|             |   https       |   smali                  |                           |               |
+|             |               |   (reverse engineering)  |                           |               |
++-------------+---------------+--------------------------+---------------------------+---------------+
 
+[smali](https://blog.csdn.net/linchaolong/article/details/51146492)
 ```
 [Android官网](https://developer.android.com/topic/performance/)
 [RelativeLayout的性能损耗](https://zhuanlan.zhihu.com/p/52386900?utm_source=androidweekly.io&utm_medium=website)
 [battery-history](https://www.cnblogs.com/jytian/p/5647798.html,https://yeasy.gitbooks.io/docker_practice/install/ubuntu.html)
+
+[启动时间](https://developer.android.com/topic/performance/vitals/launch-time)
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度

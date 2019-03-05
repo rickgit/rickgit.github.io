@@ -19,3 +19,7 @@
 
 
 ```
+
+Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(Physics-based animation) 
+
+physics，scheduler,sematics,services

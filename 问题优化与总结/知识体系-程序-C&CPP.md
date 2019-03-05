@@ -51,8 +51,8 @@
 +---------+-----------------------------------------------------------------------+
 | c++ 11  | alignas alignof                                                       |
 | (10)    | constexpr decltype  thread_loca                                       |
-| (10)    | noexcept  static_assert                                               |
-| (10)    | char16_t char32_t  nullptr                                            |
+|         | noexcept  static_assert                                               |
+|         | char16_t char32_t  nullptr                                            |
 +---------------------------------------------------------------------------------+
 |         | try   catch    throw                                                  |
 |         | typedef  sizeof  typeid   Template    typename                        |
