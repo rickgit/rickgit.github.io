@@ -18,7 +18,6 @@ dart
 +------------------------------+------+------------------------------------------------| Event-driven|      
 |            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
 +------------------------------+------------+------------------------------------------+-------------+
-|                                                                                                    |
 |                             conditional/decision-making/loops                                      |
 +----------------------------------+------------+---------------+-+-----------+-------------+--------+
 |            Whitespace(tab space) |            |               | |           |             |        |
@@ -40,30 +39,21 @@ dart
 |              |      await 3  yield 3                                         |
 +--------------+---------------------------------------------------------------+
 |              |      deferred 2   covariant 2   factory 2     mixin 2         |
-|              |                                                               |
 | built-in     |      as 2             external 2                              |
-|              |                                                               |
 | identifiers  |      import 2    export 2   library 2    part 2               |
-|              |                                                               |
 |              |      abstract 2  dynamic 2    implements 2   interface 2      |
-|              |                                                               |
 |              |      get 2    set 2                                           |
-|              |                                                               |
 |              |      typedef 2    static 2    operator 2     Function 2       |
 +------------------------------------------------------------------------------+
-|  contextual  |      on 1    sync 1     show 1        hide 1                  |
+|  contextual  |      on 1    sync 1                                           |
 |  keywords    |      async 1                                                  |
+|              |      show 1        hide 1                                     |
 +------------------------------------------------------------------------------+
 |              |      try  catch  finally    rethrow     throw    assert       |
-|              |                                                               |
 |              |      enum  class  extends     super  this    new              |
-|              |                                                               |
-|   reserved   |      void    final  const   var    in    is                   |
-|   words      |                                                               |
-|              |      if   else    while    do  for                            |
-|              |                                                               |
+|   reserved   |      void    final  const   var    in    is                   | 
+|   words      |      if   else    while    do  for                            |
 |              |      switch  case  default  with   break    continue  return  |
-|              |                                                               |
 |              |      null   true  false                                       |
 +------------------------------------------------------------------------------+
 
@@ -138,6 +128,7 @@ You can also create a nameless function called an anonymous function, or sometim
 
 ## 纯面向对象编程
 
+
 ### 虚拟机
 
 generational garbage collection
@@ -149,8 +140,19 @@ generational garbage collection
 继承（abstract,extends ,implements,super）
 多态 Overridable operators
 
+#### import
+ 不完全导入 **show**
+ 隐藏导入 **hide**
+ 命名冲突 **as**
+ 库的拆分 **part**
+```
+dart:io File, socket, HTTP, and other I/O
+dart:core Built-in types, collections, and other core functionality 
+dart: math Mathematical constants and functions, plus a random number generator.
+dart: convert Encoders and decoders
+dart: typed_data 
 
-
+```
 ### 数据并发
 isolates
 #### [异步支持](https://www.dartlang.org/guides/language/language-tour#asynchrony-support)

@@ -16,30 +16,19 @@ When a batch file is run, the shell program (usually COMMAND.COM or cmd.exe/CMD 
 |          |  help ipconfig label net ping shutdown subst systeminfo   |
 |          |  taskkill tasklist  diskpart                              |
 +----------------------------------------------------------------------+
-|          |                                                           |
 |  shell   |  cls exit pause prompt start title                        |
-|          |   rem  :: echo  @echo off                                 |
-|          |                                                           |
-|          |                                                           |        
+|          |   rem  :: echo  @echo off                                 |     
 |----------+-----------------------------------------------------------+
 |  file    |  assoc copy del md move rd  type attrib comp expand       |
 |          |  more  sort xcopy fc                                      |
-|          |                                                           |
-|          |                                                           |
 +----------------------------------------------------------------------+
-|          |                                                           |
 |  find    |  cd dir path find tree                                    |
-|          |                                                           |
-|          |                                                           |
-|          |                                                           |
 +----------------------------------------------------------------------+
 | Decision |   if else  goto                                           |
 | Making   |                                                           |
 +----------------------------------------------------------------------+
 | datatype | %% []   date   time                                       |
-|          |                                                           |
 +----------------------------------------------------------------------+
-|          |                                                           |
 |  var     |   set  SETLOCAL/ENDLOCAL                                  |
 +----------+-----------------------------------------------------------+
 
@@ -95,6 +84,27 @@ Arrays：[]
 +----------+-----------------------------------------------------------+
 
 ```
+
+
+```
+
+::设置参数
+set var="var"
+
+
+ ::命令行输入参数
+set /p var= 
+
+
+::内置参数
+%0 文件名
+%1 参数1
+
+
+::输出到文件
+echo abc >a.txt
+echo abc_cd >>a.txt
+```
 ## powershell
 
 
@@ -105,14 +115,8 @@ Arrays：[]
 ```
 +----------+-----------------------------------------------------------+
 |  system  |                                                           |
-|          |                                                           |
-|          |                                                           |
-|          |                                                           |
 +----------------------------------------------------------------------+
 |  user    |                                                           |
-|          |                                                           |
-|          |                                                           |
-|          |                                                           |
 +------------------------+---------------------------------------------+
 |  file    | Navigating  |  cat  cd    cp    file   find  head  less ls|
 |          |             |  mkdir  more  mv  pwd   rm   rmdir  tail    |
