@@ -20,10 +20,8 @@
 +----------------------------------+    0x1     +---------------+-+           |             | token  |
 |              separator           |   Literals |  keywords       |Operators  | Identifiers |        |
 +----------------------------------+------------+-----------------------------+-------------+--------+
-|                                                                                                    |
 |                                            Character set (Unicode,UTF+8)                           |
 +----------------------------------------------------------------------------------------------------+
-|                                                                                                    |
 |                                            Byte                                                    |
 +----------------------------------------------------------------------------------------------------+
 
@@ -33,45 +31,42 @@
 硬关键字：这些关键字无论在什么情况下都不能作为标识符。
 软关键字：这些关键字可以在它们不起作用的上下文中用作标识符。
 修饰符关键字：这些关键字也可以在代码中用作标识符。
-+----------------+----------------------------------------------------------------+
-|   Special      |                                                                |
-| Identifiers    |  field it                                                      |
-+------------------------------+--------------------------------------------------+
-|                |             |  final  open                                     |
-|                |             |  private   protected   public  internal          |
-|                |             |  abstract data sealed inner enum annotation      |
-|  Modifier      |             |  companion                                       |
-|                |             |  operator   override  suspend   external  tailrec|
-|  Keywords      |             |  inline noinline   crossinline   infix           |
-|                |             |  const  lateinit   vararg   out  reified         |
-|                |             |  expect   actual                                 |
-+---------------------------------------------------------------------------------+
-|                |             | catch     finally                                |
-|                |             | import file                                      |
-|  Soft Keywords |             | by  delegate                                     |
-|                |             | constructor init     param                       |
-|                |             | receiver  property                               |
-|                |             | where     setparam   set   get   field           |
-|                |             | dynamic                                          |
-+---------------------------------------------------------------------------------+
-|                |  exception  |  throw  try                                      |
-|                +----------------------------------------------------------------+
-|                |  func       |  func                                            |
-|                |  class      |  package class interface                         |
-| Hard Keywords  |  package    |  super this                                      |
-|                +----------------------------------------------------------------+
-|                |  Flow       |   if  else  when while  do  for                  |  
-|                |  Control    |   break continue  return                         |
-|                |             |   (type casts) as as?                            |
-|                |             |   (type checks)  in !in  is !is                  |
-|                +-------------------------------------------- --------------------+
-|                |  special    |  typealias var val                               |
-|                |  identifiers|                                                  |
-|                +----------------------------------------------------------------+
-|                |  literals   |  false true null object                          |
-+----------------+-------------+--------------------------------------------------+
++----------------+--------------------------------------------------------------------------------+
+|   Special      |                                                                                |
+| Identifiers    |  field it                                                                      |
++------------------------------+------------------------------------------------------------------+
+|                |             |  (Generic) out  reified                                          |
+|                |             |  (Encapsulation)private protected public internal expect actual  |
+|  Modifier      |             |  (Encapsulation)inline noinline   crossinline   infix            |
+|                |             |  (abstract) abstract                                             |
+|  Keywords      |             |  (Polymorphism)operator   override    final  open                |
+|                |             |  (class fun)  external  vararg   tailrec    suspend              |
+|                |             |  (class)  data enum annotation sealed    inner  companion        | 
+|                |             |  (type)      const  lateinit                                     |
++-------------------------------------------------------------------------------------------------+
+|                |             | catch     finally                                                |
+|                |             | import    set   get  by                                          |
+|  Soft Keywords |             | (annotation) param setparam delegate field file property receiver|
+|                |             | (class) constructor init  (Generic) where                        |
+|                |             | (type)dynamic                                                    |
++-------------------------------------------------------------------------------------------------+
+|                |  exception  |  throw  try                                                      |
+|                +--------------------------------------------------------------------------------+
+|                |             | (abstract)interface          (Encapsulation)package              |
+|                |             | (Polymorphism)    super      (type casts) as as?                 |
+|                |  OOPs       | (Polymorphism)    typealias  (type checks)  in !in  is !is       |
+| Hard Keywords  |             | this              class    fun                                   |
+|                +--------------------------------------------------------------------------------+
+|                |  Flow       |   if  else  when while  do  for                                  |
+|                |  Control    |   break continue  return                                         |
+|                +--------------------------------------------------------------------------------+
+|                |  special    |   var val                                                        |
+|                |  identifiers|                                                                  |
+|                +--------------------------------------------------------------------------------+
+|                |  literals   |  false true null object                                          |
++----------------+-------------+------------------------------------------------------------------+
 
-
+identifiers：对象的名字( a name of  a unique object )
 ```
 
 ``` Operators
@@ -89,26 +84,16 @@
 |             | -> (lambda ,function type, when expression)                  |
 |             | _  ( lambda/destructuring declaration)                       |
 +----------------------------------------------------------------------------+
-|             |                                                              |
 |  Logical    |  && || !                                                     |
-|             |                                                              |
 +----------------------------------------------------------------------------+
-|             |                                                              |
 |  Relational |  == != > < >= <=                                             |
-|             |                                                              |
 |             |  === !==                                                     |
 +----------------------------------------------------------------------------+
-|             |                                                              |
 |  Assignment |  = += -= *= /= %=   < < =   > > =   &=   ^=   |=             |
-|             |                                                              |
 +----------------------------------------------------------------------------+
-|             |                                                              |
 |  Bitwise    |  & | ^  ~    < <   > >   > > >                               |
-|             |                                                              |
 +----------------------------------------------------------------------------+
-|             |                                                              |
 |  Arithmetic |  + - * / % ++ --                                             |
-|             |                                                              |
 +-------------+--------------------------------------------------------------+
 
 
@@ -240,15 +225,8 @@ Any?可空类型。Any?是Any的超集，Any?是整个类型体系的顶部，No
   11. Inline Class（类内联化）
   12. 类型别名
   13. companion object （伴生对象）
-- 继承
-  1. abstract，open/：,is （类似instanseof） 
-  2. super
-- 多态
-  1. 继承方法
-  2. 重写方法override
-  3. 父类引用指向子类
-  4. 委托 by
-  5. 属性委派 by
+
+
 ## 运行时数据解析 - 反射（Any::class，动态代理，annotation class），序列化，泛型
 ```java
 @JvmOverloads

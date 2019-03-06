@@ -913,7 +913,17 @@ MarkSweep::MarkSweep(Heap* heap, bool is_concurrent, const std::string& name_pre
 mark_compact 算法：标记-压缩（整理)算法
 concurrent_copying算法：
 semi_space算法: 
+
+
+#### android触发垃圾回收
+当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
+系统需要更多内存的时候触发。
+HPROF时触发。
+
+[回收机制](https://blog.csdn.net/f2006116/article/details/71775193)
 [android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
+
+[smalidea 无源码调试 apk](https://blog.csdn.net/hackooo/article/details/53114838)
 ### 类加载问题
 [pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
 QQ空间补丁
@@ -1489,6 +1499,7 @@ ps -t | grep -E "NAME| <zygote ps id> "
 ```
 
 ### 应用内消息机制-handler
+管道pipe唤醒主线程和epoll机制
 ```
 +------------------+     +------------------------------------+
 |                  |     |                                    |
@@ -1993,11 +2004,11 @@ Glide
 |             | Activity      |         |                |                           |               |
 |             | LauchTime     +---------+----------------+                           |               |
 |             | (am start)    |     profiler cpu/gpu     |                           |               |
-|             |reportFullyDrawn|                          |                           |               |
+|             |reportFullyDrawn|                         |                           |               |
 +-------------+---------------+--------------------------+---------------------------+---------------+
-|   secure    |    debug      |   apktool                |                           |               |
+|   secure    |    debug      |   apktool                |                           | drizzleDumper |  
 |             |   https       |   smali                  |                           |               |
-|             |               |   (reverse engineering)  |                           |               |
+|             |               |   (reverse engineering)  |                           |   FDex2       |
 +-------------+---------------+--------------------------+---------------------------+---------------+
 
 [smali](https://blog.csdn.net/linchaolong/article/details/51146492)
