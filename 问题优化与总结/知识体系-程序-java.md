@@ -15,7 +15,6 @@
 +------------------------------+------+------------------------------------------------| Event-driven|      
 |            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
 +------------------------------+------------+------------------------------------------+-------------+
-|                                                                                                    |
 |                             conditional/decision-making/loops                                      |
 +----------------------------------+------------+---------------+-+-----------+-------------+--------+
 |            Whitespace(tab space) |            |               | |           |             |        |
@@ -24,13 +23,12 @@
 +----------------------------------+            +---------------+-+           |             | token  |
 |              separator           |  Literals  |  keywords       | Operators | Identifiers |        |
 +----------------------------------+------------+-----------------------------+-------------+--------+
-|                                                                                                    |
 |                                            Character set (Unicode,UTF+8)                           |
 +----------------------------------------------------------------------------------------------------+
-|                                                                                                    |
 |                                            Byte                                                    |
 +----------------------------------------------------------------------------------------------------+
 
+identifiers（标识符）："对象"的名字( a name of  a unique object )
 
 ```
 
@@ -130,6 +128,17 @@ lines |   |    plane 0     |    plane 1     |    plane 2     |       |     plane
 [Java 8 规范文档](https://docs.oracle.com/javase/8/docs/)
 [Java Conceptual Diagram](https://docs.oracle.com/javase/8/docs/index.html)
 ### 特性
+[程序通常对每一个值关系一个特定的类型。](https://zh.wikipedia.org/wiki/類型系統)
+数据类型,一个数值的类型;类别,一个对象的类型;种类,一个类型的类型
+```
++---------------------------+--------------------+------------------------------+
+|   type|    data type      |    class           |  kind                        |
++-------------------------------------------------------------------------------+
+|  value|  a type of a value| a type of an object| a type of a type, or metatype|
+|       |                   |                    |                              |
++-------+-------------------+--------------------+------------------------------+
+
+```
 x编译型语言/x解释型语言/√混合型语言	
 x动态语言/√静态语言	
 √静态/√动态类型(java 10 auto)	
@@ -158,23 +167,24 @@ keyword(53)
 |  debug    |  throw    throws                                                      |
 |           |  assert                                                               |
 +-----------------------------------------------------------------------------------+
-|  Access   |  public protected    private                                          |
-|  modifiers|  package    import                                                    |
+|           |                 |  access modifiers  | public protected    private    |
+|           |  Encapsulation  +--------------------+--------------------------------+                
+|           |                 |                   package import                    |
+|  OOPs     |-----------------------------------------------------------------------|
+|           |  interface  abstract                                                  |
+|           |  super  instanceof   final                                            |
+|           |  extends   implements                                                 |
+| modifiers |  class  enum                                                          |
+|           |  new    this(reference variable)   static                             +
 +-----------------------------------------------------------------------------------+
-|           |  class  enum  interface  abstract                                     |
-|  class    |  extends   implements                                                 |
-| interface |                                                                       |
-| modifiers |  new  this    super   synchronized                                    |
-+-----------------------------------------------------------------------------------+
-|  variable |  final  static  volatile transient                                    |
+|  variable |  volatile transient                                                   |
 |  method   |  void native  strictfp                                                |
-|  modifiers|                                                                       |
+|  modifiers|  synchronized                                                         |
 +-----------+-----------------------------------------------------------------------+
 |  Flow     |  if     else                                                          |
 |  control  |  do    while    for                                                   |
 |  keyword  |  switch    case    default                                            |
 |           |  break    continue    return                                          |
-|           |  instanceof                                                           |
 +-----------------------------------------------------------------------------------+
 | Primitive |                                                                       |
 | types     |  byte    short     int    long    float    double    boolean    char  |
@@ -717,7 +727,8 @@ Generational Collection
 ```
 Reference Counting：难解决对象之间循环引用的问题
 
-[“长时间执行”](https://crowhawk.github.io/2017/08/10/jvm_2/)的最明显特征就是指令序列复用，例如方法调用、循环跳转、异常跳转等，所以具有这些功能的指令才会产生Safepoint。
+[“长时间执行”](https://crowhawk.github.io/2017/08/10/jvm_2/)的最明显特征就是指令序列复用;
+例如方法调用、循环跳转、异常跳转等，所以具有这些功能的指令才会产生Safepoint。
 在GC发生时让所有线程（这里不包括执行JNI调用的线程）都“跑”到最近的安全点上再停顿下来。
 **安全区域**是指在一段代码片段之中，引用关系不会发生变化。在这个区域中的任意地方开始GC都是安全的。
 
@@ -731,6 +742,8 @@ Generational Collection（分代收集）算法
 
 《如何监控Java GC》中已经介绍过了jstat
 
+JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
+
 ###  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
 高级特性：强类型，静态语言，混合型语言（编译，解释）
 动态类型语言是指在运行期间才去做数据类型检查的语言，说的是数据类型，动态语言说的是运行是改变结构，说的是代码结构。
@@ -738,43 +751,35 @@ Generational Collection（分代收集）算法
 静态语言的数据类型是在编译其间确定的或者说运行之前确定的，编写代码的时候要明确确定变量的数据类型。
 [oops](https://www.javatpoint.com/java-oops-concepts)
 ```
----------+---------------------------------------------------------+
-|        |  reference variable| this                               |
-|        +---------------------------------------------------------+
-|        | (memory management)| Variable Method  Block Nested class|    
-|        |     static         |                                    |
-|        +-----------------+--+------------------------------------+
-|        |   Encapsulation |  package                              |
-|        |                 |  Access Modifiers                     |
-|        |                 |   member, method, constructor or class|
-|        +---------------------------------------------------------+
-|        |    Abstraction  |  Abstract class                       |
-|        |                 |  Interface                            |
-|        +---------------------------------------------------------+
-|        |                 |  Overloading   Overriding             | 
-|        |                 |  Covariant Return Type    Super       | 
-|        |                 |  instance initializer block           |
-|        |                 |  final      variable                  |
-|        |                 |             method                    |
-|        |                 |             class                     |
-|        | Polymorphism    |  Runtime polymorphism                 |
-|        |                 |  Dynamic Binding                      |
-|        |                 |  instanceof operator                  |
-|        +---------------------------------------------------------+
-|        |      Inheritance|  Method Overriding                    |
-|        |    ( IS-A )     |  Code Reusability                     |
-|        +-------------------------------+-------------------------+
-| OOPs   |                 |  Fields     |      Constructors       |
-|        |         Class   |             +-------------------------+
-|        |                 |  Methods    |default constructor      |
-|        |                 |             |                         |
-|        |                 |  Blocks     |Parameterized constructor|
-|        |                 |             +-------------------------+
-|        |                 |  Nested class and interface           |
-|        +-----------------+---------------------------------------+
-|        |               Object                                    |
-+--------+---------------------------------------------------------+
-
+---------+---------------------------------------------------------------------------------+
+|        |  reference variable| this                                                       |
+|        +---------------------------------------------------------------------------------+
+|        | (memory management)| Variable Method  Block Nested class                        |
+|        |     static         |                                                            |
+|        +-----------------+--+------------------------------------------------------------+
+|        |  Encapsulation  |  package                                                      |
+|        |                 |  Access Modifiers                                             |
+|        |                 |   member, method, constructor or class                        |
+|        +---------------------------------------------------------------------------------+
+|        |  Abstraction    |  Abstract class                                               |
+|        |                 |  Interface                                                    |
+|        +---------------------------------------------------------------------------------+
+|        |                 |  +--------------------+  Overloading   Overriding             |
+|        |                 |  |final      variable |  Covariant Return Type ,    Super     |
+|        |                 |  |           method   |  instance initializer block           |
+|        |  Polymorphism   |  |           class    |  Runtime polymorphism, Dynamic Binding|
+|        |                 |  +--------------------+  instanceof operator                  |
+|        +---------------------------------------------------------------------------------+
+|        |  Inheritance    |  Method Overriding                                            |
+|        |  ( IS-A )       |  Code Reusability                                             |
+|        +---------------------------------------------------------------------------------+
+| OOPs   |                 |                              +----------------------------+   |
+|        |  Class          | Fields    Methods  Blocks    |             |default       |   |
+|        |                 |                              |Constructors |Parameterized |   |
+|        |                 | Nested class and interface   +----------------------------+   |
+|        +-----------------+---------------------------------------------------------------+
+|        |  Object                                                                         |
++--------+---------------------------------------------------------------------------------+
 
 ```
 《Effect java》
@@ -1385,40 +1390,34 @@ Rxjava实现
 ## 2.4 数据并发访问 - 线程与并发
 
 ### 异步实现（多线程编程）
-线程初始化三种方式： Thread,Runnable,Callable
+线程初始化三种方式： Thread,Runnable,Callable，Feature
 线程的生命周期
 ```
                                        +---------------+
-                                       |               |
                             +----------+ Block         | <-----------------+   run synchronized
-                            |          |               |                   |
                             |          +---------------+                   |
                             |          +---------------+                   |
-                            |          |               |                   |
                             +----------+ Time_waitting | <-----------------+   sleep(),wait(ms),join(ms)
-                            |          |               |                   |
                             |          +---------------+                   |   LockSupport.parkNanos(),LockSupport.parkUntil()
                             |          +---------------+                   |
-                            |          |               |                   |
                             +----------+ Waitting      | <-----------------+   wait(),join(),LockSupport.park()
-                            |          |               |                   |
                             v          +---------------+                   |
                      +-------------------------------------------------------------+
-+---------+          | +------------+            yield()             +-----------+ |      +--------------+
-|         |          | |            |   +------------------------>   |           | |      |              |
-|  New    | +------> | | Runnable   |                                |  Ready    | +----> |  Terminated  |
-|         |          | |            |                                |           | |      |              |
-+---------+          | +------------+   <------------------------+   +-----------+ |      +--------------+
-                     |          (Running)        system call                       |
++---------+          |   +-----------+         system call        +------------+   |      +--------------+
+|         |          |   |           | +------------------------> |            |   |      |              |
+|  New    | +------> |   |  Ready    |                            |  Running   |   +----> |  Terminated  |
+|         |          |   |           |                            |            |   |      |              |
++---------+          |   +-----------+ <------------------------+ +------------+   |      +--------------+
+                     |                          yield()                            |
                      +-------------------------------------------------------------+
-
+                                                 Runnable
 
 ```
 
 - 多线程
   线程通讯：volatile/synchronized，wait()/nofity()，pipe,join(),ThreadLocal
- 
-  线程池：ThreadPoolExecutor/ScheduledThreadPoolExecutor
+  线程（实现**异步**）
+  线程池（实现**并发**）：ThreadPoolExecutor/ScheduledThreadPoolExecutor
     - 任务队列 SynchronousQueue,LinkedBlockingDeque（常用）,ArrayBlockingQueue
     - 任务 FutureTask（get方法会阻塞，知道FutureTask执行结束）,Callable
   
@@ -1775,6 +1774,7 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 特点：运行时类型擦除
 集合容器和网络请求经常用到
 
+泛型是一种多态技术。而多态的核心目的是为了消除重复，隔离变化，提高系统的正交性。
 
 ## 2.3 数据访问 - 流（IO, NIO）
 字符串，类，文件（xml,json），内存，网络，数据库
@@ -1842,9 +1842,6 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 |               |         Greedy                                                    |     Reluctant       |              Possessive    |
 |               |       (matches entire input,then backtrack)                       | (matches as little) | (Greedy, doesn't backtrack)|
 +--------------------------------------------------------------------------------------------------------------------------------------+
-|               |         Greedy                                                    |     Reluctant       |              Possessive    |
-|               |       (matches entire input,then backtrack)                       | (matches as little) | (Greedy, doesn't backtrack)|
-+--------------------------------------------------------------------------------------------------------------------------------------+
 | Boundary      | ^ The beginning of a line          \b   A word boundary         \A   The beginning of the input                      |
 | Matchers      | $  The end of a line               \B   A non-word boundary     \z   The end of the input                            |
 |               | \G  The end of the previous match                     \Z  The end of the input but for the final terminator, if any  |
@@ -1875,7 +1872,6 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 |               |   \p{XDigit}             \p{Space}                    |                               |                              |
 |               |   A hexadecimal digit:   A whitespace char:           |                               |                              |
 |               |   [0+9a+fA+F]            [ \t\n\x0B\f\r]              |                               |                              |
-|               |                                                       |                               |                              |
 |               +-------------------------------------------------------+-------------------------------+------------------------------+
 |               |       POSIX                                           |              JAVA             |              Unicode         |
 +--------------------------------------------------------------------------------------------------------------------------------------+
@@ -2008,7 +2004,7 @@ public final class Matcher implements MatchResult {
 +---------------+------------------+--------------------------+--------------------+-----------------+
 |   blocking IO | nonblocking IO   |    IO multiplexing       |  signal driven IO  | asynchronous IO |
 |               |                  | select poll epoll(Linux) |                    |                 |
-|               |                  | Socket , javaNIO,javaRAF |                    |    Datagram     |
+|  Socket       |           | SocketServer,javaNIO , javaRAF  |                    |    Datagram     |
 +----------------------------------------------------------------------------------------------------+   +
 |               |                  |                          |                    |                 |   |
 |initiate       |  initiate        |   check                  |                    |  initiate       |   |
