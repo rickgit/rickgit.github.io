@@ -1498,31 +1498,48 @@ ps -t | grep -E "NAME| <zygote ps id> "
 
 ```
 
-### 应用内消息机制-handler
+### 应用内消息机制（异步）
+- Handler        子线程与主线程通讯
+- Thread
+- AsyncTask      界面回调，异步任务，一次性
+- HandlerThread  异步队列，子线程与子线程通讯
+- TimeTask       定时任务
+- IntentServices 无界面，异步任务
+- ThreadPool     并行任务
+#### handler
 管道pipe唤醒主线程和epoll机制
 ```
-+------------------+     +------------------------------------+
-|                  |     |                                    |
-|  Handler      +-----+  |   Looper                           |
-|                  |  |  |                                    |
-+------------------+  |  +------------------------------------+
-|                  |  |  |                                    |
-|  enqueueMessage  |  +----> loop()                           |
-|              |   |     |             +-------------------+  |
-|              |   |     |             |                   |  |
-|              +------------>          |  MessageQueue     |  |
-|                  |     |             |            epoll  |  |
-|                  |     |             +---------+---------+  |
-|                  |     |                       |            |
-|                  |     |                       v            |
-|                  |     |                                    |
-|                  |     |             +--------------------+ |
-|                  |     |             | Message            | |
-| dispatchMessage <---------------+    |  Handler target    | |
-|   mCallback      |     |             |  Runnable callback | |
-|   handleMessage()|     |             +--------------------+ |
-+------------------+     +------------------------------------+
+     +------------------------------------------+
+     |  Handler                                 |
+     +------------------------------------------+
+     | +---------------+  +---------------------+
++----+ |enqueueMessage |  | dispatchMessage     |
+|    | |               |  |   Message#callback  |  <----+
+|    | +---------------+  |   mCallback         |       |
+|    |                    |   handleMessage()   |       |
+|    +--------------------+---------------------+       |
+|                                                       |
+|    +--------------+                                   |
+|    |Looper Thread |                                   |
+|    +--------------+----------------------------+      | (runOnLooperThread)
+|    |  Looper                                   |      |
+|    +-------------------------------------------+      |
+|    |   loop()                                  |      |
+|    |                                           |      |
+|    |  +---------------------+                  | +----+
+|    |  | MessageQueue        | epoll            |  +--------------------+
++--> |  |  Message mMessages  +------>           |  | Message            |
+     |  |                     |                  |  |  Handler target    |
+     |  +---------------------+                  |  |  Runnable callback |
+     +-------------------------------------------+  +--------------------+
 
+Handler{
+    final Looper mLooper;
+    final MessageQueue mQueue;
+    final Callback mCallback;
+    final boolean mAsynchronous;
+    IMessenger mMessenger;
+}
 
 ```
 [select/poll/epoll对比分析](http://gityuan.com/2015/12/06/linux_epoll/)
@@ -1538,22 +1555,27 @@ cat /proc/sys/fs/file-max
 ```
 2. epoll不同于select和poll轮询的方式，而是通过每个fd定义的回调函数来实现的
 
-###  AsyncTask
+####  AsyncTask
 ```java
-
-public abstract class AsyncTask<Params, Progress, Result> {
-
-    private final WorkerRunnable<Params, Result> mWorker;
-    private final FutureTask<Result> mFuture;
-
-    private volatile Status mStatus = Status.PENDING;
-    
-    private final AtomicBoolean mCancelled = new AtomicBoolean();
-    private final AtomicBoolean mTaskInvoked = new AtomicBoolean();
-
-    private final Handler mHandler;
-
-}
+                     +--------------------------------------------+  MESSAGE_POST_RESULT
+                     |   AsyncTask                                |  MESSAGE_POST_PROGRESS
+                     |                                            |              +--------------------------------+
+                     |   +----------------------------+           |              |   MainLooper                   |
+ way 1   +---------> |   | FutureTask(WorkerRunnable) |           |        +---> |                                |
+                     |   +----------+-----------------+           |        |     |                                |
+                     |              |                             |        |     +--------------------------------+
+                     |              |     +-----------------------+        |
+                     |      mStatus |     |Handle:InternalHandler | -------+
+                     |      +-------+     |                       |
+ way 2               |              |     +-----------------------+  <---------------------------------------------------+
+                     |      offer() v                             |              +---------------------------------+     |
++--------------+     |         +----+-----------------------+     |              | ThreadPoolExecutor |            |     |
+| Runnable     +------>        | SerialExecutor|            |     |  ArrayDeque  +--------------------+            |     |
++--------------+     |         +---------------+            |     |  #poll()     | LinkedBlockingQueue             |     |
++--------------+     | offfer()|          mTasks:ArrayDeque |     | +--------->  |    +-----------+ +------------+ |     |
+| Runable      +------>        |                            |     |              |    |FeueureTask| | FutureTask | | ----+
++--------------+     |         +----------------------------+     |              |    +-----------+ +------------+ |
+                     +--------------------------------------------+              +---------------------------------+
 ```        
     容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
     并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
@@ -1563,6 +1585,23 @@ public abstract class AsyncTask<Params, Progress, Result> {
 ### 四大组件基础 - Context
 Context作用
 ```
+
++--------------------------------------------------------------------------------------------+
+|   ContextImpl                                                                              |
++-----------------------------------------------------+--------------------------------------+
+|        ActivityThread mMainThread                   |    File mDatabasesDir                |
++-----------------------------------------------------+    File mPreferencesDir              |
+|        LoadedApk mPackageInfo                       |    File mFilesDir                    |
+|                                                     |    File mNoBackupFilesDir            |
+|        ResourcesManager mResourcesManager           |    File mCacheDir                    |
+|        ApplicationContentResolver mContentResolver  |    File mCodeCacheDir                |
++-----------------------------------------------------+                                      |
+|       Display mDisplay                              |    ArrayMap<String, File>            |
+|                                                     |    mSharedPrefsPaths                 |
++-----------------------------------------------------+--------------------------------------+
+|       Object[] mServiceCache                                                               |
++--------------------------------------------------------------------------------------------+
+
                                     AMS                Activity
                                                        Service
                                 +------------------->  ContentProvider
@@ -2001,7 +2040,7 @@ Glide
 |             |frame Rate     |         | gpu overdraw   |  canvas.cliprect()        | multiThread&  |
 |             |               |on-device| gpu render     |  hierachy viewer          | mainThread    |
 |             |               |  tools  | gup view update|                           |               |
-|             | Activity      |         |                |                           |               |
+|             | Activity      |         |                |                           | Webview       |
 |             | LauchTime     +---------+----------------+                           |               |
 |             | (am start)    |     profiler cpu/gpu     |                           |               |
 |             |reportFullyDrawn|                         |                           |               |
@@ -2018,6 +2057,31 @@ Glide
 [battery-history](https://www.cnblogs.com/jytian/p/5647798.html,https://yeasy.gitbooks.io/docker_practice/install/ubuntu.html)
 
 [启动时间](https://developer.android.com/topic/performance/vitals/launch-time)
+
+[Android 内存泄漏](https://android.jlelse.eu/9-ways-to-avoid-memory-leaks-in-android-b6d81648e35e)
+```
++---------------------+
+| memory leaks        |
++---------------------+
+| unrelease           |
++---------------------+
+| static Fields       |
+| (View,Context)      |
+|                     |
+| Inner Classes       |
+| That Reference      |
+| Outer Classes       |
+| (Async Handler)     |
+| (WeakReference view)|
+|                     |
+| ThreadLocals        |
+|                     |
+| Unclosed Resources  |
+|(unregisterReceiver) |
+|                     |
++---------------------+
+
+```
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
