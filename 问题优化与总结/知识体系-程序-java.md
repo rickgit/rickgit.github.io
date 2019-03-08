@@ -4,29 +4,42 @@
 文档：需求开发计划（排期）及进度，设计说明书（架构图，项目结构图，类图），规范文档（命名，注释），功能预演文档，开发总结文档，用户指南(使用手册)
 [java 规范文档](https://docs.oracle.com/javase/specs/index.html)
 ```
-+------------------+---------------------------------------------------------------------------------+
-|  comunicate      |                                                                                 |
-|                  |         ReadWrite Object(String,List,Serializable)/C&C++/File/Socket/db         |
-+------------------+------------------------+------------+---------+-----------+-------+-------------+
-|Class-based|concurrency|Aspect|            |            |         |           |       |             |
-| Log/Date  |           |      |            |            |         |           |       |             |
-+-----------+-----------+------+------+     |            |         |           |       |             |
-|        oop                          | pop | Functional | FRP     |Reflective |Generic|             |
-+------------------------------+------+------------------------------------------------| Event-driven|      
-|            Structured        | Imperative |  Declarative         |  Metaprogramming  |             |
-+------------------------------+------------+------------------------------------------+-------------+
-|                             conditional/decision-making/loops                                      |
-+----------------------------------+------------+---------------+-+-----------+-------------+--------+
-|            Whitespace(tab space) |            |               | |           |             |        |
-|            comment               |            | Base Data Type| |           |             | other  |
-|            separator sign(;)     |10b 01 1 0x1|               | |           |             | symbol/|
-+----------------------------------+            +---------------+-+           |             | token  |
-|              separator           |  Literals  |  keywords       | Operators | Identifiers |        |
-+----------------------------------+------------+-----------------------------+-------------+--------+
-|                                            Character set (Unicode,UTF+8)                           |
-+----------------------------------------------------------------------------------------------------+
-|                                            Byte                                                    |
-+----------------------------------------------------------------------------------------------------+
++------------------+-------------------------------------------------------------------------------------------+
+|  security        |                                                                                           |
++--------------------------------------------------------------------------------------------------------------+
+|  perfomance      |                                                                                           |
++--------------------------------------------------------------------------------------------------------------+
+|  test            |                                                                                           |
++--------------------------------------------------------------------------------------------------------------+
+|  API /SDK        |       lang,util,io,math,net,text,sql,security,awt/swing,xml                               |
++--------------------------------------------------------------------------------------------------------------+
+|                  |        lang     util       io              net      sql                                   |
+|                  +-------------------------------------------------------------------------------------------+
+|  comunicate      |       String    List      Serializable                        C&C++                       |
+|                  |       Thread              File             Socket    db                                   |
+|                  |  Reflect/Annotation                                                                  |
++------------------+------------------------+------------+---------+-----------+-------+-----------------------+
+|Class+based|concurrency|Aspect|            |            |         |           |       |                       |
+| Log/Date  |           |      |            |            |         |           |       |                       |
++-----------+-----------+------+------+     |            |         |Annotation |       |                       |
+|        oop                          | pop | Functional | FRP     |Reflecti^e |Generic|                       |
++------------------------------+------+------------------+-----------------------------+ Event+driven          |
+|            Structured        | Imperative |  Declarative         |  Metaprogramming  |                       |
++------------------------------+------------+----------------------+-------------------+-----------------------+
+|                             conditional/decision|making/loops                                                |
++-------------------------+--------------------------------+-----------+-+------------+-------------+----------+
+|                         |       |true ,10b(2) ,1f(float) |           | |            |             |          |
+|  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   oops/.. | |            |             |          |
+|  comment                | memory|        1(10),""(Str)   |  decision | |            |             | other    |
+|  separator sign(;)      |       |      0x1(16),[](Arr)   |  Data Type| |            |             | symbol/  |
++---------------------------------+------------------------------------+-+            |             | token    |
+|     separator           |  Literals                      |  keywords   |  Operators | Identifiers |          |
++-------------------------+--------------------------------+-------------+------------+-------------+----------+
+
+|                                            Character set (Unicode,UTF|8)                                     |
++--------------------------------------------------------------------------------------------------------------+
+|                                            Byte                                                              |
++--------------------------------------------------------------------------------------------------------------+
 
 identifiers（标识符）："对象"的名字( a name of  a unique object )
 
@@ -45,7 +58,9 @@ file.encoding是指JAVA文件的编码
 javac -encoding utf-8 TextFileEncoding.java  //必须设置和文件编码一直的编码
 
 java -Dfile.encoding=utf-8 TextFileEncoding
+
 ```
+[java -h 相关启动参数帮助文档](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html)
 
 《The Unicode® Standard Version 9.0 》
 BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
@@ -408,7 +423,7 @@ JVM
 |                           |      | +-------------+ +-----------------------------+ ||
 |                           |      | |Method Area  | |  Program                    | ||
 |                           |      | | +-----------+ |  Couter                     | ||
-|                           |      | | | const pool| |  Register                   | ||
+|                           |      | | |String Pool| |  Register                   | ||
 |                           |      | +-------------+ +-----------------------------+ ||
 |                           |      +--------------------------------------------------|
 +-----------+-------------------------------------------------------------------------+
@@ -436,6 +451,12 @@ JVM
 ```
 
 #### 加载，连接（校验，准备，解析），初始化
+1.加载：查找并加载Class文件。
+2.链接：验证、准备、以及解析。
+  验证：确保被导入类型的正确性。
+  准备：为类的静态字段分配字段，并用默认值初始化这些字段。（heap开辟空间）
+  解析：根据运行时常量池的符号引用来动态决定具体值得过程。
+3.初始化：将类变量初始化为正确初始值。
 ```java
 dx --dex --output=Hello.dex Hello.class
 
@@ -446,6 +467,22 @@ javap –verbose Hello.class 可以看到更加清楚的信息
 [**Jasmin**](http://jasmin.sourceforge.net/guide.html) 是一种免费的开源的 JAVA 汇编器 ，它将使用**Java虚拟机指令集**以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
 [Dalvik寄存器指令](http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html)，有64k个寄存器，只用到前256个
  smali - An assembler/disassembler for Android's dex format
+
+[ **初始化**](https://blog.csdn.net/sujz12345/article/details/52590095/)
+ ```
+<init>与<clinit> 对象和类字段初始化
+
+1. 父类静态变量初始化 
+2. 父类静态语句块 
+3. 子类静态变量初始化 
+4. 子类静态语句块 
+5. 父类变量初始化 
+6. 父类语句块 
+7. 父类构造函数 
+8. 子类变量初始化 
+9. 子类语句块 
+10. 子类构造函数
+ ```
 
 #### 类加载器与双亲委派模型(Parents Dlegation Mode)
 ```
@@ -619,8 +656,8 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 +-----------------+---------------------------------------+
 |  misc           | athrow   monitorenter,monitorexit     |
 +---------------------------------------------------------+
-|                 |        -load    -store                |
-|  stack operator |-const   -push    -ldc  -pop     -dup  |  
+|                 |-aload_<n>  -store                     |
+|  stack operator |-const_<num>   -push -ldc  -pop   dup  |     
 +---------------------------------------------------------+
 |  type conversion|  i2b, i2c,f2i                         |
 +----------------------------+----------------------------+
@@ -822,7 +859,19 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 } 
 
 ```
+### 字符串
+```
++---------------+----------+----------+
+|               |  final   |  synchro |
++-------------------------------------+
+| String        |   √      |          |
++-------------------------------------+
+| StringBuffer  | char[]   |    √     |
++-------------------------------------+
+| StringBuilder | char[]   |    x     |
++---------------+----------+----------+
 
+```
 
 
 ### 2.1 数据集合  - Collection 类（List, Queue, Map）
@@ -1293,7 +1342,27 @@ Charset#availableCharsets():SortedMap
   - 中介者模式
     Binder机制
  #### 性能（异常，断言，日志）
+[java memory leaks](https://www.baeldung.com/java-memory-leaks)
+```
++-----------------------------------------------------+
+| memory leaks                                        |
++--------------------+--------------------------------+
+| unrelease          | improper api                   |
++-----------------------------------------------------+
+| static Fields      | Improper equals()              |
+| (Collection,SingleIns)| and hashCode() Implementations |
+|                    |                                |
+| Inner Classes      |                                |
+| That Reference     |                                |
+| Outer Classes      | finalize() Methods             |
+|                    |                                |
+| ThreadLocals       | Interned Strings               |
+|                    |                                |
+| Unclosed Resources |                                |
++--------------------+--------------------------------+
 
+
+```
 
 ## 声明式编程-函数式编程/响应式编程（java 1.8） 
 函数是一等公民
@@ -2051,6 +2120,7 @@ UTF-8
 
 #### NIO（BUffer,Channel ,Selector）
 IO是面向流的，NIO是面向缓冲区的。
+NIO机制，它是一种基于通道与缓冲区的新I/O方式，可以直接从操作系统中分配直接内存，即在堆外分配内存
 
 Channel 和 Selector
 ```java
