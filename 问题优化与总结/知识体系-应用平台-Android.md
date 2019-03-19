@@ -4,42 +4,48 @@
 阅读应用流程（以APK文档为主线，程序Main方法为入口）
 [启动流程](https://blog.csdn.net/qq_30993595/article/details/82714409#_2)
 ```diagram
-+-----------------------------------------------------------------------+
-|                                AppS                                   |
-|  Home  Contacts  Phone   Browser                                      |
-+-----------------------------------------------------------------------+
-|                              component                                |
-|  Resources                                                            |
-|  Views  Layouts Controls                                              |
-|  Fragments                                                            |
-|                          Intents   Manifest                           |
-|  Activities     Services     Broadcast Receivers     Content Providers|
-+-----------------------------------------------------------------------+
-|                       App Framework                                   |
-|  AMS             WMS    View System        content provider   XMPP    |
-|  PMS             NMS    ResourceManager    TelephonyManager   LMS     |
-+-------------------------------------------------+---------------------+
-|                  Libraries                      |  Android Runtime    |
-|                                                 |  +----------------+ |
-|  Surface Manager    Media       Webkit          |  | dalvik vm      | |
-|  OpenGL+ES (3d)                 SQLite          |  +----------------+ |
-|  SGL(Skia 2d)                   SSL/TLS         +---------------------+
-|  FreeType                       libc(bionic)                          |
-+-----------------------------------------------------------------------+
-|                      Linux kernel                                     |
-|                                                                       |
-|  Bind (IPC) Driver   Display Driver   USB Driver     Power Management |
-|                      (FrameBuffer)                                    |
-|  Bluetooth Driver    Camera Driver    Flash Driver                    |
-|                        (V4L2)                                         |
-|  WIFI Driver         Audio Driver     KeyPad Driver                   |
-|                      (oss/alsa)                                       |
-+-----------------------------------------------------------------------+
-|                                                                       |
-|                                        ^                              |
-|                                        |                              |
-|  Loader +--->Boot ROM+--->Boot Loader+-+                              |
-+-----------------------------------------------------------------------+
++---------+--------------------------------------------------------------------------------------------------+
+| AppS    |   Home  Contacts  Phone   Browser                                                                |
++--------------------------------+------------------------------------+---------------------+----------------+
+|         |         os           |            content                 |   app               |   util         |
+|         |(IPC,message passing) | (accessing and publishing data)    |( app  model)        |                |
+|         +--------------------------------------------------------------------------------------------------+
+|         |  Binder              |      BroadcastReceiver             |  Application        |  SparseArray   |
+|         |  MemoryFile          |      ContentProvider               |  Activity    Dialog |  ArrayMap      |
+|         |  AsyncTask           |         Context                    |  Fragment           |  LruCache      |
+|         |                      |     ClipboardManager               |  AlarmManager       |                |
+|         |  Handler             |         Intent                     |  Notification       |                |
+|         |                      |      AssetManager/Resource         |  JobScheduler       |                |
+| Android |  Environment         |      SharedPreferences             |                     |                |
+| SDK     +-----------------------------------------------+-----------+------------++------------------------+
++         | view                 |      widget/webkit     |       graphics          |       animation        |
+|         |(ui,layout,interaction|      (UI elements )    |(drawing2Screen directly)|   (property animation) |
+|         +--------------------------------------------------------------------------------------------------+
+|         |Window  View  KeyEvent| TextView  ImageView    |     Drawable   Bitmap   |       TypeEvaluator    |
+|         |GestureDetector       | EditText  Toast        |     Camera     Canvas   |                        |
+|         |InputMethodManager    | RecyclerView           |     ColorFilter Point   |                        |
+|         |Animation             | ViewPager              |     Rect                |                        |
++--------------------------------+------------------------+-------------------------+------------------------+
+| App     |   AMS             WMS    View System        content provider   XMPP                              |
+|Framework|   PMS             NMS    ResourceManager    TelephonyManager   LMS                               |
++--------------------------------------------------------------------------------------+---------------------+
+|         |   Surface Manager    Media       Webkit                        | Android      +----------------+ +
+|         |   OpenGL+ES (3d)                 SQLite                        | Runtime      | dalvik vm      | |
+|Libraries|   SGL(Skia 2d)                   SSL/TLS                       |              +----------------+ |
+|         |   FreeType                       libc(bionic)                  +---------------------------------+
++------------------------------------------------------------------------------------------------------------+
+|         |   Bind (IPC) Driver   Display Driver   USB Driver     Power Management                           |
+|  Linux  |                       (FrameBuffer)                                                              |
+|         |   Bluetooth Driver    Camera Driver    Flash Driver                                              |
+|  kernel |                         (V4L2)                                                                   |
+|         |   WIFI Driver         Audio Driver     KeyPad Driver                                             |
+|         |                       (oss/alsa)                                                                 |
++---------+------------------------------+-------------------------------------------------------------------+
+|                                        ^                                                                   |
+|                                        |                                                                   |
+|  Loader +--->Boot ROM+--->Boot Loader+-+                                                                   |
++------------------------------------------------------------------------------------------------------------+
+
 
 
 ```
@@ -157,11 +163,12 @@ Linux中的RPC方式有管道，消息队列，共享内存等。
 消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
 Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
 ```java
-性能，并发，一对多
+实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
+，并发，一对多
                          +-----------+---------+---------------------+
                          | Bundle    | Messager|  Content Provider   |
          +---------------------------+---------+--------------------------------------+-----------------+
-         | ashmem        |   AIDL    +-------------------------------+                |                 |
+         |               |   AIDL    +-------------------------------+                |                 |
          |               |           | byte, char, short, int, long, |                |                 |
          |               |           | float, double, boolean        |                |                 |
          |               |           | String, CharSequence          |                |                 |
@@ -173,10 +180,10 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
          |               |           +-------------------------------+                |                 |
          |               |           | in out inout                  |                |                 |
          |               |           +-------------------------------+                |                 |
-         |               |           | oneway                        |                |                 |
+         | MemoryFile    |           | oneway                        |                |                 |
          |               |           +-------------------------------+                |                 |
          |               |-------------------------------------------|                |                 |
-         |               |   android.os.Binder                       |                |                 |
+         | ashmem        |   android.os.Binder                       |                |                 |
          +-----------------------------------------------------------+                |                 |
          |               |                                           |  Socket        |  File           |
          | Shared memory |   Binder                                  |  pipe          | SharedPreference|
@@ -861,9 +868,9 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
                                                     |
                                                     v
       +--------+  +-------+  +---------+ +------+ +-+-----+ +-------+
-      |  ART   |  | Zygote|  | No      | | Image| | main  | | Large |
-Heap  |        |  | Space |  | Moving  | | Space| | alloc | | Object|
-      |  L+    |  |       |  | space   | |      | | space | | Space |
+      |  ART   |  | Zygote|  | No      | | Image| |       | | Large |
+Heap  |        |  | Space |  | Moving  | | Space| | Alloc | | Object|
+      |  L+    |  |       |  | space   | |      | | Space | | Space |
       +--------+  +-------+  +---------+ +------+ +-------+ +-------+
 
       +--------+  +-------+  +---------+ +------+
@@ -1655,53 +1662,42 @@ APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->
 ```
 #### 生命周期
 ```
-                                            +--------+
-                                            | Start  |
-                                            |        |
-                                            +----+---+
-                                                 v
-
-                                            +--------+
-         +------------------------------->  |onCreate|
-         |                                  |        |
-         |                                  +---+----+
-         |                                      v
-         |  back to
-         |  foreground                      +--------+                 +-----------+
-         |                                  |onStart |  <--------------+ onRestart +-----+
-         |                                  |        |                 |           |     |
-+--------+---------+                        +----+---+                 +-----------+     |
-| Process killed   |                             v                                       |
-|                  |                                                                     |
-+--------+---------+              +-------+ +--------+                                   |
-         |                        v         |onResume|  <-----+                          |
-         |                   +----+-----+   |        |        |                          |
-         |                   |Running   |   +--------+        |  activity                |  activity
-         |                   |          |                     |  froreground             |  foreground
-         |            other  +----+-----+                     |                          |
-         |            activity    |         +--------+        |                          |
-         |            foreground  +-------> |onPause |        |                          |
-         |  <-----------------------------+ |        | +----->+                          |
-         | other app need memory            +---+----+                                   |
-         |                                      v    no longe visiable                   |
-         |                                                                               |
-         |                                  +--------+                                   |
-         |                                  |onStop  |                                   |
-         +--------------------------------+ |        | +---------------------------------+
-                                            +---+----+
-                                                v
-
-                                            +--------+
-                                            |onDestroy
-                                            |        +
-                                            +---+----+
-                                                v
-
-                                            +--------+
-                                            |shutdown|
-                                            |        |
-                                            +--------+
-
+                                  +--------+
+                                  | Start  |
+                                  +----+---+
+                                       v                                                   +-----------------+
+                                  +----+---+                            Activity States    |onAttach         |
+      +------------------------>  |onCreate|                                               |oncreate         |
+      |                           +---+----+                                               |oncreateView     +<---+
+      | back to                       v  created +------------------------------------>    |onActivityCreated|    |
+      | foreground                +---+----+        +-----------+                          |                 |    |
+      |                           |onStart |  <-----+ onRestart +--+                       +-----------------+    |
+      |                           |        |        +-----------+  |                                              |
++-----+---------+                 +----+---+                       |                       +---------+            |
+| Process killed|                      v started                   |   +-------------->    |onStart  |            |
++-----+---------+       +-------+ +----+---+                       |                       +---------+            |
+      |                 v         |onResume|  <-----+activity      |                                              |
+      |             +---+------+  +--------+        |froreground   |                       +---------+            |
+      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |            |
+      |   activity  +---+------+                    |              |                       +---------+            |
+      |   foreground    |         +--------+        |              |                                              |
+      |                 +-------> |onPause |        |    activity  |                                              | onBack
+      | <-----------------------+ |        | +----->+    foreground|                                              |
+      |   other app               +---+----+                       |                       +---------+            |
+      |   need memory                 v  paused                    |     +------------>    |onPause  |            |
+      |                                  no longe visiable         |                       +---------+            |
+      |                           +--------+                       |                                              |
+      +-------------------------+ |onStop  | +---------------------+                                              |
+                                  +---+----+                                               +---------+            |
+                                      v  stoped                       +--------------->    |onStop   |            |
+                                  +---+----+                                               +---------+            |
+                                  |onDestroy                                                                      |
+                                  |        +                                               +-v-----v------+       |
+                                  +---+----+                                               |onDestroyView +-------+
+                                      v  destroyed  +--------------------------------->    |onDestroy     |
+                                  +---+----+                                               |onDetach      |
+                                  |shutdown|                                               +--------------+
+                                  +--------+
 
 
 ```
@@ -2026,7 +2022,7 @@ Glide
 
 ## Android 开发模式
 
-#### 性能优化总结
+### 性能优化总结
 > <<Android High Performance Programming>>
 ```
 +-------------+-------------------+----------------------+---------------------------+---------------+
@@ -2035,7 +2031,7 @@ Glide
 |  memory     |                   |                      |                           |  keep alive   |
 |             | gc time>frame rate|     profiler cpu     |  ResourceCanary           |               |
 |             | leaks             |                      |  Bitmap&Activity          |               |
-|             | Memory Churn      |                      |  APKsize                  |    +----------+
+|             | Memory Churn      |    dumpsys meminfo   |  APKsize                  |    +----------+
 +-----------------------------+---+-------------------------------------------------------+ network& |
 |  battery    | wakelock time |                          |   Doze /standby           |    | secure   |
 |             | gps time      |        battery-historian |   jobscheduler API        |    +----------+
@@ -2056,6 +2052,18 @@ Glide
 |             |   https       |   smali                  |                           |               |
 |             |               |   (reverse engineering)  |                           |   FDex2       |
 +-------------+---------------+--------------------------+---------------------------+---------------+
++-------------+-----------------------+
+|             network                 |
++-------------+-----------------------+
+|   fast      |  compress data/charge |
++-------------------------------------+
+| v60ms GOOD  | compress image        |
+|             | serialize data        |
+| <200ms OK   |                       |
+|             | cache                 |
+| other BAD   | jms                   |
++-------------+-----------------------+
+
 
 [smali](https://blog.csdn.net/linchaolong/article/details/51146492)
 ```
@@ -2067,26 +2075,28 @@ Glide
 
 [Android 内存泄漏](https://android.jlelse.eu/9-ways-to-avoid-memory-leaks-in-android-b6d81648e35e)
 ```
-+---------------------+
-| memory leaks        |
-+---------------------+
-| unrelease           |
-+---------------------+
-| static Fields       |
-| (View,Context)      |
-|                     |
-| Inner Classes       |
-| That Reference      |
-| Outer Classes       |
-| (Async Handler)     |
-| (WeakReference view)|
-|                     |
-| ThreadLocals        |
-|                     |
-| Unclosed Resources  |
-|(unregisterReceiver) |
-|                     |
-+---------------------+
++-----------------------------------+
+| memory leaks                      |
++-----------------------------------+
+| unrelease                         |
++-----------------------------------+
+| static Fields                     |
+| (View,Context)                    |
+|                                   |
+| Inner Classes                     |
+| That Reference                    |
+| Outer Classes/LongLifecycle       |
+| (Async Handler)                   |
+| (WeakReference view)              |
+|                                   |
+| ThreadLocals                      |
+|                                   |
+| Unclosed Resources                |
+|(unregisterReceiver)               |
+|                                   |
++-----------------------------------+
+
+
 
 ```
 >《Android开发艺术探索》
@@ -2175,7 +2185,54 @@ LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有�
 
 
 ```sh
-adb shell dumpsys meminfo  com.ww.roxiesample
+>adb shell dumpsys meminfo edu.ptu.java.kotlinbase
+Applications Memory Usage (kB):
+Uptime: 53403267 Realtime: 53403267
+
+** MEMINFO in pid 32724 [edu.ptu.java.kotlinbase] **
+                   Pss  Private  Private  Swapped     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------
+  Native Heap        0        0        0        0    15616    14393     1222
+  Dalvik Heap     2908     2416        0        0    13722     9283     4439
+ Dalvik Other      680      532        0        0
+        Stack      260      260        0        0
+       Ashmem        2        0        0        0
+    Other dev        4        0        4        0
+     .so mmap     3713      340      924        0
+    .apk mmap      972        0       88        0
+    .ttf mmap      164        0      132        0
+    .dex mmap     3259        4     2652        0
+    .oat mmap     2602        0      520        0
+    .art mmap     1016      680        4        0
+   Other mmap       39        8        0        0
+      Unknown     3795     3612        0        0
+        TOTAL    19414     7852     4324        0    29338    23676     5661
+
+ App Summary
+                       Pss(KB)
+                        ------
+           Java Heap:     3100
+         Native Heap:        0
+                Code:     4660
+               Stack:      260
+            Graphics:        0
+       Private Other:     4156
+              System:     7238
+
+               TOTAL:    19414      TOTAL SWAP (KB):        0
+
+ Objects
+               Views:       18         ViewRootImpl:        1
+         AppContexts:        3           Activities:        1
+              Assets:        2        AssetManagers:        2
+       Local Binders:        9        Proxy Binders:       13
+       Parcel memory:        3         Parcel count:       12
+    Death Recipients:        0      OpenSSL Sockets:        0
+
+ SQL
+         MEMORY_USED:        0
+  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
 ```
 #### 包大小
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)

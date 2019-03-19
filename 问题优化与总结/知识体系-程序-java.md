@@ -11,15 +11,15 @@
 +--------------------------------------------------------------------------------------------------------------+
 |  test            |                                                                                           |
 +--------------------------------------------------------------------------------------------------------------+
-|  API /SDK        |       lang,util,io,math,net,text,sql,security,awt/swing,xml,time                          |
+|  API /SDK        |       lang,util,io,net,text,math,sql,security,awt/swing,xml,time                          |
 +--------------------------------------------------------------------------------------------------------------+
-|                  |        lang     util        io/nio           net      sql                                 |
+|                  |        lang             util        io/nio           net      sql                         |
 |                  +-------------------------------------------------------------------------------------------+
-|  comunicate      |       String    List      Serializable                        C&C++                       |
-|                  |       Thread  concurrent    File             Socket    db                                 |
+|  comunicate      |       String           List      Serializable                               C&C++         |
+|                  | Thread/ThreadLocal  concurrent    File             Socket     db                          |
 |                  |  Reflect/Annotation                                                                       |
 +------------------+------------------------+------------+---------+-----------+-------+-----------------------+
-|Class+based|concurrency|Aspect|            |            |         |           |       |                       |
+|Class-based|concurrency|Aspect|            |            |         |           |       |                       |
 | Log/Date  |           |      |            |            |         |           |       |                       |
 +-----------+-----------+------+------+     |            |         |Annotation |       |                       |
 |        oop                          | pop | Functional | FRP     |Reflecti^e |Generic|                       |
@@ -32,6 +32,7 @@
 |  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   oops/.. | |            |             |          |
 |  comment                | memory|        1(10),""(Str)   |  decision | |            |             | other    |
 |  separator sign(;)      |       |      0x1(16),[](Arr)   |  Data Type| |            |             | symbol/  |
++                         +       +              ADT       +           + +            |             | token    |
 +---------------------------------+------------------------------------+-+            |             | token    |
 |     separator           |  Literals                      |  keywords   |  Operators | Identifiers |          |
 +-------------------------+--------------------------------+-------------+------------+-------------+----------+
@@ -411,7 +412,7 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 ```
 JVM
 |--------------------------------------------------------------------+    +-------------------------------------------------+
-| heap:  memory allocation a|d garbage collection                    |    |  Thread                                         |
+| heap:  memory allocation and garbage collection                    |    |  Thread                                         |
 +--------------------------------------------------------------------+    | +--------------+ +-------------+                |
 | Structure of JVM          | Run-Time Data Areas                    |    | | Native Method| |  Program    |                |
 |                           |                                     +-----> | | Stacks       | |  Couter     |                |
@@ -425,8 +426,8 @@ JVM
 |Complete   | linking       | Preparation  |                         |    | |                 |   Frame Data   |        | | |
 |           |               +--------------+                         |    | |                 |                |        | | |
 |           |               | Verification |                         |    | |                 |                |        | | |
-|           +--------------------------------------------------------+    | |                 +-------------------------+ | |
-|           | loaders       |  ClassLoader | Application ClassLoader |    | +---------------------------------------------+ |
+|lifetime of+--------------------------------------------------------+    | |                 +-------------------------+ | |
+|class      | loaders       |  ClassLoader | Application ClassLoader |    | +---------------------------------------------+ |
 |           |               |              | Extension ClassLoader   |    +-------------------------------------------------+
 |           |               |              | BootstrapClassLoader    |    | +-------------+     +-------------------------+ |
 +-----------+------------------------------+-------------------------+    | | Heap        |     |Method Area              | |
@@ -442,13 +443,19 @@ JVM
 
 
 ```
+#### 编译
+ 常量传播(constant propagation) 常量折叠(constant folding)
+
+
+[《Compilers-Principles, Techniques, & Tools》, Second Edition  # 9.4 Constant Propagation ](https://www.slideshare.net/kitocheng/ss-42438227)
+
 
 #### 加载，连接（校验，准备，解析），初始化
-1.加载：查找并加载Class文件。
+1.加载：查找并加载Class文件。(五种主动加载)
 2.链接：验证、准备、以及解析。
   验证：确保被导入类型的正确性。
   准备：为类的静态字段分配字段，并用默认值初始化这些字段。（heap开辟空间）
-  解析：根据运行时常量池的符号引用来动态决定具体值得过程。
+  解析：根据运行时常量池的符号引用来动态决定具体值得过程。（查找接口，父类，其他符号）
 3.初始化：将类变量初始化为正确初始值。
 ```java
 dx --dex --output=Hello.dex Hello.class
@@ -778,6 +785,9 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 [oops](https://www.javatpoint.com/java-oops-concepts)
 ```
 ---------+---------------------------------------------------------------------------------+
+|        |  Design patterns    | SOLID and GRASP guidelines                                |
+|        |(cohesion & coupling)|  Gof                                                       |
+|        +---------------------------------------------------------------------------------+
 |        |  reference variable| this                                                       |
 |        +---------------------------------------------------------------------------------+
 |        | (memory management)| Variable Method  Block Nested class                        |
@@ -804,7 +814,9 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 |        |                 |                              |Constructors |Parameterized |   |
 |        |                 | Nested class and interface   +----------------------------+   |
 |        +-----------------+---------------------------------------------------------------+
-|        |  Object                                                                         |
+|        |  Object  (data and functions)                                                   |
++--------+---------------------------------------------------------------------------------+
+| ooad   |                                                                                 |
 +--------+---------------------------------------------------------------------------------+
 
 ```
@@ -1262,8 +1274,14 @@ Charset#availableCharsets():SortedMap
 
 
 ### 数据类结构 - 类实现面向对象与设计模式
- 五大基本原则：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
+三特性， 基于内聚与藕合(cohesion & coupling)五大基本原则(SOLID )：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
+23设计模式
 ```
+
+                                                               association   
+                                                               aggregation  
+                             inheritance                       composition
+    encapsulation            polymorphism                      dependencies
 +----------------------+----------------------------------+---------------------------------------+
 |                      |                                  | Visitor                               |
 |                      |                                  |                                       |
@@ -1331,6 +1349,7 @@ Charset#availableCharsets():SortedMap
   - 中介者模式
     Binder机制
  #### 性能（异常，断言，日志）
+ 《Efficiency Java》
 [java memory leaks](https://www.baeldung.com/java-memory-leaks)
 ```
 +-----------------------------------------------------+
@@ -1512,20 +1531,21 @@ Rxjava实现
 
 ### 并发底层实现
 ```
-+----------+-----------------+------------------------------------------------------------------------------------------+
-|          |     CAS         |                                           AQS                                            |
-|          +----------------------------------------+------------------+------------------------+-----------------------+
-|          | AtomicInteger   |  ReentrantLock       |  Condition       |   CountDownLatch       |   ArrayBlockingQueue  |
-|          |                 |(Exclusive,optimistic)|                  |   CyclicBarrier        |                       |
-| volatile |                 |ReentrantReadWriteLock|                  |   Semaphore,Exchanger  |   LinkedBlockingQueue |
-|          |                 |(shared Read)         |                  |                        |                       |
-|          |                 |StampedLock           |                  |                        |   Fork/Join           |
-+----------+------------------------------------------------------------------------------------------------------------+
-|                            |                      |                  |                        |                       |
-| Object                     |    synchronized      |  Object.wait()   |                        |                       |
-|                            | (Reentrant,unfair)   |  Object.notify() |                        |                       |
-|                            | (Exclusive,pessimism)|                  |                        |                       |
-+----------------------------+----------------------+------------------+------------------------+-----------------------+
++-------------+--------------+------------------------------------------------------------------------------------------+
+|             |              |                      |                  |                        |                       |
+| Object      |  DCL problem |    synchronized      |  Object.wait()   |                        |                       |
+|             |              | (Reentrant,unfair)   |  Object.notify() |                        |                       |
+|             |              | (Exclusi^e,pessimism)|                  |                        |                       |
++-------------+--------------+-----------------------------------------+------------------------+-----------------------+
+|             |     CAS      |                                           AQS                                            |
+|             +-------------------------------------+------------------+------------------------+-----------------------+
+|             | AtomicInteger|  ReentrantLock       |  Condition       |   CountDownLatch       |   ArrayBlockingQueue  |
+| volatile    |              |(Exclusive,optimistic)|                  |   CyclicBarrier        |                       |
+|             |              |ReentrantReadWriteLock|                  |   Semaphore,Exchanger  |   LinkedBlockingQueue |
+|             |              |(shared Read)         |                  |                        |                       |
+|             |              |StampedLock           |                  |                        |   Fork/Join           |
++-----------------------------------------------------------------------------------------------------------------------+
+
 
 ```
 
@@ -2471,229 +2491,8 @@ SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加�
 见[知识总结-im篇](./知识体系-im.md)
 ### RPC
 
-##### 基础
-欧拉公式、费马小定理、中国剩余定理，可以说是三大加密算法的基础
-
-三大公钥加密算法（RSA、离散对数、椭圆曲线）都依赖数论与群论的知识
-
-常见 MD5,DES,RSA 算法
-#### SSL/TLS
-
-**Content Type**指示SSL通信处于哪个阶段，分为 ：握手(Handshake)，开始加密传输(ChangeCipherSpec)，正常通信(Application)，（EncryptedAlert）四种
-
-**version** 
-0: SSL 3.0，
-1: TLS 1.0，
-2: TLS 1.1,
-3: TLS 2.1
-
-**handshanke** ：当**Content Type**为握手阶段的标识，有以下几个过程
-```
-0 HelloRequest
-1 ClientHello
-2 ServerHello
-11 Certificate
-12 ServerKeyExchange
-13 CertificateRequest
-14 ServerHelloDone
-15 CertificateVerify
-16 ClientKeyExchange
-20 Finished
-```
-
-**Cipher Suit**分为 四部分
-```
-密钥交换算法，用于决定客户端与服务器之间在握手的过程中如何认证，用到的算法包括RSA，Diffie-Hellman，ECDH，PSK等，非对称加密算法主要用于 交换对称加密算法的密钥，而非数据交换
-加密算法，用于加密消息流，该名称后通常会带有两个数字，分别表示密钥的长度和初始向量的长度，比如DES 56/56, RC2 56/128, RC4 128/128, AES 128/128, AES 256/256
-报文认证信息码（MAC）算法，用于创建报文摘要，确保消息的完整性（没有被篡改），算法包括MD5，SHA，SHA256等。
-PRF（伪随机数函数），用于生成“master secret”。
-
-```
-
-例如：TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA
-
-```
-基于TLS协议的；
-使用ECDHE、RSA作为密钥交换算法；
-加密算法是AES（密钥和初始向量的长度都是256）；
-MAC算法（这里就是哈希算法）是SHA。
-``` 
-[密钥协商类型一，RSA](https://blog.csdn.net/andylau00j/article/details/54583769)
-[RSA 证明过程](https://www.di-mgt.com.au/rsa_theory.html)
-[RSA key生成过程 RSAKeyPairGenerator](openjdk/jdk/src/share/classes/sun/security/rsa/RSAKeyPairGenerator.java)介绍 n,p,q（p > q）,φ(n),e（RSAKeyGenParameterSpec.F4=65537）,d的胜场
-
-```
-public KeyPair generateKeyPair() {
-        // accommodate odd key sizes in case anybody wants to use them
-        int lp = (keySize + 1) >> 1;
-        int lq = keySize - lp;
-        if (random == null) {
-            random = JCAUtil.getSecureRandom();
-        }
-        BigInteger e = publicExponent;
-        while (true) {
-            // generate two random primes of size lp/lq
-            BigInteger p = BigInteger.probablePrime(lp, random);
-            BigInteger q, n;
-            do {
-                q = BigInteger.probablePrime(lq, random);
-                // convention is for p > q
-                if (p.compareTo(q) < 0) {
-                    BigInteger tmp = p;
-                    p = q;
-                    q = tmp;
-                }
-                // modulus n = p * q
-                n = p.multiply(q);
-                // even with correctly sized p and q, there is a chance that
-                // n will be one bit short. re-generate the smaller prime if so
-            } while (n.bitLength() < keySize);
-
-            // phi = (p - 1) * (q - 1) must be relative prime to e
-            // otherwise RSA just won't work ;-)
-            BigInteger p1 = p.subtract(BigInteger.ONE);
-            BigInteger q1 = q.subtract(BigInteger.ONE);
-            BigInteger phi = p1.multiply(q1);
-            // generate new p and q until they work. typically
-            // the first try will succeed when using F4
-            if (e.gcd(phi).equals(BigInteger.ONE) == false) {//不是互质，重新找p,q
-                continue;
-            }
-
-            // private exponent d is the inverse of e mod phi
-            BigInteger d = e.modInverse(phi);  //e*d 与phi欧拉函数互质
-
-            // 1st prime exponent pe = d mod (p - 1)
-            BigInteger pe = d.mod(p1);
-            // 2nd prime exponent qe = d mod (q - 1)
-            BigInteger qe = d.mod(q1);
-
-            // crt coefficient coeff is the inverse of q mod p
-            BigInteger coeff = q.modInverse(p);
-
-            try {
-                PublicKey publicKey = new RSAPublicKeyImpl(n, e);
-                PrivateKey privateKey =
-                        new RSAPrivateCrtKeyImpl(n, e, d, p, q, pe, qe, coeff);
-                return new KeyPair(publicKey, privateKey);
-            } catch (InvalidKeyException exc) {
-                // invalid key exception only thrown for keys < 512 bit,
-                // will not happen here
-                throw new RuntimeException(exc);
-            }
-        }
-    }
-
-```
-
-```
-1. 客户端连上服务端
-2. 服务端发送 CA 证书给客户端
-3. 客户端验证该证书的可靠性
-4. 客户端从 CA 证书中取出公钥
-5. 客户端生成一个随机密钥 k，并用这个公钥加密得到 k'
-6. 客户端把 k' 发送给服务端
-7. 服务端收到 k' 后用自己的私钥解密得到 k
-8. 此时双方都得到了密钥 k，协商完成。
-```
-
-密钥协商类型二，hm（离散对数问题）
-```
-1. 客户端先连上服务端
-2. 服务端生成一个随机数 y1 作为自己的私钥，然后根据算法参数计算出公钥 b1（算法参数通常是固定的）
-3. 服务端使用某种签名算法把“算法参数（模数p，基数g）和服务端公钥b1”作为一个整体进行签名
-4. 服务端把“算法参数（模数p，基数a）、服务端公钥b1、签名”发送给客户端
-5. 客户端收到后验证签名是否有效
-6. 客户端生成一个随机数 y2 作为自己的私钥，然后根据算法参数计算出公钥 b2
-7. 客户端把 b2 发送给服务端
-8. 客户端和服务端（根据上述 DH 算法）各自计算出 k 作为会话密钥
 
 
-定义（数论中同余，指数，原根等概念）：
-a^y1≡b1 (mod p)
-a^y2≡b2 (mod p)
-
-计算：
-K=(b2)^y1 mod p
-或
-K=(b1)^y2 mod p
-```
-密钥协商类型三，ECDH（ 依赖的是——求解“椭圆曲线离散对数问题”的困难。）
-密钥协商类型四，PSK 
-```
-　　在通讯【之前】，通讯双方已经预先部署了若干个共享的密钥。
-　　为了标识多个密钥，给每一个密钥定义一个唯一的 ID
-　　协商的过程很简单：客户端把自己选好的密钥的 ID 告诉服务端。
-　　如果服务端在自己的密钥池子中找到这个 ID，就用对应的密钥与客户端通讯；否则就报错并中断连接。
-```
-密钥协商类型五，SRP 
-```
- client/server 双方共享的是比较人性化的密码（password）而不是密钥（key）。该算法采用了一些机制（盐/salt、随机数）来防范“嗅探/sniffer”或“字典猜解攻击”或“重放攻击”。
-```
-[SSL/TLS 协议报文](https://www.cnblogs.com/findumars/p/5929775.html)
-```
-+---------------------------------------------------------------+
-|                    APPLICATION PROTOCOL                       |
-+-----------------+----------------------+----------------------+
-|  SSL HandSHARK  |SSL Change Cipher Spec|   SSL Alert Protocol |
-+-----------------+----------------------+----------------------+
-|                      SSL RECORD（封装SSL/TLS握手协议或http数据）|
-+---------------------------------------------------------------+
-|                      TCP                                      |
-+---------------------------------------------------------------+
-|                      IP                                       |
-+---------------------------------------------------------------+
-
-```
-
-```
-             +------------+                            +------------+
-             |            |                            |            |
-             |   Client   |                            |   Ser^er   |
-             |            |                            |            |
-             +-----+------+                            +------+-----+
-                   |                                          |
-                   |             Client Hello                 +
-                   |            （Support CipSuites,Client RN）+
-                   |    +---------------------------------->  +
-                   |                                          |
-                   |                                          |
-                   |                                          | Choose CipherSuites
-                   |                                          |
-                   |             Server Hello                 | (Ser^er RN,Choosed chip)
-                   |                                          |
-                   |                                          |
-                   |             Certificate                  | (CA and Key Exchange Pubkey)
-                   |             Server Key Exchange          | (encrypted Pubkey,Signature Hash key)
-                   |                                          |
-                   |             Server Hello DONE            |
-                   |    <---------------------------------+   |
-                   |                                          |
-Client RN,Server RN|                                          |
-to generate        |                                          |
-premaster secret   |                                          |
-                   | (premaster secret,Signature Hash key)    |
-                   |             Client Key Exchange          |
-                   |    +--------------------------------->   |
-msg Pubkey=        |               ChangeCipherSpec           |(notify use encrypted meg)
-Client RN          |              encrypted handshake msg     |
-+Server RN         |                                          |
-+premaster secret  |                                          |
-                   |                                          |
-                   |                                          |
-                   |                                          |
-                   |   <---------------------------------+    |
-                   |            ChangeCipherSpec              |
-                   |            encrypted handshake msg       |
-                   |                                          |
-                   |                                          |
-                   |                                          |
-                   +                                          +
-
-
-
-
-```
 
 ## 7 操作系统
 参考 Brian Ward,《How Linux works - what every superuser should know》[M].No Starch Press(2014)

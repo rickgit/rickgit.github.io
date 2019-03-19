@@ -587,3 +587,5 @@ c++11有了标准的线程库
 ## 网络数据
 
 CGI
+
+## [内存泄漏](https://blog.nelhage.com/post/three-kinds-of-leaks/)

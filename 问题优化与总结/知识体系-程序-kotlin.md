@@ -5,7 +5,7 @@
 |                            ReadWrite Object(String,Serializable)/File/Socket/db                    |
 +-------------------------------------------+------------+---------+-----------+-------+-------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |             |
-|           |           |      |            |            |         |           |       |             |
+|           |Async      |      |            |            |         |           |       |             |
 +-----------+-----------+------+            |            |         |           |       |             |
 |                    oop                    | Functional | FRP     |Reflective |Generic|             |
 +------------------------------+------+------------------------------------------------|             |      
@@ -262,6 +262,14 @@ Any?可空类型。Any?是Any的超集，Any?是整个类型体系的顶部，No
 ## 数据集合
 Collections: List, Set, Map
 
+
+## 异步
+
+Threading
+Callbacks
+Futures, Promises et al.
+Reactive Extensions 响应式拓展
+Coroutines 协程
 
 ## 数据并发
 ## 声明式编程-函数编程范式
