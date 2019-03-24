@@ -2057,7 +2057,7 @@ Glide
 +-------------+-----------------------+
 |   fast      |  compress data/charge |
 +-------------------------------------+
-| v60ms GOOD  | compress image        |
+| <60ms GOOD  | compress image        |
 |             | serialize data        |
 | <200ms OK   |                       |
 |             | cache                 |
