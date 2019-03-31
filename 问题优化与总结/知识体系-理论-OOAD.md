@@ -14,7 +14,7 @@
                                              object+oriented
                                                     ^
                                                     |
-                                                    +                  relation
+                                                    +                  aggregation
                                                  abstract +----> Type --------> inheritance +----> polymorphism
                                                     ^
                                                     |

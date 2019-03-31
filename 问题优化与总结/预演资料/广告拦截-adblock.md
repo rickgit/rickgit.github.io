@@ -9,10 +9,29 @@
 Consider using CMake or ndk-build integration. For more information, go to:
 
 ```
+//依赖环境
+sudo apt-get install p7zip-full
+ 
 update-alternatives --install /usr/bin/python python /usr/bin/python2.7 2
 
 
+//必须下载对应操作系统的NDK
+https://developer.android.com/ndk/downloads/older_releases.html?hl=zh-cn#ndk-16b-downloads
 export PATH=/home/anshu/workspace/ws-adblock/android-ndk-r16b:$PATH
+
+
+./ensure_dependencies.py
+
+
+//编译
+//下载对应环境的v8头文件及静态库
+make TARGET_OS=android ABP_TARGET_ARCH=arm Configuration=release get-prebuilt-v8
+make TARGET_OS=android ABP_TARGET_ARCH=ia32 Configuration=release get-prebuilt-v8
+
+//
+make TARGET_OS=android ABP_TARGET_ARCH=arm Configuration=release
+make TARGET_OS=android ABP_TARGET_ARCH=ia32 Configuration=release
+
 ```
 
 v8支持库下载
@@ -38,19 +57,16 @@ v8支持库下载
 |  Platform     FilterEngine  LogSystem   FileSystem   WebRequest | AdblockWebView |          |
 |                                                                 |                |          |
 +-----------------------------------------------------------------+----------------+----------+
-|                                                                                             |
 |                          AdblockEngine                                                      |
-|                                                                                             |
 +---------------------------------------------------------------------------------------------+
 |                         adblockplus                                                         |
-|                                                                                             |
 +---------------------------------------------------------------------------------------------+
-|                                                                                             |
 |                           v8                                                                |
-|                                                                                             |
 +---------------------------------------------------------------------------------------------+
 
 
+api
+https://adblockplus.org/jsdoc/adblockpluscore/elemHide.js.html
 ```
 
 加载规则路径
@@ -91,6 +107,199 @@ errors=1
 ```
 
 
+```
++-----------------------+
+|    AdblockHelper      |                      +------------------------+
++-----------------------+   <------------------+ SingleInsEngineProvider|
+|SingleInsEngineProvider|                      +------------------------+                                +---------------------------------+
+|                       |                      |   AdblockEngine        | <-------------+                |          JAVA                   |
+|                       |                      |                        |               |                |                                 |
+|                       |                      |                        |               |                +---------------------------------+
++-----------------------+                      |                        |               |                |          JNI                    |
+                                               |                        |               |                |                                 |
+                                               +-------+----------------+               |                +---------------------------------+
+                                                       ^                                |                |                                 |
+                                                       |                                |                |                                 |
+                                                       |                                |                |                                 |
+                          +----------------------------+                                |                |                                 |
+                          |                                                             |                |                                 |
+                          |                          +------------------------+         |                |                                 |
+                          |                          |     AdblockEngine      |  +------+                +---------------------------------+
+                          |                          +------------------------+
+                          |                          | WebRequest             |
+                          |                          | LogSystem              |
+                          |                          | FileSystem             |
++----------------------+  |                          | Platform               |
+|     AdblockWebView   |  |                 +------> | FilterEngine           |  +-----------+
++----------------------+  |                 |        |                        |              |
+|  ElemHideThread      |  |                 |        +------------------------+              |        +-------------------+
+|AdblockEngineProvider +--+                 |                                                +----->  |  FilterEngine.cpp |
+|  WebViewClient       |                    |                                                         +-------------------+
+|                      |        +----+ ElemH+deThread  <-------------+                                | libadblockplus    |
++----------------------+        +                                    |                                |    /lib/*.js      |
+|@JavascriptInterface  |  CountDownLatch.countDown()                 |                                +-------------------+
+|getElemhideSelectors()|        |                         +----------+-------------+                  | adblockpluscore   |
++----------------------+  <-----v-------------------------+ CountDownLatch.await() +<--------+        |    /lib/*.js      |
+                                                          +------------------------+         |        |                   |
+                                                                                             |        +-------------------+
++-------------------+                                                                        |
+|   WebChromeClient |    +-----------------------+                                           |
++-------------------+    |AdblockWebViewClient   |                                           |
+|onProgressChanged()|    +-----------------------+         +-------------------+          +--+------------+
+|                   |    |   onPageStarted()     | +-----> |   inject.js       | +------> |  css.js       |
+|                   |    |shouldInterceptRequest()         +-------------------+          +---------------+
++-------------------+    |                       |
+                         |                       |
+                         +-----------------------+
+
+
+```
+
+
+```
+onProgressChanged
+       FilterEngine#getElementHidingSelectors
+            ------> elemHide.js#getSelectorsForDomain
+
+shouldInterceptRequest (block <iframe>)
+       FilterEngine#matches
+            ------> matcher.js#matchesAny
+                                blacklist
+                                whitelist
+
+
+AndroidWebRequest#GET
+            synchronizer.js
+
+                      +----------------+
+                      |  Subscription  |
+                      +----------------+
+                      | url            |
+                      | type           |
+                      | filters:[]     |
+                      | _title         |
+                      | _fixedTitle    |
+                      | _disabled:false|
+                      |                |
+                      +----------------+
+
+
+prefs.js 偏好设置文件
+```
+
+
+```
+https://easylist-downloads.adblockplus.org/easylistchina+easylist.txt
+
+白名单（有问题，加载完应用会闪退）
+https://easylist-downloads.adblockplus.org/exceptionrules.txt
+ [Adblock Plus 2.0]
+    ! Checksum: fPAP6CiW0rRHYnKgbqcpdw
+    ! Version: 201903260841
+    ! Title: EasyList China+EasyList
+    ! Last modified: 26 Mar 2019 08:41 UTC
+    ! Expires: 1 days (update frequency)
+    ! Homepage: http://abpchina.org/forum/
+    !
+    ! EasyList China and EasyList combination subscription
+    !
+    ! *** easylistchina:easylistchina.txt ***
+    ! Chinese supplement for the EasyList filters
+    ! License: https://easylist-downloads.adblockplus.org/COPYING
+    !
+    ! Please report any unblocked adverts or problems
+    ! in the forums (http://abpchina.org/forum/)
+    ! or via e-mail (easylist.china@gmail.com).
+    !
+    !-----------------------General advert blocking filters-----------------------!
+    -1688-wp-media/ads/
+    -880-80-4.jpg
+
+
+
+```
+
+### 过滤规则（elehide.js）
+
+[过滤规则](https://adblockplus.org/zh_TW/filters#basic)
+
+概念：
+[PSL（Public Suffix List，公共后缀列表）](https://publicsuffix.org/list/public_suffix_list.dat)
+利用 **WebStorm** 阅读JS代码
+```
+startup入口：
+notification.js#init()
+
+filterListener.js#init()
+
+
+synchronizer.js//同步下载的规则文本
+
+
+elemHide.js //过滤业务
+
+filtersByDomain: [domain,[filter,isIncluded]]
+
+filterBySelector
+
+knownFilters
+
+
+
+filterClasses.js //规则文本转化为Filter对象
+Filter.fromText
+
+
+            +----------------------------+
+            |                #Filter     |
+            +----------------------------+
+            |domains:{[domain,isInclude]}|
+            |                            |
+            |                            |
+            |                            |
+            +----------------------------+
+
+
++-------------------------------------------------+
+|elemHide.js                                      |
++-------------------------------------------------+
+|                                                 |
+|filtersByDomain:Map.<string,Map.<Filter,boolean> |
+|                                                 |
+|filterBySelector:Map.<string,Filter>             |
+|                                                 |
+|unconditionalSelectors:?string[]                 |
+|                                                 |
+|defaultDomains:Map.<string,boolean>              |
+|                                                 |
+|knownFilters:Set.<ElemHideFilter>                |
+|                                                 |
++-------------------------------------------------+
+
+                                                        Filter
+                                                           ^
+                                                           |
+                                     +---------------------+-----------------+
+                                   ActiveFilter       InvalidFilter   1.CommentFilter
+                                      ^
+                  +-------------------+----------+
+            RegExpFilter                      ContentFilter
+                                                       ^
+                 ^                             +-------+---------------------------+
+      +----------+-----+                ElemHideBase                             SnippetFilter
+BlockingFilter    WhitelistFilter
+                                              ^
+                                              |
+                             +----------------+--------------------+
+                        ElemHideFilter   ElemHideException   ElemHideEmulationFilter
+
+```
+
+### 存在问题
+1. 白名单使用不了
+2. 线程同步，需要先下载规则，如果出问题，可能导致页面显示不出来
+
+
 ## 本地实现项目 AdBlock_Android
 
 ```
@@ -100,4 +309,17 @@ gitee账号： anshu.wang@qq.com
 ```
 
 shouldInterceptRequest
+```
+
+
+### DevTools 调试（需要代理访问）
+
+```
+git clone https://git.coding.net/scaffrey/hosts.git
+
+
+chrome://inspect/#devices
+
+
+file:///android_asset/testRule.html
 ```
