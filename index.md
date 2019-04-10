@@ -1,6 +1,9 @@
 ﻿ <h1>技术文章分享</h1>
 
 <p>博客</p>
+<a href="https://github.com/rickgit/rickgit.github.io/blob/master/%E5%88%86%E4%BA%AB%E5%86%85%E5%AE%B9/2019%E5%B9%B43%E6%9C%8819%E6%97%A5-%E7%AE%80%E5%8E%86-Android%E9%AB%98%E7%BA%A7%E5%B7%A5%E7%A8%8B%E5%B8%88.pdf">简历</a><br/>
+
+<hr/>
 
 <a href="https://github.com/rickgit/rickgit.github.io/blob/master/问题优化与总结/知识体系-程序-java.md">程序-java</a><br/>
 <a href="https://github.com/rickgit/rickgit.github.io/blob/master/问题优化与总结/知识体系-程序-kotlin.md">程序-kotlin</a><br/>
