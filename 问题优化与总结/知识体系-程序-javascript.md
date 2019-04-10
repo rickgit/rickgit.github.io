@@ -183,6 +183,18 @@ Other Reserved Words(HTML and Window objects and properties)
 ```
 
 ```Regex
+
+
+$1、$2、...、$99	与 regexp 中的第 1 到第 99 个子表达式相匹配的文本。
+$&	与 regexp 相匹配的子串。
+$`	位于匹配子串左侧的文本。
+$'	位于匹配子串右侧的文本。
+$$	直接量符号。
+
+
+//g 相当于 Java的String.replaceAll
+
+
 +---------------+----------------------------------------------------------------------------------------------------------------------+
 |               |  exec() Returns the first match                                                                                      |
 |  methods      |  test() Returns true or false                                                                                        |
