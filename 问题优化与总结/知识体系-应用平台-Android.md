@@ -1039,49 +1039,17 @@ gc  标记为DELETED，key,Value替换为有值的数据。
 |              file      |              |
 +------------------------+--------------+
 ```
-```java
-final class SharedPreferencesImpl implements SharedPreferences {
-    private final File mFile;
-    private final File mBackupFile;
-    private final int mMode;
-    private final Object mLock = new Object();
-    private final Object mWritingToDiskLock = new Object();
-
-    @GuardedBy("mLock")
-    private Map<String, Object> mMap;
-    @GuardedBy("mLock")
-    private Throwable mThrowable;
-
-    @GuardedBy("mLock")
-    private int mDiskWritesInFlight = 0;
-
-    @GuardedBy("mLock")
-    private boolean mLoaded = false;
-
-    @GuardedBy("mLock")
-    private StructTimespec mStatTimestamp;
-
-    @GuardedBy("mLock")
-    private long mStatSize;
-
-    @GuardedBy("mLock")
-    private final WeakHashMap<OnSharedPreferenceChangeListener, Object> mListeners =
-            new WeakHashMap<OnSharedPreferenceChangeListener, Object>();
-
-    /** Current memory state (always increasing) */
-    @GuardedBy("this")
-    private long mCurrentMemoryStateGeneration;
-
-    /** Latest memory state that was committed to disk */
-    @GuardedBy("mWritingToDiskLock")
-    private long mDiskStateGeneration;
-
-    /** Time (and number of instances) of file-system sync requests */
-    @GuardedBy("mWritingToDiskLock")
-    private final ExponentiallyBucketedHistogram mSyncTimes = new ExponentiallyBucketedHistogram(16);
-    private int mNumSync = 0;
-}
 ```
+SQLiteOpenHelper
+
+getWritableDatabase()
+
+executeSQL()
+
+executeQuery()
+
+```
+ 
 #### RPC - Protocol Buffer
 #### OKIO
 Source（io InputStream）,Sink（io OutputStream）,Buffer（io BufferedInputStream,BufferedOutputStream）

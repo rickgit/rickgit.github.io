@@ -5,17 +5,17 @@
 ```
 +---------------------------+-----------------------------------+---------------------------+
 |                           |   Layers                          |                           |
-|pseudo-element pseudo-class|   Positioning                     |                           |
-|                           |   Visibility                      |                           |
+|pseudo-element             |   Positioning                     |                           |
+|pseudo-class               |   Visibility                      |                           |
 +-------------------------+-+---------------+-------------------+                           |
-| Type       Universal *  |                 |                   |                           |
-|                         |Scrollbars       |                   |                           |
-| Descendant Class .      |Dimension        |                   |                           |
-|                         |Outlines         |                   |                           |
-| ID #   Child >          |Paddings Cursors |                   |                           |
-|                         |Margins Lists    |                   |                           |
+| Adjacent sibling +      |                 |                   |                           |
+|  Universal *            |Scrollbars       |                   |                           |
+| Descendant(space)       |Dimension        |                   |                           |
+|  Child >                |Outlines         |                   |                           |
+|  Class .                |Paddings Cursors |                   |                           |
+| ID #                    |Margins Lists    |                   |                           |
 | Attribute [type = ""]   |Tables Borders   |                   |                           |
-|                         |Images Links     |                   |                           |
+| Type                    |Images Links     |                   |                           |
 | Grouping ,              |Fonts  Text      |  Unit  Colors     |                           |
 |                         |Colors background|                   |                           |
 +---------------------------------------------------------------+ @font-face !important     |

@@ -15,7 +15,10 @@ python 语言特性：动态强类型
 +--------------------------------------------------------------------------------------------------------------+
 |  test            |                                                                                           |
 +--------------------------------------------------------------------------------------------------------------+
-|  API /SDK        |       lang,util,io,net,text,math,sql,security,awt/swing,xml,time                          |
+|                  |       os          hashlib         re                                                      |
+|  API /MOdule     |       sys         logging                                                                  |
+|                  |       time        subprocess                                                                   |
+|                  |       datetime                                                                                |
 +--------------------------------------------------------------------------------------------------------------+
 |                  |                                                                                           |
 |                  +-------------------------------------------------------------------------------------------+
@@ -218,6 +221,51 @@ A                       56
 
 ```
 ## 数据类型 - 模块
++------------------------------------------------------------------------------------------------------------+
+|                                                                                                            |
+|                       Custom Python Interpreters                                                           |
+|                                                                                                            |
+|                                                                                                            |
+|                       Program Frameworks             Development Tools       Debugging and Profiling       |
+|                                                                                                            |
+|                       Graphical User Interfaces with Tk       Software Packaging and Distribution          |
+|                                                                                                            |
+|                                                                                                            |
+|                                                                                                            |
+|                       Networking and Interprocess Communication             Internet Data Handling         |
+|                                                                                                            |
+|                       Structured Markup Processing Tools           Internet Protocols and Support          |
+|                                                                                                            |
+|                       File and Directory Access         Data Persistence                                   |
+|                                                                                                            |
+|                       Data Compression and Archiving     File Formats                                      |
+|                                                                                                            |
+|                       Internationalization                                                                 |
+|                                                                                                            |
+|                                                                                                            |
+|                                                                                                            |
+|           Modules     Numeric and Mathematical           Functional Programming                            |
+|                                                                                                            |
+|                       Importing                     Superseded                                             |
+|                                                                                                            |
+|                       Data Types                 Undocumented                                              |
+|                                                                                                            |
+|                                                                                                            |
+|          Services     Text Processing    Binary Data        Cryptographic           Multimedia             |
+|                                                                                                            |
+|                       Generic Operating System    Concurrent Execution     Context Variables               |
+|                                                                                                            |
+|                        Python Runtime    Miscellaneous           Unix Specific                             |
+|                                                                                                            |
+|                       Python Language     MS Windows Specific                                              |
+|                                                                                                            |
+|                                                                                                            |
+|                                                                                                            |
+|          Built-in     Functions      Constants      Types      Exceptions                                  |
+|                                                                                                            |
+|                                                                                                            |
++------------------------------------------------------------------------------------------------------------+
+
 Python 模块(Module)，是一个 Python 文件，以 .py 结尾，包含了 Python 对象定义和Python语句。
 模块与路径
 ```python 
