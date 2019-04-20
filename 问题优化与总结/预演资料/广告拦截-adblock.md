@@ -63,7 +63,10 @@ v8支持库下载
 +---------------------------------------------------------------------------------------------+
 |                           v8                                                                |
 +---------------------------------------------------------------------------------------------+
-
+V8更加直接的将抽象语法树通过JIT技术转换成本地代码，
+放弃了在字节码阶段可以进行的一些性能优化，但保证了执行速度。
+在V8生成本地代码后，也会通过Profiler采集一些信息，来优化本地代码。
+虽然，少了生成字节码这一阶段的性能优化，但极大减少了转换时间。
 
 api
 https://adblockplus.org/jsdoc/adblockpluscore/elemHide.js.html
@@ -280,7 +283,7 @@ Filter.fromText
                                                            ^
                                                            |
                                      +---------------------+-----------------+
-                                   ActiveFilter       InvalidFilter   1.CommentFilter
+                                   ActiveFilter       InvalidFilter    CommentFilter
                                       ^
                   +-------------------+----------+
             RegExpFilter                      ContentFilter
@@ -293,6 +296,30 @@ BlockingFilter    WhitelistFilter
                              +----------------+--------------------+
                         ElemHideFilter   ElemHideException   ElemHideEmulationFilter
 
+CommentFilter:（包含!）   ! Checksum: Z5CwsZg8Z8oioygwsmTblA
+
+
+ElemHideFilter: （包含##）                         数据管理类：ElemHide：filtersByDomain，filterBySelector
+hk.yahoo.com###mntl1 
+hk.yahoo.com##li[class="js-stream-content Cf Pos-r RevealNested      "][data-uuid]:not([data-uuid*="-"])
+
+ElemHideException:（包含#@#）       数据管理类：ElemHideExceptions：exceptionsBySelector [selector,domain]
+ comicbookmovie.com#@#.skyscraperAd
+
+
+ElemHideEmulationFilter:（包含#?#）   
+aliexpress.com#?#.list-item:-abp-has(span.sponsored)   
+
+SnippetFilter: （包含#$#）  
+abpchina.org#$#log Hello
+
+
+BlockingFilter: 数据管理类：AdMatcher:filterByKey
+/adsfooter   
+||imagebam.com/image/  
+          
+WhitelistFilter:（包含@@）    数据管理类：AdMatcher:filterByKey
+@@|blob:$script,domain=dato.porn
 ```
 #### css 相邻兄弟选择器
 
