@@ -82,3 +82,6 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 
 
 抽象:所带来的问题（个性与共性问题，对象类型层次）
+- DRY《The Pragmatic Programmer》
+- YAGNI "极限编程"
+- Rule of three 《Refactoring》
