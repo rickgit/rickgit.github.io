@@ -54,21 +54,21 @@ CommentFilter:（注释文本，包含!）
 
 
 ElemHideFilter: （元素隐藏匹配规则，包含##）                         数据管理类：ElemHide#filtersByDomain，filterBySelector
-格式：主机名（可选）##CSS元素
+格式：主机名（可选）##CSS元素选择器
 hk.yahoo.com###mntl1 
 hk.yahoo.com##li[class="js-stream-content Cf Pos-r RevealNested      "][data-uuid]:not([data-uuid*="-"])
 
 ElemHideException:（可接受元素隐藏匹配规则，包含#@#）       数据管理类：ElemHideExceptions#exceptionsBySelector [selector,domain]
-格式：主机名（可选）#@#CSS元素
+格式：主机名（可选）#@#CSS元素选择器
 comicbookmovie.com#@#.skyscraperAd
 
 
 ElemHideEmulationFilter:（未使用，需调用js模板文件，包含#?#）
-格式：主机名（可选）#?#CSS元素
+格式：主机名（可选）#?#CSS元素选择器
 aliexpress.com#?#.list-item:-abp-has(span.sponsored)   
 
 SnippetFilter: （未使用，包含#$#）
-格式：主机名（可选）#$#CSS元素
+格式：主机名（可选）#$#CSS元素选择器
 abpchina.org#$#log Hello
 
 
