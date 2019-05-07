@@ -53,12 +53,12 @@ CommentFilter:（注释文本，包含!）
  ! Checksum: Z5CwsZg8Z8oioygwsmTblA
 
 
-ElemHideFilter: （元素隐藏过滤规则，包含##）                         数据管理类：ElemHide#filtersByDomain，filterBySelector
+ElemHideFilter: （元素隐藏匹配规则，包含##）                         数据管理类：ElemHide#filtersByDomain，filterBySelector
 格式：主机名（可选）##CSS元素
 hk.yahoo.com###mntl1 
 hk.yahoo.com##li[class="js-stream-content Cf Pos-r RevealNested      "][data-uuid]:not([data-uuid*="-"])
 
-ElemHideException:（可接受元素隐藏过滤规则，包含#@#）       数据管理类：ElemHideExceptions#exceptionsBySelector [selector,domain]
+ElemHideException:（可接受元素隐藏匹配规则，包含#@#）       数据管理类：ElemHideExceptions#exceptionsBySelector [selector,domain]
 格式：主机名（可选）#@#CSS元素
 comicbookmovie.com#@#.skyscraperAd
 
@@ -72,20 +72,20 @@ SnippetFilter: （未使用，包含#$#）
 abpchina.org#$#log Hello
 
 
-BlockingFilter: （广告链接过滤规则）数据管理类：AdMatcher:filterByKey
+BlockingFilter: （广告链接匹配规则）数据管理类：AdMatcher:filterByKey
 格式：部分URL（可能包含起始标识||,或结束标识^）$过滤类型（可选，包含‘contentType’，match-case,domain,third-party,collapse,sitekey,rewrite）；
 其中，‘contentType’可以是OTHER，SCRIPT，IMAGE，STYLESHEET，OBJECT，SUBDOCUMENT，DOCUMENT，WEBSOCKET，WEBRTC，CSP，XBL，PING，XMLHTTPREQUEST，OBJECT_SUBREQUEST，DTD，MEDIA，FONT，BACKGROUND，POPUP，GENERICBLOCK，ELEMHIDE，GENERICHIDE
 /adsfooter
 ||imagebam.com/image/  
 
-WhitelistFilter:（可接受广告链接的过滤规则，包含@@）    数据管理类：AdMatcher:filterByKey
+WhitelistFilter:（可接受广告链接的匹配规则，包含@@）    数据管理类：AdMatcher:filterByKey
 格式：@@部分URL）$过滤类型（可选，包含‘contentType’，match-case,domain,third-party,collapse,sitekey,rewrite）；
 其中，‘contentType’可以是OTHER，SCRIPT，IMAGE，STYLESHEET，OBJECT，SUBDOCUMENT，DOCUMENT，WEBSOCKET，WEBRTC，CSP，XBL，PING，XMLHTTPREQUEST，OBJECT_SUBREQUEST，DTD，MEDIA，FONT，BACKGROUND，POPUP，GENERICBLOCK，ELEMHIDE，GENERICHIDE
 @@|blob:$script,domain=dato.porn
 
 ```
 
-白名单配置
+白名单列表配置
 ```
 主机名
 如：h5.m.taobao.com，taobao.com
