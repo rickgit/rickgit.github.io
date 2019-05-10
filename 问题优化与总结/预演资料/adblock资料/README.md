@@ -43,6 +43,9 @@ GitHub上有 [Adblockplus 源代码](https://github.com/adblockplus)及对应的
 Adblock Plus 项目中代码主要的调用结构：
 ![Adblock拦截方方式及调用流程](./doc/Adblock拦截方法及流程.png)
 
+业务流程图
+![业务流程图](./doc/Adblock拦截流程图.png)
+
 Adblock Plus 广告拦截规则列表是以 TXT 文本文件存储，规则列表的每行文本被抽象为 **Filter** 对象及其子类。
 
 ![Filter类关系图](./doc/Adblockplus_Filter类关系图.png)
