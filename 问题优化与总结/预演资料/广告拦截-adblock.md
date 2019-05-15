@@ -363,3 +363,33 @@ chrome://inspect/#devices
 
 file:///android_asset/testRule.html
 ```
+
+
+## 网站测试
+ifeng 
+354 requests |107kb transferred | Finish 6.97s |DOMContentLoaded 5.13s| Load:6.58s
+
+每个请求 36.86ms
+
+tmall
+177 request | 1.5m transferred | Finish 1.2min | DOMContentLoaded 2.9s | Load 11.35s
+
+内存缓存 1500条数据，查询完，还要查询数据库，没必要，需要 7s
+去掉后，需要3s
+
+[布隆过滤](https://blog.csdn.net/xinzhongtianxia)
+
+
+DOM文档加载流程：
+
+解析HTML结构。
+加载外部脚本和样式表文件。
+解析并执行脚本代码。
+构造HTML DOM模型。// DOMContentLoaded 相当于jQuery中的ready
+加载图片等外部文件。
+页面加载完毕。// load
+
+[webchrome tools](https://developers.google.com/web/tools/chrome-devtools/network-performance/resource-loading#http)
+
+
+外部生成数据库 53s
