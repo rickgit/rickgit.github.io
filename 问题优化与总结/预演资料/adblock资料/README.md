@@ -1,4 +1,4 @@
-# AdBlock_Android(Adblock Plus实现)
+﻿# AdBlock_Android(Adblock Plus实现)
 
 #### 介绍
 [广告拦截 v1.0（文档）](./README_v1.md)
@@ -33,6 +33,9 @@
 ![图片来源https://github.com/fang5566/uBlock](./doc/Chromium广告屏蔽能力.png)
 
 [其他广告拦截性能对比](https://whotracks.me/blog/adblockers_performance_study.html)
+
+其中，Brave浏览器使用了 **It uses a bloom filter and Rabin-Karp algorithm to be super fast**，提高搜索速度
+
 
 [规则订阅文件介绍](http://www.jiangyiqun.cn/?p=2616)
 [规则订阅文件（英文）介绍](https://easylist.to/)
