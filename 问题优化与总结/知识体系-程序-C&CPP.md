@@ -492,9 +492,12 @@ type_info = dynamic_cast < type-id > ( expression)
 - typename:1.模板定义,2.使用嵌套依赖类型(nested depended name)
 
 ## 数据访问
-文件，内存，网络，数据库
+内存，文件，网络，数据库
+### 数据容器
+[Containers](http://www.cplusplus.com/reference/stl/)
 
 ### 标准IO
+[CPP IO 类图](http://www.cplusplus.com/reference/iolibrary/)
 - C 
 stdin 键盘 
 stdout 屏幕 
@@ -569,6 +572,8 @@ SIGTERM
 ```
 
 ## 数据并发 -多线程
+
+[多线程](http://www.cplusplus.com/reference/multithreading/)
 
 ```
 #include <pthread.h>

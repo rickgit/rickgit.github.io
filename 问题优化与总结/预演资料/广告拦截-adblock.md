@@ -327,6 +327,7 @@ WhitelistFilter:（包含@@）    数据管理类：AdMatcher:filterByKey
 ### 存在问题
 1. 白名单使用不了
 2. 线程同步，需要先下载规则，如果出问题，可能导致页面显示不出来
+3. js 存在 Uncaught TypeError: Identifier has already been de，把js文件放置一个(function(){   })()
 
 
 ### 优化速度
