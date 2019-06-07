@@ -182,7 +182,7 @@ Other Reserved Words(HTML and Window objects and properties)
 
 ```
 
-```Regex
+```js
 
 
 $1、$2、...、$99	与 regexp 中的第 1 到第 99 个子表达式相匹配的文本。
@@ -295,3 +295,5 @@ $$	直接量符号。
 ```
 
 ## 数据并发 
+
+### ES6 Promise 是异步编程

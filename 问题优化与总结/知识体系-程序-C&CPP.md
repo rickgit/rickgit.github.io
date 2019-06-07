@@ -506,11 +506,14 @@ stderr 您的屏幕
 - C++
 ```
 <iostream>
+处理控制台IO。
 该文件定义了 cin、cout、cerr 和 clog 对象，分别对应于标准输入流、标准输出流、非缓冲标准错误流和缓冲标准错误流。
 <iomanip>
 该文件通过所谓的参数化的流操纵器（比如 setw 和 setprecision），来声明对执行标准化 I/O 有用的服务。
 <fstream>
-该文件为用户控制的文件处理声明服务。我们将在文件和流的相关章节讨论它的细节。
+处理命名文件IO。
+<stringstream>
+内存string的IO。
 ```
 ### 文件和流
 C
@@ -594,3 +597,39 @@ c++11有了标准的线程库
 CGI
 
 ## [内存泄漏](https://blog.nelhage.com/post/three-kinds-of-leaks/)
+
+
+## 编译流程
+
+```
++----------+---------------------------------------------------------------------------------------------+
+|          |      GNU C Library (glibc): core C library including headers, libraries, and dynamic loader |
+|          |                                                                                             |
+|          |                                                                                             |
+|          |      GNU m4: an m4 macro processor                                                          |
+|          |                                                                                             |
+|          |      GNU Debugger (GDB)                                                                     |
+|          +---------------------------------------------------------------------------------------------+
+|   GNU    |   GNU Binutils:                                                                             |
+|          |       GNU profiler  gprof    addr2line   dlltool   nlmconv   objdump   size	  windmc     |
+|          |       linking         ld     ar          gold      nm        ranlib    strings   windres    |
+|toolchain |       GNU Assembler(as)      c++filt               objcopy   readelf   strip	             |
+|          +---------------------------------------------------------------------------------------------+
+|          |    GNU Compiler Collection (GCC)                                                            |
+|          +-------------+-------------------------------------------------------------------------------+
+|          |             | GNU Bison: a parser generator, often used with the Flex lexical analyser      |
+|          | Development |                                                                               |
+|          |             | GNU build system (autotools): Autoconf, Automake and Libtool                  |
+|          | tools       |                                                                               |
+|          |             | GNU make: an automation tool for compilation and build                        |
+|          |             |                                                                               |
++------------------------+-------------------------------------------------------------------------------+
+| Terminals|    mintty                                                                                   |
++--------------------------------------------------------------------------------------------------------+
+|  shell   |    Bash                                                                                     |
++----------+---------------------------------------------------------------------------------------------+
+
+
+[autotools介绍](https://www.jianshu.com/p/ff361db3e6d3)
+ 
+```
