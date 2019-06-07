@@ -228,6 +228,9 @@ https://easylist-downloads.adblockplus.org/exceptionrules.txt
 
 概念：
 [PSL（Public Suffix List，公共后缀列表）](https://publicsuffix.org/list/public_suffix_list.dat)
+[过滤规则符号语义解释](https://adblockplus.org/en/filter-cheatsheet)
+[编写规则](https://adblockplus.org/en/filters)
+
 利用 **WebStorm** 阅读JS代码
 ```
 startup入口：
@@ -314,7 +317,8 @@ SnippetFilter: （包含#$#）
 abpchina.org#$#log Hello
 
 
-BlockingFilter: 数据管理类：AdMatcher:filterByKey
+BlockingFilter:数据管理类：AdMatcher:filterByKey
+filter$options == Options 
 /adsfooter   
 ||imagebam.com/image/  
           
@@ -322,7 +326,8 @@ WhitelistFilter:（包含@@）    数据管理类：AdMatcher:filterByKey
 @@|blob:$script,domain=dato.porn
 ```
 #### css 相邻兄弟选择器
-
+[css 选择器](https://en.wikipedia.org/wiki/Comparison_of_browser_engines_(CSS_support))
+[UI Explorer工具](https://www.cnblogs.com/TeresaMu/p/9871718.html)
 
 ### 存在问题
 1. 白名单使用不了
@@ -394,3 +399,78 @@ DOM文档加载流程：
 
 
 外部生成数据库 53s
+
+
+## 其他屏蔽工具
+[Malware  致力于收集和整理在网络上各种零碎的恶意软体资料](https://malware.wikia.org/zh/wiki/Main_Page)
+
+
+[cliqz-oss/adblocker](https://github.com/cliqz-oss/adblocker.git)
+
+```
++--------------------------------------------------------+ 
+|                                                        |
++---------------------------+----------------------------+
+|          parsing          |     matching               |
++--------+------------------+----------------------------+
+|        |   miscFilters                                 |
+|      ^ |                                               |
+|      | |  networkFilters/ cosmeticsFilters             |
+|order | |                                               |
+|      | |   exceptions                                  |
+|      | |                                               |
+|      | |   redirects       : ($redirect=resource)      |
+|      + |                                               |
+|        |   importants     : (not subject to exceptions)|
++--------+-----------------------------------------------+
+|                                                        |
+|                   cliqz-adblocker                      |
++--------------------------------------------------------+
+
+
+```
+
+[ublock filter engine](https://github.com/gorhill/uBlock/wiki/Overview-of-uBlock's-network-filtering-engine)
+
+https://github.com/gorhill/adblocker
+
+```
++------------+----------------------------------------------------------------------------------------------------+
+|            |     assets.json                                                                                    |
+|            |     assets.js                                                                                      |
+|            +------------------------------+----------------------------------+----------------------------------+
+|            |                              |                                  |                                  |
+|            |                              |   htmlFilteringEngine            |                                  |
+|            |                              |   html-filtering.js              |                                  |
+|            |                              |                                  |                                  |
+|            |                              |   scriptletFilteringEngine       |                                  |
+|            |                              |   scriptlet-filtering.js         |                                  |
+| parsing/   |                              |                                  |                                  |
+| compile    |                              |                                  |                                  |
+|            |                              +---------------------------------------------------------------------+
+|            |                              |                                  |                                  |
+|            |                              |                                  | // low generic cosmetic filters  |
+|            |                              |                                  | lowlyGeneric.id.simple           |
+|            |                              |                                  | lowlyGeneric.id.complex          |
+|            |                              |                                  | lowlyGeneric.cl.simple           |
+|            |                              |                                  | lowlyGeneric.cl.comple           |
+|            |                              |                                  |                                  |
+|            |                              |                                  | / highly generic selectors sets  |
+|            |                              |                                  | highlyGeneric.simple.dict        |
+|            |                              |                                  | highlyGeneric.simple.str         |
+|            |                              |   cosmeticFilteringEngine        | highlyGeneric.simple.mru         |
+|            |                              |   cosmetic-filtering.js          | highlyGeneric.complex.dict       |
+|            |                              |                                  | highlyGeneric.complex.str        |
+|            |                              |                                  | highlyGeneric.complex.mru        |
+|            +-----------------------------------------------------------------+----------------------------------+
+|            |     staticNetFilteringEngine |  staticExtFilteringEngine                                           |
+|            |     static-net-filtering.js  |  static-ext-filtering.js                                            |
+|            |                              |                                                                     |
+|            +------------------------------+---------------------------------------------------------------------+
+|            |       storage.js                                                                                   |
++------------+----------------------------------------------------------------------------------------------------+
+|                               ublock origin                                                                     |
++-----------------------------------------------------------------------------------------------------------------+
+
+
+```

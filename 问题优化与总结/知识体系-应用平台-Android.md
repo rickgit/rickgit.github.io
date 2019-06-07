@@ -1683,6 +1683,8 @@ adb shell dumpsys activity processes---------查看进程信息
 
 adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
 adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+
+adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 ```
 ```java
 //ActivityStarter的启动模式代码阅读
@@ -1956,7 +1958,7 @@ J: JDK tools
 |   zipalign                                                                           |
 +--------------------------------------------------------------------------------------+
 |J                                                                                     |
-|   javasigner                                                                         |
+|   javasigner  V1, V2(N), V3(P)                                                       |
 +--------------------------------------------------------------------------------------+
 |G                                                                                     |
 |   ApkBuilder                                                                         |
