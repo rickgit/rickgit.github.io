@@ -1,7 +1,10 @@
 
 ```
 +------------------+---------------------------------------------------------------------------------+
-|  comunicate      |         ReadWrite Object(String,List,Serializable)/File/Socket/db               |
+|  compiler        |         Clang ,GCC ,Microsoft Visual Studio / Express / C++                     |+------------------+---------------------------------------------------------------------------------+
+|  library         |         Bionic libhybris,      glibc ,      Microsoft Run-time Library          |+------------------+---------------------------------------------------------------------------------+
+|  comunicate      | Char (ctype.h)   File I/O (stdio.h)   Math (math.h)   Dynamic memory(stdlib.h)  |
+|                  | String (string.h)     Time (time.h)   Variadic (stdarg.h)  POSIX(unistd.h)      |
 +------------------+------------------------+------------+---------+-----------+-------+-------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |             |
 | Log/Date  |           |      |            |            |         |           |       |             |
@@ -599,7 +602,13 @@ CGI
 ## [内存泄漏](https://blog.nelhage.com/post/three-kinds-of-leaks/)
 
 
-## 编译流程
+## 编译构建流程
+compile, make都编译，但make是增量编译，compile是全新编译， build整个工程的全新编译，要生成binary的。
+CMake的是构建系统的生成器，CMake代表跨平台Make。
+- 可以产生Makefile文件，
+- 可以产生Ninja构建文件，
+- 可以产生KDevelop或XCode的项目，
+- 能产生Visual Studio解决方案。
 
 ```
 +----------+---------------------------------------------------------------------------------------------+
@@ -619,17 +628,66 @@ CGI
 |          +-------------+-------------------------------------------------------------------------------+
 |          |             | GNU Bison: a parser generator, often used with the Flex lexical analyser      |
 |          | Development |                                                                               |
-|          |             | GNU build system (autotools): Autoconf, Automake and Libtool                  |
-|          | tools       |                                                                               |
+|          |             | GNU build system (autotools):                                                 |
+|          | tools       |        Autoconf(generates a configure), Automake and Libtool                  |
 |          |             | GNU make: an automation tool for compilation and build                        |
 |          |             |                                                                               |
 +------------------------+-------------------------------------------------------------------------------+
-| Terminals|    mintty                                                                                   |
+| Terminals|    mintty(a program that run a shell)                                                       |
 +--------------------------------------------------------------------------------------------------------+
-|  shell   |    Bash                                                                                     |
+|  shell   |    Bash( a program which processes commands)                                                |
++----------+---------------------------------------------------------------------------------------------+
+|                                configure scripts                                                       |
 +----------+---------------------------------------------------------------------------------------------+
 
 
 [autotools介绍](https://www.jianshu.com/p/ff361db3e6d3)
  
+```
+[编写autoconf（configure.ac）生成Configure，编写automake（Makefile.am）生成makefile.in，构建](https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install)
+[autoconf编写](https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Setup.html#Setup)
+
+
+## C库
+只要是符合ANSI（美国国家标准学会） C标准的C库都可以叫做标准C库。
+
+现有的著名的POSIX标准的C库有：GUN C库（glibc）和Embedded Linux C库（uClibc） Bionic（Android）
+
+[Single_UNIX_Specification](https://en.wikipedia.org/wiki/Single_UNIX_Specification)
+
+[C POSIX library](https://en.wikipedia.org/wiki/C_POSIX_library)
+```cpp
+
+<assert.h>
+<complex.h>
+<ctype.h>
+<dirent.h>
+<dlfcn.h>
+<errno.h>
+<fcntl.h>
+<fenv.h>
+<float.h>
+<inttypes.h>
+<iso646.h>
+<limits.h>
+<locale.h>
+<math.h>
+<pthread.h>
+<setjmp.h>
+<signal.h>
+<stdarg.h>
+<stdbool.h>
+<stddef.h>
+<stdint.h>
+<stdio.h>
+<stdlib.h>
+<string.h>
+<sys/stat.h>
+<tgmath.h>
+<time.h>
+<unistd.h>
+<utime.h>
+<wchar.h>
+<wctype.h>
+
 ```

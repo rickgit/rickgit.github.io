@@ -278,3 +278,7 @@ Python 模块(Module)，是一个 Python 文件，以 .py 结尾，包含了 Pyt
 ## 数据类型 - 面向对象
 
 ## 数据并发 
+
+
+## 应用
+[python包管理工具:Conda和pip比较 - 简书](https://www.jianshu.com/p/5601dab5c9e5)

@@ -435,42 +435,45 @@ DOM文档加载流程：
 https://github.com/gorhill/adblocker
 
 ```
-+------------+----------------------------------------------------------------------------------------------------+
-|            |     assets.json                                                                                    |
-|            |     assets.js                                                                                      |
-|            +------------------------------+----------------------------------+----------------------------------+
-|            |                              |                                  |                                  |
-|            |                              |   htmlFilteringEngine            |                                  |
-|            |                              |   html-filtering.js              |                                  |
-|            |                              |                                  |                                  |
-|            |                              |   scriptletFilteringEngine       |                                  |
-|            |                              |   scriptlet-filtering.js         |                                  |
-| parsing/   |                              |                                  |                                  |
-| compile    |                              |                                  |                                  |
-|            |                              +---------------------------------------------------------------------+
-|            |                              |                                  |                                  |
-|            |                              |                                  | // low generic cosmetic filters  |
-|            |                              |                                  | lowlyGeneric.id.simple           |
-|            |                              |                                  | lowlyGeneric.id.complex          |
-|            |                              |                                  | lowlyGeneric.cl.simple           |
-|            |                              |                                  | lowlyGeneric.cl.comple           |
-|            |                              |                                  |                                  |
-|            |                              |                                  | / highly generic selectors sets  |
-|            |                              |                                  | highlyGeneric.simple.dict        |
-|            |                              |                                  | highlyGeneric.simple.str         |
-|            |                              |   cosmeticFilteringEngine        | highlyGeneric.simple.mru         |
-|            |                              |   cosmetic-filtering.js          | highlyGeneric.complex.dict       |
-|            |                              |                                  | highlyGeneric.complex.str        |
-|            |                              |                                  | highlyGeneric.complex.mru        |
-|            +-----------------------------------------------------------------+----------------------------------+
-|            |     staticNetFilteringEngine |  staticExtFilteringEngine                                           |
-|            |     static-net-filtering.js  |  static-ext-filtering.js                                            |
-|            |                              |                                                                     |
-|            +------------------------------+---------------------------------------------------------------------+
-|            |       storage.js                                                                                   |
-+------------+----------------------------------------------------------------------------------------------------+
-|                               ublock origin                                                                     |
-+-----------------------------------------------------------------------------------------------------------------+
++------------+------------------------------------------------------------------------------------------+
+|            |     vAPI.tabs.onPopupUpdated(tab.js)          vAPI.bootstrap( contentscript.js )         |
+|  match     |                        window.vAPI (vapi.js)                                             |
+|            |                                                                                          |
++-------------------------------------------------------------------------------------------------------+
+|            | assets.json                                                                              |
+|            | assets.js                                                                                |
+|            +--------------------------+----------------------------+----------------------------------+
+|            |                          |                            |                                  |
+|  parsing/  |                          |   htmlFilteringEngine      |                                  |
+|  compile   |                          |   html+filtering.js        |                                  |
+|            |                          |                            |                                  |
+|            |                          |   scriptletFilteringEngine |                                  |
+|            |                          |   scriptlet+filtering.js   |                                  |
+|            |                          |                            |                                  |
+|            |                          +---------------------------------------------------------------+
+|            |                          |                            |                                  |
+|            |                          |                            | // low generic cosmetic filters  |
+|            |                          |                            | lowlyGeneric.id.simple           |
+|            |                          |                            | lowlyGeneric.id.complex          |
+|            |                          |                            | lowlyGeneric.cl.simple           |
+|            |                          |                            | lowlyGeneric.cl.comple           |
+|            |                          |                            |                                  |
+|            |                          |                            | / highly generic selectors sets  |
+|            |                          |                            | highlyGeneric.simple.dict        |
+|            |                          |                            | highlyGeneric.simple.str         |
+|            |                          |   cosmeticFilteringEngine  | highlyGeneric.simple.mru         |
+|            |                          |   cosmetic+filtering.js    | highlyGeneric.complex.dict       |
+|            |                          |                            | highlyGeneric.complex.str        |
+|            |                          |                            | highlyGeneric.complex.mru        |
+|            +-------------------------------------------------------+----------------------------------+
+|            | staticNetFilteringEngine |  staticExtFilteringEngine                                     |
+|            | static+net+filtering.js  |  static+ext+filtering.js                                      |
+|            |                          |                                                               |
+|            +--------------------------+---------------------------------------------------------------+
+|            |   storage.js                                                                             |
++------------+------------------------------------------------------------------------------------------+
+|                           ublock origin                                                               |
++-------------------------------------------------------------------------------------------------------+
 
 
 ```
