@@ -1,0 +1,57 @@
+## 性能分析
+
+## 联动体验->SwipeRefreshLayout
+SwipeRefreshLayout->{NestedScrollingParent, NestedScrollingChild}
+SwipeRefreshLayout->{NestedScrollingParentHelper,NestedScrollingChildHelper}
+
+滑动体验->Scroller,VelocityTracker,Interpolator,ViewConfiguration
+
+## 机器学习
+涉及概率论、统计学、逼近论、凸分析、算法复杂度理论等多门学科
+应用，
+1,学术领域;如生物、医疗、化学等,应用场景主要包括 医疗诊断、细胞生物学、DNA测序等。
+2,开发者的开发领域
+3,日常生活
+例如：数据挖掘、计算机视觉、自然语言处理、生物特征识别、搜索引擎、医学诊断、检测信用卡欺诈、证券市场分析、DNA序列测序、语音和手写识别、战略游戏和机器人运用。
+
+Android Neural Networks API
+应用：包括图像分类，预测用户行为等。
+
+Tensor flow,cloud tpu
+
+
+## kotlin->Android KTX
+## Android App Architecture -> Room 和生命周期管理（Lifecycles）
+Room:db,dao,entity
+LiveData是一个用于持有数据并支持数据可被监听（观察）。ViewModel,LiveData
+
+## android go
+
+
+## Flutter ,dart sdk
+
+## ndroid Studio 3.2 ：r8
+
+
+## 区块连 ->p2p,共识
+
+## 编译加速
+https://github.com/alibaba/freeline
+https://github.com/typ0520/fastdex
+
+000
+	技术预演分析
+	沉浸式标题栏
+	权限
+
+001
+	推送
+	娃娃依赖库缩减
+
+002
+	票样扫码	
+	奖金优化 x
+
+003
+	预计奖金 √
+	ARCore->https://developers.google.cn/ar/ √

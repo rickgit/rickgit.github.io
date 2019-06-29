@@ -1698,7 +1698,7 @@ import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP;
 
 android N开始有5种窗口类型（窗口类型及ActivityType决定ActivityStack） ：
 全屏 FullScreenStack
-DockedStack（分屏Activity）
+DockedStack（分屏Activity） configChanges:screenLayout   onMultiWindowModeChanged
 PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
 freeformstack(自由模式Activity) ：FreeForm Stack
 homeStack（launcher和recents Activity）和其他
@@ -1722,8 +1722,8 @@ import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
 ```
 ActivityDisplay#0（一般只有一显示器） 
 +--------------------------------------------------------------------------------------+
-| ActivityStack#0                                                                      |
-|    +---------------------+                                                           |
+| ActivityStack#0                                                                      |//不用类型（mHomeStack，mFocusedStack）
+|    +---------------------+                                                           |//区分ActivityStack
 |    | +----------------+  |      +---------------------+                              |
 |    | |ActivityRecord  |  |      |                     |                              |
 |    | +----------------+  |      |                     |                              |
@@ -1735,7 +1735,7 @@ ActivityDisplay#0（一般只有一显示器）
 |    | +----------------+  |      | +----------------+  |                              |
 |    +---------------------+      +---------------------+                              |
 |    +---------------------+      +---------------------+                              |
-|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |//亲和度（taskAffinity）区分TaskRecord
 |    +---------------------+      +---------------------+                              |
 +--------------------------------------------------------------------------------------+
 +--------------------------------------------------------------------------------------+
@@ -2258,3 +2258,45 @@ Uptime: 53403267 Realtime: 53403267
 反射与注解 
 #### ARouter
 控制反转和面向切面
+
+
+
+##NDK
+[Android-MD doc](https://beijing.source.codeaurora.org/quic/la/platform/ndk/docs/ANDROID-MK.html)
+
+```
++------------------------------------------------------------+
+|                 build-binary.mk                            |
+|                                                            |
+|                 setup-toolchain.mk                         |
+|                 setup-abi.mk                               |
+|                                                            |
+|                  setup-app.mk                              |
+|                  build-all.mk                              |
+|                  init.mk                                   |
+|                  build-local.mk                            |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|   Module-description variables                             |
+|                                                            |
+|   NDK-provided variables    NDK-provided function macros   |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|              ndk-build                                     |
++------------------------------------------------------------+
+|                     NDK                                    |
++------------------------------------------------------------+
+|                 GNU Make                                   |
++------------------------------------------------------------+
+
+
+
+```
+
+
+
+## 权限
+
+[Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)

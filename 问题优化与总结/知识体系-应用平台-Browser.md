@@ -11,14 +11,44 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
 +-------------------------------------------------------------------------------+
 |                                                                               |
-|    Html/Css Engine(WebKit,Blink,Trident,Gecko)                                |
+|    Html/Css rendering  Engine(WebKit,Blink,Trident,Gecko)                     |
 |                                                 +-----------------------------+
 |                                                 |  Js Engine (v8)  Skia mojo  |
 +-------------------------------------------------+-----------------------------+
 
 
- 
+ ```
  [how blilk work](https://docs.google.com/document/d/1aitSOucL0VHZa9Z2vbRJSyAIsAz24kX8LFByQ5xQnUg)
 
 
  [chromium 设计文档](https://www.chromium.org/developers/design-documents)
+
+[视频]( https://www.chromium.org/developers/design-documents/video)
+
+ [chrome webview 介绍](https://developer.chrome.com/multidevice/webview/overview)
+
+## webview实现
+### crosswalk
+ [crosswalk](https://github.com/crosswalk-project/crosswalk.git)
+
+
+```
+architecture
+
++------------------------------------------------+
+|                  web Runntime                  |
++------------------------------------------------+
+|           Multi-Process Component              |
+|                                                |
++------------------------------------------------+
+|          webCore(webkit-WebCore from Blink)    |
+|                                                |
++------------------------------------------------+
+|          Graphics(Skia)                        |
+|          Multimedia (FFMpeg)                   |
+|          Javascript Engine(V8)                 |
++------------------------------------------------+
+
+
+```
+###  GeckoView
