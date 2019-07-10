@@ -34,7 +34,7 @@
 |  separator sign(;)      |       |      0x1(16),[](Arr)   |  Data Type| |            |             | symbol/  |
 +                         +       +              ADT       +           + +            |             | token    |
 +---------------------------------+------------------------------------+-+            |             | token    |
-|     separator           |  Literals                      |  keywords   |  Operators | Identifiers |          |
+|     separator           |  Literals(num)                 |  keywords   |  Operators | Identifiers |          |
 +-------------------------+--------------------------------+-------------+------------+-------------+----------+
 |                                            Character set (Unicode,UTF-8)                                     |
 +--------------------------------------------------------------------------------------------------------------+
@@ -406,7 +406,7 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 
 ### JVM 类加载机制及GC
 [类](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html)
-
+[类加载器（日文）](http://fits.hatenablog.com/entry/2016/05/06/200824)
 
 ```
 JVM
