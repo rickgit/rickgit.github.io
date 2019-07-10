@@ -611,6 +611,35 @@ CGI
 ### 交叉编译（cross compiler）
 
 ###
+ [GCC Compilation Process（Build）](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
+```
+                         +
+                         |
+ Source Code(.c,.cpp,.h) |
+                         v
+                 +-------+----+
+                 |Preprocessin|  step1:Preprocessor(cpp)
+                 +-------+----+
+                         |
+ Include Header,         v
+ Expand Macro    +-------+----+
+ (.i,.ii)        | Compilation|  step 2:Compiler(gcc,g++)
+                 +-------+----+
+                         |
+ Assembly(.s)            v
+                 +-------+----+
+                 | Assemble   |  step 3: Assembler(as)
+                 +-------+----+
+                         |
+ Machine Code(.o,.obj)   v
+                 +-------+----+
+Static Library+->+ Linking    |  step 4:Linker(ld)
+(.lib,.a)        +-------+----+
+                         |
+ Executable Machine Code |
+ (.exe)                  v
+
+```
 compile, make都编译，但make是增量编译，compile是全新编译， build整个工程的全新编译，要生成binary的。
 CMake的是构建系统的生成器，CMake代表跨平台Make。
 - 可以产生Makefile文件，
