@@ -4,6 +4,9 @@
 文档：需求开发计划（排期）及进度，设计说明书（架构图，项目结构图，类图），规范文档（命名，注释），功能预演文档，开发总结文档，用户指南(使用手册)
 [java 规范文档](https://docs.oracle.com/javase/specs/index.html)
 ```
+
+hotspot,jdk,corba,jaxp,jaxws,langtools(javac,javadoc,javap)
+
 +------------------+-------------------------------------------------------------------------------------------+
 |  security        |                                                                                           |
 +--------------------------------------------------------------------------------------------------------------+
@@ -407,6 +410,7 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 ### JVM 类加载机制及GC
 [类](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html)
 [类加载器（日文）](http://fits.hatenablog.com/entry/2016/05/06/200824)
+[OpenJDK备忘录（日文）](http://hsmemo.github.io/index.html)
 
 ```
 JVM
