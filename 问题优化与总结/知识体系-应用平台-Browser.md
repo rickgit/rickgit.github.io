@@ -43,6 +43,10 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
 更换git地址
 ```shell
+#git clone https://beijing.source.codeaurora.org/quic/lc/chromium/tools/depot_tools
+
+#git show-ref
+
 sed -i s#"https://beijing.source.codeaurora.org/quic/lc/chromium/src.git"#"https://beijing.source.codeaurora.org/quic/lc/chromium/src"#g  `grep "https://beijing.source.codeaurora.org/quic/lc/chromium/src.git" -rl ./`
 
 sed -i s#"https://chromium.googlesource.com/chromium/src.git"#"https://beijing.source.codeaurora.org/quic/lc/chromium/src"#g  `grep "https://chromium.googlesource.com/chromium/src.git" -rl ./`
@@ -52,7 +56,7 @@ sed -i s#"https://chromium.googlesource.com/chromium/src.git"#"https://beijing.s
 1>fatal: unable to access 'https://chromium.googlesource.com/chromium/src.git/': Failed to connect to chromium.googlesource.com port 443: Connection timed out
 
 
-#fetch --nohooks android
+#fetch --nohooks --nohistory android
 Running: gclient root
 curl: (7) Failed to connect to chrome-infra-packages.appspot.com port 443: 连接超时
 Your current directory appears to already contain, or be part of, 
@@ -63,15 +67,69 @@ Fetch also does not yet deal with partial checkouts, so if fetch
 failed, delete the checkout and start over (crbug.com/230691).
 
 #gclient config https://beijing.source.codeaurora.org/quic/lc/chromium/src@refs/remotes/origin/m52
+#gclient config https://beijing.source.codeaurora.org/quic/lc/chromium/src@refs/tags/75.0.3770.101
+
+https://beijing.source.codeaurora.org/quic/lc/chromium/src@refs/remotes/tags/75.0.3770.101
+
 #修改.gclient文件的url
 #https://beijing.source.codeaurora.org/quic/lc/chromium/src@refs/remotes/origin/m52
 
-#gclient sync //下载代码
+#gclient sync //获取Android版的代码：
 curl: (7) Failed to connect to chrome-infra-packages.appspot.com port 443: 连接超时
 1>________ running 'git -c core.deltaBaseCacheLimit=2g clone --no-checkout --progress https://beijing.source.codeaurora.org/quic/lc/chromium/src /home/anshu/workspace/chromium/_gclient_src_B70pn4' in '/home/anshu/workspace/chromium'
 1>Cloning into '/home/anshu/workspace/chromium/_gclient_src_B70pn4'...
 
+修改DEPS文件的GIT 路径
+git -c core.deltaBaseCacheLimit=2g clone --no-checkout --progress
+https://quiche.googlesource.com/quiche.git 需代理
+https://dawn.googlesource.com/dawn.git
+protobuf修改DEPS 的hash值
+修改DEPS feed的hash值
+`git rev-list -n 1` ambigous argument 'HEAD'://重新迁出分支master
+
+注释gclient_scm.py中的 cipd ensure
+
+
+./build/install-build-deps-android.sh
+./build/android/envsetup.sh
+gclient runhooks
+
+ 
+
+查看gn
+https://chrome-infra-packages.appspot.com/p/gn/gn/linux-amd64/+/git_revision:64b846c96daeb3eaf08e26d8a84d8451c6cb712b
+下载gn，到chromium/src/buildtools/linux64/gn/gn最后个gn是下载的可执行文件
+https://chrome-infra-packages.appspot.com/dl/gn/gn/linux-amd64/+/git_revision:64b846c96daeb3eaf08e26d8a84d8451c6cb712b
+
+
+下载Linux编译库（chromium/src/build/linux/system_script/，参数在sysroots.json）
+https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/9e6279438ece6fb42b5333ca90d5e9d0c188a403/debian_sid_i386_sysroot.tar.xz
+https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/e7c53f04bd88d29d075bfd1f62b073aeb69cbe09/debian_sid_amd64_sysroot.tar.xz
+注释 install_system_root.py的下载流程
+
+
+以下都是 chromium/src/DEPD 文件下载内容
+
+gs:// 替换为 https://storage.googleapis.com/ 
+下载到的：
+https://storage.googleapis.com/chromium-binutils/69bedb1192a03126687f75cb6cf1717758a1a59f
+/src/third_party/binutils/download.py文件注释掉下载chromium-binutils的代码，及修改保存文件的后缀名
+
+src/tools/clang/scripts/update.py#DownloadAndUnpackClangPackage
+
+https://storage.googleapis.com/chromium-clang-format/942fc8b1789144b8071d3fc03ff0fcbe1cf81ac8
+
+https://storage.googleapis.com/chromium-fonts/a22de844e32a3f720d219e3911c3da3478039f89
+https://storage.googleapis.com/chromium-instrumented-libraries/0185d9b6c6fdfbcfffa61d8ac9f19e8879c4dee2
+https://storage.googleapis.com/chromium-instrumented-libraries/d429da145648e1795ad8b9005b219b8e6888b79f
+https://storage.googleapis.com/v8-wasm-fuzzer/f6b95b7dd8300efa84b6382f16cfcae4ec9fa108 //需注释下载
+https://storage.googleapis.com/chromium-nodejs/10.15.3/3f578b6dec3fdddde88a9e889d9dd5d660c26db9 //node_linux
+https://storage.googleapis.com/chromium-nodejs/c0e0f34498afb3f363cc37cd2e9c1a020cb020d9 //node_model
+
+gn gen out/Default --args='target_os="android" is_debug=false'
 ```
+
+[代理处理文件下载失败](https://idom.me/articles/843.html)
 
 
 [Google 源码编译](https://blog.csdn.net/Mymain/article/details/45399025)
