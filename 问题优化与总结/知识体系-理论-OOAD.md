@@ -1,5 +1,5 @@
 
-
+## 封装性与内聚耦合
 
 >《UML面向对象程序设计基础》
 
@@ -15,10 +15,10 @@
                                                     ^
                                                     |
                                                     +                  aggregation
-                                                 abstract +----> Type --------> inheritance +----> polymorphism
-                                                    ^
+                                                 abstract +----> Type +-------> inheritance +----> polymorphism
+                 datatype/adt                       ^
                                                     |
-               +------------+  +-----------+   +----+----+   +----------+   +----------+
+infomation     +------------+  +-----------+   +----+----+   +----------+   +----------+
 encapsulation  |  level 0,  |  | level 1,  |   |level 2, |   | level 3, |   | level 4, |
 level          |  code line |  | function  |   |class    |   | package  |   | module   |
                +------+-----+--+--+-+-+--+-+-----+--+--+-+---+----------+---+----------+-->
@@ -40,6 +40,7 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
                                                +------------------------------------------->  | reusability      |
                                                                                               | maintainability  |
                                                                                               +------------------+
+
 
 
 [职责分配原则](《Applying UML and Patterns》)

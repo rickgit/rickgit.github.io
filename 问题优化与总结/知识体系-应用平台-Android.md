@@ -5,7 +5,7 @@
 [启动流程](https://blog.csdn.net/qq_30993595/article/details/82714409#_2)
 ```diagram
 +---------+--------------------------------------------------------------------------------------------------+
-| AppS    |   Home  Contacts  Phone   Browser                                                                |
+| AppS    |   Browser  Gallery  Launcher3 SystemUI(RecentsActivity)   Home  Contacts  Phone                  |
 +--------------------------------+------------------------------------+---------------------+----------------+
 |         |         os           |            content                 |   app               |   util         |
 |         |(IPC,message passing) | (accessing and publishing data)    |( app  model)        |                |
@@ -191,6 +191,51 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
          +----------------------------------------------------------------------------------------------+
 copy     |      0        |                 1                         |       2        |                 |
 times    +---------------+-------------------------------------------+----------------+-----------------+
+
+应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
+{                                                                                {
+    "mAction": "android.intent.action.MAIN",                                         "mAction": "android.intent.action.MAIN",
+    "mCategories": [                                                                 "mCategories": [
+        "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
+    ],                                                                               ],
+    "mComponent": {                                                                  "mComponent": {
+        "mClass": "com.xp.browser.activity.SplashActivity",                              "mClass": "com.xp.browser.activity.SplashActivity",
+        "mPackage": "com.xp.browser"                                                     "mPackage": "com.xp.browser"
+    },                                                                               },
+    "mContentUserHint": -2,                                                          "mContentUserHint": -2,
+    "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
+    "mPackage": "com.xp.browser"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+}                                                                                        "mSourceBounds": {
+                                                                                         "bottom": 395,
+                                                                                         "left": 540,
+                                                                                         "right": 800,
+                                                                                         "top": 120
+                                                                                     }
+                                                                                 }
+
+ 
+
+直接打开及直接打开第二次
+{
+    "mAction": "android.intent.action.MAIN",
+    "mCategories": [
+        "android.intent.category.LAUNCHER"
+    ],
+    "mComponent": {
+        "mClass": "com.xp.browser.activity.SplashActivity",
+        "mPackage": "com.xp.browser"
+    },
+    "mContentUserHint": -2,
+    "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+    "mSourceBounds": {
+        "bottom": 395,
+        "left": 540,
+        "right": 800,
+        "top": 120
+    }
+}
+ 
+
 
 public class Intent implements Parcelable, Cloneable {
     private String mAction;
@@ -1261,7 +1306,7 @@ public class NotificationManagerService extends SystemService {
 NotificationManager/nofitycation
 ```
 +-----------------------------------+         +-------------------------------------+
-|  SystemServer                     |         |  SystemUI                           |
+|  SystemServer                     |         |  SystemUI(App process)              |
 |                                   |         |                                     |
 |                                   |         |                                     |
 |       +-------------------------+ |         |   +-------------------------+       |
@@ -1281,7 +1326,7 @@ NotificationManager/nofitycation
 +-----------------------------------+         +-------------------------------------+
 
 ```
-[SystemUI启动](https://www.jianshu.com/p/2e0f403e5299)
+[SystemUI应用启动](https://www.jianshu.com/p/2e0f403e5299)
 ```
 Status Bar状态栏信息显示，比如电池，wifi信号，3G/4G等icon显示
 Notification Panel 通知面板，比如系统消息，第三方应用消息
@@ -1685,6 +1730,23 @@ adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0
 adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 
 adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+adb shell am kill <packagename>
+
+If you want to kill the Sticky Service,the following command NOT WORKING:
+
+adb shell am force-stop <PACKAGE>
+adb shell kill <PID>
+The following command is WORKING:
+
+adb shell pm disable <PACKAGE>
+If you want to restart the app,you must run command below first:
+
+adb shell pm enable <PACKAGE>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ```
 ```java
 //ActivityStarter的启动模式代码阅读
@@ -1778,7 +1840,18 @@ ActivityDisplay#0（一般只有一显示器）
 +-------------------------------------------------------------------+
 |            |   allowTaskReparenting|           |change to affinity task|
 +------------+------------------------------------------------------+
+FLAG_ACTIVITY_NEW_TASK
+在google的官方文档中介绍，它与launchMode="singleTask"具有相同的行为。实际上，并不是完全相同！
+很少单独使用FLAG_ACTIVITY_NEW_TASK，通常与FLAG_ACTIVITY_CLEAR_TASK或FLAG_ACTIVITY_CLEAR_TOP联合使用。因为单独使用该属性会导致奇怪的现象，通常达不到我们想要的效果！尽管如何，后面还是会通过"FLAG_ACTIVITY_NEW_TASK示例一"和"FLAG_ACTIVITY_NEW_TASK示例二"会向你展示单独使用它的效果。
 
+FLAG_ACTIVITY_SINGLE_TOP
+在google的官方文档中介绍，它与launchMode="singleTop"具有相同的行为。实际上，的确如此！单独的使用FLAG_ACTIVITY_SINGLE_TOP，就能达到和launchMode="singleTop"一样的效果。
+
+FLAG_ACTIVITY_CLEAR_TOP
+顾名思义，FLAG_ACTIVITY_CLEAR_TOP的作用清除"包含Activity的task"中位于该Activity实例之上的其他Activity实例。FLAG_ACTIVITY_CLEAR_TOP和FLAG_ACTIVITY_NEW_TASK两者同时使用，就能达到和launchMode="singleTask"一样的效果！
+
+FLAG_ACTIVITY_CLEAR_TASK
+FLAG_ACTIVITY_CLEAR_TASK的作用包含Activity的task。使用FLAG_ACTIVITY_CLEAR_TASK时，通常会包含FLAG_ACTIVITY_NEW_TASK。这样做的目的是启动Activity时，清除之前已经存在的Activity实例所在的task；这自然也就清除了之前存在的Activity实例！
 ```
 
 android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
@@ -1989,11 +2062,123 @@ J: JDK tools
 Glide
 
 
-
+                                                                                                                                                                                        
 ## Android 开发模式
 
 ### 性能优化总结
 > <<Android High Performance Programming>>
+
+> 性能（ the time taken to execute tasks）
+
+[Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
+```shell 
+#adb shell "getprop | grep heapgrowthlimit"
+#adb shell "getprop|grep dalvik.vm.heapstartsize"
+#adb shell "getprop|grep dalvik.vm.heapsize"
+
+#adb shell "dumpsys meminfo -s <pakagename | pid>"
+# while true;do adb shell procrank|grep <proc-keywords>; sleep 6;done
+
+
+# adb shell "cat  /proc/cpuinfo" //查看cpu核心数
+# adb shell "dumpsys cpuinfo | grep <package | pid>"
+# adb shell "top -n 5 | grep <package | pid>" 
+
+# adb shell "dumpsys gfxinfo com.xp.browser" //GPU 帧数 fps
+
+
+# adb shell "dumpsys batterystats < package | pid>" //电量采集
+```
+
+#### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
+```
+services/core/java/com/android/server/am/AppErrors.java:
+
+StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
+//                    .detectDiskReads()
+//                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyDialog() //弹出违规提示对话框
+                    .penaltyLog() //在Logcat 中打印违规异常信息
+                    .penaltyFlashScreen() //API等级11
+                    .build());
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .detectLeakedClosableObjects() //API等级11
+        .penaltyLog()
+        .detectFileUriExposure()
+        .penaltyDeath()
+        .build());
+```
+#### 内存泄漏
+ 
+ 工具：profiler，eclipse mat
+ [Activity 泄漏和重复创建的冗余Bitmap-ResourceCanary](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
+```
+LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有的Activity生命周期，并在Activity的onDestroy时，执行RefWatcher的watch方法，该方法的作用就是检测本页面内是否存在内存泄漏问题。
+
+所有未被回收的 Bitmap 的数据 buffer 取出来，然后先对比所有长度为 1 的 buffer，找出相同的，记录所属的 Bitmap 对象；再对比所有长度为 2 的、长度为 3 的 buffer ……直到把所有buffer都比对完，这样就记录下了所有冗余的 Bitmap 对象了，接着再套用 LeakCanary 获取引用链的逻辑把这些 Bitmap 对象到 GC Root 的最短强引用链找出来即可。
+```
+ 内存泄漏优化 - 资源未释放
+        3.1 单例
+        3.2 非静态内部类
+        3.3 资源未关闭（webview没执行 destroy）
+        3.4 ListView 未缓存
+        3.5 集合类未销毁
+
+
+```sh
+>adb shell dumpsys meminfo edu.ptu.java.kotlinbase
+Applications Memory Usage (kB):
+Uptime: 53403267 Realtime: 53403267
+
+** MEMINFO in pid 32724 [edu.ptu.java.kotlinbase] **
+                   Pss  Private  Private  Swapped     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------
+  Native Heap        0        0        0        0    15616    14393     1222
+  Dalvik Heap     2908     2416        0        0    13722     9283     4439
+ Dalvik Other      680      532        0        0
+        Stack      260      260        0        0
+       Ashmem        2        0        0        0
+    Other dev        4        0        4        0
+     .so mmap     3713      340      924        0
+    .apk mmap      972        0       88        0
+    .ttf mmap      164        0      132        0
+    .dex mmap     3259        4     2652        0
+    .oat mmap     2602        0      520        0
+    .art mmap     1016      680        4        0
+   Other mmap       39        8        0        0
+      Unknown     3795     3612        0        0
+        TOTAL    19414     7852     4324        0    29338    23676     5661
+
+ App Summary
+                       Pss(KB)
+                        ------
+           Java Heap:     3100
+         Native Heap:        0
+                Code:     4660
+               Stack:      260
+            Graphics:        0
+       Private Other:     4156
+              System:     7238
+
+               TOTAL:    19414      TOTAL SWAP (KB):        0
+
+ Objects
+               Views:       18         ViewRootImpl:        1
+         AppContexts:        3           Activities:        1
+              Assets:        2        AssetManagers:        2
+       Local Binders:        9        Proxy Binders:       13
+       Parcel memory:        3         Parcel count:       12
+    Death Recipients:        0      OpenSSL Sockets:        0
+
+ SQL
+         MEMORY_USED:        0
+  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
+```
+## 性能（ the time taken to execute tasks）
 ```
 +-------------+-------------------+----------------------+---------------------------+---------------+
 |             |    info           |    tools             |  fix                      |  extension    |
@@ -2044,6 +2229,8 @@ Glide
 [启动时间](https://developer.android.com/topic/performance/vitals/launch-time)
 
 [Android 内存泄漏](https://android.jlelse.eu/9-ways-to-avoid-memory-leaks-in-android-b6d81648e35e)
+
+[冷启动](开始记录跟踪数据的位置调用 Debug.startMethodTracing()，要停止跟踪的位置请调用 Debug.stopMethodTracing())
 ```
 +-----------------------------------+
 | memory leaks                      |
@@ -2137,76 +2324,20 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     1. ListView/RecycleView及Bitmap优化
     2. 线程优化 
 
- #### 内存泄漏
  
- 工具：profiler，eclipse mat
- [Activity 泄漏和重复创建的冗余Bitmap-ResourceCanary](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
-```
-LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有的Activity生命周期，并在Activity的onDestroy时，执行RefWatcher的watch方法，该方法的作用就是检测本页面内是否存在内存泄漏问题。
-
-所有未被回收的 Bitmap 的数据 buffer 取出来，然后先对比所有长度为 1 的 buffer，找出相同的，记录所属的 Bitmap 对象；再对比所有长度为 2 的、长度为 3 的 buffer ……直到把所有buffer都比对完，这样就记录下了所有冗余的 Bitmap 对象了，接着再套用 LeakCanary 获取引用链的逻辑把这些 Bitmap 对象到 GC Root 的最短强引用链找出来即可。
-```
- 内存泄漏优化 - 资源未释放
-        3.1 单例
-        3.2 非静态内部类
-        3.3 资源未关闭（webview没执行 destroy）
-        3.4 ListView 未缓存
-        3.5 集合类未销毁
-
-
-```sh
->adb shell dumpsys meminfo edu.ptu.java.kotlinbase
-Applications Memory Usage (kB):
-Uptime: 53403267 Realtime: 53403267
-
-** MEMINFO in pid 32724 [edu.ptu.java.kotlinbase] **
-                   Pss  Private  Private  Swapped     Heap     Heap     Heap
-                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
-                ------   ------   ------   ------   ------   ------   ------
-  Native Heap        0        0        0        0    15616    14393     1222
-  Dalvik Heap     2908     2416        0        0    13722     9283     4439
- Dalvik Other      680      532        0        0
-        Stack      260      260        0        0
-       Ashmem        2        0        0        0
-    Other dev        4        0        4        0
-     .so mmap     3713      340      924        0
-    .apk mmap      972        0       88        0
-    .ttf mmap      164        0      132        0
-    .dex mmap     3259        4     2652        0
-    .oat mmap     2602        0      520        0
-    .art mmap     1016      680        4        0
-   Other mmap       39        8        0        0
-      Unknown     3795     3612        0        0
-        TOTAL    19414     7852     4324        0    29338    23676     5661
-
- App Summary
-                       Pss(KB)
-                        ------
-           Java Heap:     3100
-         Native Heap:        0
-                Code:     4660
-               Stack:      260
-            Graphics:        0
-       Private Other:     4156
-              System:     7238
-
-               TOTAL:    19414      TOTAL SWAP (KB):        0
-
- Objects
-               Views:       18         ViewRootImpl:        1
-         AppContexts:        3           Activities:        1
-              Assets:        2        AssetManagers:        2
-       Local Binders:        9        Proxy Binders:       13
-       Parcel memory:        3         Parcel count:       12
-    Death Recipients:        0      OpenSSL Sockets:        0
-
- SQL
-         MEMORY_USED:        0
-  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
-```
 #### 包大小
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 
+
+#### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
+
+```shell
+# pidof  system_server
+1956
+
+# cat /proc/1956/limits
+
+```
 #### 可维护性 - 架构之模块化（插件化及组件化）
 插件化
 - Dynamic-loader-apk

@@ -441,9 +441,18 @@ JVM
 |     Compiling             |                javac                   |    |                     +-------------------------+ |
 +---------------------------+----------------------------------------+    +-------------------------------------------------+
 
+```
 
 
-
+jni方法 通过 宏**DT_RETURN_MARK_DECL** 注册方法
+```cpp
+DT_RETURN_MARK_DECL(SomeFunc, int);
+JNI_ENTRY(int, SomeFunc, ...) int return_value = 0;
+DT_RETURN_MARK(SomeFunc, int, (const int&)return_value);
+foo(CHECK_0)
+return_value = 5;
+return return_value;
+JNI_END
 
 ```
 #### 编译
@@ -707,6 +716,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 >《Inside the Java Virtual Machine》 ,Wiley (1996)《Garbage Collection- Algorithms for Automatic Dynamic Memory Management》 
 JVM给了三种选择收集器：串行收集器、并行收集器、并发收集器
 
+[垃圾回收概念Thread，Root Set of References，Reachable and Unreachable Objects，garbage collection](https://www.javarticles.com/2016/09/java-garbage-collector-reachable-and-unreachable-objects.html)
 ```
 GC Roots 的对象包括下面几种： 
 虚拟机栈（栈帧中的本地变量表）中引用的对象
@@ -769,6 +779,8 @@ Reference Counting：难解决对象之间循环引用的问题
 **安全区域**是指在一段代码片段之中，引用关系不会发生变化。在这个区域中的任意地方开始GC都是安全的。
 
 [HotSpot 虚拟机](http://openjdk.java.net/groups/hotspot/docs/HotSpotGlossary.html)
+[官方文档 Hotspot](https://openjdk.java.net/groups/hotspot/docs/RuntimeOverview.html)
+
 
 Generational Collection（分代收集）算法
   1. 新生代都采取Copying算法
@@ -823,6 +835,8 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 +--------+---------------------------------------------------------------------------------+
 
 ```
+
+
 《Effect java》
 - Object方法
 
@@ -1858,9 +1872,15 @@ RTTI，即Run-Time Type Identification，运行时类型识别。RTTI能在运�
 
 反射机制就是识别未知类型的对象。反射常用于动态代理中。
 
+### 应用：内省（Introspector）
+
 
 
 ### 序列化Serializable
+
+字节码分析：序列化后，存储java信息，类信息，字段信息
+[透过byte数组简单分析Java序列化、Kryo、ProtoBuf序列化](https://www.cnblogs.com/softlin/archive/2015/07/17/4653168.html)
+
 
 ### 类创建/运行时数据解析 - 反射（动态代理，注解接口）
 
@@ -2629,3 +2649,12 @@ B-tree和page cache共同对数据进行管理。
 ## 数据完整性与安全
 MD5
 RSA
+
+
+## OpenJDK
+  001_hotspot         5522af6c5028c6cfdf382b78796dd7ac77eb1bbd Initial load
+  002_jdk             ce0984a87ec46c2ffe3ed80d51ed350826331197 Initial load
+  006_langtools       84e2484ba645990f4c35e60d08db791806ae40be Initial load
+* 007_init_load_merge 0d206a7adbbc58f8b70c96d1b65da1e391c62474 Merge
+
+
