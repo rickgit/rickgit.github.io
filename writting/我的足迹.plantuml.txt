@@ -1,4 +1,4 @@
-@startuml
+﻿@startuml
 xearth
 24.5 117.5   "泉 州 " 
 24 117   " 厦门  " 
