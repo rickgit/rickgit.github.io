@@ -5,7 +5,10 @@
 [启动流程](https://blog.csdn.net/qq_30993595/article/details/82714409#_2)
 ```diagram
 +---------+--------------------------------------------------------------------------------------------------+
-| AppS    |   Browser  Gallery  Launcher3 SystemUI(RecentsActivity)   Home  Contacts  Phone                  |
+| AppS    |   Browser.apk  Gallery.apk  Launcher3.apk SystemUI(RecentsActivity)   Home  Contacts.apk  Phone  |
+|         |   PackageInstaller.apk   PackageInstaller.apk                                                    |
++---------+--------------------------------------------------------------------------------------------------+
+| cmds    |   install  am  wm   pm    appops                                                                 |
 +--------------------------------+------------------------------------+---------------------+----------------+
 |         |         os           |            content                 |   app               |   util         |
 |         |(IPC,message passing) | (accessing and publishing data)    |( app  model)        |                |
@@ -44,6 +47,8 @@
 |                                        ^                                                                   |
 |                                        |                                                                   |
 |  Loader +--->Boot ROM+--->Boot Loader+-+                                                                   |
++------------------------------------------------------------------------------------------------------------+
+| computer|    compute storage communicate(display share)                                                    |
 +------------------------------------------------------------------------------------------------------------+
 
 
@@ -404,7 +409,21 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 在Android中，RefBase结合sp（strong pointer）和wp（weak pointer），实现了一套通过引用计数的方法来控制对象生命周期的机制。
 
 
-### Dispaly 系统
+### Dispaly 系统与图片适配（density）
+```
+显示屏幕信息
+adb shell wm size
+wm size 1080x1920
+wm size reset
+
+wm density
+
+wm screen-capture
+
+adb shell dumpsys window displays |head -n 3
+ 
+```
+
 ```
                            OpenGL/ES        Rasterization
                            convert to
@@ -1645,7 +1664,8 @@ Context作用
                 ActivityThread  |   AssetManager
                                 +------------------->  loadResource
 
-                     
+查看权限
+adb shell pm list permissions -d -g                 
 ``` 
 [hind api](https://android.googlesource.com/platform/prebuilts/runtime/+/master/appcompat)
 
@@ -1685,19 +1705,19 @@ APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->
       | back to                       v  created +------------------------------------>    |onActivityCreated|    |
       | foreground                +---+----+        +-----------+                          |                 |    |
       |                           |onStart |  <-----+ onRestart +--+                       +-----------------+    |
-      |                           |        |        +-----------+  |                                              |
+      | recreate                  |        |        +-----------+  |                                              |
 +-----+---------+                 +----+---+                       |                       +---------+            |
 | Process killed|                      v started                   |   +-------------->    |onStart  |            |
 +-----+---------+       +-------+ +----+---+                       |                       +---------+            |
       |                 v         |onResume|  <-----+activity      |                                              |
       |             +---+------+  +--------+        |froreground   |                       +---------+            |
-      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |            |
-      |   activity  +---+------+                    |              |                       +---------+            |
-      |   foreground    |         +--------+        |              |                                              |
-      |                 +-------> |onPause |        |    activity  |                                              | onBack
-      | <-----------------------+ |        | +----->+    foreground|                                              |
-      |   other app               +---+----+                       |                       +---------+            |
-      |   need memory                 v  paused                    |     +------------>    |onPause  |            |
+      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |<-----+     |
+      |   activity  +---+------+                    |              |                       +---------+      |     |
+      |   foreground    |         +--------+        |              |                              Fragm is  |     |
+      |                 +-------> |onPause |        |    activity  |                              retaininstance  | onBack
+      | <-----------------------+ |        | +----->+    foreground|                          onactivityRecreate  |
+      |   other app               +---+----+                       |                       +---------+      |     |
+      |   need memory                 v  paused                    |     +------------>    |onPause  |------|     |
       |                                  no longe visiable         |                       +---------+            |
       |                           +--------+                       |                                              |
       +-------------------------+ |onStop  | +---------------------+                                              |
@@ -1963,6 +1983,16 @@ signatureOrSystem
 |  |                             |  |
 |  +-----------------------------+  |
 +-----------------------------------+
+
+
+
+Toolbar
++-------------+------------+------------+------------------------------+-------------------------+ 
+|             |            |   Title    |                              |                         |
+|  NavImageBtn|   Logo     |            |   CustomView                 |      ActionMenuView     |
+|             |            +------------+                              |                         |
+|             |            |   subTitle |                              |                         | 
++-------------+------------+------------+------------------------------+-------------------------+
 
 ```
 #### 布局- CoordinatorLayout

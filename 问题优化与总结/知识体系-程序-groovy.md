@@ -256,6 +256,8 @@ GPath
 [官网地址](http://groovy-lang.org/metaprogramming.html)
 >groovy.lang.GroovyObject is the main interface in Groovy as the Object class is in Java. 
 
+ExpandoMetaClass和Category可以实现元编程。
+
 ```groovy
 package groovy.lang;
 
