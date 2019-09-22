@@ -1,9 +1,22 @@
-#Gradle
+# Gradle
 
 Gradle provides a Domain Specific Language (DSL), for describing builds. 
 
 Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of work). 
 
+
+```
+ +--------------------------------------------+ 
+ |                                            |
+ |                                            |
+ |   gradleshell(parse gradle file)           |
++---------------------------------------------+
+ |                 Gradle                     |
+ |                                            |
+ +--------------------------------------------+
+
+
+```
 
 ```
 +-----------------------------------------------------------------------------------------------+
