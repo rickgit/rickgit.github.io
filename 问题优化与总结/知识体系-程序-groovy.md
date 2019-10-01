@@ -314,3 +314,27 @@ Memoization/Composition/Trampoline/Method pointers
 ## 文件
 
 eachLine 
+
+
+## 源码
+```
+  001_initial_maven a9da497ee8aff08c1ae03a816488601dc80b9a2d Initial revision
+  002_classworld    f1d001cb3c2e628888e49aebc967a744a1a4799c -- Addded classworlds as a dependency -- Simple classworlds script and config for compiler -- Maven target to install groovy toolchain to a staging dir
+  003_grok          9072d39d15bdf14c2624f6f81b696d4d031e55ea Mutating the classworlds config stuff to support mulitple binaries, so we can run the compiler or grok (groovydoc).
+* 004_code          de588ab0be7501f55518e5067e70d17b7343fed5 refactored the source tree to make things a little cleaner.
+
+
+
++-------------------------------------------------------------------+
+|                                                                   | 
+| Token lexer parser                                                |
+|         syntax       codegen                                      |
+|                                                                   |
+|    Compiler                                                       |
++-------------------------------------------------------------------+
+|                      asm-objectweb                                |  
++-------------------------------------------------------------------+
+|                    Groovy                                         | 
++-------------------------------------------------------------------+
+
+```

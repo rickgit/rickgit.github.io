@@ -7,12 +7,12 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 
 ```
  +--------------------------------------------+ 
- |                                            |
- |                                            |
- |   gradleshell(parse gradle file)           |
+ |   project,Task                             |
++---------------------------------------------+
+ +--------------------------------------------+ 
+ |   gradleshell(parse gradle file)     Dag   |
 +---------------------------------------------+
  |                 Gradle                     |
- |                                            |
  +--------------------------------------------+
 
 
