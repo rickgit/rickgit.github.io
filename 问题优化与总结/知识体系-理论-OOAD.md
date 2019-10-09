@@ -48,35 +48,34 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 
 
 
-[职责分配原则](《Applying UML and Patterns》)
-+---------+-----------+--------------------------------+------------------------------------------------------+-------------------+
-|         |           |                                |        S.R.P                                         |                   |
-|         |           | Dependency Inversion Principle |        for short                                     |                   |
-|         |           |   depend on abstractions       |                                                      |                   |
-|         |           |   not on concretions           |                                                      |                   |
-|         |           +---------------------------------------------------------------------------------------+                   |
-|         |           | Liskov substitution principle  |      Interface segregation principle                 |                   |
-|         | protected |   every subclass/derived class |        never be forced to implement                  |                   |
-|         | variations|   should be        |        an interface that it doesn't use;             |                   |
-|   GRASP |           |   for their base/parent class  |        or shouldn't be forced to depend on           |                   |
-|         |           |                                |        methods they do not use                       |                   |
-|         |           +--------------------------------+------------------------------------------------------+                   |
-|         |           |   Open-closed Principle                                                               |   LoD/PLK         |
-|         |           |     open for extension,                                                               |   loose coupling  |
-|         |           |     but closed for modification                                                       |                   |
-|         |           |                                                                                       |   CARP reusablity |
-|         +-----------+--------+------------------------------------------------------------------------------+                   |
-|         |creator,            |                                                                              |                   |
-|         |controller,         |                                                                              |                   |
-|         |indirection,        |          23 Design Patterns                                                  |                   |
-|         |information expert, |                                                                              |                   |
-|         |high cohesion,      |                                                                              |                   |
-|         |low coupling,       |                                                                              |                   |
-|         |polymorphism,       |                                                                              |                   |
-|         |pure fabrication    |                                                                              |                   |
-+------------------------------+------------------------------------------------------------------------------+-------------------+
+[职责分配原则](《Applying UML and Patterns》) 
 
-
++------------------------------+--------------------------------------------------------------------------------------------------+
+|         |creator,            |                                                                                                  |
+|         |controller,         |                                                                                                  |
+|         |indirection,        |          23 Design Patterns                            J2EE Patterns                             |
+|         |information expert, +--------------------------------------------------------------------------------------------------+
+|         |high cohesion,      |                                                                                                  |
+|         |low coupling,       |     Design Patterns - Elements of Reusable Object-Oriented Software                              |
+|         |polymorphism,       |                                                                                                  |
+|         |pure fabrication    |                                                                                                  |
++---------------------------------------------------------------+---------------------------------------------+-------------------+
+|         |                    |                                |        S.R.P                  LoD/PLK       |                   |
+|         |                    | Dependency Inversion Principle |        for short              loose coupling|                   |
+|         |                    |   depend on abstractions       |                                             |                   |
+|         |                    |   not on concretions           |                                             |                   |
+|         |                    +------------------------------------------------------------------------------+                   |
+|         |                    | Liskov substitution principle  |      Interface segregation principle        |                   |
+|         | protected          |   every subclass/derived class |        never be forced to implement         |                   |
+|         | variations         |   should be                    |        an interface that it doesn't use;    |                   |
+|   GRASP |                    |   for their base/parent class  |        or shouldn't be forced to depend on  |                   |
+|         |                    |                                |        methods they do not use              |                   |
+|         |                    +--------------------------------+---------------------------------------------+                   |
+|         |                    |   Open-closed Principle                                                      |                   |
+|         |                    |     open for extension,                                                      |   CARP reusablity |
+|         |                    |     but closed for modification                                              |                   |
+|         |                    |                                                                              |                   |
++---------+--------------------+------------------------------------------------------------------------------+-------------------+ 
 
 ```
 
