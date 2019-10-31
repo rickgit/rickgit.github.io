@@ -2,11 +2,22 @@
 
 ## 源码
 ```
-  001_initial_maven a9da497ee8aff08c1ae03a816488601dc80b9a2d Initial revision
-  002_classworld    f1d001cb3c2e628888e49aebc967a744a1a4799c -- Addded classworlds as a dependency -- Simple classworlds script and config for compiler -- Maven target to install groovy toolchain to a staging dir
-  003_grok          9072d39d15bdf14c2624f6f81b696d4d031e55ea Mutating the classworlds config stuff to support mulitple binaries, so we can run the compiler or grok (groovydoc).
-* 004_code          de588ab0be7501f55518e5067e70d17b7343fed5 refactored the source tree to make things a little cleaner.
-
+  001_initial_maven      a9da497ee8aff08c1ae03a816488601dc80b9a2d Initial revision
+  002_classworld         f1d001cb3c2e628888e49aebc967a744a1a4799c -- Addded classworlds as a dependency -- Simple classworlds script and config for compiler -- Maven target to install groovy toolchain to a staging dir
+  003_grok               9072d39d15bdf14c2624f6f81b696d4d031e55ea Mutating the classworlds config stuff to support mulitple binaries, so we can run the compiler or grok (groovydoc).
+  004_code               de588ab0be7501f55518e5067e70d17b7343fed5 refactored the source tree to make things a little cleaner.
+  005_RangeExp           b02feeab2e78130ae259e463927fddda2365c9c6 added implementation of RangeExpression
+  006_closures           20c88544e4f4b3c39ef344eb91dd6ea1ee83cc0a added support for closures in the
+  007_operation          63726dafc5074107fd885ac5b6e8981c51e481d8 implemented + - * / for numbers and + - for Strings
+  008_FileSystemCompiler 28f7cd947c9fec0d596f42c1f5542f74a316a355 Hey, fix that command-line bin/groovy scripts classworlds config for the new filesystem compiler.
+  009_GDO                d56ce8e4e03187e6e53e20d257b8182bbeba8c73 Added initial checkin of the GroovyDataObjects (GDO) developed at GeekNight with Chris Stevenson for creating groovy data objects via normal Groovy syntax (rather than SQL) and using closures for predicates or view projections or order by clauses
+  010_script             00f64cb5bdc0d06c8a6bf36084e5e89e3711ecd3 Static methods (such as scripts) can now use closures. Also fixed a bug in the codegen of static methods.
+  011_groovyshell        a2920acebb4082d5f1e770f557eb13ca9025c21a Refactored Groovy to be called GroovyShell which is a bit more descriptive.
+  012_bsf                76ffae17999c7a6f7bbceab680e6117184a7ac74 Initial cut of a BSF engine for Groovy
+  013_console            03519132b091a3c956da2494f40eb3c0e037622c Added a simple (and so far quite crap) groovy console in Swing
+  014_GroovyMock         9d52257fc429f90582fce6b3358f0aae687fe489 Added GroovyMock library for mock testing of groovy objects
+* 015_InteractiveShell   ffc170359391e00ebc97dc24d23156730fd17ef8 Added a really simple interactive command line shell
+ 
 
 +-------------------------------------------------------------------+ 
 |  CSTNode    SemanticVerifier   ASTNode/ClassNode                  |
@@ -16,7 +27,7 @@
 |       Token lexer                                                 |
 |         syntax                                                    |
 |                                                                   |
-|       Compiler                                 grok               |
+|       Compiler                                AntBuilder   grok       |
 +-------------------------------------------------------------------+
 |         classworlds           asm(objectweb)                      |
 +-------------------------------------------------------------------+

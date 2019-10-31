@@ -1,8 +1,12 @@
 
+
+
 ```
 +------------------+---------------------------------------------------------------------------------+
-|  compiler        |         Clang ,GCC ,Microsoft Visual Studio / Express / C++                     |+------------------+---------------------------------------------------------------------------------+
-|  library         |         Bionic libhybris,      glibc ,      Microsoft Run-time Library          |+------------------+---------------------------------------------------------------------------------+
+|  compiler        |         Clang ,GCC ,Microsoft Visual Studio / Express / C++                     |
++------------------+---------------------------------------------------------------------------------+
+|  library         |         Bionic libhybris,      glibc ,      Microsoft Run-time Library          |
++------------------+---------------------------------------------------------------------------------+
 |  comunicate      | Char (ctype.h)   File I/O (stdio.h)   Math (math.h)   Dynamic memory(stdlib.h)  |
 |                  | String (string.h)     Time (time.h)   Variadic (stdarg.h)  POSIX(unistd.h)      |
 +------------------+------------------------+------------+---------+-----------+-------+-------------+
@@ -30,6 +34,55 @@
 
 
 ```
+## 系统
+[UNIX](https://en.wikipedia.org/wiki/Unix)
+![UNIX家族](https://upload.wikimedia.org/wikipedia/commons/7/77/Unix_history-simple.svg)
+
+[POSIX](https://en.wikipedia.org/wiki/POSIX)
+```
++-------+-------------------------------------------------------------------------------+------------------------------------+
+|       |                                                                               |                                    |
+|       | <aio.h>       <iconv.h>       <poll.h>       <string.h>       <sys/uio.h>     |  <assert.h>        <stdatomic.h>   |
+|       |                                                                               |                                    |
+|       | <arpa/inet.h> <inttypes.h>    <pthread.h>    <strings.h>      <sys/un.h>      |  <complex.h> C99   <stdbool.h> C99 |
+|       |                                                                               |                                    |
+|       | <assert.h>    <iso646.h>      <pwd.h>        <stropts.h>      <sys/utsname.h> |  <ctype.h>         <stddef.h>      |
+|       |                                                                               |                                    |
+|       | <complex.h>   <langinfo.h>    <regex.h>      <sys/ipc.h>      <sys/wait.h>    |  <errno.h>         <stdint.h>  C99 |
+|       |                                                                               |                                    |
+| POSXI | <cpio.h>      <libgen.h>      <sched.h>      <sys/mman.h>     <syslog.h>      |  <fenv.h>    C99   <stdio.h>       |
+|       |                                                                               |                                    |
+|       | <dirent.h>    <limits.h>      <search.h>     <sys/msg.h>      <tar.h>         |  <float.h>         <stdlib.h>      |
+|       |                                                                               |                                    |
+|       | <dlfcn.h>     <locale.h>      <semaphore.h>  <sys/resource.h> <termios.h>     |  <inttypes.h>      <stdnoreturn.h> |
+|       |                                                                               |                                    |
+|       | <errno.h>     <math.h>        <setjmp.h>     <sys/select.h>   <tgmath.h>      |  <iso646.h>  NA1   <string.h>      |
+|       |                                                                               |                                    |
+|       | <fcntl.h>     <monetary.h>    <signal.h>     <sys/sem.h>      <time.h>        |  <limits.h>        <tgmath.h>  C99 |
+|       |                                                                               |                                    |
+|       | <fenv.h>      <mqueue.h>      <spawn.h>      <sys/shm.h>      <trace.h>       |  <locale.h>        <threads.h> C11 |
+|       |                                                                               |                                    |
+|       | <float.h>     <ndbm.h>        <stdarg.h>     <sys/socket.h>   <ulimit.h>      |  <math.h>          <time.h>        |
+|       |                                                                               |                                    |
+|       | <fmtmsg.h>    <net/if.h>      <stdbool.h>    <sys/stat.h>     <unistd.h>      |  <setjmp.h>        <uchar.h>   C11 |
+|       |                                                                               |                                    |
+|       | <fnmatch.h>   <netdb.h>       <stddef.h>     <sys/statvfs.h>  <utime.h>       |  <signal.h>        <wchar.h>   NA1 |
+|       |                                                                               |                                    |
+|       | <ftw.h>       <netinet/in.h>  <stdint.h>     <sys/time.h>     <utmpx.h>       |  <stdalign.h>      <wctype.h>      |
+|       |                                                                               |                                    |
+|       | <glob.h>      <netinet/tcp.h> <stdio.h>      <sys/times.h>    <wchar.h>       |  <stdarg.h>                        |
+|       |                                                                               |                                    |
+|       | <grp.h>       <nl_types.h>    <stdlib.h>     <sys/types.h>    <wctype.h>      +------------------------------------+
+|       |                                                                               |           basic C library          |
+|       |                                                               <wordexp.h>     |                                    |
+|       |                                                                               |           (ANSI or ISO C Library)  |
++-------+-------------------------------------------------------------------------------+------------------------------------+
+
+
+```
+[POSIX 定义](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html)
+[POSIX 描述](https://en.wikipedia.org/wiki/C_POSIX_library)
+
  [api](https://en.cppreference.com/w/)
 ## 关键字与符号
 [关键词](https://blog.csdn.net/weibo_dm/article/details/81629693)

@@ -10,11 +10,11 @@ DSA
 +                  +             +------+--------------------------+-------+
 |  data structures |  stack/queue|      |          BST             |       |
 |                  |             |      +--------------------------+       |
-|                  |  grap       |      |AVL Trees     |red-black  | btree |
+|                  |  graph      |      |AVL Trees     |red-black  | btree |
 |                  |             |      +--------------------------+       |
-|                  |             |      |Left rotation |           |       |
+|                  |  matrix     |      |Left rotation |           |       |
 |                  |             |      |Right rotation|           |       |
-|                  |             |      |Left-Right    |           |       |
+|                  |  String     |      |Left-Right    |           |       |
 |                  |             |      |right-Left    |           |       |
 +------------------+-------------+------+--------------+-----------+-------+
 |                  |Search Insert|                 Sort                    |
@@ -229,4 +229,46 @@ Insertion
 Deletion 
 Traversal （二叉树根节点访问顺序分为 先序遍历（中左右） 中序遍历（左中右） 后序遍历（左右中））
 Verification
+```
+
+
+### QR Code Graph
+>History. The smallest QR codes are 21x21 pixels, and the largest are 177x177. The sizes are called versions. The 21x21 pixel size is version 1, 25x25 is version 2, and so on. The 177x177 size is version 40.Each version is 4 pixels larger than the previous version.[（引用）](https://www.thonky.com/qr-code-tutorial/introduction)
+
+
+
+
+[Character Capacities by Version, Mode, and Error Correction](https://www.thonky.com/qr-code-tutorial/character-capacities)
+[Error Correction Code Words and Block Information](https://www.thonky.com/qr-code-tutorial/error-correction-table)
+
+#### 生成QR
+- Data Analysis()
+- Data Encoding(**Mode Indicator**,**Character Count Indicator**,**Encoded Data**,**Terminator**)
+- Structure Final Message(**Data Encoding**,**Error Correction Coding**)
+里德-所罗门码
+- Data Masking(**Structure Final Message**)
+
+- Format Information(**error correction level**,**mask pattern**,**Error Correction Bits**)
+- Version Information(**version string**,**error correction string**)
+
+- Matrix(**Data Masking**,**Format Information**,**Version Information**)
+ 
+
+
+## LEETCODE
+```java
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        int unsortindex,compareindex;
+        //unsorted
+        for(unsortindex=0;unsortindex<nums.length;unsortindex++){
+            for(compareindex=unsortindex+1;compareindex<nums.length;compareindex++){
+                if(nums[unsortindex]+nums[compareindex]==target){
+                        return new int[]{unsortindex,compareindex}; 
+                }
+            }
+        }
+        return null;
+    }
+}
 ```

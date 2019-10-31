@@ -11,7 +11,7 @@
 4级，模块
 
 ```
-编写代码功能，处理耦合问题（语言，性能，内存/代码数量，可拓展 ），产生内聚现象，重用代码，又出现耦合问题，反复处理。
+编写代码功能，处理耦合问题（语言，性能，内存/代码数量，可拓展 ），产生内聚现象/冗余（Redundancy）问题，重用/删除代码；又出现耦合问题，反复处理。
 方法間耦合，内聚为（抽象為/开闭原则）类，重用Class的代码產生Class和Class之间的关系（泛化/实现 > 关联{组合 > 聚合} > 依赖），CARP原则，尽量使用组合/聚合重用。
 类与类之间的关系强弱（需要降低耦合），将类放到不同Package，Package调用频率的情况下，重用为依赖包（模块/组件），开闭原则支持拓展。
 
@@ -92,7 +92,7 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 - YAGNI "极限编程"
 - Rule of three 《Refactoring》
 
-工厂单例构造原型，组合适配桥接 代理享元装饰外观,命令中介观察访问备忘  解释策略状态 责任迭代模板 
+工厂单例构造原型，桥接适配组合 代理享元装饰外观,命令中介观察访问备忘  解释责任模板 迭代策略状态 
 ```
 1. Strategy:
 Defines a family of algorithms, encapsulates each one, and make them interchangeable.

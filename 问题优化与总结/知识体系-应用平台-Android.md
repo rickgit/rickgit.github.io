@@ -29,8 +29,8 @@
 |         |InputMethodManager    | RecyclerView           |     ColorFilter Point   |                        |
 |         |Animation             | ViewPager              |     Rect                |                        |
 +--------------------------------+------------------------+-------------------------+------------------------+
-| App     |   AMS             WMS    View System        content provider   XMPP                              |
-|Framework|   PMS             NMS    ResourceManager    TelephonyManager   LMS                               |
+| App     |   AMS             WMS    View System        content provider   XMPP                              |//type: BootStrapService,
+|Framework|   PMS             NMS    ResourceManager    TelephonyManager   LMS                               |//coreServices,OtherService
 +--------------------------------------------------------------------------------------+---------------------+
 |         |   Surface Manager    Media       Webkit                        | Android      +----------------+ +
 |         |   OpenGL+ES (3d)                 SQLite                        | Runtime      | dalvik vm      | |
@@ -119,7 +119,7 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 | +--------------+ |       |                     |      |                           |
 | |system_server | |       |  +---------------+  |      |                           |
 | +--------------+ |       |  | mediaserver   |  |      |                           |
-| |              | |       |  +---------------+  |      |                           |
+| |SysServiceMgr | |       |  +---------------+  |      |                           |
 | | AMS,WMS,PMS..| |       |  | AudioFlinger  |  |      |                           |
 | | ServerThread | |       |  |   APS         |  |      |                           |
 | |   JSS        | |       |  |   MPS         |  |      |                           |
@@ -397,12 +397,17 @@ AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AI
 
 
 ## Native Layer
-[jni方法注册方式](https://www.jianshu.com/p/1d6ec5068d05) 
+ 
+
+
 init进程会孵化出ueventd、logd、healthd、installd、adbd、lmkd等用户守护进程
 init进程还启动servicemanager(binder服务管家)、bootanim(开机动画)等重要服务
 init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java进程(即虚拟机进程)，Zygote是所有Java进程的父进程
 --------------------- 
 [作者：硬刚平底锅  ](https://blog.csdn.net/qq_30993595/article/details/82714409)
+
+
+[jni方法注册方式](https://www.jianshu.com/p/1d6ec5068d05) 
 
 c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr 三种， Android 中封装了sp<> 强指针，wp<>弱指针的操作
 
@@ -775,7 +780,7 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
 ```
 
-##### 动画事件 
+##### WMS 窗口动画动画事件 
 [动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
 ```
  +-------------+-------------------------------+------------------+-------------------+-------------------+
@@ -1139,12 +1144,19 @@ Zygote进程启动后，加载ZygoteInit类，注册Zygote Socket服务端套接
 System Server进程，是由Zygote进程fork而来，System Server是Zygote孵化的第一个进程，System Server负责启动和管理整个Java framework，包含ActivityManager，PowerManager等服务
 Media Server进程，是由init进程fork而来，负责启动和管理整个C++ framework，包含AudioFlinger，Camera Service等服务
 
-相关系统服务
+相关系统服务（引导服务，核心服务，其他服务）
  PKMS（安装、卸载、更新以及解析AndroidManifest.xml），
  AMS（（1）统一调度各应用程序的Activity
       （2）内存管理
       （3）进程管理），
-WMS（输出-显示,包括 Activity，Dialog，PopupWindow，Toast），IMS（输入-事件），NMS(通知,Toast),IMMS(输入法弹窗)
+窗口
+- WMS 窗口管理（输出-显示,分为系统窗口，应用窗口，子窗口；包括 Activity，Dialog，PopupWindow，Toast），
+- 动画
+- IMS（输入-事件），
+- NMS(通知,Toast),IMMS(输入法弹窗)
+- Surface 窗口绘制
+
+
 PwMS,JSS,DMS,DisplayManagerService、BatteryService，MSM
 
 
@@ -1188,7 +1200,7 @@ Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对�
                                           +------------------------------------------+
 
 ```
-### SystemServer - InputManagerService
+### SystemServer - 窗口事件 InputManagerService
  [事件](http://gityuan.com/2016/12/31/input-ipc/)
  [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
 - InputReader线程：通过EventHub从/dev/input节点获取事件，转换成EventEntry事件加入到InputDispatcher的mInboundQueue。EventHub采用INotify + epoll机制
@@ -1236,6 +1248,148 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 }
 
 ```
+### SystemServer - 窗口视图（ 测量，布局及绘制,事件，动画，适配）wms
+Activity、Dialog、PopWindow、Toast
+
+ popupwindow 与 Dialog
+- popupwindow 非阻塞浮层
+- Dialog 阻塞式对话框
+
+#### 其他组件 View ，controls,layouts
+
+``` 
+SystemUI（Statusbar）
++-----------------------------------+
+|               Activity            |
+|  +-----------------------------+  |
+|  |       Phone Window          |  |
+|  |   +---------------------+   |  |
+|  |   |     DecorView       |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  |TitleView +---------------->+ActionBarContainer+--->+ ActionBar |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  | Content  | |  |   |  |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |   View   +---------------->+ FrameLayout      |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   +---------------------+   |  |
+|  |                             |  |
+|  +-----------------------------+  |
++-----------------------------------+
+SystemUI（NavigateUI）
+
+
+Toolbar
++-------------+------------+------------+------------------------------+-------------------------+ 
+|             |            |   Title    |                              |                         |
+|  NavImageBtn|   Logo     |            |   CustomView                 |      ActionMenuView     |
+|             |            +------------+                              |                         |
+|             |            |   subTitle |                              |                         | 
++-------------+------------+------------+------------------------------+-------------------------+
+
+```
+#### 布局- CoordinatorLayout
+
+```java
+public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
+
+    private final List<View> mDependencySortedChildren = new ArrayList<>();
+    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
+
+    private final List<View> mTempList1 = new ArrayList<>();
+    private final List<View> mTempDependenciesList = new ArrayList<>();
+    private final int[] mTempIntPair = new int[2];
+    private Paint mScrimPaint;
+
+    private boolean mDisallowInterceptReset;
+
+    private boolean mIsAttachedToWindow;
+
+    private int[] mKeylines;
+
+    private View mBehaviorTouchView;
+    private View mNestedScrollingTarget;
+
+    private OnPreDrawListener mOnPreDrawListener;
+    private boolean mNeedsPreDrawListener;
+
+    private WindowInsetsCompat mLastInsets;
+    private boolean mDrawStatusBarBackground;
+    private Drawable mStatusBarBackground;
+
+    OnHierarchyChangeListener mOnHierarchyChangeListener;
+    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
+
+    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
+            new NestedScrollingParentHelper(this);
+}
+```
+
+### SystemServer -窗口通知 NMS( NotificationManagerService) 
+**通知**是一个可以在应用程序正常的用户界面之外显示给用户的消息。
+
+```java
+
+public class NotificationManagerService extends SystemService {
+    private final IBinder mService = new INotificationManager.Stub();
+    private WorkerHandler mHandler;
+}
+}
+
+ protected class NotificationListenerWrapper extends INotificationListener.Stub {
+```
+**NotificationListenerService** 获取系统通知相关信息，主要包含：通知的新增和删除，获取当前通知数量，通知内容相关信息
+NotificationManager/nofitycation
+```
++-----------------------------------+         +-------------------------------------+
+|  SystemServer                     |         |  SystemUI(App process)              |
+|                                   |         |                                     |
+|                                   |         |                                     |
+|       +-------------------------+ |         |   +-------------------------+       |
+|       | NMS                     | |         |   | NotificationListener    |       |
+|       |                         | |         |   |                         |       |
+|       |   sound/vibrate/LIGHTS  | |         |   |                         +----+  |
+|       |                         | |         |   |                         |    |  |
+|       |   INotificationListener +<---------------->  onBind(Intent intent)|    |  |
+|       |                         | |         |   |                         |    |  |
+|       +-------------------------+ |         |   +-------------------------+    |  |
+|                                   |         |   +---------------------------+  |  |
+|                                   |         |   | NotificationEntryManager  |  |  |
+|                                   |         |   |       NotificationPanel   | <+  |
+|                                   |         |   |       Heads-up            |     |
+|                                   |         |   |       NotificationClicker |     |
+|                                   |         |   +---------------------------+     |
++-----------------------------------+         +-------------------------------------+
+
+```
+[SystemUI应用启动](https://www.jianshu.com/p/2e0f403e5299)
+```
+Status Bar状态栏信息显示，比如电池，wifi信号，3G/4G等icon显示
+Notification Panel 通知面板，比如系统消息，第三方应用消息
+Recents 近期任务栏显示面板，比如长按近期任务快捷键，显示近期使用的应用
+NavigationBar（导航栏）
+Keyguard（锁屏界面）
+Screenshot截图服务
+壁纸服务
+VolumeUI 音量调节对话框
+PowerUI 电源界面
+Ringtoneplayer 铃声播放器页面
+
+android 7.0:
+StackDriver分屏功能调节器
+PipUI画中画界面
+```
+
 ### SystemServer - PKMS(PackageManagerService)
 #### apk安装过程/应用进程创建过程/应用安装过程
 [Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
@@ -1308,67 +1462,8 @@ public class LocationManagerService extends ILocationManager.Stub {
 ```
 
 
-### SystemServer -NMS( NotificationManagerService) 通知
-**通知**是一个可以在应用程序正常的用户界面之外显示给用户的消息。
 
-```java
 
-public class NotificationManagerService extends SystemService {
-    private final IBinder mService = new INotificationManager.Stub();
-    private WorkerHandler mHandler;
-}
-}
-
- protected class NotificationListenerWrapper extends INotificationListener.Stub {
-```
-**NotificationListenerService** 获取系统通知相关信息，主要包含：通知的新增和删除，获取当前通知数量，通知内容相关信息
-NotificationManager/nofitycation
-```
-+-----------------------------------+         +-------------------------------------+
-|  SystemServer                     |         |  SystemUI(App process)              |
-|                                   |         |                                     |
-|                                   |         |                                     |
-|       +-------------------------+ |         |   +-------------------------+       |
-|       | NMS                     | |         |   | NotificationListener    |       |
-|       |                         | |         |   |                         |       |
-|       |   sound/vibrate/LIGHTS  | |         |   |                         +----+  |
-|       |                         | |         |   |                         |    |  |
-|       |   INotificationListener +<---------------->  onBind(Intent intent)|    |  |
-|       |                         | |         |   |                         |    |  |
-|       +-------------------------+ |         |   +-------------------------+    |  |
-|                                   |         |   +---------------------------+  |  |
-|                                   |         |   | NotificationEntryManager  |  |  |
-|                                   |         |   |       NotificationPanel   | <+  |
-|                                   |         |   |       Heads-up            |     |
-|                                   |         |   |       NotificationClicker |     |
-|                                   |         |   +---------------------------+     |
-+-----------------------------------+         +-------------------------------------+
-
-```
-[SystemUI应用启动](https://www.jianshu.com/p/2e0f403e5299)
-```
-Status Bar状态栏信息显示，比如电池，wifi信号，3G/4G等icon显示
-Notification Panel 通知面板，比如系统消息，第三方应用消息
-Recents 近期任务栏显示面板，比如长按近期任务快捷键，显示近期使用的应用
-NavigationBar（导航栏）
-Keyguard（锁屏界面）
-Screenshot截图服务
-壁纸服务
-VolumeUI 音量调节对话框
-PowerUI 电源界面
-Ringtoneplayer 铃声播放器页面
-
-android 7.0:
-StackDriver分屏功能调节器
-PipUI画中画界面
-```
-
-### SystemServer -wms
-Activity、Dialog、PopWindow、Toast
-
- popupwindow 与 Dialog
-- popupwindow 非阻塞浮层
-- Dialog 阻塞式对话框
 ### SystemServer - mediaserver
 多媒体信息，包括文字，图像，图形，音频，视频
 
@@ -1734,7 +1829,7 @@ APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->
 
 
 ```
-#### 启动模式，任务栈，亲和度
+#### AMS 栈管理（任务栈），启动模式，亲和度
 Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
 ```bash
 adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
@@ -1953,84 +2048,7 @@ signatureOrSystem
 签名相同或者申请权限的应用为系统应用才能将权限授给它 
 ```
 
-### 其他组件 View（ 测量，布局及绘制,事件，动画），controls,layouts
 
-``` 
-+-----------------------------------+
-|               Activity            |
-|  +-----------------------------+  |
-|  |       Phone Window          |  |
-|  |   +---------------------+   |  |
-|  |   |     DecorView       |   |  |
-|  |   |  +---------------+  |   |  |
-|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
-|  |   |  |  |TitleView +---------------->+ActionBarContainer+--->+ ActionBar |
-|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
-|  |   |  |  +----------+ |  |   |  |
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  | Content  | |  |   |  |
-|  |   |  |  |          | |  |   |  |     +------------------+
-|  |   |  |  |   View   +---------------->+ FrameLayout      |
-|  |   |  |  |          | |  |   |  |     +------------------+
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  |          | |  |   |  |
-|  |   |  |  +----------+ |  |   |  |
-|  |   |  +---------------+  |   |  |
-|  |   +---------------------+   |  |
-|  |                             |  |
-|  +-----------------------------+  |
-+-----------------------------------+
-
-
-
-Toolbar
-+-------------+------------+------------+------------------------------+-------------------------+ 
-|             |            |   Title    |                              |                         |
-|  NavImageBtn|   Logo     |            |   CustomView                 |      ActionMenuView     |
-|             |            +------------+                              |                         |
-|             |            |   subTitle |                              |                         | 
-+-------------+------------+------------+------------------------------+-------------------------+
-
-```
-#### 布局- CoordinatorLayout
-
-```java
-public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
-
-    private final List<View> mDependencySortedChildren = new ArrayList<>();
-    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
-
-    private final List<View> mTempList1 = new ArrayList<>();
-    private final List<View> mTempDependenciesList = new ArrayList<>();
-    private final int[] mTempIntPair = new int[2];
-    private Paint mScrimPaint;
-
-    private boolean mDisallowInterceptReset;
-
-    private boolean mIsAttachedToWindow;
-
-    private int[] mKeylines;
-
-    private View mBehaviorTouchView;
-    private View mNestedScrollingTarget;
-
-    private OnPreDrawListener mOnPreDrawListener;
-    private boolean mNeedsPreDrawListener;
-
-    private WindowInsetsCompat mLastInsets;
-    private boolean mDrawStatusBarBackground;
-    private Drawable mStatusBarBackground;
-
-    OnHierarchyChangeListener mOnHierarchyChangeListener;
-    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
-
-    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
-            new NestedScrollingParentHelper(this);
-}
-```
 ### 数据存储
 SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
 
@@ -2319,7 +2337,7 @@ Uptime: 53403267 Realtime: 53403267
 ```
     2. 显示CPU使用情况(查看后台运行)，耗电
     3. 绘制优化(profiler) CPU/Memory/Network
-
+控件边界图，绘制条状图
 ```
 +---------+--------+-------------------+---------+--------+------+------+--------+--------+-------+--------+------+-------+--------+
 |         |        | Wall clock time/  |         |        |      |      |        |        |       |        |      |       |        |
@@ -2369,7 +2387,8 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
 
 ```
 #### 可维护性 - 架构之模块化（插件化及组件化）
-插件化
+插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
+Activity校验，生命周期，Service优先级，资源访问，so插件化
 - Dynamic-loader-apk
   [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
 - Replugin

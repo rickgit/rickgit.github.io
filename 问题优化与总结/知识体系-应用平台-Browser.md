@@ -10,8 +10,10 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
 
 +-------------------------------------------------------------------------------+
-|  gclient                                                                       |
-|   depot_tools                                                                     |
+|  repo wtf weekly  git-gs zsh-goodies gn ninja                                                         |
+|  cpplint.py pylint presubmit_support.py                                                          |
+|  gclient gcl git-cl svn drover                                                         |
+|   depot_tools                                                                 |
 +-------------------------------------------------------------------------------+
 |                                                                               |
 |   chromium                                                                    |
