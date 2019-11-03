@@ -2119,6 +2119,9 @@ Glide
 > 性能（ the time taken to execute tasks）
 
 [Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
+稳定，流畅，续航，精简
+am_crash
+
 ```shell 
 #adb shell "getprop | grep heapgrowthlimit"
 #adb shell "getprop|grep dalvik.vm.heapstartsize"

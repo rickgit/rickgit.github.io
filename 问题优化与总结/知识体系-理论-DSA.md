@@ -271,4 +271,68 @@ class Solution {
         return null;
     }
 }
+
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        int overValue=0;int value=0;
+        ListNode first=null;ListNode prenode=null;ListNode node=null;
+        while(l1!=null||l2!=null){
+            value=(l1==null?0:l1.val)+(l2==null?0:l2.val)+overValue;
+            node=new ListNode(value%10); 
+            
+            overValue=value/10;
+            if(prenode==null)
+                first=node;
+            else
+                prenode.next=node;
+            prenode=node;
+            
+            if(l1!=null)
+            l1=l1.next;
+            if(l2!=null)
+            l2=l2.next;
+        }
+        if(overValue!=0)
+            prenode.next=new ListNode(overValue);
+        return first;
+    }
+}
+
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        if(s==null||"".equals(s))
+            return 0;
+        
+        char[]  chars=s.toCharArray();
+        if(chars.length==1)
+            return 1;
+        
+        int lastFindindex=0,lastLenth=0;
+        int recentFindIndex=0,recentLenth=0;
+        int index=0;
+        
+        for(index=0;index<chars.length;index++){//"dvdf" : 1 0 1,1 2 2, 
+            for(recentFindIndex=index-1;recentFindIndex>=0&&recentFindIndex>=index-recentLenth;recentFindIndex--){
+                if(chars[recentFindIndex]!=chars[index])
+                    continue;
+                break;                    
+            }
+            
+            if(index-recentFindIndex<=recentLenth){
+                recentLenth=index-recentFindIndex;
+            }else{
+                recentLenth++;
+            }
+            
+            if(recentLenth>lastLenth){
+                lastFindindex=index;
+                lastLenth=recentLenth;
+            }
+            
+        }
+        
+        return lastLenth;
+        
+    }
+}
 ```

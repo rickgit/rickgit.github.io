@@ -39,6 +39,16 @@
 ![UNIX家族](https://upload.wikimedia.org/wikipedia/commons/7/77/Unix_history-simple.svg)
 
 [POSIX](https://en.wikipedia.org/wiki/POSIX)
+
+### C库
+只要是符合ANSI（美国国家标准学会） C标准的C库都可以叫做标准C库。
+
+现有的著名的POSIX标准的C库有：GUN C库（glibc）和Embedded Linux C库（uClibc） Bionic（Android）
+
+[Single_UNIX_Specification](https://en.wikipedia.org/wiki/Single_UNIX_Specification)
+
+[C POSIX library](https://en.wikipedia.org/wiki/C_POSIX_library)
+ 
 ```
 +-------+-------------------------------------------------------------------------------+------------------------------------+
 |       |                                                                               |                                    |
@@ -738,46 +748,3 @@ CMake的是构建系统的生成器，CMake代表跨平台Make。
 [autoconf编写](https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Setup.html#Setup)
 
 
-## C库
-只要是符合ANSI（美国国家标准学会） C标准的C库都可以叫做标准C库。
-
-现有的著名的POSIX标准的C库有：GUN C库（glibc）和Embedded Linux C库（uClibc） Bionic（Android）
-
-[Single_UNIX_Specification](https://en.wikipedia.org/wiki/Single_UNIX_Specification)
-
-[C POSIX library](https://en.wikipedia.org/wiki/C_POSIX_library)
-```cpp
-
-<assert.h>
-<complex.h>
-<ctype.h>
-<dirent.h>
-<dlfcn.h>
-<errno.h>
-<fcntl.h>
-<fenv.h>
-<float.h>
-<inttypes.h>
-<iso646.h>
-<limits.h>
-<locale.h>
-<math.h>
-<pthread.h>
-<setjmp.h>
-<signal.h>
-<stdarg.h>
-<stdbool.h>
-<stddef.h>
-<stdint.h>
-<stdio.h>
-<stdlib.h>
-<string.h>
-<sys/stat.h>
-<tgmath.h>
-<time.h>
-<unistd.h>
-<utime.h>
-<wchar.h>
-<wctype.h>
-
-```
