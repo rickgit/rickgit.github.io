@@ -2444,7 +2444,23 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 
 
 
-##NDK
+## NDK
+
+```md
+GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
+
+[编译linux内核所用的gcc版本？ - jiangtao9999的回答 - 知乎](https://www.zhihu.com/question/58955848/answer/305063368)
+```
+
+```md
+    1.预处理是解决一些宏定义的替换等工作，为编译做准备,对应的gcc操作为：gcc -E xx.c -o xx.i(xx为源文件名)。
+    2.编译是将源码编译为汇编语言的过程，对应的gcc操作为:gcc -S xx.i -o xx.s。由xx.i 产生xx.s文件。
+    3.汇编是将汇编代码的文件汇编为机器语言的过程，对应的gcc操作为：gcc -c xx.s -o xx.o
+    4.链接是将目标文件链接为一个整的可执行文件的过程，对应的gcc操作为 gcc xx.o -o xx(xx成为可执行,运行时候可以用 "./xx" 的方式运行)。
+
+    [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
+```
+
 [Android-MD doc](https://beijing.source.codeaurora.org/quic/la/platform/ndk/docs/ANDROID-MK.html)
 
 ```

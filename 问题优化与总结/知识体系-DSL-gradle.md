@@ -89,3 +89,13 @@ Could not find com.android.tools.build:aapt2 AndroidStudio
 
 ```
 [Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
+
+
+## Android gradle
+
+```gradle
+
+    gradle -q dependencies your-app-project:dependencies
+
+
+```

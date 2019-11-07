@@ -273,3 +273,49 @@ Coroutines 协程
 
 ## 数据并发
 ## 声明式编程-函数编程范式
+
+
+## Android 切换为kotlin
+
+
+代码
+
+```groovy
+1. 
+buildscript {
+    ext.kotlin_version = '1.3.60-eap-25'
+    repositories {
+        google()
+        jcenter()
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+2. 
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+dependencies {
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
+    mavenCentral()
+}
+
+
+3/ annotationCompiler 转为 kapt
+apply plugin: 'kotlin-android'
+kapt 'com.xx.xx'
+
+
+4. 32bit studio 配置
+org.gradle.jvmargs=-Xmx1536m -XX\:MaxHeapSize\=1536m
+
+5. APK大小增加600k
+```
