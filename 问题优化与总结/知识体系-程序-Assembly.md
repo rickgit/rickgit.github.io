@@ -15,11 +15,11 @@
 |  String              | MOVS    LODS    STOS    CMPS   SCAS                                          |
 +-----------------------------------------------------------------------------------------------------+
 |  Numbers             |                                                                              |
-+-----------------------------------------------------------------------------------------------------+
-|  Loops               | loop <label>                                                                 |
 +----------------------------------+------------------------------------------------------------------+
 |                      |Calling    | esp ebp                                                          |
-|                      |Con^ention |                                                                  |
+|                      |Convention |                                                                  |
+|                      +------------------------------------------------------------------------------+
+|                      |Loops      | loop (Decrement CX and Loop if CX Not Zero)                      |
 |                      +------------------------------------------------------------------------------+
 |                      |           | CMP  JMP	 JE/JZ   JNE/JNZ  JG/JNLE  JGE/JNL   JL/JNGE   JLE/JNG|
 |                      |Conditions |                              JA/JNBE  JAE/JNB   JB/JNAE   JBE/JNA|
@@ -30,46 +30,41 @@
 |                      +------------------------------------------------------------------------------+
 |                      |  Data     |  mov   push        pop     lea                                   |
 |                      |  Movement |                                                                  |
-+----------------------+-----------+------------------------------------------------------------------+
-|                      |  Multiple           |TIMES                    |                              |
-|                      |  Initializations    |                         |                              |
-|                      |                     |RESB    RESW   RESD      |                              |
-|                      |  Allocating Storage |RESQ    REST             |  EQU    %assign   %define    |
-| define-directive     |  Uninitialized Data |                         |                              |
-|                      |                     |DB    allocates 1 byte   |                              |
-|                      |  storage allocation |DW    allocates 2 bytes  |                              |
-|                      |  Initialized Data   |DD    allocates 4 bytes  |                              |
-|                      |                     |DQ    allocates 8 bytes  |                              |
-|                      |                     |DT    allocates 10 bytes |                              |
-|                      +----------------------------------------------------------------------------  |
++----------------------+-----------+------------------+----------------+------------------------------+
+| Operands  Addressing |  Register addressing           Immediate addressing      Memory addressing   |
+| Modes                |                                                                              |
++----------------------+------------+-----------------+-----------------------------------------------+
+|                      | DB  DW  DD | RESB  RESW RESD |                |                              |
+|                      | DQ  DT     | RESQ  REST      | TIMES          |                              |
+|                      +------------+-----------------+----------------+                              |
+| define-directive     | storage    | Allocating      |                |  EQU    %assign   %define    |
+| (pseudo-opcodes)     | allocation | Storage         |                |                              |
+|                      | Initialized| Uninitialized   | Multiple       |                              |
+|                      | Data       |Data(BSS section)| Initializations|                              |
+|                      +------------+-----------------+-----------------------------------------------+
 |                      |                 Variables                     |          Constants           |
-+----------------------+------------------------------------------------------------------------------+
-|  Operands            |  Register addressing                                                         |
-|  Addressing Modes    |  Immediate addressing                                                        |
-|                      |  Memory addressing                                                           |
-+-------------------------------------------+-------------------+-------------------------------------+
++----------------------+------------+-----------------+-----------------------------------------------+
+|  Memory Segments     |   .data    | .bss            | .text                  |                      |
+|                      +------------+-----------------+-----------------------------------------------+
+|                      |   Data segment               | Code segment           |      Stack  segment  |
++----------------------+------------------------------+------------------------+----------------------+
 |  system call         |  call number in the EAX register                                             |
 |(between the user space|  Store the arguments                                                        |
 |and the kernel space) |   Call the relevant interrupt (80h)                                          |
 |                      |  The result is usually returned in the EAX register                          |
-+----------------------+--------------------+---------------------------------------------------------+
-|  Memory Segments     |   Data segment     |.data   .bss                                             |
-|                      |   Code segment     |.text                                                    |
-|                      |   Stack  segment   |                                                         |
-+----------------------+--------------------+---------------------------------------------------------+
-|                      |                    | Data registers    |  32-bit  EAX,    EBX,   ECX,  EDX   |
-|                      |                    |                   |  16-bit   AX,     BX,    CX,   DX   |
-|                      |                    +                   |        AH,AL,  BH,BL, CH,CL, DH,DL  |
-|                      |  General registers +---------------------------------------------------------+
-|                      |                    | Pointer registers |   IP, SP, , BP                      |
-|                      |                    +---------------------------------------------------------+
-|                      |                    | Index registers   |  16-bit  SI , DI   32-bit  ESI , EDI|
-| Processor Registers  +----------------------------------------+-------------------------------------+
-|(CPU internal memory) |  Control registers | Flag  :              O  D I T S Z   A   P   C           |
-|                      |                    | Bit no: 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0           |
-|                      +------------------------------------------------------------------------------+
-|                      |  Segment registers | Code  Data  Stack                                       |
-+----------------------+--------------------+---------------------------------------------------------+
++----------------------+--------------------+----------------------------------+----------------------+
+|                      | 32-bit                 |         |         |Flag  :              O  D |CS(Code)|
+|                      |   EAX,  EBX,  ECX, EDX |         |16-bit   |Bit no: 15 14 13 12 11 10 |DS    |
+|                      | 16-bit                 |IP,      |   SI, DI|                          |(DATA)|
+|                      |    AX,   BX,   CX,  DX |SP,      |32-bit   |      I T S Z   A   P   C |SS    |
+|                      | AH,AL;BH,BL;CH,CL;DH,DL|BP       |  ESI,EDI|      9 8 7 6 5 4 3 2 1 0 |(Stack)|
+| Processor Registers  +-------------------------------------------------------------------+----------+
+|(CPU internal memory) | Data                   |Pointer  |Index    |                      |   ES,FS,GS|
+|                      | registers              |registers|registers|                      |          | dr调试寄存器
+|                      +--------------------------------------------+  Control             |Segment   | fpu,mmx以及sse寄存器
+|                      | General registers                          |  registers           |registers | 
++----------------------+--------------------------------------------+---------------------------------+
+
 
 ```
 ## 语法
