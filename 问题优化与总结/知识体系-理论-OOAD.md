@@ -1,4 +1,6 @@
 
+# OOAD
+
 ## 封装性与内聚耦合
 
 >《UML面向对象程序设计基础》
@@ -159,8 +161,8 @@ Visitor lets you define a new operation without changing the classes of the elem
 
 
 
-## 架构
-##
+## 架构（稳定，流畅，续航，精简）
+
 ```
  https://en.wikipedia.org/wiki/Computer_programming
 
@@ -195,8 +197,9 @@ Visitor lets you define a new operation without changing the classes of the elem
 +------------------------------------------------------------+
 
 ```
-##
-高耦合产生问题
+## 高耦合产生问题
+
+
 - 修改代码，改动量大，造成程序不稳定，容易产生异常，错误等问题
 [架构,框架,设计模式](https://blog.csdn.net/CillyB/article/details/79464339)
 [软件架构、框架、模式、模块、组件、插件概念汇总 ](https://www.cnblogs.com/doit8791/p/6129963.html)

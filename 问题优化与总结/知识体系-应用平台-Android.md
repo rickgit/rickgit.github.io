@@ -1847,6 +1847,8 @@ adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activ
 adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 
 
+adb shell  dumpsys window windows |grep "Window #"
+
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 adb shell am kill <packagename>

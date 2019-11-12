@@ -20,17 +20,17 @@ DSA
 |                  |Search Insert|                 Sort                    |
 |                  |       Update|                                         |
 |                  |       Delete|                                         |
-|                  +----------------------------------------------+--------+
-|                  |              | Exchange|Selection|Insertion  | Merge  |
-|   alth           |  Linear      +---------------------------------------+
-|                  |              |Bubble(s)|Selection|Insertion(s)|       |  simple sorts
-|                  |  Binary      |         |         |           |        |
-|                  |              | Quick   | heapsort| Shell     |Merge(s)| Efficient sorts
-|                  |  Hash Table  |         |         |           |        |
-|                  |              |         |         |           |        |
-|                  | Interpolation|         |         |           |        |
-|                  |              |         |         |           |        |
-+------------------+--------------+----------+---------+----------+--------+
++                  +-------------+-----------------------------------------+
+|                  |             | Exchange| Merge  |Insertion   |Selection|
+|   alth           |Linear       +-----------------------------------------+
+|                  |             |Bubble(s)|        |Insertion(s)|Selection|  simple sorts
+|                  |Binary       |         |        |            |         |
+|                  |             | Quick   |Merge(s)| Shell      | heapsort| Efficient sorts
+|                  |Hash Table   |         |        |            |         |
+|                  |             |         |        |            |         |
+|                  |Interpolation|         |        |            |         |
+|                  |             |         |        |            |         |
++------------------+-------------+---------+--------+------------+---------+
 |                  |                                                       |
 |  Asymptotic      |     Ο(n)    Ω(n)    θ(n)                              |
 |  Analysis        |                                                       |
@@ -335,4 +335,12 @@ class Solution {
         
     }
 }
+
+1. Two Sum                                        18 ms 36.8 MB
+2. Add Two Numbers                                2 ms 44.6 MB
+3. Longest Substring Without Repeating Characters 2 ms 36.7 MB
+4. Median of Two Sorted Arrays                    2 ms 46 MB 
+5. Longest Palindromic Substring  135 ms 35.9 MB
+6. ZigZag Conversion               3 ms 37.8 MB
+7. Reverse Integer                 15 ms  35.6 MB
 ```
