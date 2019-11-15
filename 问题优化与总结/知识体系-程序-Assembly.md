@@ -24,7 +24,7 @@
 |                      |           | CMP  JMP	 JE/JZ   JNE/JNZ  JG/JNLE  JGE/JNL   JL/JNGE   JLE/JNG|
 |                      |Conditions |                              JA/JNBE  JAE/JNB   JB/JNAE   JBE/JNA|
 | Instructions         |           | JXCZ JC    JNC     JO      JNO      JP/JPE   JNP/JPO   JS   JNS  |
-|                      +------------------------------------------------------------------------------+
+| (256)                +------------------------------------------------------------------------------+
 |                      |  Logical  | AND      OR   XOR   TEST   NO                                    |
 |                      | Arithmetic| INC      DEC  ADD   SUB    MUL/IMUL      DIV/IDIV                |
 |                      +------------------------------------------------------------------------------+
@@ -34,21 +34,21 @@
 | Operands  Addressing |  Register addressing           Immediate addressing      Memory addressing   |
 | Modes                |                                                                              |
 +----------------------+----------------------------+------------+------------------------------------+
-|  define|directive    |                            | DB  DW  DD | RESB  RESW RESD|                   |
-| (pseudo+opcodes)     | EQU    %assign             | DQ  DT     | RESQ  REST     |                   |
+|  define-directive    |                            | DB  DW  DD | RESB  RESW RESD|                   |
+| (pseudo-opcodes)     | EQU    %assign             | DQ  DT     | RESQ  REST     |                   |
 |                      | %define                    | TIMES      |                |                   |
 |                      |                            +-----------------------------+                   |
 |                      |                            |Data section| BSS section    |                   |
 |                      +------------------------------------------------------------------------------+
-|                      |        Constants           |            Variables        |                   |
+|                      |        Constants           |         Variables           |                   |
 +----------------------------------------------------------------+------------------------------------+
 |  Memory Segments     | .text                      |   .data    | .bss           |                   |
 |                      +-----------------------------------------+------------------------------------+
 |                      | Code segment               |   Data segment              |   Stack  segment  |
 +---------------------------------------------------+-----------------------------+-------------------+
-|  system call         +  call number in the EAX register                                             |
-|(between the user space+  Store the arguments                                                        |
-|and the kernel space) +   Call the relevant interrupt (80h)                                          |
+|  system call         |  call number in the EAX register                                             |
+|(between the user space|  Store the arguments                                                        |
+|and the kernel space) |   Call the relevant interrupt (80h)                                          |
 |                      |  The result is usually returned in the EAX register                          |
 +---------------------------------------------------+-----------------------------+---------+---------+
 |            |CS (code)|Flag  :              O  D   | 32+bit                      |         |         |
@@ -63,9 +63,7 @@
 |            |registers|  registers                 | General registers                               |
 +---------------------------------------------------+-------------------------------------------------+
       dr调试寄存器
-     fpu,mmx以及sse寄存器
-
-
+     fpu,mmx以及sse寄存器 
 ```
 ## 语法
 >[Intel 80x86 Assembly Language OpCodes](http://www.mathemainzel.info/files/x86asmref.html)

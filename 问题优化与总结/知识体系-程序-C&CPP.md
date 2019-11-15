@@ -50,9 +50,12 @@
 [C POSIX library](https://en.wikipedia.org/wiki/C_POSIX_library)
  
 ```
+[c header](https://en.cppreference.com/w/c/header)
+[cpp header](https://en.cppreference.com/w/cpp/header)
+
 +-------+-------------------------------------------------------------------------------+------------------------------------+
 |       |                                                                               |                                    |
-|       | <aio.h>       <iconv.h>       <poll.h>       <string.h>       <sys/uio.h>     |  <assert.h>        <stdatomic.h>   |
+|       | <aio.h>       <iconv.h>       <poll.h>       <string.h>       <sys/uio.h>     |  <assert.h>        <stdatomic.h>c11|
 |       |                                                                               |                                    |
 |       | <arpa/inet.h> <inttypes.h>    <pthread.h>    <strings.h>      <sys/un.h>      |  <complex.h> C99   <stdbool.h> C99 |
 |       |                                                                               |                                    |
@@ -65,8 +68,8 @@
 |       | <dirent.h>    <limits.h>      <search.h>     <sys/msg.h>      <tar.h>         |  <float.h>         <stdlib.h>      |
 |       |                                                                               |                                    |
 |       | <dlfcn.h>     <locale.h>      <semaphore.h>  <sys/resource.h> <termios.h>     |  <inttypes.h>      <stdnoreturn.h> |
-|       |                                                                               |                                    |
-|       | <errno.h>     <math.h>        <setjmp.h>     <sys/select.h>   <tgmath.h>      |  <iso646.h>  NA1   <string.h>      |
+|       |                                                                               |                                c11 |
+|       | <errno.h>     <math.h>        <setjmp.h>     <sys/select.h>   <tgmath.h>      |  <iso646.h>  c95   <string.h>      |
 |       |                                                                               |                                    |
 |       | <fcntl.h>     <monetary.h>    <signal.h>     <sys/sem.h>      <time.h>        |  <limits.h>        <tgmath.h>  C99 |
 |       |                                                                               |                                    |
@@ -76,9 +79,9 @@
 |       |                                                                               |                                    |
 |       | <fmtmsg.h>    <net/if.h>      <stdbool.h>    <sys/stat.h>     <unistd.h>      |  <setjmp.h>        <uchar.h>   C11 |
 |       |                                                                               |                                    |
-|       | <fnmatch.h>   <netdb.h>       <stddef.h>     <sys/statvfs.h>  <utime.h>       |  <signal.h>        <wchar.h>   NA1 |
+|       | <fnmatch.h>   <netdb.h>       <stddef.h>     <sys/statvfs.h>  <utime.h>       |  <signal.h>        <wchar.h>   C95 |
 |       |                                                                               |                                    |
-|       | <ftw.h>       <netinet/in.h>  <stdint.h>     <sys/time.h>     <utmpx.h>       |  <stdalign.h>      <wctype.h>      |
+|       | <ftw.h>       <netinet/in.h>  <stdint.h>     <sys/time.h>     <utmpx.h>       |  <stdalign.h> c11  <wctype.h>  C95 |
 |       |                                                                               |                                    |
 |       | <glob.h>      <netinet/tcp.h> <stdio.h>      <sys/times.h>    <wchar.h>       |  <stdarg.h>                        |
 |       |                                                                               |                                    |
@@ -88,6 +91,48 @@
 |       |                                                                               |           (ANSI or ISO C Library)  |
 +-------+-------------------------------------------------------------------------------+------------------------------------+
 
+
+[POSIX Library Functions](https://www.mkompf.com/cplus/posixlist.html)
+
+Files and Directories
+Advanced File Operations
+Processes
+Long Jumps
+Signal Handling
+Obtaining Information at Runtime
+Terminal I/O
+Process Groups and Job Control
+
+
+[Classification of Library Functions](https://www.improgrammer.net/header-file-list-functions-c-language/)
+C Input Output Functions – transfer data between the C program and standard input/output devices.
+C String Character Functions – String.h header file supports all the string functions in C language.
+C Time Date Localization Functions –  implementing date and time manipulation operations.
+C Dynamic Memory Allocation Functions – dynamic memory allocation defined as the process of allocating memory during program execution.
+
+
+[The Standard Function Library](https://www.tutorialspoint.com/cplusplus/cpp_standard_library.htm)
+Standard Function Library:
+I/O,
+String and character handling,
+Mathematical,
+Time, date, and localization,
+Dynamic allocation,
+Miscellaneous,
+Wide-character functions, 
+
+Object Oriented Class Library:
+The Standard C++ I/O Classes
+The String Class
+The Numeric Classes
+The STL Container Classes
+The STL Algorithms
+The STL Function Objects
+The STL Iterators
+The STL Allocators
+The Localization library
+Exception Handling Classes
+Miscellaneous Support Library
 
 ```
 [POSIX 定义](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html)
