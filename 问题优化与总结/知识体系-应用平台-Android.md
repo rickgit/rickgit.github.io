@@ -1769,6 +1769,17 @@ adb shell pm list permissions -d -g
 APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
  
 ```
+
+```
+
+打包参数
+manifestPlaceholders = [ app_label_name:"xxxxxxx"]
+//${app_label_name}
+getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_DATA).metaData.getString("app_label_name")
+
+
+```
+
 ### 四大组件-Activity
 ```
 +---------------------------------------------------------------+
@@ -2118,31 +2129,17 @@ Glide
 ### 性能优化总结
 > <<Android High Performance Programming>>
 
-> 性能（ the time taken to execute tasks）
-
 [Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
-稳定，流畅，续航，精简
+稳定，流畅，续航，精简，美观
 am_crash
+### 稳定
+#### 代码Review
+Commit 审阅 if，系统版本，模块管理
+Push   代码重用
 
-```shell 
-#adb shell "getprop | grep heapgrowthlimit"
-#adb shell "getprop|grep dalvik.vm.heapstartsize"
-#adb shell "getprop|grep dalvik.vm.heapsize"
-
-#adb shell "dumpsys meminfo -s <pakagename | pid>"
-# while true;do adb shell procrank|grep <proc-keywords>; sleep 6;done
-
-
-# adb shell "cat  /proc/cpuinfo" //查看cpu核心数
-# adb shell "dumpsys cpuinfo | grep <package | pid>"
-# adb shell "top -n 5 | grep <package | pid>" 
-
-# adb shell "dumpsys gfxinfo com.xp.browser" //GPU 帧数 fps
-
-
-# adb shell "dumpsys batterystats < package | pid>" //电量采集
-```
-
+#### 日志
+使用 adb 获取错误报告
+adb bugreport E:/bugs/bugreport.zip
 #### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
 ```
 services/core/java/com/android/server/am/AppErrors.java:
@@ -2164,6 +2161,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
+
 #### 内存泄漏
  
  工具：profiler，eclipse mat
@@ -2231,6 +2229,30 @@ Uptime: 53403267 Realtime: 53403267
          MEMORY_USED:        0
   PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
 ```
+
+## 流畅
+> 性能（ the time taken to execute tasks）
+
+```shell 
+#adb shell "getprop | grep heapgrowthlimit"
+#adb shell "getprop|grep dalvik.vm.heapstartsize"
+#adb shell "getprop|grep dalvik.vm.heapsize"
+
+#adb shell "dumpsys meminfo -s <pakagename | pid>"
+# while true;do adb shell procrank|grep <proc-keywords>; sleep 6;done
+
+
+# adb shell "cat  /proc/cpuinfo" //查看cpu核心数
+# adb shell "dumpsys cpuinfo | grep <package | pid>"
+# adb shell "top -n 5 | grep <package | pid>" 
+
+# adb shell "dumpsys gfxinfo com.xp.browser" //GPU 帧数 fps
+
+
+# adb shell "dumpsys batterystats < package | pid>" //电量采集
+```
+
+
 ## 性能（ the time taken to execute tasks）
 ```
 +-------------+-------------------+----------------------+---------------------------+---------------+
@@ -2378,7 +2400,7 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     2. 线程优化 
 
  
-#### 包大小
+#### 精简
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 
 
@@ -2501,3 +2523,16 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 ## 权限
 
 [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
+
+
+## 源码
+```
+[platform/development](https://beijing.source.codeaurora.org/quic/la/platform/development/)
+包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
+tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
+
+
+[platform/frameworks/base](https://beijing.source.codeaurora.org/quic/la/platform/frameworks/base/)
+framework源码，开发必备
+
+```
