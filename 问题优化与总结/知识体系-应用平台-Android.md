@@ -1890,7 +1890,7 @@ android N开始有5种窗口类型（窗口类型及ActivityType决定ActivitySt
 全屏 FullScreenStack
 DockedStack（分屏Activity） configChanges:screenLayout   onMultiWindowModeChanged
 PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
-freeformstack(自由模式Activity) ：FreeForm Stack
+freeformstack(自由模式  Activity) ：FreeForm Stack
 homeStack（launcher和recents Activity）和其他
 ```java
 import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
@@ -2135,11 +2135,22 @@ am_crash
 ### 稳定
 #### 代码Review
 Commit 审阅 if，系统版本，模块管理
-Push   代码重用
+Push   代码重用,多次提交Review
 
 #### 日志
-使用 adb 获取错误报告
-adb bugreport E:/bugs/bugreport.zip
+1. monkey tools 测试
+adb shell monkey -p com.bla.yourpackage -v 1000
+adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+停止 monkey
+adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
+
+2. 使用 adb 获取错误报告
+adb bugreport E:/bugs/
+3. anr文件
+adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
+
+
 #### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
 ```
 services/core/java/com/android/server/am/AppErrors.java:
@@ -2161,7 +2172,11 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
-
+#### 反编译
+[Apktool](https://github.com/iBotPeaches/Apktool)
+[dex2jar](https://github.com/pxb1988/dex2jar)
+[jd-gui](https://github.com/java-decompiler/jd-gui)
+[jad（不维护）](http://www.kpdus.com/jad.html)
 #### 内存泄漏
  
  工具：profiler，eclipse mat
@@ -2180,6 +2195,12 @@ LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有�
 
 
 ```sh
+
+adb shell am dumpheap $(ps | grep com.xp.browser | awk '{print $2}') /mnt/sdcard/my_heap/dumpheap.hprof
+
+adb shell 'am dumpheap com.xp.browser /mnt/sdcard/dumpheap.hprof'
+
+
 >adb shell dumpsys meminfo edu.ptu.java.kotlinbase
 Applications Memory Usage (kB):
 Uptime: 53403267 Realtime: 53403267
@@ -2237,6 +2258,8 @@ Uptime: 53403267 Realtime: 53403267
 #adb shell "getprop | grep heapgrowthlimit"
 #adb shell "getprop|grep dalvik.vm.heapstartsize"
 #adb shell "getprop|grep dalvik.vm.heapsize"
+
+#adb shell getprop | grep product 获取手机型号
 
 #adb shell "dumpsys meminfo -s <pakagename | pid>"
 # while true;do adb shell procrank|grep <proc-keywords>; sleep 6;done
@@ -2535,4 +2558,45 @@ tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshot
 [platform/frameworks/base](https://beijing.source.codeaurora.org/quic/la/platform/frameworks/base/)
 framework源码，开发必备
 
+[platform/packages/apps/PackageInstaller](https://beijing.source.codeaurora.org/quic/la/platform/packages/apps/PackageInstaller)
+“点击通知”需要访问文件权限intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+[platform/packages/providers/MediaProvider](https://beijing.source.codeaurora.org/quic/la/platform/packages/providers/MediaProvider)
+ ```
+ 添加到相册，需要uri.getScheme().equals("file")
+public class MediaScannerReceiver extends BroadcastReceiver
+{
+    private final static String TAG = "MediaScannerReceiver";
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        String action = intent.getAction();
+        Uri uri = intent.getData();
+        String externalStoragePath = Environment.getExternalStorageDirectory().getPath();
+
+        if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+            // scan internal storage
+            scan(context, MediaProvider.INTERNAL_VOLUME);
+            
+            // scan external storage if it is mounted
+            String state = Environment.getExternalStorageState();
+            if (Environment.MEDIA_MOUNTED.equals(state) || 
+                    Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+               scan(context, MediaProvider.EXTERNAL_VOLUME);
+            }
+        } else {
+            if (uri.getScheme().equals("file")) {
+                // handle intents related to external storage
+                String path = uri.getPath();
+                if (action.equals(Intent.ACTION_MEDIA_MOUNTED) && 
+                        externalStoragePath.equals(path)) {
+                    scan(context, MediaProvider.EXTERNAL_VOLUME);
+                } else if (action.equals(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE) &&
+                        path != null && path.startsWith(externalStoragePath + "/")) {
+                    scanFile(context, path);
+                }
+            }
+        }
+    }
+ ```
 ```

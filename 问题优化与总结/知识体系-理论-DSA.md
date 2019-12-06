@@ -217,6 +217,16 @@ bloom filter
 +----------------+---------------------------------------------------+
 
 StringSearch.jar (Boyer–Moore, Bitap algorithm)
+### 字符串
+[String_processing_algorithms](https://en.wikipedia.org/wiki/String_(computer_science)#String_processing_algorithms)
+```
+String searching algorithms for finding a given substring or pattern
+String manipulation algorithms
+Sorting algorithms
+Regular expression algorithms
+Parsing a string
+Sequence mining
+```
 
 ### 树
 

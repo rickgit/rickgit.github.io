@@ -843,14 +843,48 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 equals()，hashcode()，toString()
 ##### [hashcode() 基础知识](https://www.cnblogs.com/mengfanrong/p/4034950.html)
 混合hash （MD5）
+ 
+JDK Hash算法
+1. Map.hash: Austin Appleby's MurmurHash3
+
+2. String.hashCode
+```
+public int hashCode() {
+    int h = hash;
+    if (h == 0 && value.length > 0) {
+        char val[] = value;
+
+        for (int i = 0; i < value.length; i++) {
+            h = 31 * h + val[i];
+        }
+        hash = h;
+    }
+    return h;
+}
+```
+
+3. Object.hashCode
+```
+ java -XX:+PrintFlagsFinal -version|grep hashCode
+
+static inline intptr_t get_next_hash(Thread * Self, oop obj) {
+}
+```
+
+Redis
+1. Thomas Wang's 32 bit Mix Function
+2. Austin Appleby's MurmurHash2
+3. DJB Hash
+
+
 
 面向对象的三大特性，五大原则，23个设计模式
 - 封装
-     4. 枚举类,内部类（静态，成员，局部，匿名）
-    5. 自动装箱和拆箱
-    6. 日期
+    1. 枚举类,内部类（静态，成员，局部，匿名）
+    2. 自动装箱和拆箱
+    3. 日期
 - 继承
-     3. 抽象类，接口
+     1. 抽象类，接口
 - 多态 
     1. 继承
     2. 重写
