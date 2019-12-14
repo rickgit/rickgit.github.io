@@ -3,33 +3,40 @@
 
 ```
 DSA
-+------------------+-------------+-----------------------------------------+
-|                  |   Array     |                 tree                    |
-|                  |             +------+----------------------------------+
-|                  |   List      | Heap |    Search tree                   |
-+                  +             +------+--------------------------+-------+
-|  data structures |  stack/queue|      |          BST             |       |
-|                  |             |      +--------------------------+       |
-|                  |  graph      |      |AVL Trees     |red-black  | btree |
-|                  |             |      +--------------------------+       |
-|                  |  matrix     |      |Left rotation |           |       |
-|                  |             |      |Right rotation|           |       |
-|                  |  String     |      |Left-Right    |           |       |
-|                  |             |      |right-Left    |           |       |
-+------------------+-------------+------+--------------+-----------+-------+
-|                  |Search Insert|                 Sort                    |
-|                  |       Update|                                         |
-|                  |       Delete|                                         |
++------------------+-------------------------------------------------------+
+|                  | Array                                                 |
+| data structures  |                                                       |
+|                  | List                queue      Deque           stack  |
+|                  |  add                 offer      offerFirst      push  |
+|                  |  remove              poll       offerLast       pop   |
+|                  |  Positional Access   peek       pollFirst       peek  |
+|                  |  Search/indexOf                 pollLast              |
+|                  |  traverse                                             |
+|                  |                                                       |
+|                  | Map                     graph      matrix      String |
+|                  |    HashMap  Hashtable      Depth                      |
+|                  |    TreeMap  SortedMap      Breadth                    |
+|                  +------+------+-----------------------------------------+
+|                  |      | Heap |    Search tree                 |Spanning|
+|                  |      +--------------------------------+------+        |
+|                  |      |      |         BST             |      |        |
+|                  |      |      +-------------------------+      |        |
+|                  |      |      |AVL Trees     |red-black | btree|        |
+|                  | tree |      +-------------------------+      |        |
+|                  |      |      |Left rotation |          |      |        |
+|                  |      |      |Right rotation|          |      |        |
+|                  |      |      |Left-Right    |          |      |        |
++                  |      |      |right-Left    |          |      |        |
++------------------+---------+---------------------------------------------+
+|                  |search       |           Sort                          | 
 +                  +-------------+-----------------------------------------+
-|                  |             | Exchange| Merge  |Insertion   |Selection|
-|   alth           |Linear       +-----------------------------------------+
-|                  |             |Bubble(s)|        |Insertion(s)|Selection|  simple sorts
-|                  |Binary       |         |        |            |         |
-|                  |             | Quick   |Merge(s)| Shell      | heapsort| Efficient sorts
-|                  |Hash Table   |         |        |            |         |
-|                  |             |         |        |            |         |
+|                  |  Linear     | Exchange| Merge  |Insertion   |Selection|
+|   alth           |  Binary     +-----------------------------------------+
+|                  |  Hash Table |Bubble(s)|        |Insertion(s)|Selection|  simple sorts
 |                  |Interpolation|         |        |            |         |
-|                  |             |         |        |            |         |
+|                  |             | Quick   |Merge(s)| Shell      | heapsort| Efficient sorts 
++                  +-------------+---------+--------+------------+---------+
+|                  |  time,random                                          |
 +------------------+-------------+---------+--------+------------+---------+
 |                  |                                                       |
 |  Asymptotic      |     Ο(n)    Ω(n)    θ(n)                              |

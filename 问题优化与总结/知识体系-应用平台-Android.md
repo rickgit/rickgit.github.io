@@ -2130,26 +2130,66 @@ Glide
 > <<Android High Performance Programming>>
 
 [Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
-稳定，流畅，续航，精简，美观
+
+稳定（monkey,bugreport），流畅（systrace，卡顿，动画，多线程，zxing），续航（battery historian 后台，发热，功耗），精简（apk），美观（布局layout inspector），安全
 am_crash
 ### 稳定
 #### 代码Review
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 
-#### 日志
+#### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000
 adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
 
+
+adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+
 停止 monkey
 adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
+
+基础参数 | 事件参数 | 调试参数
+|------:|---------:|---------:|
+-v |     -pct-touch| -hprof   |
+-s |            ...|--ignore-security-exceptions|
+-p |               |       ...|
+--throttle|  |  |
+
+```java
+    public static final int FACTOR_TOUCH        = 0;//点击
+    public static final int FACTOR_MOTION       = 1;//滑动
+    public static final int FACTOR_TRACKBALL    = 2;//滚动
+    public static final int FACTOR_NAV          = 3;
+    public static final int FACTOR_MAJORNAV     = 4;//back home menu
+    public static final int FACTOR_SYSOPS       = 5;//物理按键
+    public static final int FACTOR_APPSWITCH    = 6;//startActivity
+    public static final int FACTOR_ANYTHING     = 7;
+```
+
+
+```
+monkey network
+adb forward tcp:1080 tcp:1080
+adb shell monkey --port 1080
+telnet 127.0.0.1 1080
+
+```
+
 
 2. 使用 adb 获取错误报告
 adb bugreport E:/bugs/
 3. anr文件
 adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 
+4. 日志
+- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
+- EXCEPTION,NullPointerException
+- ERROR
+
+[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
+[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
 
 #### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
 ```
@@ -2274,9 +2314,17 @@ Uptime: 53403267 Realtime: 53403267
 
 # adb shell "dumpsys batterystats < package | pid>" //电量采集
 ```
+### 官方定义
+[识别与负载能力相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_capacity)
+[识别与抖动相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_jitter)
+
+systrace
+
+离线获取systrace
+adb shell "atrace -z -b 40000 gfx input view wm am camera hal res dalvik rs sched freq idle disk mmc -t 15 > /data/local/tmp/trace_output &"
 
 
-## 性能（ the time taken to execute tasks）
+### 性能（ the time taken to execute tasks）
 ```
 +-------------+-------------------+----------------------+---------------------------+---------------+
 |             |    info           |    tools             |  fix                      |  extension    |
@@ -2354,6 +2402,7 @@ Uptime: 53403267 Realtime: 53403267
 
 
 ```
+ 
 >《Android开发艺术探索》
 方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
 - 渲染速度
@@ -2422,6 +2471,16 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     1. ListView/RecycleView及Bitmap优化
     2. 线程优化 
 
+ [动画大全](https://github.com/OCNYang/Android-Animation-Set)
+
+#### 续航
+```
+ pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "keep bright");
+
+
+ adb shell dumpsys "power|grep -i wake" 
+ 查看
+```
  
 #### 精简
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
@@ -2549,7 +2608,12 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 
 ## 源码
+[1798个项目（2019-12-11统计）](https://beijing.source.codeaurora.org/quic/la)
 ```
+[platform/system/core](https://beijing.source.codeaurora.org/quic/la/platform/system/core)
+adb
+
+
 [platform/development](https://beijing.source.codeaurora.org/quic/la/platform/development/)
 包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
 tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
