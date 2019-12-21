@@ -15,10 +15,31 @@ python 语言特性：动态强类型
 +--------------------------------------------------------------------------------------------------------------+
 |  test            |                                                                                           |
 +--------------------------------------------------------------------------------------------------------------+
-|                  |       os          hashlib         re                                                      |
-|  API /MOdule     |       sys         logging                                                                  |
-|                  |       time        subprocess                                                                   |
-|                  |       datetime                                                                                |
+|                  | Built-in Functions         Data Types                         File Formats                |(https://docs.python.org/3/library/)
+|  API /MOdule     | Built-in Constants         Numeric and Mathematical Modules   Cryptographic Services         |
+|                  | Built-in Types             Functional Programming Modules     Generic os Services      |
+|                  | Built-in Exceptions        File and Directory Access          Concurrent Execution                    |
+|                  | Text Processing Services   Data Persistence                   contextvars           |
+|                  | Binary Data Services       Data Compression and Archiving     Networking and Interprocess Communication       |
+|                  |                                                               Internet Data Handling|
+|                  |                                                               Structured Markup Processing Tools|
+|                  |                                                              Internet Protocols and Support|
+|                  |                                                             Multimedia Services|
+|                  |                                                              Internationalization|
+|                  |                                                              Program Frameworks|
+|                  |                                                              Graphical User Interfaces with Tk|
+|                  |                                                              Development Tools|
+|                  |                                                              Debugging and Profiling|
+|                  |                                                              Software Packaging and Distribution|
+|                  |                                                              Python Runtime Services|
+|                  |                                                              Custom Python Interpreters|
+|                  |                                                              Importing Modules|
+|                  |                                                              Python Language Services|
+|                  |                                                              Miscellaneous Services|
+|                  |                                                              MS Windows Specific Services|
+|                  |                                                              Unix Specific Services|
+|                  |                                                             Superseded Modules|
+|                  |                                                             Undocumented Modules|
 +--------------------------------------------------------------------------------------------------------------+
 |                  |                                                                                           |
 |                  +-------------------------------------------------------------------------------------------+
@@ -125,7 +146,7 @@ print(keyword.kwlist)
           +--+   Booleans
           |
           |
-+------------+   Numbers
++------------+   Numbers int, float, complex¶
 |         |
 |         |
 |         +--+   Strings
@@ -282,3 +303,35 @@ Python 模块(Module)，是一个 Python 文件，以 .py 结尾，包含了 Pyt
 
 ## 应用
 [python包管理工具:Conda和pip比较 - 简书](https://www.jianshu.com/p/5601dab5c9e5)
+
+
+
+## 源码
+```
+cpython/
+│
+├── Doc      ← Source for the documentation
+├── Grammar  ← The computer-readable language definition
+├── Include  ← The C header files
+├── Lib      ← Standard library modules written in Python
+├── Mac      ← macOS support files
+├── Misc     ← Miscellaneous files
+├── Modules  ← Standard Library Modules written in C
+├── Objects  ← Core types and the object model
+├── Parser   ← The Python parser source code
+├── PC       ← Windows build support files
+├── PCbuild  ← Windows build support files for older Windows versions
+├── Programs ← Source code for the python executable and other binaries
+├── Python   ← The CPython interpreter source code
+└── Tools    ← Standalone tools useful for building or extending Python
+
+内置方法
+cpython/Python/bltinmodule.c
+
+程序C api
+cpython/Modules
+
+程序py api
+cpython/Lib
+
+```

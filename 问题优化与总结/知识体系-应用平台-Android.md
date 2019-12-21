@@ -9,20 +9,20 @@
 |         |   PackageInstaller.apk   PackageInstaller.apk                                                    |
 +---------+--------------------------------------------------------------------------------------------------+
 | cmds    |   install  am  wm   pm    appops                                                                 |
-+--------------------------------+------------------------------------+---------------------+----------------+
-|         |         os           |            content                 |   app               |   util         |
-|         |(IPC,message passing) | (accessing and publishing data)    |( app  model)        |                |
++---------+----------------+------------------------------------+----------------------+---------------------+
+|         |   util         |content/provider/database/preference|         os           |   app               |
+|         |   (DSA)        | (accessing and publishing data)    |(IPC,message passing) |(app model,UI Control)|
 |         +--------------------------------------------------------------------------------------------------+
-|         |  Binder              |      BroadcastReceiver             |  Application        |  SparseArray   |
-|         |  MemoryFile          |      ContentProvider               |  Activity    Dialog |  ArrayMap      |
-|         |  AsyncTask           |         Context                    |  Fragment           |  LruCache      |
-|         |                      |     ClipboardManager               |  AlarmManager       |                |
-|         |  Handler             |         Intent                     |  Notification       |                |
-|         |                      |      AssetManager/Resource         |  JobScheduler       |                |
-| Android |  Environment         |      SharedPreferences             |                     |                |
+|         |  SparseArray   |      BroadcastReceiver             |  Binder              |  Application        |
+|         |  ArrayMap      |      ContentProvider               |  MemoryFile          |  Activity    Dialog |
+|         |  LruCache      |         Context                    |  AsyncTask           |  Fragment           |
+|         |                |     ClipboardManager               |                      |  AlarmManager       |
+|         |                |         Intent                     |  Handler             |  Notification       |
+|         |                |      AssetManager/Resource         |                      |  JobScheduler       |
+| Android |                |      SharedPreferences             |  Environment         |                     |
 | SDK     +-----------------------------------------------+-----------+------------++------------------------+
-+         | view                 |      widget/webkit     |       graphics          |       animation        |
-|         |(ui,layout,interaction|      (UI elements )    |(drawing2Screen directly)|   (property animation) |
+|         | view/gesture         | widget/webkit/appwidget|  graphics/opengl/media  |       animation        |text/sax net/nfc/bluetooth
+|         |(window,interaction)  |      (UI elements )    |(drawing2Screen directly)|   (property animation) |
 |         +--------------------------------------------------------------------------------------------------+
 |         |Window  View  KeyEvent| TextView  ImageView    |     Drawable   Bitmap   |       TypeEvaluator    |
 |         |GestureDetector       | EditText  Toast        |     Camera     Canvas   |                        |
@@ -2131,7 +2131,7 @@ Glide
 
 [Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
 
-稳定（monkey,bugreport），流畅（systrace，卡顿，动画，多线程，zxing），续航（battery historian 后台，发热，功耗），精简（apk），美观（布局layout inspector），安全
+稳定（monkey,bugreport），流畅（systrace，卡顿，动画，多线程，zxing），续航（battery historian 后台，发热，功耗），精简（apk），美观（布局layout inspector），安全（加固，插件化）
 am_crash
 ### 稳定
 #### 代码Review
@@ -2610,21 +2610,28 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 ## 源码
 [1798个项目（2019-12-11统计）](https://beijing.source.codeaurora.org/quic/la)
 ```
+含有61个内置platform/system
 [platform/system/core](https://beijing.source.codeaurora.org/quic/la/platform/system/core)
-adb
+adb，log
 
 
 [platform/development](https://beijing.source.codeaurora.org/quic/la/platform/development/)
 包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
 tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
 
+[android studio profilers源码](https://github.com/JetBrains/android)
 
+含有61个内置platform/frameworks
 [platform/frameworks/base](https://beijing.source.codeaurora.org/quic/la/platform/frameworks/base/)
 framework源码，开发必备
 
+
+含有118个内置platform/packages/apps
 [platform/packages/apps/PackageInstaller](https://beijing.source.codeaurora.org/quic/la/platform/packages/apps/PackageInstaller)
 “点击通知”需要访问文件权限intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
+
+含有18个内置platform/packages/providers
 [platform/packages/providers/MediaProvider](https://beijing.source.codeaurora.org/quic/la/platform/packages/providers/MediaProvider)
  ```
  添加到相册，需要uri.getScheme().equals("file")

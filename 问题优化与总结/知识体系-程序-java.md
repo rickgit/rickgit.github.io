@@ -14,20 +14,21 @@ hotspot,jdk,corba,jaxp,jaxws,langtools(javac,javadoc,javap)
 |              +-----------------------------------------------------------------------------------------------+
 |              |  test/stable     |                                                                            +
 +--------------------------------------------------------------------------------------------------------------+
-|                  |   lang(ooad)        util(dsa)      io/nio    net       sql   math/text  rmi/security   ui |
-|                  +-------------------------------------------------------------------------------------------+
-|  API /SDK        |      String           List      Serializable                               C&C++          |
-|                  | Thread/ThreadLocal  concurrent    File       Socket     db                                |
-|                  |  Reflect/Annotation                                                                       |
-+------------------+------------------------+------------+---------+-----------+-------+-----------------------+
+|              |  lang(ooad)        util(dsa)      io/nio    net       sql   math/text  rmi/security   ui      |
+|              +-----------------------------------------------------------------------------------------------+
+|  API /SDK    |      String           List      Serializable                 BigInteger     C&C++    awt      |
+|              | Thread/ThreadLocal  concurrent    File       Socket     db   DecimalFormat                    |
+|              |  Reflect/Annotation   regex                                                                   |
+|              |  (InvocationHandler)                                                                          |
++--------------+----------------------------+------------+---------+-----------+-------+-----------------------+
 |Class-based|concurrency|Aspect|            |            |         |           |       |                       |
 | Log/Date  |           |      |            |            |         |           |       |                       |
 +-----------+-----------+------+------+     |            |         |Annotation |       |                       |
-|        oop                          | pop | Functional | FRP     |Reflecti^e |Generic|                       |
+|        oop                          | pop | Functional | FRP     |Reflective |Generic|                       |
 +------------------------------+------+------------------+-----------------------------+ Event+driven          |
 |            Structured        | Imperative |  Declarative         |  Metaprogramming  |                       |
 +------------------------------+------------+----------------------+-------------------+-----------------------+
-|                             conditional/decision|making/loops                                                |
+|                             conditional/decision-making/loops                                                |
 +-------------------------+--------------------------------+-----------+-+------------+-------------+----------+
 |                         |       |true ,10b(2) ,1f(float) |           | |            |             |          |
 |  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   oops/.. | |            |             |          |

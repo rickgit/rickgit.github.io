@@ -1,6 +1,5 @@
 
 
-
 ```
 +------------------+---------------------------------------------------------------------------------+
 |  compiler        |         Clang ,GCC ,Microsoft Visual Studio / Express / C++                     |
@@ -35,11 +34,15 @@
 
 ```
 ## 系统
+### 概念
 [UNIX](https://en.wikipedia.org/wiki/Unix)
 ![UNIX家族](https://upload.wikimedia.org/wikipedia/commons/7/77/Unix_history-simple.svg)
-
 [POSIX](https://en.wikipedia.org/wiki/POSIX)
 
+### 说明
+[API](https://en.cppreference.com/w/)
+[教程](https://www.tutorialspoint.com/cplusplus/cpp_classes_objects.htm)
+## 库文件实现
 ### C库
 只要是符合ANSI（美国国家标准学会） C标准的C库都可以叫做标准C库。
 
@@ -94,52 +97,92 @@
 
 [POSIX Library Functions](https://www.mkompf.com/cplus/posixlist.html)
 
-Files and Directories
-Advanced File Operations
-Processes
-Long Jumps
-Signal Handling
-Obtaining Information at Runtime
-Terminal I/O
-Process Groups and Job Control
-
-
 [Classification of Library Functions](https://www.improgrammer.net/header-file-list-functions-c-language/)
-C Input Output Functions – transfer data between the C program and standard input/output devices.
-C String Character Functions – String.h header file supports all the string functions in C language.
-C Time Date Localization Functions –  implementing date and time manipulation operations.
-C Dynamic Memory Allocation Functions – dynamic memory allocation defined as the process of allocating memory during program execution.
 
+Type support 
+Program utilities 
+Variadic functions 
+Error handling
+Dynamic memory management 
+Date and time utilities
+Strings library
+Null-terminated strings:
+Algorithms
+Numerics
+    Common mathematical functions
+    Floating-point environment (C99)
+    Pseudo-random number generation
+    Complex number arithmetic (C99)
+    Type-generic math (C99)
 
-[The Standard Function Library](https://www.tutorialspoint.com/cplusplus/cpp_standard_library.htm)
-Standard Function Library:
-I/O,
-String and character handling,
-Mathematical,
-Time, date, and localization,
-Dynamic allocation,
-Miscellaneous,
-Wide-character functions, 
+Input/output support
+Localization support
+Atomic operations library (C11)
+Thread support library (C11)
 
-Object Oriented Class Library:
-The Standard C++ I/O Classes
-The String Class
-The Numeric Classes
-The STL Container Classes
-The STL Algorithms
-The STL Function Objects
-The STL Iterators
-The STL Allocators
-The Localization library
-Exception Handling Classes
-Miscellaneous Support Library
 
 ```
 [POSIX 定义](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html)
 [POSIX 描述](https://en.wikipedia.org/wiki/C_POSIX_library)
 
+[C ANSI/POSIX library 常用api](https://web.archive.org/web/20100724201155/http://www.space.unibe.ch/comp_doc/c_manual/C/FUNCTIONS/funcref.htm)
  [api](https://en.cppreference.com/w/)
-## 关键字与符号
+
+### C++ 库
+C++ Standard Library is a collection of classes and functions
+
+(Apache stdcxx)[https://stdcxx.apache.org/download.html]
+(GNU libstdc++)[https://gcc.gnu.org/onlinedocs/libstdc++/]
+(llvm libcxx)[https://libcxx.llvm.org/docs/]
+```
+[The Standard Function Library](https://www.tutorialspoint.com/cplusplus/cpp_standard_library.htm)
+
+
+Language support library
+
+Concepts library (C++20)
+
+Error Handling
+
+General utilities library
+
+Strings library
+
+Containers library
+
+Iterators library
+
+Ranges library (C++20)
+
+Algorithms library
+
+Numerics library
+
+Input/output library
+
+Localizations library
+
+Regular expressions library (C++11)
+
+Atomic operations library (C++11)
+
+Thread support library (C++11)
+
+Filesystem library (C++17)
+
+```
+
+
+(C++ Standard Library headers)[https://en.cppreference.com/w/cpp/header]
+## 符号
+符号包括：标识符，关键字，注释
+### 数据标识（变量，常量）的定义，声明，初始化，赋值及作用域
+
+- C/C++ 中，有两种简单的定义常量的方式：
+1. 使用 #define 预处理器。
+2. 使用 const 关键字
+
+### 关键字与符号
 [关键词](https://blog.csdn.net/weibo_dm/article/details/81629693)
 ```
 +----+---------------------------------------------------+
@@ -196,7 +239,7 @@ Miscellaneous Support Library
 +-------------+--------------------------------------------------------------+
 |  C++        |  sizeof                                                      |
 |  Misc       |  (? :)                                                       |
-|             |  ,(comma operator)                                           |
+|(member access)|  ,(comma operator)                                         |
 |             |  .(dot)and->(arrow) (reference field)                        |
 |             |  cast               (type cast)                              |
 |             |  &(pointer operator)                                         |
@@ -204,7 +247,7 @@ Miscellaneous Support Library
 +-------------+--------------------------------------------------------------+
 |  C          |  sizeof                                                      |
 |  Misc       |  & (return address)                                          |
-|             |  *(pointer operator)                                         |
+|(member access)|  *(pointer operator)                                         |
 |             |  (? :)                                                       |
 +----------------------------------------------------------------------------+
 |  Logical    |  && || !                                                     |
@@ -223,18 +266,16 @@ Miscellaneous Support Library
 ## 数据类型与内存结构
 [C内存模型](https://blog.csdn.net/ufolr/article/details/52833736)
 ```
-                                                 ++   char
+                                                 ++   [<signed | unsigned>] char
                                                  |
-                                  +IntegerType   ++   int
-                                  |  +short
-                                  |  |long
-                                  |  |sign
-                         +  Base  |  +unsign
+                                  +IntegerType   ++    [<signed | unsigned>] [<short | long >] int
+                                  |
+                         +  Base  |
                          |  Type  |
-                         |        |               +    Float
+                         |        |               +   Float
                          |        +floating-point |
-                         |             +long      ++   double
-            ++arithmetic++ EnumType
+                         |                        +   [long]  double
+            + arithmetic + EnumType
             | Type
             |            +  pointerType
             |            |                +   Array
@@ -246,25 +287,22 @@ Miscellaneous Support Library
             + VoidType
 
 
-                                  +IntegerType      int
-                                  | +short  （修饰符类型）  
-                                  | |long
-                                  | |sign
-                         +  Number| +unsign
+                                  +IntegerType      [<signed | unsigned>] [<short | long | long long>] int
+                                  |                （修饰符类型）  
+                         +  Number|
                          |  Type  |
-                         |        |            +    Float
+                         |        |            +    float
                          |        +DecimalType |
-                         |                     ++   double
-            ++Primitive  ++ Char  +  Char
+                         |                     +    [long] double
+            ++Primitive  ++ Char  +  [<signed | unsigned >]char
             |  Built-in  |  Type  |
-            |            | +sign  +  wchar_t
-            |            | +unsign
+            |            |        +  [<signed | unsigned >]wchar_t
             |            |
             |            ++ boolean
             |            |
             |            ++ void
             |
-            |            +  Arr
+            |            +  Arr: [<extern|static>][const] type array[size][={list}];
 C++         |            |
 data type   | derived+-+ |  Struct
             | Type       |
@@ -274,11 +312,9 @@ data type   | derived+-+ |  Struct
             |
             |            +  Addr（&）
             | PointerType|
-            |            +  Pointer（*）
+            |            +  Pointer（*）:[const] type * [const] ptr[=pointer expression];
             |
-            + Class （String class）
-
-
+            + Class （String class）:[const] type object[(argument list)];
 
 ```
 
@@ -295,40 +331,6 @@ shared_ptr 允许多个指针指向同一个对象。为了解决 auto_ptr 在�
 unique_ptr 独占所指向的对象 , 替代auto_ptr。不能进行拷贝、赋值等操作，但是可以通过release函数在unique_ptr之间转移控制权；
 weak_ptr shared_ptr的弱引用 
 ```
-## 预处理命令
-```
-+--------------------+--------------------+-------------------------+----------------------+
-|                    |  Predefined Macros |  Operator               |                      |
-+------------------------------------------------------------------------------------------+
-| #include           |                    |                         |                      |
-+------------------------------------------------------------------------------------------+
-| #define  #undef    | __DATE__           | Macro Continuation (\)  |                      |
-|                    |("MMM DD YYYY" )    |                         |                      |
-|(preprocessor macro)|   __TIME__         |  Stringize (#)         |  Parameterized Macros|
-|                    |  ("HH:MM:SS")      |                         |                      |
-|                    | __FILE__           | Token Pasting (##)      |                      |
-|                    |                    |                         |                      |
-|                    | __LINE__           | Defined()               |                      |
-|                    |                    |                         |                      |
-|                    | __STDC__           |                         |                      |
-|                    |                    |                         |                      |
-+------------------------------------------------------------------------------------------+
-| #ifdef   #ifndef   |                    |                         |                      |
-| #if      #elif     |                    |                         |                      |
-| #else    #endif    |                    |                         |                      |
-|                    |                    |                         |                      |
-| #error             |                    |                         |                      |
-|                    |                    |                         |                      |
-| #pragma            |                    |                         |  region，pack ，data_seg，disable   |
-+--------------------+--------------------+-------------------------+----------------------+
-```  
-The #define preprocessor directive creates symbolic constants. The symbolic constant is called a macro 
-```c
-#define macro-name replacement-text 
-```
-- 预处理器
-  C 预处理器只不过是一个文本替换工具而已，它们会指示编译器在实际编译之前完成所需的预处理。
-
 ### 函数类型
 构造函数 跟冒号 
 ```
@@ -362,6 +364,149 @@ C++11 提供了对匿名函数的支持,称为 Lambda 函数(也叫 Lambda 表�
 [&, x]  // x显式地以传值方式加以引用。
 [=, &z] // z显式地以引用方式加以引用。
 ```
+## 编译
+
+### 预处理命令
+
+[预处理命令](https://blog.csdn.net/qq_35038153/article/details/71293265)
+```
++--------------------+--------------------+-------------------------+----------------------+
+|                    |  Predefined Macros |  Operator               |                      |
++------------------------------------------------------------------------------------------+
+| #include           |                    |                         |                      |
++------------------------------------------------------------------------------------------+
+| #define  #undef    | __DATE__           | Macro Continuation (\)  |                      |
+|                    |("MMM DD YYYY" )    |                         |                      |
+|(preprocessor macro)|   __TIME__         |  Stringize (#)          | Parameterized Macros |
+|                    |  ("HH:MM:SS")      |                         |                      |
+|                    | __FILE__           | Token Pasting (##)      |                      |
+|                    |                    |                         |                      |
+|                    | __LINE__           | Defined()               |                      |
+|                    |                    |                         |                      |
+|                    | __STDC__           |                         |                      |
+|                    |                    |                         |                      |
++------------------------------------------------------------------------------------------+
+| #ifdef   #ifndef   |                    |                         |                      |
+| #if      #elif     |                    |                         |                      |
+| #else    #endif    |                    |                         |                      |
+|                    |                    |                         |                      |
+| #error             |                    |                         |                      |
+|                    |                    |                         |                      |
+| #pragma            |                    |                         |  region，pack ，data_seg，disable   |
++--------------------+--------------------+-------------------------+----------------------+
+```  
+The #define preprocessor directive creates symbolic constants. The symbolic constant is called a macro 
+```c
+#define macro-name replacement-text 
+```
+- 预处理器
+  C 预处理器只不过是一个文本替换工具而已，它们会指示编译器在实际编译之前完成所需的预处理。
+
+
+为了尽可能地兼容，一般都遵循#define定义“可读”的常量以及一些宏语句的任务，而typedef则常用来定义关键字、冗长的类型的别名。
+
+
+### namespace 和 using
+
+```
+在C语言中只有一个全局作用域：
+
+1.C语言中所有的全局标识符共享一个作用域
+2.标识符之间可能发生冲突
+C++中提出了命名空间的概念：
+
+1.命名空间将全局作用域分成不同的部分，
+2.不同命名空间中的标识符可以同名而不会发生冲突
+3.命名空间可以发生嵌套
+4.全局作用域也叫默认命名空间
+```
+>[本文为CSDN博主「李燕良」的原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接及本声明。](https://blog.csdn.net/qq_40416052/article/details/82528676)
+
+### 编译构建流程
+``` shell
+
+--build=X86, --host=X86, --target=X86
+
+```
+### 交叉编译（cross compiler）
+
+ [GCC Compilation Process（Build）](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
+```
+                         +
+                         |
+ Source Code(.c,.cpp,.h) |
+                         v
+                 +-------+----+
+                 |Preprocessin|  step1:Preprocessor(cpp)
+                 +-------+----+
+                         |
+ Include Header,         v
+ Expand Macro    +-------+----+
+ (.i,.ii)        | Compilation|  step 2:Compiler(gcc,g++)
+                 +-------+----+
+                         |
+ Assembly(.s)            v
+                 +-------+----+
+                 | Assemble   |  step 3: Assembler(as)
+                 +-------+----+
+                         |
+ Machine Code(.o,.obj)   v
+                 +-------+----+
+Static Library+->+ Linking    |  step 4:Linker(ld)
+(.lib,.a)        +-------+----+
+                         |
+ Executable Machine Code |
+ (.exe)                  v
+
+```
+compile, make都编译，但make是增量编译，compile是全新编译， build整个工程的全新编译，要生成binary的。
+CMake的是构建系统的生成器，CMake代表跨平台Make。
+- 可以产生Makefile文件，
+- 可以产生Ninja构建文件，
+- 可以产生KDevelop或XCode的项目，
+- 能产生Visual Studio解决方案。
+
+```
++----------+---------------------------------------------------------------------------------------------+
+|          |      GNU C Library (glibc): core C library including headers, libraries, and dynamic loader |
+|          |                                                                                             |
+|          |                                                                                             |
+|          |      GNU m4: an m4 macro processor                                                          |
+|          |                                                                                             |
+|          |      GNU Debugger (GDB)                                                                     |
+|          +---------------------------------------------------------------------------------------------+
+|   GNU    |   GNU Binutils:                                                                             |
+|          |       GNU profiler  gprof    addr2line   dlltool   nlmconv   objdump   size	  windmc     |
+|          |       linking         ld     ar          gold      nm        ranlib    strings   windres    |
+|toolchain |       GNU Assembler(as)      c++filt               objcopy   readelf   strip	             |
+|          +---------------------------------------------------------------------------------------------+
+|          |    GNU Compiler Collection (GCC)                                                            |
+|          +-------------+-------------------------------------------------------------------------------+
+|          |             | GNU Bison: a parser generator, often used with the Flex lexical analyser      |
+|          | Development |                                                                               |
+|          |             | GNU build system (autotools):                                                 |
+|          | tools       |        Autoconf(generates a configure), Automake and Libtool                  |
+|          |             | GNU make: an automation tool for compilation and build                        |
+|          |             |                                                                               |
++------------------------+-------------------------------------------------------------------------------+
+| Terminals|    mintty(a program that run a shell)                                                       |
++--------------------------------------------------------------------------------------------------------+
+|  shell   |    Bash( a program which processes commands) ,Coreutils                                     |
++----------+---------------------------------------------------------------------------------------------+
+|                                configure scripts                                                       |
++----------+---------------------------------------------------------------------------------------------+
+
+
+[autotools介绍](https://www.jianshu.com/p/ff361db3e6d3)
+ 
+```
+[编写autoconf（configure.ac）生成Configure，编写automake（Makefile.am）生成makefile.in，构建](https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install)
+[autoconf编写](https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Setup.html#Setup)
+
+
+
+
+
 ## 对象
 
 对象的创建方法
@@ -447,10 +592,7 @@ v   |                                         |
 </pre>
 
 ```
-## 数据标识（变量，常量）的定义，声明，初始化，赋值及作用域
-- C/C++ 中，有两种简单的定义常量的方式：
-1. 使用 #define 预处理器。
-2. 使用 const 关键字
+
  
 
 #### 关键词
@@ -714,86 +856,22 @@ CGI
 ## [内存泄漏](https://blog.nelhage.com/post/three-kinds-of-leaks/)
 
 
-## 编译构建流程
-``` shell
 
---build=X86, --host=X86, --target=X86
 
-```
-### 交叉编译（cross compiler）
-
-###
- [GCC Compilation Process（Build）](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
-```
-                         +
-                         |
- Source Code(.c,.cpp,.h) |
-                         v
-                 +-------+----+
-                 |Preprocessin|  step1:Preprocessor(cpp)
-                 +-------+----+
-                         |
- Include Header,         v
- Expand Macro    +-------+----+
- (.i,.ii)        | Compilation|  step 2:Compiler(gcc,g++)
-                 +-------+----+
-                         |
- Assembly(.s)            v
-                 +-------+----+
-                 | Assemble   |  step 3: Assembler(as)
-                 +-------+----+
-                         |
- Machine Code(.o,.obj)   v
-                 +-------+----+
-Static Library+->+ Linking    |  step 4:Linker(ld)
-(.lib,.a)        +-------+----+
-                         |
- Executable Machine Code |
- (.exe)                  v
+## 源码
 
 ```
-compile, make都编译，但make是增量编译，compile是全新编译， build整个工程的全新编译，要生成binary的。
-CMake的是构建系统的生成器，CMake代表跨平台Make。
-- 可以产生Makefile文件，
-- 可以产生Ninja构建文件，
-- 可以产生KDevelop或XCode的项目，
-- 能产生Visual Studio解决方案。
+glibc
+ http://ftp.gnu.org/gnu/glibc/
+gcc-libstdc++
+ http://ftp.gnu.org/gnu/gcc/
+
+
+clang+llvm
+
+ http://llvm.org/git/libc
+ http://llvm.org/git/libcxx
+ https://beijing.source.codeaurora.org/quic/la/platform/external/libcxx
+
 
 ```
-+----------+---------------------------------------------------------------------------------------------+
-|          |      GNU C Library (glibc): core C library including headers, libraries, and dynamic loader |
-|          |                                                                                             |
-|          |                                                                                             |
-|          |      GNU m4: an m4 macro processor                                                          |
-|          |                                                                                             |
-|          |      GNU Debugger (GDB)                                                                     |
-|          +---------------------------------------------------------------------------------------------+
-|   GNU    |   GNU Binutils:                                                                             |
-|          |       GNU profiler  gprof    addr2line   dlltool   nlmconv   objdump   size	  windmc     |
-|          |       linking         ld     ar          gold      nm        ranlib    strings   windres    |
-|toolchain |       GNU Assembler(as)      c++filt               objcopy   readelf   strip	             |
-|          +---------------------------------------------------------------------------------------------+
-|          |    GNU Compiler Collection (GCC)                                                            |
-|          +-------------+-------------------------------------------------------------------------------+
-|          |             | GNU Bison: a parser generator, often used with the Flex lexical analyser      |
-|          | Development |                                                                               |
-|          |             | GNU build system (autotools):                                                 |
-|          | tools       |        Autoconf(generates a configure), Automake and Libtool                  |
-|          |             | GNU make: an automation tool for compilation and build                        |
-|          |             |                                                                               |
-+------------------------+-------------------------------------------------------------------------------+
-| Terminals|    mintty(a program that run a shell)                                                       |
-+--------------------------------------------------------------------------------------------------------+
-|  shell   |    Bash( a program which processes commands) ,Coreutils                                     |
-+----------+---------------------------------------------------------------------------------------------+
-|                                configure scripts                                                       |
-+----------+---------------------------------------------------------------------------------------------+
-
-
-[autotools介绍](https://www.jianshu.com/p/ff361db3e6d3)
- 
-```
-[编写autoconf（configure.ac）生成Configure，编写automake（Makefile.am）生成makefile.in，构建](https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install)
-[autoconf编写](https://www.gnu.org/software/autoconf/manual/autoconf-2.69/html_node/Setup.html#Setup)
-
-
