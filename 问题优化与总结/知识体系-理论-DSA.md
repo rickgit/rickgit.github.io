@@ -3,50 +3,57 @@
 
 ```
 DSA
-+------------------+-------------------------------------------------------+
-|                  | Array                                                 |
-| data structures  |                                                       |
-|                  | List                queue      Deque           stack  |
-|                  |  add                 offer      offerFirst      push  |
-|                  |  remove              poll       offerLast       pop   |
-|                  |  Positional Access   peek       pollFirst       peek  |
-|                  |  Search/indexOf                 pollLast              |
-|                  |  traverse                                             |
-|                  |                                                       |
-|                  | Map                     graph      matrix      String |
-|                  |    HashMap  Hashtable      Depth                      |
-|                  |    TreeMap  SortedMap      Breadth                    |
-|                  +------+------+-----------------------------------------+
-|                  |      | Heap |    Search tree                 |Spanning|
-|                  |      +--------------------------------+------+        |
-|                  |      |      |         BST             |      |        |
-|                  |      |      +-------------------------+      |        |
-|                  |      |      |AVL Trees     |red-black | btree|        |
-|                  | tree |      +-------------------------+      |        |
-|                  |      |      |Left rotation |          |      |        |
-|                  |      |      |Right rotation|          |      |        |
-|                  |      |      |Left-Right    |          |      |        |
-+                  |      |      |right-Left    |          |      |        |
-+------------------+---------+---------------------------------------------+
-|                  |search       |           Sort                          | 
-+                  +-------------+-----------------------------------------+
-|                  |  Linear     | Exchange| Merge  |Insertion   |Selection|
-|   alth           |  Binary     +-----------------------------------------+
-|                  |  Hash Table |Bubble(s)|        |Insertion(s)|Selection|  simple sorts
-|                  |Interpolation|         |        |            |         |
-|                  |             | Quick   |Merge(s)| Shell      | heapsort| Efficient sorts 
-+                  +-------------+---------+--------+------------+---------+
-|                  |  time,random                                          |
-+------------------+-------------+---------+--------+------------+---------+
-|                  |                                                       |
-|  Asymptotic      |     Ο(n)    Ω(n)    θ(n)                              |
-|  Analysis        |                                                       |
-+--------------------------------------------------------------------------+
-|  Characteristics | Finiteness    Unambiguous   Feasibility               |
-|                  |                                                       |
-|                  | Input   Output                  Independent           |
-+------------------+-------------------------------------------------------+
++------------------+-----------------------------------------------------------------------------+
+|                  | Array                                                                       |
+| data structures  |                                                                             |
+|                  | List                queue      Deque           stack   Map                  |
+|                  |  add                 offer      offerFirst      push      HashMap  Hashtable|
+|                  |  remove              poll       offerLast       pop       TreeMap  SortedMap|
+|                  |  Positional Access   peek       pollFirst       peek                        |
+|                  |  Search/indexOf                 pollLast                                    |
+|                  |  traverse                                                                   |
+|                  |                                                                             |
+|                  | graph      matrix      String                                               |
+|                  |    Depth                                                                    |
+|                  |    Breadth                                                                  |
+|                  +------+------+---------------------------------------------------------------+
+|                  |      | Heap |    Search tree                 |Spanning                      |
+|                  |      +--------------------------------+------+                              |
+|                  |      |      |         BST             |      |                              |
+|                  |      |      +-------------------------+      |                              |
+|                  |      |      |AVL Trees     |red|black | btree|                              |
+|                  | tree |      +-------------------------+      |                              |
+|                  |      |      |Left rotation |          |      |                              |
+|                  |      |      |Right rotation|          |      |                              |
+|                  |      |      |Left+Right    |          |      |                              |
+|                  |      |      |right+Left    |          |      |                              |
++-------------------------+---------------------+----------+------+------------------------------+
+|                  |search       |           Sort                                                |
+|                  +-------------------------------------------------------------+---------------+
+|                  |             |  compared                                     |  key          |
+|                  +-----------------------------+-----------------------------------------------+
+|                  |  Linear     | Exchange      | Merge  |Insertion   |Selection|               |
+|   alth           |  Binary     +---------------------------------------------------------------+
+|                  |  Hash Table |Bubble(s)      |        |Insertion(s)|Selection|Counting  Radix|  simple sorts
+|                  |Interpolation|               |        |            |         |               |
+|                  |             | Quick         |Merge(s)| Shell      | heapsort|         bucket| Efficient sorts
+|                  |             +-----------------------------------------------+               |
+|                  |             | Cocktail/Comb |   Tim               |         |               |
+|                  +-------------+---------------+---------------------+---------+               |
+|                  |  time,random                                                |               |
++--------------------------------------------------------------------------------+---------------+
+|                  |                                                                             |
+|  Asymptotic      |     Ο(n)    Ω(n)    θ(n)                                                    |
+|  Analysis        |                                                                             |
++------------------------------------------------------------------------------------------------+
+|  Characteristics | Finiteness    Unambiguous   Feasibility                                     |
+|                  |                                                                             |
+|                  | Input   Output                  Independent                                 |
++------------------+-----------------------------------------------------------------------------+
+
 ```
+
+
 
 ```DS
                      Operation
@@ -95,6 +102,8 @@ DSA
 +------+-------------+----------------------+-----------------------------------+
 
 ```
+
+
 ### 排序涉及的元素
 由小到大排序,简单到高效算法
 
@@ -210,7 +219,8 @@ split  unsorted   |item| item|      |     |      |      |      |     |     |
                    +-------------------------------------------------------+
 
 ```
-## Hash 与 Bloom Filter
+ 
+ [其他排序](https://www.cnblogs.com/kkun/archive/2011/11/23/2260312.html)
 
 
 ## Search
@@ -224,6 +234,23 @@ bloom filter
 +----------------+---------------------------------------------------+
 
 StringSearch.jar (Boyer–Moore, Bitap algorithm)
+
+### Binary
+n：数组长度
+k：次数
+第k次折半：还剩n/(2^k)个元素.
+最后还剩1个元素，n/(2^k)= 1，耗时 2^k=n，即k=log2(n)
+
+
+### Hash
+ 开放定址法
+    线行探查法、平方探查法、双散列函数探查法。
+ 链地址法
+ 再哈希法
+ 建立公共溢出区
+ 其他方法
+### Hash 与 Bloom Filter
+
 ### 字符串
 [String_processing_algorithms](https://en.wikipedia.org/wiki/String_(computer_science)#String_processing_algorithms)
 ```

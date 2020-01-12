@@ -212,3 +212,34 @@ mHashes.length > (BASE_SIZE*2) && mSize < mHashes.length/3
         }
     }
 ```
+
+## 缓存
+``` java
+    static Object[] mBaseCache;
+    static int mBaseCacheSize;
+    static Object[] mTwiceBaseCache;
+    static int mTwiceBaseCacheSize;
+```
+
+```
++--------+---------+-------+-----------+
+|        | mHash[] |       |           | mValue3
++--------+---------+-------+-----------+
+
+    ^
+    |
+    |
++---+----+---------+-------+-----------+
+|        | mHash[] |       |           | mValue2
++--------+---------+-------+-----------+
+
+    ^
+    |
++---+----+---------+-------+-----------+
+|        | mHash[] |       |           | mValue1
++--------+---------+-------+-----------+
+
+如上图，mBaseCache用数组位置为0的值，维持一个链表
+mBaseCache=mValue1
+mBaseCacheSize=3
+```

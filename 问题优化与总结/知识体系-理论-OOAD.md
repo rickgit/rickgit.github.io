@@ -21,6 +21,7 @@
 1. 创建类。解法：注解（Dagger），AOP
 2. 注入代码。解法：面向切面解耦。
 3. 依赖注入。长生命周期类，依赖的对象解耦，面向方法变成。
+4. 类代码量大。桥接模式解耦
 
 
                                              object-oriented
@@ -79,7 +80,7 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 |         |                    |                                |        methods they do not use              |                   |
 |         |                    +--------------------------------+---------------------------------------------+                   |
 |         |                    |   Open-closed Principle                                                      |                   |
-|         |                    |     open for extension,                                                      |   CARP reusablity |
+|         |                    |     open for extension,                                                      |CARP/CRP reusablity|
 |         |                    |     but closed for modification                                              |                   |
 |         |                    |                                                                              |                   |
 +---------+--------------------+------------------------------------------------------------------------------+-------------------+ 

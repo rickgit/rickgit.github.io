@@ -20,15 +20,15 @@
 |         |                |         Intent                     |  Handler             |  Notification       |
 |         |                |      AssetManager/Resource         |                      |  JobScheduler       |
 | Android |                |      SharedPreferences             |  Environment         |                     |
-| SDK     +-----------------------------------------------+-----------+------------++------------------------+
-|         | view/gesture         | widget/webkit/appwidget|  graphics/opengl/media  |       animation        |text/sax net/nfc/bluetooth
-|         |(window,interaction)  |      (UI elements )    |(drawing2Screen directly)|   (property animation) |
+| SDK     +-----------------------------------------------+-----------+------------+---+---------------------+
+|         | view/gesture         | widget/webkit/appwidget|graphics/opengl/media/hardware|       animation   |     text/sax net/nfc/bluetooth dalvik
+|         |(window,interaction)  |      (UI elements )    |(drawing2Screen directly)    |(property animation)|
 |         +--------------------------------------------------------------------------------------------------+
-|         |Window  View  KeyEvent| TextView  ImageView    |     Drawable   Bitmap   |       TypeEvaluator    |
-|         |GestureDetector       | EditText  Toast        |     Camera     Canvas   |                        |
-|         |InputMethodManager    | RecyclerView           |     ColorFilter Point   |                        |
-|         |Animation             | ViewPager              |     Rect                |                        |
-+--------------------------------+------------------------+-------------------------+------------------------+
+|         |Window  View  KeyEvent| TextView  ImageView    |     Drawable   Bitmap       |   TypeEvaluator    |
+|         |GestureDetector       | EditText  Toast        |     Camera     Canvas       |                    |
+|         |InputMethodManager    | RecyclerView           |     ColorFilter Point       |                    |
+|         |Animation             | ViewPager              |     Rect                    |                    |
++--------------------------------+------------------------+-----------------------------+--------------------+
 | App     |   AMS             WMS    View System        content provider   XMPP                              |//type: BootStrapService,
 |Framework|   PMS             NMS    ResourceManager    TelephonyManager   LMS                               |//coreServices,OtherService
 +--------------------------------------------------------------------------------------+---------------------+
@@ -194,7 +194,7 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
          | Shared memory |   Binder                                  |  pipe          | SharedPreference|
          |               |                                           |  messagequeue  |                 |
          +----------------------------------------------------------------------------------------------+
-copy     |      0        |                 1                         |       2        |                 |
+copy     |      0        |                 1                         |       2                          |
 times    +---------------+-------------------------------------------+----------------+-----------------+
 
 应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
@@ -1726,6 +1726,29 @@ way 1   +---------> |   | FutureTask(WorkerRunnable) |           |        +---> 
 ### 四大组件基础 - Context
 Context作用
 ```
+ ContextWrapper
+       ^   Context
+       |
+       +
+ ContextThemeWrapper
+       ^   Theme,LayoutInflater,Resources
+       |
+       +
+ Activity
+       ^   Dialog,Cursor,Context
+       |
+       +
+ComponentActivity
+       ^     Lifecycle
+       |
+       +
+ FragmentActivity
+       ^     Fragment
+       |
+       +
+AppCompatActivity
+             ActionBar
+
 
 +--------------------------------------------------------------------------------------------+
 |   ContextImpl                                                                              |
@@ -2126,6 +2149,65 @@ Glide
                                                                                                                                                                                         
 ## Android 开发模式
 
+### 刷机方法
+厂刷，线刷，卡刷，软刷
+
+ 
+9008是终极救砖，一定可以的
+adb reboot edl
+
+### 唯一ID
+
+1. Build.SERIAL：Android 9.0
+
+2. IMEI / DeviceID： Android 10.0 Q版本中，禁止获取
+```java
+TelephonyManager tm = (TelephonyManager) context
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+deviceId = tm.getDeviceId(); 
+```
+```java
+Object defaultTlpMgrInstance = Class.forName("miui.telephony.TelephonyManager").getMethod("getDefault").invoke(null);
+Object imeiObj = defaultTlpMgrInstance.getClass().getMethod("getMiuiDeviceId").invoke(defaultTlpMgrInstance);
+```
+
+```java
+private String getIMEI(int slotId){
+    try {
+        Class clazz = Class.forName("android.os.SystemProperties");
+        Method method = clazz.getMethod("get", String.class, String.class);
+        String imei = (String) method.invoke(null, "ril.gsm.imei", "");
+        if(!TextUtils.isEmpty(imei)){
+            String[] split = imei.split(",");
+            if(split.length > slotId){
+                imei = split[slotId];
+            }
+            Log.d(TAG,"getIMEI imei: "+ imei);
+            return imei;
+        }
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+        e.printStackTrace();
+        Log.w(TAG,"getIMEI error : "+ e.getMessage());
+    }
+    return "";
+}
+```
+
+
+4. Android ID：手机恢复出厂设置或root了手机，会重置。 
+```java
+Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)
+```
+5. Mac地址：Android 9 P版本中，地址会随机变化。没有wifi的时候，我们是无法获得数据的
+
+6. 蓝牙MAC地址。
+
+```java
+BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+String btMAC = mBluetoothAdapter.getAddress(); 
+```
+
+
 ### 性能优化总结
 > <<Android High Performance Programming>>
 
@@ -2133,18 +2215,27 @@ Glide
 
 稳定（monkey,bugreport），流畅（systrace，卡顿，动画，多线程，zxing），续航（battery historian 后台，发热，功耗），精简（apk），美观（布局layout inspector），安全（加固，插件化）
 am_crash
-### 稳定
-#### 代码Review
+ 
+性能（ the time taken to execute tasks）
+
+#### 稳定
+##### 代码Review
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 
-#### MONKEY
+##### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000
 adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
 
 
 adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+heisha:
+adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
+
+[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
+[-p, com.xp.browser, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
 
 
 停止 monkey
@@ -2191,7 +2282,7 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 [ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
 [ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
 
-#### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
+##### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
 ```
 services/core/java/com/android/server/am/AppErrors.java:
 
@@ -2212,12 +2303,12 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
-#### 反编译
+##### 反编译
 [Apktool](https://github.com/iBotPeaches/Apktool)
 [dex2jar](https://github.com/pxb1988/dex2jar)
 [jd-gui](https://github.com/java-decompiler/jd-gui)
 [jad（不维护）](http://www.kpdus.com/jad.html)
-#### 内存泄漏
+##### 内存泄漏
  
  工具：profiler，eclipse mat
  [Activity 泄漏和重复创建的冗余Bitmap-ResourceCanary](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
@@ -2291,7 +2382,8 @@ Uptime: 53403267 Realtime: 53403267
   PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
 ```
 
-## 流畅
+
+#### 流畅
 > 性能（ the time taken to execute tasks）
 
 ```shell 
@@ -2314,7 +2406,7 @@ Uptime: 53403267 Realtime: 53403267
 
 # adb shell "dumpsys batterystats < package | pid>" //电量采集
 ```
-### 官方定义
+#### 官方定义
 [识别与负载能力相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_capacity)
 [识别与抖动相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_jitter)
 
@@ -2324,7 +2416,6 @@ systrace
 adb shell "atrace -z -b 40000 gfx input view wm am camera hal res dalvik rs sched freq idle disk mmc -t 15 > /data/local/tmp/trace_output &"
 
 
-### 性能（ the time taken to execute tasks）
 ```
 +-------------+-------------------+----------------------+---------------------------+---------------+
 |             |    info           |    tools             |  fix                      |  extension    |
@@ -2633,7 +2724,7 @@ framework源码，开发必备
 
 含有18个内置platform/packages/providers
 [platform/packages/providers/MediaProvider](https://beijing.source.codeaurora.org/quic/la/platform/packages/providers/MediaProvider)
- ```
+
  添加到相册，需要uri.getScheme().equals("file")
 public class MediaScannerReceiver extends BroadcastReceiver
 {
@@ -2669,5 +2760,18 @@ public class MediaScannerReceiver extends BroadcastReceiver
             }
         }
     }
- ```
+
+
+
+[浏览器模块](https://beijing.source.codeaurora.org/quic/la/platform/external/chromium_org)
+jni_android.cc
+
+
+[浏览器源码](https://cs.chromium.org/chromium/)
+
 ```
+
+
+
+
+(从jvm源码看synchronized)[https://www.cnblogs.com/kundeg/p/8422557.html]

@@ -182,6 +182,23 @@ Filesystem library (C++17)
 1. 使用 #define 预处理器。
 2. 使用 const 关键字
 
+
+#### 宏定义（#define）
+
+- （#）字符串化操作符
+- （##）符号连接操作符
+- （#@）单字符化操作符
+- （\） 续行操作符
+
+### 声明(Declarations)
+#### Specifiers
+- storage class specifier (register, static, thread_local (since C++11), extern, mutable).
+- Type specifiers( class,emum,simple type,...)
+
+``` C
+extern "C" {       //告诉编译器下面的函数是c语言函数（因为c++和c语言对函数的编译转换不一样，主要是c++中存在重载）
+```
+
 ### 关键字与符号
 [关键词](https://blog.csdn.net/weibo_dm/article/details/81629693)
 ```
