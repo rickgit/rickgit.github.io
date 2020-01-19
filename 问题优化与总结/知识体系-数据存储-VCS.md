@@ -130,6 +130,8 @@ git log --reverse
 git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
 
 git branch initial_revision <commit id>
+ //显示分支
+git branch -v  --abbrev=40 //打印详情，hash值长度40
 
 git checkout initial_revision  
 
@@ -138,7 +140,9 @@ git show-ref
 //显示tag
  git tag -n --sort=taggerdate
  git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
- 
+
+
+
  git checkout -b <new branch name> <tag_name>
 
 ```

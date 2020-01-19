@@ -1866,6 +1866,9 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
 #### AMS 栈管理（任务栈），启动模式，亲和度
 Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
 ```bash
+adb shell dumpsys -T 60000 activity -v all
+
+
 adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
 adb shell dumpsys activity activities----------查看Activity组件信息
 adb shell dumpsys activity services-----------查看Service组件信息
@@ -2775,3 +2778,6 @@ jni_android.cc
 
 
 (从jvm源码看synchronized)[https://www.cnblogs.com/kundeg/p/8422557.html]
+[Okhttp.md](..\阅读代码\http\Okhttp.md)
+[DiskLruCache.md](..\阅读代码\DiskLruCache.md)
+[Glide.md](../阅读代码/Glide.md)

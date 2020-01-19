@@ -17,28 +17,28 @@
 ## 初定修订版本数据结构
 ```
 +-----------------------+----------------------------+
-|                       |  lruEntries(LinkedHashMap) |
+|    maxSize            |  lruEntries(LinkedHashMap) |
 +----------------------------------------------------+
-|                       |          edit() get()      |
+|                       |  edit()  remove() get()    |
 |                       +----------------------------+
-|    magic              |  REMOVE  DIRTY  READ  CLEAN|
-|    version            |                            |
+|    magic              |  DIRTY   REMOVE READ  CLEAN|
+|    version            | (Editor)      (Snapshot)   |
 |    appVersionString   +----------------------------+
 |    valueCountString   |    Entry                   |
-|                       |                            |
 +-----------------------+----------------------------+
 |                   JOURNAL_FILE                     |
 +----------------------------------------------------+
 |                  DiskLruCache                      |
 +----------------------------------------------------+
 
+valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解决冲突 0,1,2,3
 
 ```
 1. 文档及配置文件
 2. 源码
 3. 单元测试
 4. 性能及容错
-5. 封装，解耦
+5. 重用，封装，解耦，通讯
 6. 文档
 
 

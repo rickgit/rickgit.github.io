@@ -1581,20 +1581,30 @@ Rxjava实现
 
 ### 并发底层实现
 ```
-+-------------+--------------+------------------------------------------------------------------------------------------+
++-------------+--------------+----------------------+------------------+------------------------+-----------------------+
 |             |              |                      |                  |                        |                       |
 | Object      |  DCL problem |    synchronized      |  Object.wait()   |                        |                       |
 |             |              | (Reentrant,unfair)   |  Object.notify() |                        |                       |
 |             |              | (Exclusi^e,pessimism)|                  |                        |                       |
-+-------------+--------------+-----------------------------------------+------------------------+-----------------------+
-|             |     CAS      |                                           AQS                                            |
-|             +-------------------------------------+------------------+------------------------+-----------------------+
-|             | AtomicInteger|  ReentrantLock       |  Condition       |   CountDownLatch       |   ArrayBlockingQueue  |
-| volatile    |              |(Exclusive,optimistic)|                  |   CyclicBarrier        |                       |
-|             |              |ReentrantReadWriteLock|                  |   Semaphore,Exchanger  |   LinkedBlockingQueue |
-|             |              |(shared Read)         |                  |                        |                       |
-|             |              |StampedLock           |                  |                        |   Fork/Join           |
-+-----------------------------------------------------------------------------------------------------------------------+
++----------------------------+-----------------------------------------+------------------------+-----------------------+
+|             | J.U.C.atomic                                                                                            |
+|  volatile   +---------------------------------------------------------------------------------------------------------+
+|             | ConcurrentLinkedDeque                                                                                   |
+|             | ConcurrentSkipListMap                                                                                   |
+|             +---------------------------------------------------------------------------------------------------------+
+|             |              |ReentrantReadWriteLock                                                                    |
+|             |     AQS      |(shared Read)                                                                             |
+|             |              |StampedLock                                                                               |
+|             |              +----------------------+------------------+------------------------+-----------------------+
+|             |              |                      |   Condition      |    CountDownLatch      |   ArrayBlockingQueue  |
+|    CAS      |              |                      |                  |    CyclicBarrier       |   LinkedBlockingQueue |
+|             |              |  ReentrantLock       |                  |                        |                       |
+|             |              |(Exclusi^e,optimistic)|                  |   Semaphore,Exchanger  |   ConcurrentHashMap   |
+|             |              |                      |                  |                        |   CopyOnWriteArrayList|
+|             |              |                      |                  |                        |                       |
+|             |              |                      |                  |                        |   Fork/Join           |
++-------------+--------------+----------------------+------------------+------------------------+-----------------------+
+
 
 
 ```
@@ -1605,7 +1615,7 @@ Rxjava实现
 上下文切换查看工具 **vmstat**,**LMbench**
 
 #### 内置锁（synchronized）
-    
+ [从jvm源码看synchronized](https://www.cnblogs.com/kundeg/p/8422557.html)
     - 静态的锁顺序死锁。一个线程执行a方法且已经获得了A锁，在等待B锁；另一个线程执行了b方法且已经获得了B锁，在等待A锁。这种状态，就是发生了静态的锁顺序死锁。
     - [动态的锁顺序死锁](https://www.androidos.net.cn/codebook/AndroidRoad/java/concurrence/deadlock.md)
     ```java
