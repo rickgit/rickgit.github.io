@@ -2534,6 +2534,14 @@ SYN_SENT  |                                                  |                  
 
 SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加密是合适的。
 
+#### NPN和ALPN
+NPN（Next Protocol Negotiation，下一代协议协商），是一个 TLS 扩展，由 Google 在开发 SPDY 协议时提出。随着 SPDY 被 HTTP/2 取代，NPN 也被修订为 ALPN（Application Layer Protocol Negotiation，应用层协议协商）。二者目标一致，但实现细节不一样，相互不兼容。以下是它们主要差别：
+
+NPN 是服务端发送所支持的 HTTP 协议列表，由客户端选择；而 ALPN 是客户端发送所支持的 HTTP 协议列表，由服务端选择；
+NPN 的协商结果是在 Change Cipher Spec 之后加密发送给服务端；而 ALPN 的协商结果是通过 Server Hello 明文发给客户端；
+
+[](https://imququ.com/post/enable-alpn-asap.html)
+
 ### XMPP/MQTT
 见[知识总结-im篇](./知识体系-im.md)
 ### RPC

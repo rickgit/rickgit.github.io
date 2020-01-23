@@ -744,3 +744,101 @@ java的SSLSocket相关的开发再来了解本框架中的安全性
 ##平台适应性
 
 Platform是整个平台适应的核心类。同时它封装了针对不同平台的三个平台类Android和JdkWithJettyBootPlatform。
+
+
+
+
+``` java
+  001_initial_mockwebserver 0c4790dafaf6ccf7d8d34d04d24aac65cac910eb Initial checkin of MockWebServer.
+  002_ant_maven             4ebac2656c870a090141106ad9ce267d25863301 Upgrade from ant to maven.
+  003_initial_client        ea63463c2ff8a67f63e541036f0d5998b5bb1f3e Initial import.
+
+                              google mockwebserver
+                +-------------------------------------------------------+
+                |                  HttpConnectionPool                   |
+                |                           +---------------------------+
+                |                           |    bouncycastle           |
+                |                           |    conscrypt              |
+                |                           |    JettyNpnProvider       |
+                |                           |    HttpsEngine            |
+                +---------------------------+---------------------------+
+                |  HttpEngine                                           |
+                |     responseCache                                     |
+                |     transparentGzip                                   |
+                +---------------------------+---------------------------+
+                |  HttpURLConnectionImpl    |    HttpsURLConnectionImpl |
+                |           proxy           |            HttpsEngine    |
+                |           redirectionCount+---------------------------+
+                |           httpEngine      |    OkHttpsConnection      |
+                +---------------------------+---------------------------+
+                |                    OkHttpConnection                   |
+                +-------------------------------------------------------+
+                |                     URLConnection                     |
+                +-------------------------------------------------------+
+ 
+  100_parent1.0.0           d95ecff5423f19e019e178baddfe4211f2fe57aa [maven-release-plugin] prepare release parent-1.0.0
+                +-------------------------------------------------------+
+                |                  HttpConnectionPool                   |
+                |                           +---------------------------+
+                |                           |    Platform               |
+                |                           |    HttpsEngine            |
+                +---------------------------+---------------------------+
+                |  HttpEngine                                           |
+                |     responseCache                                     |
+                |     transparentGzip                                   |
+                +---------------------------+---------------------------+
+                |  HttpURLConnectionImpl    |    HttpsURLConnectionImpl |
+                |           proxy           |            HttpsEngine    |
+                |           redirectionCount+---------------------------+
+                |           httpEngine      |    OkHttpsConnection      |
+                +---------------------------+---------------------------+
+                |                    OkHttpConnection                   |
+                +-------------------------------------------------------+
+                |                     URLConnection                     |
+                +-------------------------------------------------------+
+                |                     OkHttpClient                      |
+                +-------------------------------------------------------+
+ 
+* 200_parent-2.0.0-RC1      8dcc74d339e0664580756063ff47c65c6f1a17ae [maven-release-plugin] prepare release parent-2.0.0-RC1 
+* 300_parent-3.0.0-RC1      ffc35dbd02822bf6584c6144266cbbca6b348b17 [maven-release-plugin] prepare release parent-3.0.0-RC1
+  400_parent-4.0.0-ALPHA01  8f21b934f928986bba7e50114911c3c494e1d5c5 Prepare for release 4.0.0-ALPHA01.
+
+                gradle+kotlin
+
+
+```
+
+
+OKIO 缓存字节，避免空间浪费，避免频繁GC（zero-fill and GC churn ）
+```
+* 001_okbuffer 2d3cdc9e5dfb593f8eb7da38459163b902a95d7f OkBuffer API sketch.
+                +--------------------------------------------+
+                |           ByteString                       |
+                +--------------------------------------------+
+                |                            SegmentPool     |
+                +--------------------------------------------+
+                |         Segment                            |
+                |             pos//for read                  |
+                |             limite // for write            |
+                +--------------------------------------------+
+                |         OKBuffer:Sink,Source               |
+                |                segment                     |
+                |                byteCount                   |
+                +--------------------------------------------+
+
+  002_okbuffer_dapter       bece94f8970fa6d0615581f81f71efa4b950d3b2 Adapters for sources and sinks.
+  003_InflaterSource        88b2592d0aea290aecd38bc24a9e3ed66bb38d05 InflaterSource. Like InflaterInputStream.
+  004_GipSource             8efe816e6fa54efd935b08050dfdcf43a50f8bbe GzipSource beginnings.
+  005_BufferedSink          d1dcbcf786fff9f1d1da0ffea6703e2f749c032b BufferedSink.
+  006_DeflaterSink          2fcbac79930492eeb379b9c9b3c63cca4e8789df DeflaterSink.
+  007_RealBufferedSink      c287d63829969fe03f559e76deb735c8286d4d32 Interfaces for BufferedSource and BufferedSink.
+  008_GzipSink              d0a461ffd277ab8e34edd7ca995a0fae0b02b790 Add GzipSink for writing Gzip data.
+  050_okio-parent0.5.0      21362a2634b287f3d2136327a56ebf1b9738a7ae [maven-release-plugin] prepare release okio-parent-0.5.0
+                maven
+
+
+* 200_okio_parent-2.0.0-RC1 4da4d9e3e311cdce7294fc59507f00dca2cf2ce0 Update changelog for 2.0.0-RC1
+                Gradle+Kotlin
+
+
+```
