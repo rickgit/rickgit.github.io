@@ -1,6 +1,7 @@
 
 # OOAD
-
+《Pattern-oriented Software Architecture 》五套书
+《Software Architecture: Perspectives on an Emerging Discipline》
 ## 封装性与内聚耦合
 
 >《UML面向对象程序设计基础》
@@ -100,7 +101,7 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 - YAGNI "极限编程"
 - Rule of three 《Refactoring》
 
-工厂单例构造原型，桥接适配组合 代理享元装饰外观,命令中介观察访问备忘  解释责任模板 迭代策略状态 
+工厂单例构造原型，桥接适配组合 代理装饰享元外观,命令中介观察访问备忘  解释责任模板 迭代策略状态 
 ```
 1. Strategy:
 Defines a family of algorithms, encapsulates each one, and make them interchangeable.
@@ -407,6 +408,240 @@ Android MVVM with Dagger2, Retrofit, RxJava and Android Architecture Components
 |                                                   |            | +------------------------------------+   |
 +---------------------------------------------------+            +------------------------------------------+
 
+
+  002_injector            04892c03bad8cc45a3c509880c33e7f1d41f5a47 First draft of a new, fast dependency JSR-330 injector.
+                          +---------------------------------------------------------------------------------------------------------+
+                          |                       Linker                                                                            |
+                          |                          link(Collection<Binding<?<>)                                                   |
+                          |                          injector                                                                       |
+                          +------------------------+--------------------------------------------------------------------------------+
+                          |                        |                       UnresolvedBinding<T>    unattachedBindings               |
+                          |                        +----------------------------------------------------+---------------------------+
+                          |                        |                                                    |                           |
+                          |                        |  BuiltInBinding<T>           ConstructorBinding<T> |                           |
+                          |                        |        MembersInjector.class                       |                           |
+                          |                        |        Provider.class                              |  ProviderMethodBinding<T> |
+                          |                        |                     DeferredBinding<T>             |         Provider.class    |
+                          |                        |                           root_injection           |         attach(Linker)    |
+                          +-----------------------------------------------------------------------------+---------------------------+
+                          |     Key<T>             |                            Binding<T>                                          |
+                          |        type            |                                get()                                           |
+                          |        annotation      |                                                                                |
+                          +------------------------+--------------------------------------------------------------------------------+
+                          |  Maven                  Injector                                                                        |
+                          |                             inject(Class<T> type, Object... modules)                                    |
+                          +---------------------------------------------------------------------------------------------------------+
+
+  003_code_gen            576136ba600e81192960350f58503dfed9d824f4 New, very basic Java code generator.
+  004_modules             2ecf2ed141990194e89d88f7d159aca86a39c5aa Add Modules.override().
+  005_stringKey           733a7f6431616202b248adc6cf9d619bd4750162 Use Strings for Keys.
+  006_ProvidesProcessor   2a5de416ac26b37cde2d07c66873931495db6da8 First draft of the @Provides processor.
+  007_InjectProcessor     6fd3de3797baa8b44789fd50a43b8daa5bc7fcd7 First draft of the @Inject processor.
+  008_DependencyGraph     4890139ad39ae959dc5b0bb9e638fc66ef702513 New annotation-driven API that uses entry points.
+                          ----------------------+-------------------------------------------------------------------------------------------------------+
+                          |                     |                                                Linker                                                 |
+                          |                     |                                                   installModules()                                    |
+                          |                     |                                                   link()                                              |
+                          |                     +------------------------+------------------------------------------------------------------------------+
+                          |                     |                        |                       UnresolvedBinding<T>                                   |
+                          |                     |                        |                       unattachedBindings                                     |
+                          |                     |                        +----------------------------------------------------+-------------------------+
+                          |@interface Injector  |                        |  BuiltInBinding<T>           ConstructorBinding<T> |                         |
+                          |        modules()    |                        |        MembersInjector.class       @Inject         |                         |
+                          |        entryPoints()|                        |        @Provides                                   |ProviderMethodBinding<T> |
+                          |                     |                        |                     DeferredBinding<T>             |       @Provides         |
+                          |                     |                        |                           root_injection           |       attach(Linker)    |
+                          |                     |                        +----------------------------------------------------+-------------------------+
+                          |                     |  Keys                  |                            Binding<T> :Provider<T>, MembersInjector<T>       |
+                          |                     |    get(type,annotation)|                                              get()      injectMembers(T)     |
+                          |---------------------+------------------------+------------------------------------------------------------------------------+
+                          |                     |                         DependencyGraph                                                               |
+                          |  CodeGen(java apt)  |                             DependencyGraph( injectorClass, bindings)                                 |
+                          ----------------------+-------------------------------------------------------------------------------------------------------+
+
+
+  009_static_inject       34e2a25c3a6eed0b261c8be4b00610c6df782bc3 Support static injection.
+  010_google_guice        63a7e1ce3f7d202d907b4227ab51e98549d91d76 Minimal support for Guice annotations to ease migration and A/B testing.
+  011_@module             52a260e81054eec5bfd47f419537cbadc2045612 Replace @Injector with @Module.
+                          ----------------------+-------------------------------------------------------------------------------------------------------+
+                          |                     |                                                Linker                                                 |
+                          |                     |                                                   installModules()                                    |
+                          |                     |                                                   link()                                              |
+                          |                     +------------------------+------------------------------------------------------------------------------+
+                          |                     |                        |                       UnresolvedBinding<T>                                   |
+                          |                     |                        |                       unattachedBindings                                     |
+                          |                     |                        +----------------------------------------------------+-------------------------+
+                          |@interface module    |                        |  BuiltInBinding<T>           ConstructorBinding<T> |                         |
+                          |        modules()    |                        |        MembersInjector.class       @Inject         |                         |
+                          |        entryPoints()|                        |        @Provides                                   |ProviderMethodBinding<T> |
+                          |                     |                        |                     DeferredBinding<T>             |       @Provides         |
+                          |                     |                        |                           root_injection           |       attach(Linker)    |
+                          |                     |                        +----------------------------------------------------+-------------------------+
+                          |                     |  Keys                  |                            Binding<T> :Provider<T>, MembersInjector<T>       |
+                          |                     |    get(type,annotation)|                                              get()      injectMembers(T)     |
+                          |---------------------+------------------------+------------------------------------------------------------------------------+
+                          |   guice             |                         DependencyGraph                                                               |
+                          |  CodeGen(java apt)  |                             DependencyGraph( injectorClass, bindings)                                 |
+                          ----------------------+-------------------------------------------------------------------------------------------------------+
+  012_ProblemDetector     3f013f16c6663fa023c1c64a4a291e7083712fe7 Detect problems at runtime.
+  013_LazyInjection       31ad32fd607773ac3c0d0f7fdde26591a459506e Support lazy object graphs.
+  014_androidmenifest     4136fd157588b3ea64f054e82d10e4c09419deb4 Initial infrastructure to generate modules from AndroidManifest.xml.
+  015_FullGraphProcessor  7b0c34fe4def38191eef738ab391b7a5810bc18a Build time graph construction and validation.
+  016_LazyBinding         69c9daf5931d27902dd2282d0e606a83bc993ead Add a Lazy<T> with a delegate binding, so consumers can @Inject a Lazy<T> if T is bound. Tighten up key mangling code
+  017_SetBinding          0656b1a9d346099d3138da9d50b20c4efa1486e8 Add support for multi-bindings, such that any method annotated with Provide AND Element contribute that binding to a set-binding, which builds an injectable set at injection time.
+  018_OneOf               4670896e18e3e748ac33ff42f388450c082e2c39 Rename Element to OneOf
+  019_dagger-compiler     f0de3941d22fa017c377f05822f225005d9dd7fc Migrate code-gen processors to their own project, and separate reflection code.
+  020_ModuleGeneratorTask ecfce61047a6aee7b57d27dad9f7f1d7b6339535 Allow manifest module generator invocation as Ant task.
+* 021_website             e8586ef986fde827ea43c890da7252c8f66c0a7d Add website.
+  092_android_examples    d45582b83d3cd6400a0f7b3a1e98f79ea856404a Add two Android examples.
+  100_dagger-parent-1.0.0 21bdcdd0ff1d88b78d5f2be68096f1cc50947c31 [maven-release-plugin] prepare release dagger-parent-1.0.0
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |                                  Linker                                                                               |
+                          |                                    plugin         installBindings()      requestBinding()                             |
+                          |                                    errorHandler   link()                                                              |
+                          +------------------------+-------------------------------------------------+--------------------------------------------+
+                          |                        |                                                 |                   ProviderMethodBinding<T> |
+                          |                        |                                                 |                    ReflectiveModuleAdapter |
+                          |                        |   @Inject          @Provides                    |             @Module                        |
+                          |                        |    :Binding          :Binding,Provider          |             ModuleAdapter                  |
+                          |                        |                                                 |                   getBindings()            |
+                          |                        |                                                 +--------------------------------------------+
+                          |                        |  BuiltInBinding<T>                              |  ClassloadingPlugin     ReflectivePlugin   |
+                          |                        |        MembersInjector                          |           Plugin                           |
+                          |                        |                                                 |              getModuleAdapter()            |
+                          |                        +-------------------------------------------------+--------------------------------------------+
+                          |  Keys                  |   Binding<T> :Provider<T>, MembersInjector<T>                                                |
+                          |    get(type,annotation)|                     get()      injectMembers(T)                                              |
+                          +------------------------+----------------------------------------------------------------------------------------------+
+                          |                         ObjectGraph                                                                                   |
+                          |                             create(modules)      linker      staticInjections                                         |
+                          |                             inject(instance)     plugin      injectableTypes                                          |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |                                  java apt, squareup javawriter                                                        |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+
+  200_dagger-2.0          ddbe7f199027f8aacb259c884bf85ee3451d2fe3 Update the README.md to reflect the release of Dagger 2.0, fixing up some filler text, updating versions, and pointing at the right download/repository sources.
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |     InjectProcessingStep                                            MapKeyProcessingStep                              |
+                          |            InjectBindingRegistry                                          MapKeyGenerator                             |
+                          |                   MembersInjectorGenerator                          ModuleProcessingStep                              |
+                          |                   FactoryGenerator                                        FactoryGenerator                            |
+                          |                                                                     ComponentProcessingStep                           |
+                          |                                                                           ComponentGenerator                          |
+                          |                                                                     ProducerModuleProcessingStep                      |
+                          |                                                                           ProducerFactoryGenerator                    |
+                          |                                                                     ProductionComponentProcessingStep                 |
+                          |                                                                           ComponentGenerator                          |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |                                                                           ProcessingStep                              |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |                                        @autoservice                                                                   |
+                          |                                        ComponentProcessor: BasicAnnotationProcessor                                   |
+                          |                                                      injectBindingRegistry                                            |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+                          |                                  java apt(google auto), squareup javawriter , google  guava,truth                     |
+                          +-----------------------------------------------------------------------------------------------------------------------+
+
+
+
+auto
+  001_initial_maven         b281ea4dfe5cfc7cf9d1a74541c411a07a89c0b4 An initial project and an initial continuous integration system config, as well as contributors docs, license, and an initial checkstyle, cribbed from Dagger.
+  002_generator_integration 85b81393b08319ace2734187ac25ec1371536f36 Initial shape of autofactory and early code drop.
+                            +--------------------------------------------------------------------------------------+
+                            |              CodeGen(javawriter)                                                     |
+                            +---------------------------------------------------+----------------------------------+
+                            |            FactoryAdapterGenerator                |  InterfaceLinkAdapterGenerator   |
+                            +---------------------------------------------------+----------------------------------+
+                            |                     generator                     |         integration (dagger)     |
+                            +---------------------------------------------------+----------------------------------+
+                            |    @AutoFactory     @Param         @Inject                                           |
+                            +--------------------------------------------------------------------------------------+
+                            |    FactoryProcessor :AbstractProcessor                                               |
+                            |              process(types, env)    processingEnv                                    |
+                            +--------------------------------------------------------------------------------------+
+  003_truth                 c6d3b38736c93ef69ecd342daa9f3669960fc329 Introduce a Truth subject that uses javac to parse source into an AST and compare them in parallel.
+  004_truth_test            513a71854e704a5d1e1078ee8a2703485ffa0b91 Add some simple tests.
+  005_generator_test        5466b8f210b86b81ba8fc114087ea19bffaf6af1 An initial addition of some simple usecases
+* 006_generator_newapi      d08d9c3828833bcacdc05208842d32f4c3710332 Adopt the new API.  The tests are still failing, but this is a mostly working checkpoint
+                            +--------------------------------------------------------------------------------------+
+                            |                         Factory                                                      |
+                            |                             create()                                                 |
+                            +--------------------------------------------------------------------------------------+
+                            |                       FactoryDescriptorGenerator   FactoryMethodDescriptor           |
+                            |                                 messager                                             |
+                            |                                 elements                                             |
+                            |       JavaCompiler    FactoryDescriptor                                              |
+                            |                                 name                                                 |
+                            |                                 methodDescriptors                                    |
+                            |                                 providerNames                                        |
+                            |                                                                                      |
+                            |                   FactoryWriter                                                      |
+                            |                            filer                                                     |
+                            +--------------------------------------------------+---------------------------------- |
+                            |          AutoFactoryProcessor                    |  InterfaceLinkAdapterGenerator    |
+                            +--------------------------------------------------+---------------------------------- |
+                            |    @Provided            @AutoFactory                                                 |
+                            |                              implementing():class                                    |
+                            +--------------------------------------------------------------------------------------+
+                            | AutoFactoryProcessor:AbstractProcessor                                               |
+                            |              process(types, en^)    processingEn^                                    |
+                            +--------------------------------------------------------------------------------------+
+                            |                     generator                                                        |
+                            +--------------------------------------------------------------------------------------+
+  007_readme                0265313d9460f732a92b15e01d957d2776f93325 Update the READMEs.
+  008_autoservice           afda34252be53cacc35c0732ccf5f1040d2766d3 Add @AutoService for generating META-INF/services configuration files.
+  009_autovalue             d67532c38d7fb39906b2ee7de6567e6c2620ca2e An initial import of @AutoValue
+* 010_autovalue_test        4e54bae91a70b7c1c6aeec275a0a423a775d53a3 Add the tests as well
+                            +---------------------------------------------------------------------+---------------------------+----------------------------------------+
+                            |        Factory                                                      |    META-INF/services      | AutoValue_name   AutoValueFactory_name |
+                            |            create()                                                 |                           |                                        |
+                            +------------------------------------------------------------------------------------------------------------------------------------------+
+                            |                                                                     |                           |                                        |
+                            |                 FactoryDescriptorGenerator   FactoryMethodDescriptor|                           |                                        |
+                            |                           messager                                  |                           |                                        |
+                            |                           elements                                  |       ServicesFiles       |TEMPLATE_STRING  FACTORY_TEMPLATE_STRING|
+                            | JavaCompiler    FactoryDescriptor                                   |                           |                                        |
+                            |                           name                                      |                           |                                        |
+                            |                           methodDescriptors                         |                           |                                        |
+                            |                           providerNames                             |                           |                                        |
+                            |                                                                     |                           |                                        |
+                            |             FactoryWriter                                           |                           |                                        |
+                            |                      filer                                                                      |                                        |
+                            +---------------------------------+---------------------------------- +--------------------------------------------------------------------+
+                            |   AutoFactoryProcessor          |  InterfaceLinkAdapterGenerator    |   AutoServiceProcessor    |       AutoValueProcessor               |
+                            +---------------------------------+--------------------------------------------------------------------------------------------------------+
+                            |          @Provided            @AutoFactory                          |      @AutoService         |           @AutoValue                   |
+                            |                                    implementing():class             |                           |                                        |
+                            +------------------------------------------------------------------------------------------------------------------------------------------+
+                            |    AutoFactoryProcessor:AbstractProcessor                           |      ServiceLoader        |                  |  AutoValues         |
+                            |                 process(types, en^)    processingEn^                |                           |                  |                     |
+                            +------------------------------------------------------------------------------------------------------------------------------------------+
+                            |                          generator                                  |      service              |              value                     |
+                            +---------------------------------------------------------------------+---------------------------+----------------------------------------+
+  011_auto-common              5834df6914a592731e34a34e4641f162afa7a444 Introduce com.google.auto:auto-common with some simple Element utilities.
+  012_dagger_moretype          9b389fa6cb49fd121fb0433241f55863778b1962 Copy MoreTypes from dagger to auto-common so that it can be used by auto-value. Eventually it should be moved rather than copied.
+  013_superficialvalidation    4874fbf0c227a62a90af31f37ad2753e6a0adf80 Add a utility that does quick, superficial validation on elements to ensure that all type information is present while running a processor. ------------- Created by MOE: http://code.google.com/p/moe-java MOE_MIGRATED_REVID=70831442
+  014_visibility               260023d4c69008ea6646aacb8b378c1f4d3616b9 Add validation to make sure that modules must be public and not inner classes. ------------- Created by MOE: http://code.google.com/p/moe-java MOE_MIGRATED_REVID=74368767
+  015_MoreTypsIsTypeOfTest     6992f634601141e4e1529c8c93aae64c6da5a868 Fix the SuperficialValidator to properly handle unreasonable AnnotationValues (specifically  "<any>" and "<error>" strings appearing instead of real values where there are missing imports or other upstream compilation issues).  Migrate isTypeOf from Dagger to perform the key test (is there a sane match between the expected annotation value type and the type returned by the processor environment) ------------- Created by MOE: http://code.google.com/p/moe-java MOE_MIGRATED_REVID=75599279
+* 016_BasicAnnotationProcessor d1f1f9a1c13a9ab76db20380ad6479da2af88bc6 Add AnnotationMirrors, AnnotationValues, and a BasicAnnotationProcessor which performs early validation of elements, and stores un-processable elements and re-tries them on subsequent processing rounds (in case the processor depends on code which will become valid in future rounds).  Also,  move some stray tests from dagger to google/auto common. ------------- Created by MOE: http://code.google.com/p/moe-java MOE_MIGRATED_REVID=83567228
+
+                            +---------+---------+-------------------------------------------------+-----------------------------------------------------------+
+                            |         |         | AutoAnnotation_enclosedtype_method:returntype   |                                                           |
+                            |         |         |                                                 |                                                           |
+                            |         |         | AutoValue_enclosedtype: enclosedtype            |                                                           |
+                            |         |         +-------------------------------------------------------------------------------------------------------------+
+                            |         |         |    AutoAnnotationProcessor   AutoValueProcessor |               ProcessingStep                              |
+                            |         |         +-------------------------------------------------+                       annotations():set                   |
+                            |         |         |           @AutoAnnotation      @AutoValue       |                       process( elementsByAnnotation);     |
+                            |         |         +-------------------------------------------------------------------------------------------------------------+
+                            |         |         |                                                 |          BasicAnnotationProcessor                         |
+                            |         |         |                                                 |              steps:List^? extends ProcessingStep^         |
+                            +---------------------------------------------------------------------------------------------------------------------------------+
+                            | factory |ser^ice  |              value                              |                     common                                |
+                            +-------------------+-------------------------------------------------+-----------------------------------------------------------+
+
+
+
 ```
 
 *dagger-android* 包含 **@ContributesAndroidInjectortor**的 **抽象buildsModule** 用来根据Activity创建**具体Module**
@@ -425,12 +660,123 @@ D:\workspace\ws-component\Dagger2App\app\build\tmp\kapt3\stubs\debug\edu\ptu\jav
 ## 数据异步链式开发框架-Rxjava+Rxlife+RxCache
 RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察者模式。
 ```
-  002_initial_commit      87cfa7a44 Initial commit
-  003_observer_observable 2a4122c11 Rename to Observer/Observable
-* 004_rxwork              9d48f996e Refactoring for consistent implementation approach.
-  005_rx                  aa423afe5 changing package to rx.*
-  006_subject             967337e24 Adding a draft of Subject class https://github.com/Netflix/RxJava/issues/19
+  001_Jersey              697fd66aae9beed107e13f49a741455f1d9d8dd9 Initial commit, working with Maven Central
+* 002_rx                  87cfa7a445f7659ef46d1a6a4eb38daa46f5c97a Initial commit
+  003_Observer_Observable 2a4122c11b95eaa3213c2c3e54a93d28b9231eec Rename to Observer/Observable
+  004_refactoring         9d48f996e4ee55e89dc3c60d9dd7a8d644316140 Refactoring for consistent implementation approach.
+                         Observable静态代理，Observer适配器模式，Func通过桥接Observer的具体实现，operations为Observable的子类
+                        +----------------------------------------------------------------------------+ 
+                        |AtomicObserverSingleThreaded AtomicObserverMultiThreaded                    |decorate pattern
+                        |                      AtomicObserver                                        |state pattern
+                        |  ToObservableIterable                                                      |
+                        +----------------------------------------------------------------------------+ 
+                        |Observable<T>           Observer<T>       Subscription                      |
+                        |  subscribe(Observer<T>)   onCompleted()      unsubscribe()                 |
+                        |                            onError()                        Func0<R>       |
+                        |                            onNext(T)     Notification<T>     call():R      | 
+                        +----------------------------------------------------------------------------+
+                        |                     reactive                           functions operations| 
+                        +----------------------------------------------------------------------------+
+  005_languageAdapter     f57a242b17f1214142dea97c0cb9049b106378a0 LanguageAdaptor for Function execution
+  006_readme              fbbac394fbc2e0af4ef3a507ad3e15dd18bfb10c Create README.md
+  007_gh-pages            6797c4384d91a2567cf0b429ccbd8053c72b716f Create gh-pages branch via GitHub
+  008_performace          787d8fc0215c5bab541f61c2d69a91753d462559 Refactoring towards performance improvements
+                          gradle
+  009_example             b61b7607e0f2b00a0d36672a95999f1fb081dbf1 Start of examples with clojure and groovy
+  010_readme              10fe96474a6ab4ec62c7cab50fb376a173bda78e Create README.md
+  012_0.1.2               74da0769266a8fd5832e558f1a6e0081895b9201 Gradle Release Plugin - pre tag commit:  'rxjava-0.1.2'.
+  013_takeLast                      4c5c41364411e062d5d71f22ce311700d045821b TakeLast basic implementation
+  014_RxJavaPlugins                 ee001549ef06f17f38139b4cfecd4ce4445ecb6d RxJavaErrorHandler Plugin
+  015_operationNext                 d72c5892774a2c67327e07943f6b92416317871f Implemented Operation Next
+  062_schedulers                    dfc784126f259361f01f1927f44f5d1aa4e49a43 Naive schedulers implementation
+  063_RxJavaObservableExecutionHook c2a40bd1a391edf7f8b71965ca20fa84c72c0bb4 RxJavaObservableExecutionHook
+  064_multicast                     0499cffcb53f928a5083f701603ccf3ec3c81c60 Multicast implemented
+  065_sample                        1aa722d3379df88d05c9455d7630b7236edb9d9b Merge pull request #248 from jmhofer/sample
+  066_throttle                      2ea065c0ef22ea7cf58e9fb6d6f24c69f365bed6 Created and wired an implementation for the throttle operation on Observables.
+  067_AndroidSchedulers             3919547f1e5f7940974e383f4f573e48cac7e09b Expose main thread scheduler through AndroidSchedulers class
+  068_window                        5789894638a62ac17b5276053e3bea8bdd570580 Merge window operator commit to master
+  069_debound_throttleWithTimeout   5fabd5883561ff18b18b0d1dfb7001e2959cb11d Use 'debounce' as proper name for ThrottleWithTimeout which unfortunately is the poorly named Rx Throttle operator.
+  070_ApachHttpAsyncClient          db2e08ca039c59d51349255c4b8b3c65b26d52de Observable API for Apache HttpAsyncClient 4.0
+  071_AndroidObservables            715dcece5c781c394b59f86e32f1f514fc9f7a31 Drop use of WeakReferences and use a custom subscription instead
+  072_backwards                     abff40fd0a40bee4f97b0363014e98aecb50d7ff Backwards compatible deprecated rx.concurrency classes
+  073_single                        96064c37af520de375929ae8962c527dd869ad57 Implement the blocking/non-blocking single, singleOrDefault, first, firstOrDefault, last, lastOrDefault
+  074_subscribeOn                   89bb9dbdf7e73c8238dc4a92c8281e8ca3a5ec53 Reimplement 'subscribeOn' using 'lift'
+  075_observeOn                     9e2691729d94f00cde97efb0b39264c2f0c0b7f5 ObserveOn Merge from @akarnokd:OperatorRepeat2
+  076_RxJavaSchedulers              d07d9367911d8ec3d0b65846c8707e0a41d1cf1f RxJavaSchedulers Plugin
+  077_math-module                   68d40628a78db18ecb49d880798f1a03551ccd59 math-module
+  078_operatorSerialize             4427d03db0d8ba67137654447c6c7a57615c0b00 OperatorSerialize
+* 079_contrib-math                  26a4a1a05a6cc367061639fb19bfdda9d5b97fab Operators of contrib-math
+  100_1.0.0-rc.1          6de88d2a39e2ae84744cd1f350e28bef4de7dacb Travis build image
+                        observeOn 切换了消费者的线程，因此内部实现用队列存储事件。
+                        +-----------------------------------------------------------------------+-------------------+
+                        |AtomicObserverSingleThreaded AtomicObserverMultiThreaded               |                   |
+                        |                      AtomicObserver                                   |                   |
+                        |  ToObser^ableIterable                                                 |OperatorSubscribeOn|
+                        +-----------------------------------------------------------------------+                   |
+                        |ObservablevTv           ObservervTv       Subscription                 |OperatorObserveOn  |
+                        |  subscribe(Observer<T>)    onCompleted()     unsubscribe()            |                   |
+                        |  observeOn(Scheduler)      onError()                        Func0<R>  +-------------------+
+                        |                            onNext(T)     Notification<T>     call():R |      schedulers   |
+                        |                                                                       |                   |
+                        +-------------------------------------------------------------------------------------------+
+                        |                     reactive                                          |      plugins      |
+                        +-----------------------------------------------------------------------+-------------------+
+                        |                                         functions operations                              |
+                        +-------------------------------------------------------------------------------------------+
 
+  200_v2.0.0-RC1          fa565cb184d9d7d45c257afa1fbbec6ab488b1cf Update changes.md and readme.md
+                        Disposable装饰Observer，使得Observer可以销毁。ObservableSource,CompletableSource， MaybeSource<T>,SingleSource<T>,FlowableProcessor。
+                        io.reactivex.Flowable：发送0个N个的数据，支持Reactive-Streams和背压。Flowable.subscribe(4 args)
+                        io.reactivex.Observable：发送0个N个的数据，Rx 2.0 中，不支持背压，Observable.subscribe(4 args)
+                        io.reactivex.Single：只能发送单个数据或者一个错误，不支持背压。 Single.toCompletable()
+                        io.reactivex.Completable：没有发送任何数据，但只处理 onComplete 和 onError 事件，不支持背压。 Completable.blockingGet()
+                        io.reactivex.Maybe：能够发射0或者1个数据，要么成功，要么失败，不支持背压。Maybe.toSingle(T)
+                        RxJavaPlugins 转化Obserable.
+                        +----------------------------------------------------------------------------+---------------+-------------------+
+                        |  FromArrayDisposable                                                       |               |                   |
+                        |  ObservableFromArray                                                       |               |                   |
+                        +----------------------------------------------------------------------------+               |                   |
+                        |                             RxJavaPlugins                                  |               |                   |
+                        |                                      apply(Function<T, R> f, T t)          |               |                   |
+                        +----------------------------------------------------------------------------+               |                   |
+                        |ObservablevTv:ObservableSource          ObservervTv           Disposable    |               |OperatorSubscribeOn|
+                        |             subscribe(Observer<T>)         onCompleted()       dispose()   |               |                   |
+                        |   subscribeWith(Observer<T>)               onError()           isDisposed()|Function<T, R> |OperatorObserveOn  |
+                        |   subscribeActual(ObservervT>)             onNext(T)                       | apply(T):R    |                   |
+                        |                                            onSubscribe(Disposable)         |               +-------------------+
+                        |                                                                            +---------------+      schedulers   |
+                        |                             RxJavaPlugins                                  |   functions   |                   |
+                        +----------------------------------------------------------------------------+-----------------------------------+
+                        |                                         functions operations                               |      plugins      |
+                        +----------------------------------------------------------------------------------------------------------------+
+                        |                     reactive-streams      jmh                                              |                   |
+                        +--------------------------------------------------------------------------------------------+-------------------+
+
+* 300_v3.0.0-RC0          fb37226be292c8ee0934311f8ca2f139dfd0dc5a 3.x: remove no-arg, dematerialize(); remove replay(Scheduler) variants (#6539)
+
+
+
+
+
+[reactivestreams](https://github.com/reactive-streams/reactive-streams-jvm.git)
+  001_scala           e58fed62249ad6fbd36467d1bbe5c486f31a8c0e Initial implementation
+  020_java            6e5c63f3492524c21fda0bc1a08d72b52c9e9692 Reimplements the SPI and API in Java
+  021_tck_java        3e67969207994b8e34ff49dffbf9fe3ac2d51284 !tck #12 Migrated TCK to plain Java
+  022_api_spi_example f3a43863bd7c370a1f292a456eddcd1e9d226738 API/SPI Combination and Examples
+* 101_gradle          dddbd3a52fcb7d71059a30760b5e77127c785c7c fix #96
+                        +-------------------------------------------------------------------+--------+
+                        |                                                                   |        |
+                        |        Processor<T, R> :Subscriber<T>, Publisher<R>               |        |
+                        +-------------------------------------------------------------------+        |
+                        |                                                                   |        |
+                        |  Publisher<T>                Subscriber<T>          Subscription  |        |
+                        |     subscribe(Subscriber<T>)    onSubscribe()           cancel()  |        |
+                        |                                 onNext(T)                         |        |
+                        |                                 onComplete()                      |        |
+                        |                                 onError(Throwable)                |        |
+                        +-------------------------------------------------------------------+        |
+                        |                       api                                         |  tck   |
+                        +-------------------------------------------------------------------+--------+
 
 ```
 

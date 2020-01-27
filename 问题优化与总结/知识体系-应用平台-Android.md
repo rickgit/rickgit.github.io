@@ -426,6 +426,9 @@ wm density
 wm screen-capture
 
 adb shell dumpsys window displays |head -n 3
+
+导出view,layoutinspector
+/system/bin/dumpsys -T 60000 activity -v all
  
 ```
 
@@ -2778,6 +2781,9 @@ jni_android.cc
 
 
 (从jvm源码看synchronized)[https://www.cnblogs.com/kundeg/p/8422557.html]
-[Okhttp.md](..\阅读代码\http\Okhttp.md)
-[DiskLruCache.md](..\阅读代码\DiskLruCache.md)
+
 [Glide.md](../阅读代码/Glide.md)
+[DiskLruCache.md](..\阅读代码\DiskLruCache.md)
+[Okhttp.md](..\阅读代码\http\Okhttp.md)
+[retrofit.md](..\阅读代码\plantuml\retrofit.plantuml.txt)
+[rxjava dagger](..\问题优化与总结\知识体系-理论-OOAD.md)
