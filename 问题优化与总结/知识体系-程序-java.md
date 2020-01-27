@@ -1400,6 +1400,7 @@ Charset#availableCharsets():SortedMap
     Binder机制
  #### 性能（异常，断言，日志）
  《Efficiency Java》
+[**JMH** 即Java Microbenchmark Harness](http://openjdk.java.net/projects/code-tools/jmh/)
 [java memory leaks](https://www.baeldung.com/java-memory-leaks)
 ```
 +-----------------------------------------------------+
@@ -1997,13 +1998,25 @@ javassist
 java 8 重复注解
 
 Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任何元素上：局部变量、接口类型、超类和接口实现类，甚至可以用在函数的异常定义上。
-### 类创建/运行时数据解析 - 泛型
+##  类创建/运行时数据解析 - 泛型
 1. 泛型：Generics in Java is similar to templates in C++.
 特点：运行时类型擦除
 集合容器和网络请求经常用到
 
 泛型是一种多态技术。而多态的核心目的是为了消除重复，隔离变化，提高系统的正交性。
+```
++------------------------------------------------------------------------------------------------------+ 
+|                                                                                                      |
+| GenericArrayType            ParameterizedType          TypeVariable            WildcardType     Class|
+|   getGenericComponentType()   getActualTypeArguments()  getBounds()              getUpperBounds()    |
+|                               getRawType()              getGenericDeclaration()  getLowerBounds()    |
+|                               getOwnerType()            getName()                                    |
+|                                                         getAnnotatedBounds()                         |
++------------------------------------------------------------------------------------------------------+ 
+|                               Type  (reflect)                                                        |
++------------------------------------------------------------------------------------------------------+
 
+```
 ## 2.3 数据访问 - 流（IO, NIO）
 字符串，类，文件（xml,json），内存，网络，数据库
 

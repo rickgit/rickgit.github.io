@@ -771,16 +771,17 @@ Platform是整个平台适应的核心类。同时它封装了针对不同平台
                 |           redirectionCount+---------------------------+
                 |           httpEngine      |    OkHttpsConnection      |
                 +---------------------------+---------------------------+
-                |                    OkHttpConnection                   |
-                +-------------------------------------------------------+
-                |                     URLConnection                     |
+                |             OkHttpConnection : URLConnection          |
+                |                         open()                        |
                 +-------------------------------------------------------+
  
   100_parent1.0.0           d95ecff5423f19e019e178baddfe4211f2fe57aa [maven-release-plugin] prepare release parent-1.0.0
                 +-------------------------------------------------------+
                 |                  HttpConnectionPool                   |
                 |                           +---------------------------+
-                |                           |    Platform               |
+                |                           |    bouncycastle           |
+                |                           |    conscrypt              |
+                |                           |    JettyNpnProvider       |
                 |                           |    HttpsEngine            |
                 +---------------------------+---------------------------+
                 |  HttpEngine                                           |
@@ -792,15 +793,41 @@ Platform是整个平台适应的核心类。同时它封装了针对不同平台
                 |           redirectionCount+---------------------------+
                 |           httpEngine      |    OkHttpsConnection      |
                 +---------------------------+---------------------------+
-                |                    OkHttpConnection                   |
-                +-------------------------------------------------------+
-                |                     URLConnection                     |
-                +-------------------------------------------------------+
-                |                     OkHttpClient                      |
-                +-------------------------------------------------------+
+                |              OkHttpClient                             |
+                |                   failedRoutes                        |
+                |                   open()                              |
+                +-------------------------------------------------------+ 
+
+
  
 * 200_parent-2.0.0-RC1      8dcc74d339e0664580756063ff47c65c6f1a17ae [maven-release-plugin] prepare release parent-2.0.0-RC1 
+                Okio+Request
+                +-------------------------------------------------------+
+                |                  HttpConnectionPool                   |
+                |                           +---------------------------+
+                |                           |    bouncycastle           |
+                |                           |    conscrypt              |
+                |                           |    JettyNpnProvider       |
+                |                           |    HttpsEngine            |
+                +---------------------------+---------------------------+
+                |  HttpEngine                                           |
+                |       connection                                      |
+                |       routeSelector                                   |
+                |        sendRequest()                                  |
+                +-------------------------------------------------------+
+                |  Call                                                 |
+                |      client        execute()                          |
+                |      dispatcher    enqueue()                          |
+                |      request                                          |
+                |      engine                                           |
+                +-------------------------------------------------------+
+                |  OkHttpClient                                         |
+                |       routeDatabase                                   |
+                |       dispatcher                                      |
+                |       newCall()                                       |
+                +-------------------------------------------------------+
 * 300_parent-3.0.0-RC1      ffc35dbd02822bf6584c6144266cbbca6b348b17 [maven-release-plugin] prepare release parent-3.0.0-RC1
+                Spidy->Http/2
   400_parent-4.0.0-ALPHA01  8f21b934f928986bba7e50114911c3c494e1d5c5 Prepare for release 4.0.0-ALPHA01.
 
                 gradle+kotlin
@@ -809,7 +836,7 @@ Platform是整个平台适应的核心类。同时它封装了针对不同平台
 ```
 
 
-OKIO 缓存字节，避免空间浪费，避免频繁GC（zero-fill and GC churn ）
+OKIO 封装链表缓存字节，避免空间浪费，避免频繁GC（zero-fill and GC churn ）
 ```
 * 001_okbuffer 2d3cdc9e5dfb593f8eb7da38459163b902a95d7f OkBuffer API sketch.
                 +--------------------------------------------+
@@ -839,6 +866,63 @@ OKIO 缓存字节，避免空间浪费，避免频繁GC（zero-fill and GC churn
 
 * 200_okio_parent-2.0.0-RC1 4da4d9e3e311cdce7294fc59507f00dca2cf2ce0 Update changelog for 2.0.0-RC1
                 Gradle+Kotlin
+
+
+```
+
+
+
+```
+
+retrofit 核心：动态代理访问注解方法，返回Call适配器
+  001_ant_ivy                  0404ce4a2ef46e4ed9c5f06da6ebf862cc52253d Initial code drop, includes Ant buildfile and QueueFile
+  002_ShakeDetector            fb98822a9c17acfb6846d3f07d368804e155fd3f moved util to android, added ShakeDetector
+  003_restAdapter_core_io_http 42dba217c69705a456b837bdd3cc2966c8d67b52 added core, io, and http modules
+                              +-------------------+-----------------+---------+----------------------------------------+
+                              |                   |                 |         |                      Sink              |
+                              +-------------------+-----------------+         +----------------------------------------+
+                              |                   |                 |  Gson   | httpClientProvider Executor MainThread |
+                              |                   |                 |  guice  |                            Fetcher     |
+                              |                   |                 | easymock|                                        |
+                              |                   |                 +---------+----------------------------------------+
+                              |QueueFile          | ShakeDetector   |core  io                            http          |
+                              |  RandomAccessFile |                 +--------------------------------------------------+
+                              |                   |                 |                     restAdapter                  |
+                              +-------------------+-----------------+--------------------------------------------------+
+* 004_test_app                 9c195d377fe86f8d59c20a8ec012b24bdf4288f4 Added support for fsyncing a directory.
+  100_parent-1.0.0             193b3f0027dbbcb99d1701e6106a9856197824e4 [maven-release-plugin] prepare release parent-1.0.0
+
+                              +--------------------------------------------------------+---------------+
+                              |           (Proxy)                                      |               |
+                              |          requestHeaders                                |               |
+                              | server   RestMethodInfo                                |   debug       |
+                              |     clientProvider       converter  callbackExecutor   |   profiler    |
+                              |                                                        |   log         |
+                              |               httpExecutor                             |               |
+                              +--------------------------------------------------------+---------------+
+                              |                        RestAdapter                                     |
+                              +-------------------------+----------------------------------------------+
+                              |         okhttp  gson    |   junit   easytesting  mockito    guava      |
+                              +-------------------------+----------------------------------------------+
+* 200_parent-2.0.0-beta1       bcf627578ae8fd593e1c8a4a85a841f6a68b072c [maven-release-plugin] prepare release parent-2.0.0-beta1
+                              +-----------------------------------------------------------------------------------+
+                              |                       OkHttpCall:Call                                             |
+                              |                             enqueue()                                             |
+                              |                             execute()                                             |
+                              |                                                                                   |
+                              | methodHandlerCache    adapterFactories       converterFactories  callbackExecutor |
+                              | baseUrl                  get()                  get()                             |
+                              | client                      responseType()         fromBody()                     |
+                              |                             adapt():Call            toBody()                      |
+                              +-----------------------------------------------------------------------------------+
+                              |                       Retrofit                                                    |
+                              +-----------------------------------------------------------------------------------+
+                              |adapters  convert             okhttp|                                              |
+                              |   Rxjava  Gson    protobuf   smocks|                                              |
+                              |           jackson simplexml        |junit assertj-core mockito guava mockwebserver|
+                              |           moshi   wire             |                                              |
+                              +------------------------------------+----------------------------------------------+
+
 
 
 ```

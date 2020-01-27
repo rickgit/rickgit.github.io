@@ -1,6 +1,7 @@
 
 # OOAD
-
+《Pattern-oriented Software Architecture 》五套书
+《Software Architecture: Perspectives on an Emerging Discipline》
 ## 封装性与内聚耦合
 
 >《UML面向对象程序设计基础》
@@ -100,7 +101,7 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 - YAGNI "极限编程"
 - Rule of three 《Refactoring》
 
-工厂单例构造原型，桥接适配组合 代理享元装饰外观,命令中介观察访问备忘  解释责任模板 迭代策略状态 
+工厂单例构造原型，桥接适配组合 代理装饰享元外观,命令中介观察访问备忘  解释责任模板 迭代策略状态 
 ```
 1. Strategy:
 Defines a family of algorithms, encapsulates each one, and make them interchangeable.
@@ -425,12 +426,33 @@ D:\workspace\ws-component\Dagger2App\app\build\tmp\kapt3\stubs\debug\edu\ptu\jav
 ## 数据异步链式开发框架-Rxjava+Rxlife+RxCache
 RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察者模式。
 ```
-  002_initial_commit      87cfa7a44 Initial commit
-  003_observer_observable 2a4122c11 Rename to Observer/Observable
-* 004_rxwork              9d48f996e Refactoring for consistent implementation approach.
-  005_rx                  aa423afe5 changing package to rx.*
-  006_subject             967337e24 Adding a draft of Subject class https://github.com/Netflix/RxJava/issues/19
+  001_Jersey              697fd66aae9beed107e13f49a741455f1d9d8dd9 Initial commit, working with Maven Central
+* 002_rx                  87cfa7a445f7659ef46d1a6a4eb38daa46f5c97a Initial commit
+                        Observable静态代理，Observer适配器模式，Func通过桥接为Observer的具体实现，operations为Observable的子类
+                        +----------------------------------------------------------------------------+ 
+                        |IObservable<T>           IObserver<T>     IDisposable                       |
+                        |  subscribe(IObserver<T>)   onCompleted()   unsubscribe()                   |
+                        |                            onError()                        Func0<R>       |
+                        |                            onNext(T)     Notification<T>     call():R      | 
+                        +----------------------------------------------------------------------------+
+                        |                     reactive                           functions operations| 
+                        +----------------------------------------------------------------------------+
 
+  003_Observer_Observable 2a4122c11b95eaa3213c2c3e54a93d28b9231eec Rename to Observer/Observable
+                        +----------------------------------------------------------------------------+ 
+                        |Observable<T>           Observer<T>     Subscription                        |
+                        |  subscribe(Observer<T>)   onCompleted()   unsubscribe()                    |
+                        |                            onError()                        Func0<R>       |
+                        |                            onNext(T)     Notification<T>     call():R      | 
+                        +----------------------------------------------------------------------------+
+                        |                     reactive                           functions operations| 
+                        +----------------------------------------------------------------------------+
+  004_refactoring         9d48f996e4ee55e89dc3c60d9dd7a8d644316140 Refactoring for consistent implementation approach.
+  005_languageAdapter     f57a242b17f1214142dea97c0cb9049b106378a0 LanguageAdaptor for Function execution
+  006_readme              fbbac394fbc2e0af4ef3a507ad3e15dd18bfb10c Create README.md
+  007_gh-pages            6797c4384d91a2567cf0b429ccbd8053c72b716f Create gh-pages branch via GitHub
+  008_performace          787d8fc0215c5bab541f61c2d69a91753d462559 Refactoring towards performance improvements
+  3.x                     0c50f0ab1bcfe9bdb1c8cd13ef1dc214c405e580 [behind 114] 3.x: constrain upstream requests from take (#6569) (#6650)
 
 ```
 
