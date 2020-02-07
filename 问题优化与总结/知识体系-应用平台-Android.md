@@ -2786,4 +2786,4 @@ jni_android.cc
 [DiskLruCache.md](..\阅读代码\DiskLruCache.md)
 [Okhttp.md](..\阅读代码\http\Okhttp.md)
 [retrofit.md](..\阅读代码\plantuml\retrofit.plantuml.txt)
-[rxjava dagger](..\问题优化与总结\知识体系-理论-OOAD.md)
+[rxjava Dagger.Android (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)

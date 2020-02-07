@@ -207,46 +207,86 @@ remote            +              tag
 object : <ascii tag without space> + <space> + <ascii decimal size> + <byte\0> + <binary data>
 
 tree: <mode> + <space> + <file name> + <byte\0> + <sha1>
+   
 
-----------e83c5163316f89bfbde7d9ab23ca2e25604af290
-init-db         # 初始化 object database
-update-cache    # 将工作区文件写入暂存区，对应现在的 git add
-show-diff       # 比较工作区和暂存区的差异，对应现在的 git diff
-write-tree      # 将暂存区的文件列表写入 object database，也就是生成 tree 对象
-read-tree       # 把 objce database 的一个 tree 对象加载到暂存区，对应现在的 git checkout
-commit-tree     # 提交 commit，对应现在的 git commit
-cat-file        # 查看 object 内容，对应现在的 git cat-file
------------20222118ae4cbd0a7ba91a7012574cd2f91101ec
-fsck-cache      # 验证数据库中对象的连通性和有效性
------------8d3af1d53255ac36494492720ebb83e932b0c0bc
-checkout-cache  # 从暂存区读取文件内容到工作区，对应现在的 git checkout
+* 001_revision       e83c5163316f89bfbde7d9ab23ca2e25604af290 Initial revision of "git", the information manager from hell
+                    [如何评价 2017 2 月 23 日谷歌宣布实现了 SHA-1 碰撞？](https://www.zhihu.com/question/56234281)
+                    +------------------------------------------------------+
+                    |      cat-file.c                                      |
+                    |                                                      |
+                    |      write-tree.c   read-tree.c    commit-tree.c     |
+                    |                                                      |
+                    |      update-cache.c show-diff.c                      |
+                    +------------------------------------------------------+
+                    |                                                      |
+                    |              init-db.c read-cache.c                  |
+                    +------------------------------------------------------+
+                    |             sha1collisiondetection   diff    tree    |
+                    +------------------------------------------------------+
+                    init-db         # 初始化 object database
+                    update-cache    # 将工作区文件写入暂存区，对应现在的 git add
+                    show-diff       # 比较工作区和暂存区的差异，对应现在的 git diff
+                    commit-tree     # 提交 commit，对应现在的 git commit
+                    write-tree      # 将暂存区的文件列表写入 object database，也就是生成 tree 对象（有点像 git merge，新建个DAG修订点）
+                    read-tree       # 把 objce database 的一个 tree 对象加载到暂存区，（有点像 git checkout 到内存对象buf）
+                    cat-file        # 查看 object 内容，对应现在的 git cat-file
+  002_fsck-cache     20222118ae4cbd0a7ba91a7012574cd2f91101ec Add first cut at "fsck-cache" that validates the SHA1 object store.
+                    # 验证数据库中对象的连通性和有效性
 
--------------9174026cfe69d73ef80b27890615f8b2ef5c265a
-diff-tree       # 比较两个 tree 对象的差异
+  003_checkout-cache 33db5f4d9027a10e477ccf054b2c1ab94f74c85a Add a "checkout-cache" command which does what the name suggests.
+                   # 从暂存区读取文件内容到工作区，对应现在的 git checkout
 
-------------84fe972055398ba0790ac0a8f159c79c83efcef4
-rev-tree        # 按反向时间顺序列出提交对象
+  004_diff-tree      9174026cfe69d73ef80b27890615f8b2ef5c265a Add "diff-tree" program to show which files have changed between two trees.
+                    # 比较两个 tree 对象的差异
 
-show-files      # 查看暂存区文件列表，对应现在的 git status
+  005_re-tree        84fe972055398ba0790ac0a8f159c79c83efcef4 Add a "rev-tree" helper, which calculates the revision tree graph.
+                    rev-tree        # 按反向时间顺序列出提交对象
+                    show-files      # 查看暂存区文件列表，对应现在的 git status
+                    check-files     # Check that a set of files are up-to-date in the filesystem or do not exist. Used to verify a patch target before doing a patch.
+                    merge-base      # 查找两个 commit 的最新共公 commit
+                    ls-tree         # 查看 tree 对象内容，对应现在的 git ls-tree
+                    merge-cache     # 合并
+  006_show-files     8695c8bfe181677ca112502c1eef67930d84a75d Add "show-files" command to show the list of managed (or non-managed) files.
+  007_check-files    74b46e32cb3907a4a062a0f11de5773054b7c71a Add a "check-files" command, which is useful for scripting patches.
+  008_ls-tree        7912c07037cf704394e9bcb7cb24c05ee03aa921 [PATCH] ls-tree for listing trees
+  009_merge-tree     33deb63a36f523c513cf29598d9c05fe78a23cac Add "merge-tree" helper program. Maybe it's retarded, maybe it's helpful.
+  010_merge-base     6683463ed6b2da9eed309c305806f9393d1ae728 Do a very simple "merge-base" that finds the most recent common parent of two commits.
+  011_merge-cache    75118b13bc8187c629886b108929f996c47daf01 Ass a "merge-cache" helper program to execute a merge on any unmerged files.
+  012_sample_script     839a7a06f35bf8cd563a41d6db97f453ab108129 Add the simple scripts I used to do a merge with content conflicts.
+  013_splite_read-cache 0fcfd160b0495c0881e142c546c4418b8cea7e93 Split up read-cache.c into more logical clumps.
+  014_unpack-file       3407bb4940c25ca67c846a48ef2c2c60c02178e0 Add "unpack-file" helper that unpacks a sha1 blob into a tmpfile.
+  015_git-export        c9823a427a0a7aabc4f840a90e82548e91f9bdd6 Add stupid "git export" thing, which can export a git archive as a set of patches and commentary.
+  016_diff-cache        e74f8f6aa7807d479d78bfc680a18a9a5198b172 Add "diff-cache" helper program to compare a tree (or commit) with the current cache state and/or working directory.
+  017_convert-cache     d98b46f8d9a3daf965a39f8c0089c1401e0081ee Do SHA1 hash _before_ compression.
+  018_sha1_lib          cef661fc799a3a13ffdea4a3f69f1acd295de53d Add support for alternate SHA1 library implementations.
+  019_sha1_ppc          a6ef3518f9ac8a1c46a36c8d27173b1f73d839c4 [PATCH] PPC assembly implementation of SHA1
+  020_var_transport     6eb7ed5403b7d57d5ed7e30d0cd0b312888ee95c [PATCH] Various transport programs
+  021_rev-list          64745109c41a5c4a66b9e3df6bca2fd4abf60d48 Add "rev-list" program that uses the new time-based commit listing.
+  022_git-mktag         ec4465adb38d21966acdc9510ff15c0fe4539468 Add "tag" objects that can be used to sign other objects.
+  023_tag               2636f6143751a064e366cb7763d0705b296726e3 [PATCH] Add tag header/parser to library
+  024_pull              4250a5e5b1755e45153248217fe1d5550c972c8d [PATCH] Split out "pull" from particular methods
+  025_splite_document   2cf565c53c88c557eedd7e5629437b3c6fe74329 [PATCH 1/4] split core-git.txt and update
+  026_splite_pull_fetch 7ef76925d9c19ef74874e1735e2436e56d0c4897 Split up git-pull-script into separate "fetch" and "merge" phases.
+  027_commit_helper     a3e870f2e2bcacc80d5b81d7b77c15a7928a9082 Add "commit" helper script
+  028_git_helper        e764b8e8b3c50b131be825532ba26fa346d6586e Add "git" and "git-log-script" helper scripts.
+  029_refs              95fc75129acf14d980bdd56b9b2ee74190f81d91 [PATCH] Operations on refs
+  030_cvs2git           d4f8b390a4326625f0c3d65a8d120336e38928d7 Add CVS import scripts and programs
+  031_git-add           40d8cfe4117564e5520e8f4f953addaa94844476 Trivial git script fixups
+  032_git-checkout      303e5f4c325d008c68e5e70e901ab68b289ade2e Add "git checkout" that does what the name suggests
+  033_gitk              5569bf9bbedd63a00780fc5c110e0cfab3aa97b9 Do a cross-project merge of Paul Mackerras' gitk visualizer
+  034_git-clone         3f571e0b3a7893ed068acd75f27e152d29945637 Add "git-clone-script" thingy
+  035_git-rebase        59e6b23acef9d29b9bdabc38ee80361e19ef7ebe [PATCH] git-rebase-script: rebase local commits to new upstream head.
+  036_git-push          51cb06c36de67007f3464d864f63d93213fcaf86 Add "git-push-script" to make a more regular interface
+  037_git-branch        37f1a519f2ea0ce912ccd7c623aea992147c3900 Add "git branch" script
+  038_git-tools         98e031f0bb6e857c684e6db24d03d22cfc1a532a Merge git-tools repository under "tools" subdirectory
+  039_git-ls-remote     0fec0822721cc18d6a62ab78da1ebf87914d4921 [PATCH] git-ls-remote: show and optionally store remote refs.
+  040_update-server     8f3f9b09dc5ac8a946422422c3c70a4a4c284be3 [PATCH] Add update-server-info.
+  041_git-revert        045f82cbee3135a3d75256828b0cf101eedf38c8 git-revert: revert an existing commit.
+  042_ssh_pull          f71a69ab055c47056d0270b29b8f7455278c2422 Be more backward compatible with git-ssh-{push,pull}.
+  100_v1.0rc1           f7a2eb735982e921ae4379f1dcf5f7a023610393 GIT 0.99.9h
+  101_git               8e49d50388211a0f3e7286f6ee600bf7736f4814 C implementation of the 'git' program, take two.
+* 200_v2.0.0-rc0        cc291953df19aa4a97bee3590e708dc1fc557500 Git 2.0-rc0
 
-check-files     # Check that a set of files are up-to-date in the filesystem or do not exist. Used to verify a patch target before doing a patch.
-
-merge-base      # 查找两个 commit 的最新共公 commit
-
-ls-tree         # 查看 tree 对象内容，对应现在的 git ls-tree
-merge-cache     # 合并
-
-
-  revision_001_blob           e497ea2 Make read-tree actually unpack the whole tree.
-  revision_002_fsck-cache     7660a18 Add new fsck-cache to Makefile.
-  revision_003_checkout-cache 33db5f4 Add a "checkout-cache" command which does what the name suggests.
-  revision_004_diff-tree      9174026 Add "diff-tree" program to show which files have changed between two trees.
-  revision_005_re-tree        84fe972 Add a "rev-tree" helper, which calculates the revision tree graph.
-  revision_006_show-files     8695c8b Add "show-files" command to show the list of managed (or non-managed) files.
-  revision_007_check-files    74b46e3 Add a "check-files" command, which is useful for scripting patches.
-  revision_008_merge-tree     33deb63 Add "merge-tree" helper program. Maybe it's retarded, maybe it's helpful.
-  revision_009_merge-base     6683463 Do a very simple "merge-base" that finds the most recent common parent of two commits.
-* revision_010_merge-cache    75118b1 Ass a "merge-cache" helper program to execute a merge on any unmerged files.
 
 ```
 
