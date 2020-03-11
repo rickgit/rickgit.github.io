@@ -75,7 +75,32 @@ project
         +     +---- main.cpp （1.0版本的发布文件）
         +     +---- common.h
 ```
-## 分布式的VCS (DVCS) -git
+
+
+
+
+### svn源码
+1. 下载编译及checkout命令
+```shell
+# svn co https://svn.apache.org/repos/asf/subversion/trunk subversion
+```
+2. 查看网站的user guild 运行入口及release note的主要版本
+[quick-start](https://subversion.apache.org/quick-start)
+[release-notes](https://subversion.apache.org/docs/release-notes/)
+3. 查看Initial版本，README 目录结构，找入口
+
+
+
+
+## 分布式的VCS (DVCS) -Git
+
+Git与SVN区别:
+1. Git是分布式的，操作几乎不需要联网，SVN是CS模式；
+2. Git是整个仓库拷贝，SVN是相当于工作区拷贝
+3. Git分支工作流 branch(master,dev,feature,release,hotfix),tag；SVN branch(分支) tag(标记)都是trunk(主线) 的拷贝
+4. Git文件持久化为工作区，暂存区，贮藏区，仓库，远程仓库；SVN只有本地工作区拷贝和远程仓库；
+5. Git每次修订是sha1;SVN是用全局版本号；
+6. Git文件是元数据方式存储（snapshot），而SVN是按文件
 
 https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
 
@@ -180,8 +205,31 @@ remote            +              tag
 
 
 ```
+### 常见问题
+```shell
+Please move or remove them before you can switch branches.
+# git clean  -d  -fx ""
 
-[Git内部原理/源码](https://zhuanlan.zhihu.com/p/71577255)
+
+```
+[常见GUI](https://git-scm.com/downloads/guis)
+git-cola Gitg
+
+```shell
+# git log --all --decorate --oneline --graph
+
+```
+
+gitk
+```shell
+#gitk -d --all
+```
+
+```shell
+# git config --global url.https://source.codeaurora.org.insteadOf git://codeaurora.org
+```
+
+### [Git内部原理/源码](https://zhuanlan.zhihu.com/p/71577255)
 ```
  +--------------------------------------------+--------------+---------------------+---------------------+
  |                                            |              |                     |                     |

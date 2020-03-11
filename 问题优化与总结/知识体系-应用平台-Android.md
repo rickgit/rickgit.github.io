@@ -2309,10 +2309,10 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
-##### 反编译
-[Apktool](https://github.com/iBotPeaches/Apktool)
+##### （异常 错误 安全）反编译
 [dex2jar](https://github.com/pxb1988/dex2jar)
 [jd-gui](https://github.com/java-decompiler/jd-gui)
+[Apktool](https://github.com/iBotPeaches/Apktool)
 [jad（不维护）](http://www.kpdus.com/jad.html)
 ##### 内存泄漏
  
@@ -2664,7 +2664,7 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
     [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
 ```
 
-[Android-MD doc](https://beijing.source.codeaurora.org/quic/la/platform/ndk/docs/ANDROID-MK.html)
+[Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
 
 ```
 +------------------------------------------------------------+
@@ -2699,38 +2699,78 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 
 
-## 权限
+## 版本特性
+[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
 
+### 29(Android 10 )
+深色主题背景
+```xml
+<style name="AppTheme" parent="Theme.AppCompat.DayNight">
+
+<style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+
+```
+### API level 27 (android-8.1)
+- Safe Browsing API 的 WebView 实现
+ ```xml
+ <application>
+            ...
+            <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+                       android:value="true" />
+</application>
+ ```
+
+ ```java
+superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean success) {
+                safeBrowsingIsInitialized = true;
+                if (!success) {
+                    Log.e("MY_APP_TAG", "Unable to initialize Safe Browsing!");
+                }
+            }
+        });
+ ```
+ ### API level 23 (Android 6)
+ 
 [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
 
-
+深层链接和 Android 应用链接
 ## 源码
-[1798个项目（2019-12-11统计）](https://beijing.source.codeaurora.org/quic/la)
+[1798个项目（2019-12-11统计）](https://source.codeaurora.cn/quic/la)
 ```
 含有61个内置platform/system
-[platform/system/core](https://beijing.source.codeaurora.org/quic/la/platform/system/core)
+[platform/system/core](https://source.codeaurora.cn/quic/la/platform/system/core)
 adb，log
 
-
-[platform/development](https://beijing.source.codeaurora.org/quic/la/platform/development/)
-包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
-tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
 
 [android studio profilers源码](https://github.com/JetBrains/android)
 
 含有61个内置platform/frameworks
-[platform/frameworks/base](https://beijing.source.codeaurora.org/quic/la/platform/frameworks/base/)
+[platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
 framework源码，开发必备
 
 
 含有118个内置platform/packages/apps
-[platform/packages/apps/PackageInstaller](https://beijing.source.codeaurora.org/quic/la/platform/packages/apps/PackageInstaller)
+[platform/packages/apps/PackageInstaller](https://source.codeaurora.cn/quic/la/platform/packages/apps/PackageInstaller)
 “点击通知”需要访问文件权限intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 
-含有18个内置platform/packages/providers
-[platform/packages/providers/MediaProvider](https://beijing.source.codeaurora.org/quic/la/platform/packages/providers/MediaProvider)
 
+
+
+[浏览器模块](https://source.codeaurora.cn/quic/la/platform/external/chromium_org)
+jni_android.cc
+
+
+[浏览器源码](https://cs.chromium.org/chromium/)
+
+```
+### [platform/packages/providers 系统交互providers]()
+
+含有18个内置platform/packages/providers
+[platform/packages/providers/MediaProvider](https://source.codeaurora.cn/quic/la/platform/packages/providers/MediaProvider)
+```java
  添加到相册，需要uri.getScheme().equals("file")
 public class MediaScannerReceiver extends BroadcastReceiver
 {
@@ -2766,24 +2806,248 @@ public class MediaScannerReceiver extends BroadcastReceiver
             }
         }
     }
-
-
-
-[浏览器模块](https://beijing.source.codeaurora.org/quic/la/platform/external/chromium_org)
-jni_android.cc
-
-
-[浏览器源码](https://cs.chromium.org/chromium/)
-
 ```
+### [Monkey](https://source.codeaurora.cn/quic/la/platform/development/)
+包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
+tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
+
+### [support 各类控件](https://source.codeaurora.cn/quic/la/platform/frameworks/support/)
+
+```java
+  001_v4_FragmentAct cba2e2c881e8e16ea5025b564c94320174d65f01 First checkin!
+            //FragmentActivity 添加声明周期
+            +-------------------------------------------------------------------------------------------------+-----------------------+
+            | FragmentActivity                        FragmentManagerImpl             Fragment                |                       |
+            |      mFragments:FragmentActivity          *mCurState                        mState              |                       |
+            |      onCreate()                           mBackStack:List<BackStackRecord>  mSavedViewState     |   INITIALIZING = 0    |
+            |                                            mActive:List<Fragment>           mTarget             |                       |
+            |                                            mActivity                        mActivity           |                       |
+            |                                            attachActivity()                 mFragmentManager    |                       |
+            |                                            dispatchCreate()                 mHidden             |  ->CREATED = 1        |
+            |                                           *moveToState(f,newState,transit,transitionStyle)      |                       |
+            |                                                                            onAttach()           |                       |
+            |      onAttachFragment()                                                    onCreate()           |                       |
+            |                                                                            onCreateView()       |                       |
+            |                                                                                                 |                       |
+            |     *onCreateView()                        findFragmentByTag()             instantiate()        |                       |
+            |                                            findFragmentById()              addFragment()        |                       |
+            |      onPostCreate()                        dispatchActivityCreated()                            | ->ACTIVITY_CREATED = 2|
+            |      onStart()                             noteStateNotSaved()           dispatchStart()        | ->STARTED = 3         |
+            |                                            execPendingActions()                                 |                       |
+            |      onPostResume()                        dispatchResume()                                     | ->RESUMED = 4         |
+            |                                            execPendingActions()                                 |      CREATED = 1      |
+            |      onResume()                            execPendingActions()                                 |                       |
+            |                                            outState                                             |                       |
+            |      onPause()                             dispatchPause()                 onPause()              ->STARTED = 3         |
+            |      onStop()                              dispatchStop()                                         ->ACTIVITY_CREATED = 2|
+            |      onDestroy()                           dispatchDestroy()               onDestroy()            ->INITIALIZING = 0    |
+            |                                                                            onDetach()                                   |
+            |      onSaveInstanceState()                 saveAllState():Parcelable                                                    |
+            |      dispatchCreateOptionsMenu()           newMenus:List<Fragment>         mAdded                                       |
+            |                                            dispatchCreateOptionsMenu()     onCreateOptionsMenu()                        |
+            |      onMenuItemSelected()                                                                                               |
+            |                                            mBackStack                                                                   |
+            |      onKeyDown()                           mPendingActions                                                              |
+            |                                            popBackStackImmediate()                                                      |
+            |      onMenuItemSelected()                  dispatchOptionsItemSelected()  mHidden                                       |
+            |                                            dispatchContextItemSelected()  mHasMenu                                      |
+            |                                                                           onOptionsItemSelected()                       |
+            |      onPanelClosed()                       dispatchOptionsMenuClosed()    onOptionsMenuClosed()                         |
+            |                                            dispatchLowMemory()                                  |                       |
+            |      onLowMemory()                         mAdded:List<Fragment>          onLowMemory()         |                       |
+            |                                            dispatchLowMemory()                                  |                       |
+            +-------------------------------------------------------------------------------------------------------------------------+
+            //FragmentTransaction添加Fragment
+            +-------------------------------------------------------------------------------------------------------------------------+
+            | FragmentManagerImpl                        BackStackRecord:FragmentTransaction  Op                         Fragment     |
+            |    mCurState                                               ,Runnable              next       enterAnim      mCalled     |
+            |    mPendingActions:List<Action>              mManager:FragmentManagerImpl         prev       exitAnim       mRetaining  |
+            |    beginTransaction():FragmentTransaction    mHead:Op                             cmd                       mView       |
+            |    allocBackStackIndex()                     mTail:Op                             fragment                              |
+            |    enqueueAction()                                                                removed:List<Fragment>                |
+            |                                                                                                                         |
+            |    mAdded:List<Fragment>                                                          OP_NULL = 0;                          |
+            |    addFragment()                             add():FragmentTransaction            OP_ADD = 1;               mAdded      |
+            |    removeFragment()                          replace():FragmentTransaction        OP_REPLACE = 2;                       |
+            |    hideFragment()                            remove():FragmentTransaction         OP_REMOVE = 3;            mRemoving   |
+            |    showFragment()                            hide():FragmentTransaction           OP_HIDE = 4;              mHidden     |
+            |                                              show():FragmentTransaction           OP_SHOW = 5;                          |
+            |    mBackStack:                                                                                                          |
+            |    List<BackStackRecord>                     commit()                                                                   |
+            |                                              commitInternal()                                                           |
+            |                                                                                                                         |
+            |                                              run()                                                                      |
+            +-------------------------------------------------------------------------------------------------------------------------+
 
 
+            LoaderManager
+            +-------------------------------------------------+------------------------------+----------------------------------------+
+            |                                                 |                              |                                        |
+            |                                                 |                              |                                        |
+            |   FragmentActivity                              | LoaderCallbacks              |CursorAdapter：Filterable,               |
+            |                                                 |   onCreateLoader():Loader<D> |              CursorFilterClient        |
+            |     mAllLoaderManagers:Array<LoaderManagerImpl> |   onLoadFinished()           |    mCursorFilter:CursorFilter          |
+            |     getSupportLoaderManager():LoaderManager     |   onLoaderReset()            |                                        |
+            |                                                 |                              |                                        |
+            |                                                 |                              |CursorFilter:Filter                     |
+            |  LoaderManagerImpl:LoaderManager                |                              |   mClient:CursorFilterClient           |
+            |    updateActivity()                             |                              |   performFiltering(constraint)         |
+            |    initLoader(id,args,callback):Loader<D>       |                              |   publishResults(constraint,results)   |
+            |                                                 |                              |                                        |
+            |                                                 |                              |                                        |
+            |  AsyncTaskLoader<D>:Loader<D>                   |                              |                                        |
+            +-------------------------------------------------+------------------------------+----------------------------------------+
 
+* 002_FragmentPager  eedc67283a5a49dce86c625e54596dfdea9465a7 First submit of FragmentPager class.
+  003_v4demo         c644c91b91b83a6b400a57b02671f4ef7b7a810b Extract support lib samples out of ApiDemos and in to their own app.
+  004_ViewPager      ea2c91b0198855073983b4a8437aa71cbd83872f New super-spiffier ViewPager class.
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |                                    ViewPager                                                                            |
+            |                                        populate()                                                                       |
+            |                                                                                                                         |
+            |                                                                                                                         |
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |                                                                                                                         |
+            |                                       PagerAdapter                                                                      |
+            |                                           getCount()                                                                    |
+            |                                           startUpdate()                                                                 |
+            |                                           instantiateItem(viewId,position)                                              |
+            |                                           destroyItem(position, object)                                                 |
+            |                                           finishUpdate()                                                                |
+            |                                           isViewFromObject(view, object)                                                |
+            |                                           saveState():Parcelable                                                        |
+            |                                           restoreState(Parcelable state)                                                |
+            |                                                                                                                         |
+            |                       FragmentPagerAdapter:PagerAdapter     FragmentStatePagerAdapter:PagerAdapter                      |
+            |                                                                   mFragments:List<Fragment>                             |
+            |                                                                                                                         |
+            +-------------------------------------------------------------------------------------------------------------------------+
 
+  005_v13demo        4557342eeab7018e2edece1d3265819737d078fc New demos for the v13 support library.
+* 006_localBroadcast 3083afddf1baabb57e801d2aa7d9c59e8b1e1c19 Add LocalBroadcastManager.
+  007_EdgeEffect     560114f591be31d0fb73c26a1ee1cc0a15184aba Make ViewPager aware of EdgeEffect on ICS devices.
+  008_volley         3713094c56d25e25df2a508dbee4aea869ffdea1 Volley: an HTTP RPC library.
+
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |                              RequestQueue                                                                               |
+            |                                   mNetworkQueue         mDispatchers:NetworkDispatcher                                  |
+            |                                   mCacheQueue           mDelivery:ExecutorDelivery                                      |
+            |                                   mWaitingRequests      mCacheDispatcher:CacheDispatcher                                |
+            |                                   mCache                                                                                |
+            |                                                                                                                         |
+            |                                   start()                                                                               |
+            |                                   add(request)                                                                          |
+            +-----------------------------------------------------------+-------------------------------------------------------------+
+            | NetworkDispatcher:Thread       NetworkDispatcher:Thread   |     Request                                                 |
+            |        mQueue:BlockingQueue                 mQueue        |         parseNetworkResponse(response:NetworkResponse )     |
+            |        networkQueue                         mNetwork      |         deliverResponse()                                   |
+            |        cache                                mCache        |                                                             |
+            |        mDelivery                            mDelivery     |         deliverError()                                      |
+            |        mNetwork:BaseNetwork                               |                                                             |
+            |                                                           |                                                             |
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |  BasicNetwork:Network                                     |     ImageRequest    JsonRequest    StringRequest            |
+            |      performRequest():NetworkResponse                     |                                                             |
+            +-----------------------------------------------------------+-------------------------------------------------------------+
+  009_SearchView     fe32563fd610767a2d3eea8dbd96e6bae87739d5 Fixing a comment in SearchViewCompat
+  010_LongSparseArray 97b687d492c63a6a016f420835d5457d8b4b55b1 Add support lib LongSparseArray.
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |                                  LongSparseArray                                                                        |
+            |                            mGarbage                                                                                     |
+            |                            mKeys               gc()                                                                     |
+            |                            mValues             binarySearch()                                                           |
+            |                            mSize                                                                                        |
+            +-------------------------------------------------------------------------------------------------------------------------+
+* 011_gridlayout      e1feb53bd8abfa46613fdd0abcf7a015c7e706c1 Add GridLayout as a support project library.
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |  GridLayout                                                                                                             |
+            |     horizontalAxis:Axis                                                                                                 |
+            |     verticalAxis:Axis                                                                                                   |
+            |     onlayouot()                                                                                                         |
+            +----------------------------------------+--------------------------------------------------------------------------------+
+            |   Axis                                 |               LayoutParams:MarginLayoutParams                                  |
+            |     layout(size)                       |                     rowSpec:Spec                                               |
+            |     getGroupBounds():Bounds            |                     columnSpec:Spec                                            |
+            |     horizontal(orientation)            +--------------------------------------------------------------------------------+
+            |     definedCount( rowCount/columnCount)|                     Spec                                +----------------------+
+            |                                        |                       span:Interval                     | (layout_gravity)     |
+            |                                        |                       alignment:Alignment               |                      |
+            +--------------------------------------------------------------------------------------------------+----------------------+
+            |   Bounds                               |          Interval                                         Alignment            |
+            |    *getOffset()                        |             min:int(layout_column/row )                     *getGravityOffset()|
+            |                                        |             max:int                                         *getSizeInCell()   |
+            |                                        |                (min+layout_column/rowSpan)                                     |
+            +----------------------------------------+--------------------------------------------------------------------------------+
+
+  012_ByteArrayOS     c4cbfcb8d044cea99e2471ce5c401cd959b6cdfe Creates a pooled ByteArrayOutputStream
+  013_Nofitication    f021758934b35e3b842c6799344531d7ea2969da Add v16 Notification APIs to NotificationCompat.
+  014_AtomicFile      b87fe4a348db4e64876052619036232749e70d9f Support lib version of AtomicFile.
+  015_SlidingPane     97341bdc5bea1d7bf777de65228039142d249f38 Add SlidingPaneLayout
+  016_rs              98a281354fe06d1f970d0521c9a08d9eb0aa1a45 Initial pass at RS compatibility library.
+  017_actionbar       bbbb8f39d1b1d1b317c5f9237f20fe6b1d9eb17f Initial work on ActionBar support library
+  031_GestureDetecotr 1ce805e30800bf2852fa5421b7277a18e089ee31 Add GestureDetectorCompat
+  032_ViewDragHelper  c56ba65d20be8742ff717907a3a2cd81dd0e5f3c Factor ViewDragHelper out from SlidingPaneLayou
+  033_DrawerLayout    1d26501f0c8e9f3577f651938a03f6b3a1a672c7 Initial DrawerLayout implementation
+  034_PopupMenu       dbfc21aa98c4a1092204854b99830a50557aa969 Add support version of PopupMenu to AppCompat
+  034_multidex        acedbc72ca7c30a24d869f5067ed89ec4dead7c8 Add ADT project for android-support-multidex.
+  035_recyclerview    009b4ef9d97e1cc237477e3284fc305bb1438cc9 Add RecylerView to the support library
+  035_rv_Examample     f6c36bb9b61083b25397a6cff82ddbb102cacfbd Example activity for RecyclerView
+  039_resourceAnno    75aea14c26565d3fde46c4ce410f5c384c42162c Add typedef enum and resource type annotations
+  040_leanback        20c094c196271089a7119a965b6a99786ea9ed36 Initial import of leanback into support lib (4).
+  041_rv_itemDecor    8e032f7070214b27589e80935e618315f6a41d3a Implement RecyclerView ItemDecorations
+  042_listLM          7dad56243ebcde65d75d592dc802269a4d86c875 List Layout Manager
+  043_rv_anim         33b18903168c177d65e3c2ef7398c1b2ca0c826f Add animations to RecyclerView
+  044_palette         059178a8c7cc80848e5594a9287be91bd924831a New Palette support library
+  045_rectShadow      767f1e75ad6e96042c6e4466c363b285a8bfda68 Merge "Use raw shadow size when deciding cardview bounds" into lmp-mr1-dev
+  050_vectorDrawable  824b14618bca27526ec3de3a5ef28e3cb3c40c23 Setup the code structure for VectorDrawable's support lib.
+  051_tinting         cd6e77607caba0b3b26163791a361938afb8b9c5 Improvements to AppCompat's tinting
+  052_pathinterpolat  94213f7183ca8a0a91ee0cf25723e2791a078ae0 Create v4 PathInterpolatorCompat
+  054_snackbar        b7f9224b1495db47eb8fd813b5912250e900770a Snackbar
+  055_vd              4fcaa70c2362e58a3fb30d140f0a0eeda8e35b44 Add the support lib for VD and AVD
+* 056_percentage      f9cabe2ad76a19d555b5b656d8167bdb167c9d03 Percentage based layouts.
+  057_newpermission   36c328cb8d2b86ce99c9e7c7382478b2b496bdd3 Add support lib shims for new permissions APIs
+  060_ripple          8c3f75732bc35cf683f9014816b26c77d9c8f4e8 Add workaround for ripple + alpha animation bug
+ 
+```
+### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
+### 编程源码
 (从jvm源码看synchronized)[https://www.cnblogs.com/kundeg/p/8422557.html]
 
+
+### 项目源码
+#### mqtt
+[mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/software?id=software)
+broker/server
+[ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
+[eclipse mosquitto](https://github.com/eclipse/mosquitto)
+[apache activemq](https://github.com/apache/activemq.git)
+client lib
+[Eclipse Paho Java MQTT client library](https://github.com/eclipse/paho.mqtt.java)
+tools
+[IBM IA92 (java -jar wmqttSample.jar) ](http://www-01.ibm.com/support/docview.wss?rs=171&uid=swg24006006&loc=en_US&cs=utf-8&lang=en)
+
+vcard
+[xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
+#### xmpp
+openfire
+asmack
+#### 插件化
+编译打包多渠道多模块插件化
+[dynamic-load-apk]
+[EventBus]()
+
+#### 浏览器chromium
+
+
+#### 多媒体（图片音视频zxing,ffmpeg）
 [Glide.md](../阅读代码/Glide.md)
 [DiskLruCache.md](..\阅读代码\DiskLruCache.md)
 [Okhttp.md](..\阅读代码\http\Okhttp.md)
-[retrofit.md](..\阅读代码\plantuml\retrofit.plantuml.txt)
-[rxjava Dagger.Android (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)
+ [rxjava.ReactiveX Dagger.Android.di (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)
+[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
+
+
+[Doc: Jekyll]()
+[zxing, ffmpeg]()
+
+#### 服务器jetty,tomcat

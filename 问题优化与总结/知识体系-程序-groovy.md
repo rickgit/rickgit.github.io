@@ -1,6 +1,15 @@
 
 
 ## 源码
+
+1. 下载groovy，入口
+
+```groovy
+groovyc MyClass.groovy
+```
+[org.codehaus.groovy.ant.Groovyc官方文档](http://groovy-lang.org/groovyc.html)
+
+
 ```
   001_initial_maven      a9da497ee8aff08c1ae03a816488601dc80b9a2d Initial revision
   002_classworld         f1d001cb3c2e628888e49aebc967a744a1a4799c -- Addded classworlds as a dependency -- Simple classworlds script and config for compiler -- Maven target to install groovy toolchain to a staging dir

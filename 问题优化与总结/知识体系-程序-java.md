@@ -2006,27 +2006,29 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 
 泛型是一种多态技术。而多态的核心目的是为了消除重复，隔离变化，提高系统的正交性。
 ```
-+------------------------------------------------------------------------------------------------------+ 
-|                                                                                                      |
-| GenericArrayType            ParameterizedType          TypeVariable            WildcardType     Class|
-|   getGenericComponentType()   getActualTypeArguments()  getBounds()              getUpperBounds()    |
-|                               getRawType()              getGenericDeclaration()  getLowerBounds()    |
-|                               getOwnerType()            getName()                                    |
-|                                                         getAnnotatedBounds()                         |
-+------------------------------------------------------------------------------------------------------+ 
-|                               Type  (reflect)                                                        |
-+------------------------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------------------------+ 
+|                                                                                                          |
+| GenericArrayType            ParameterizedType          TypeVariable            WildcardType         Class|
+|   getGenericComponentType()   getActualTypeArguments()  getBounds()              getUpperBounds()        |
+|                               getRawType()              getGenericDeclaration()  getLowerBounds()        |
+|                               getOwnerType()            getName()                                        |
+|                                                         getAnnotatedBounds()                             |
++----------------------------------------------------------------------------------------------------------+ 
+|                                      Type  (reflect)                                                     |
++----------------------------------------------------------------------------------------------------------+
 
 ```
 ```
-java apt/serviceloader
-+-------------------------------------------------------------------------+ 
-|         VariableElement           ExecutableElement:Parameterizable     | 
-|TypeElement:Parameterizable,QualifiedNameable    TypeParameterElement    |           
-|                    PackageElement:QualifiedNameable                     |
-+-------------------------------------------------------------------------+
-|                        Element                                          |
-+--------------------------------------------------------------------------
+javax annotation apt/serviceloader
++-------------------------------------------------------------------------+------------------+ 
+|         VariableElement           ExecutableElement:Parameterizable     |                  |
+|TypeElement:Parameterizable,QualifiedNameable    TypeParameterElement    |                  |        
+|                    PackageElement:QualifiedNameable                     |                  |
++-------------------------------------------------------------------------+------------------+
+|                        Element                                          | AnnotationMirror |
++-------------------------------------------------------------------------+------------------+
+|                        AnnotatedConstruct                                                  |
++--------------------------------------------------------------------------------------------+
 
 ```
 

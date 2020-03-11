@@ -309,7 +309,7 @@ repositories {
 }
 
 
-3/ annotationCompiler 转为 kapt
+3. annotationCompiler 转为 kapt
 apply plugin: 'kotlin-android'
 kapt 'com.xx.xx'
 
@@ -318,4 +318,107 @@ kapt 'com.xx.xx'
 org.gradle.jvmargs=-Xmx1536m -XX\:MaxHeapSize\=1536m
 
 5. APK大小增加600k
+ 
+
+## 源码
+[Kotlin源码分析](https://zhuanlan.zhihu.com/p/76622754)
+https://blog.csdn.net/weixin_34283445/article/details/89580460
+
+1. [官方文档执行入口](https://kotlinlang.org/docs/tutorials/command-line.html)
+```shell
+$ kotlinc hello.kt -d hello.jar
+$ kotlin -classpath hello.jar HelloKt
+```
+2. 源码阅读
+
+
+```
+
+  001_collection    369b1974782b821e44b7aa6cd68e2e41eb2ba036 Initial
+  002_io            54ccb2e184b822db5f4ec3a8e2390f7bf74c0f94 Enhanced iterator
+  003_grammar       6d6a22de1d8bc6a4faff1618e8202c65b9a42c32 Projections & Initial grammar
+  004_control       807062a1f8914c24d84884b9753064e4baf1c92a Binary operations, control structures
+  005_bit           661931469b96e1f645553709e3ed5a1529eb9fab Expressions
+  006_Anonymous     8beb0da924b18145059bd78f18d3e5d693fe2f4a Anonymous Objects
+  007_with          73b12271c06078b74bce9548a207dfaa9918f8b7 Calling closures on objects
+  008_Default       dd49fc6ce2e18909ca8fd8be379283f22d7a68f0 Default parameters, function type examples fixed, tuples with named entries
+  009_Matches       ff3f7d82265cc958b14296fe19ea3770a55bb81d Matches reorganized
+  010_Namespaces    03ef48508fa17f1e9a6766100b22a03a3ef1a3f1 Namespaces and imports
+  011_scripts       d9cdd4ee34fa5df2198c81576408e598dceceae5 Scripts
+  012_Attributes    0c90942472375f7212ef926786cf3091106ca134 Attributes
+  013_keywords      274cf80336940757365d16e84b3d84e474e4b80f Preliminary list of keywords
+  014_lexer         a7919fdc1db453fd228739a94652ebf2ae8a6159 lexer/highlighting initial
+  015_parser        4f18686978ebcfa5970dfafdbe5143e0d507bc9f Stub parser
+* 016_Soft_keywords 17d9240d148e721c06da86f494a6c693f2103e3e parser, baby steps. Soft keywords highlighting
+  017_parsingtest   5a31694d70c1371361422afb012d69bca76c843c Parsing tests
+  018_psi_nodes     fce72774392674d579a16237499e230530a5f51a psi nodes, initial
+  019_codegen       c5d8aae5152 codegen, initial
+                    objectweb
+  020_psvm          26c5a07a6bb55c0163084be86f129ea9bf138bab dummy test
+  021_return        8e6c2995d0a542bf0105039dfa37f6bc9bfc6224 return 42
+  022_as            445736bfbd83b97c19515fd992730098f95c5705 Priorities for ":" and "as" changed
+  023_!             2e8b828ee009afa115465a8e548a559f4b06807c Resolve for "!"
+* 024_in            e414413112078b4739943174f06dcb98ada4c27a Contains (in, !in)
+  025_helloWorld    af4c77719768df7f5476abc1341f2c70e2e8612f hello world can be compiled
+  026_cf            5888ac5a606a286a1c7ea43657a63e1c1c202c54 Working on CFG building
+  027_mockJDK       dd3f2b3afbc21487e0ce7524c12fe918c7354c71 add mock JDK to Jet repo
+  028_bottles       1d01d519b98d5ab5317217b32658292461fa721f a working version of 99 bottles
+  029_24game        93b30bd7c7ed5f737b2e5b40540e42166857efd5 TwentyFourGame wip
+  030_kt            9bfa61bfb23618d705f2ea5ead44bc45a04e7e16 accept .kt extension for Kotlin files
+  031_split2frontend 07e0a332c335aeb5fb57022f0c9e6cd4db1577f7 Project split into four modules
+  032_compiler       116f35c650c411e7a3477dc5bde85f9273eb6824 "compiler" folder created
+  033_Docs          7629ebe272d90be0f810df337f7def0a3b49a06b Docs
+  034_kotlinc       3083fde2dda88949a0c80564f9a161633a02812f binary distribution for Kotlin
+  
+  033_j2k            8cf4c809511530577a6c074917b4fd10e90c4aa7 initial commit for j2k
+  034_codegenDOC     f82259ae84f2bd48b7fa4eb020c73aba014638e6 Detailed session desc for CodeGen
+  035_k2js           27bddcd2a4b08dde73812ebc42cf28d3e78e297e initial commit
+  036_puzzlers       89fa7cd29a386b37c079a5f058cc85d80f7ee36a More Kotlin vs Java puzzlers
+  037_examples       e787d94b96bf7b98c374bcc3fd1db96e8c1f35da ++/-- performance optimization
+  038_DSLs           db76e28c6da37521b3d5e7d68bf11bc4fea5b0dd added a little experimental spike of a text and markup based template library for internal DSLs for templating (which external DSLs like Jade / Razor / Velocity / Erb / JSP style) could layer on top of. Mails to follow shortly :)
+  039_buildToolsTest 823852cc6c875f658092a29fcd47c9c075c9b779 First Ant task + "buildToolsTest" Ant target added
+  040_collections    3e29aad6dd1bb5909c5dd94682c2f586b1e699aa KT-987 Unboxing_nulls: Kotlinized versions of basic Java collections
+  041_Post-build     ea6b6f7495f7587b8c07eb2723fb98584d516aeb Post-build step: renaming the zip artifact
+  042_webdemo        2a515b2eb935026af6fc94f9ae0f744506c77d24 working on examples
+  043_kdoc           9af12d1bacc75e1ef958e3d0c14c4a66edda9f4a added a little experimental kdoc module using the maven plugin for dogfooding
+
+* 103_v1.0.3        2f47e30a1a12347759dbb8707f5137178de65696 Fixed UnsupportedOperationException when a namespace is used in place of an expression.
+
+```
+
+
+
+### jflex 词法分析
+
+1. [使用说明 How to get it building](http://wwww.jflex.de/manual.html#Installing)
+    - Install JFlex
+
+    - If you have written your specification file (or chosen one from the examples directory), save it (say under the name java-lang.flex).
+
+    - Run JFlex with
+
+        ```shell   
+            jflex java-lang.flex
+        ```
+    - JFlex should then show progress messages about generating the scanner and write the generated code to the directory of your specification file.
+
+    - Compile the generated .java file and your own classes. (If you use CUP, generate your parser classes first)
+
+    - That’s it.
+2. 源码从init开始阅读，读到第一步提交入口的commit
+3. release note 选择版本阅读
+    [release note ](https://jflex.de/changelog.html)
+```
++------------------------------------------------------------------------------------+ 
+|                                                                                    |
+|                                   JFlex.Main                                       |
+|                                                                                    |
++------------------------------------------------------------------------------------+
+|     LexParse.java    sym.java                      LexParse.java                   |
+|                                                 skeleton.nested                    |
+|    java_cup.Main  LexParse.cup                   JFlex/LexScan.flex                |
+|                                                                                    |
++------------------------------------------------------------------------------------+
+
+
 ```
