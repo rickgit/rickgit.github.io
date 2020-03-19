@@ -1519,6 +1519,7 @@ Rxjava实现
 ## 2.4 数据并发访问 - 线程与并发
 
 ### 异步实现（多线程编程）
+[Java 异步编程：从 Future 到 Loom](https://www.jianshu.com/p/5db701a764cb)
 线程初始化三种方式： Thread,Runnable,Callable，Feature
 线程的生命周期
 ```
@@ -2733,9 +2734,52 @@ RSA
 
 
 ## OpenJDK
-  001_hotspot         5522af6c5028c6cfdf382b78796dd7ac77eb1bbd Initial load
-  002_jdk             ce0984a87ec46c2ffe3ed80d51ed350826331197 Initial load
-  006_langtools       84e2484ba645990f4c35e60d08db791806ae40be Initial load
-* 007_init_load_merge 0d206a7adbbc58f8b70c96d1b65da1e391c62474 Merge
+```
+  070001_initial 686d76f7721f9e5f4ccccf0f4e7147bd3ba5da6f Initial load
+  071201_hotspot 8153779ad32d1e8ddd37ced826c76c7aafc61894 Initial load
++-------------------------------------------------------------------------------------------------------------------------------+
+|  java.c                                                                java_md.c                                              |
+|    options:JavaVMOption*                                                                                                      |
+|    main()                                                                                                                     |
+|    SelectVersion(char **main_class)                                      LocateJRE(manifest_info* info):char*                 |
+|    ParseArguments():jboolean                                             LoadJavaVM()                                         |
+|    InitializeJVM(JavaVM **pvm, JNIEnv **penv, InvocationFunctions *ifn)                                                       |
+|    GetMainClassName():jstring                                                                                                 |
+|    LoadClass(JNIEnv *env, char *name):jclass                                                                                  |
+|    CreateExecutionEnvironment()                                                                                               |
+|                                                                                                                               |
+|   *JNIEnv:JNINativeInterface_       *JavaVM:JNIInvokeInterface_                                                               |
+|       CallStaticVoidMethod()              DestroyJavaVM()                                                                     |
+|                                           AttachCurrentThread()                                                               |
+|                                           DetachCurrentThread()                                                               |
+|     jni.cpp                               GetEnv()                                                                            |
+|       DT_RETURN_MARK_DECL()               AttachCurrentThreadAsDaemon()                                                       |
+|       JNIWrapper(arg)                                                                                                         |
+|       JNITraceWrapper()                JavaThread                                                                             |
+|       jni_invoke_static()                                                                                                     |
+|   dtrace.hpp                                                                                                                  |
+|      HS_DTRACE_PROBE_DECL1()                                                                                                  |
+|      DTRACE_PROBE1()                                                                                                          |
+|                                                                                                                               |
++-------------------------------------------------------------------------------------------------------------------------------+
+|        JavaCalls                                                                                                              |
+|             call()                                                                                                            |
+|             call_helper()     CompileBroker                                                     StubRoutines.cpp              |
+| os_linux.cpp                   _method_queue:CompileQueue*   compiler_thread_loop()                call_stub()                |
+|   os::os_exception_wrapper()   _task_free_list:CompileTask*  invoke_compiler_on_method()        stubGenerator_x86_64.cpp      |
+|                                compile_method()                                                  generate_call_stub()         |
+|                                compile_method_base()                                                                          |
+|                                create_compile_task()                                                                          |
+|                                allocate_task():CompileTask*                                     assembler.cpp                 |
+|                                                                                                                               |
+|                                                                                                                               |
+|                               CompileTask                     ciEnv.cpp                                                       |
+|                                     initialize()                 get_method_from_handle()                                     |
++-------------------------------------------------------------------------------------------------------------------------------+
+
+  071201_jdk     319a3b994703aac84df7bcde272adfcb3cdbbbf0 Initial load
+  000006_langtools       84e2484ba645990f4c35e60d08db791806ae40be Initial load
+* 000007_init_load_merge 0d206a7adbbc58f8b70c96d1b65da1e391c62474 Merge
 
 
+```

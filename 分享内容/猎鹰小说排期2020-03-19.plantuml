@@ -1,0 +1,20 @@
+@startgantt
+' printscale weekly
+
+Project starts the 2020/03/12
+[男女生引导] lasts 2 days
+-- 第二周 --
+then [首页-推荐，男生，女生]   starts  2020/03/16 
+[首页-推荐，男生，女生] lasts 2 days
+then [首页-分类-排行榜移到书城] starts  2020/03/18
+then [首页-书城滚动条和排行榜UI] starts  2020/03/19
+then [分类UI] starts  2020/03/20
+-- 第三周 --
+then [书籍详情] starts  2020/03/23
+then [搜索] starts  2020/03/24
+then [书籍阅读页] starts  2020/03/25
+then [福利] starts  2020/03/26
+-- 第三周 --
+then [测试] lasts 1 days
+
+@endgantt

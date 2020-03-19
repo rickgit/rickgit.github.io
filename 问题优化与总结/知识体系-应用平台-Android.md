@@ -371,6 +371,75 @@ binder的服务实体
 AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
 
 - Bundle(实现了接口Parcelable)
+
+[Android O 后台startService限制简析](https://www.jianshu.com/p/f2db0f58d47f)
+```java
+不允许Application启动服务。kill应用会出现问题。
+startService(new Intent(this,BackService.class));
+    java.lang.RuntimeException: Unable to create application edu.ptu.gson.DApplication: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6227)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+     Caused by: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.DApplication.onCreate(DApplication.java:10)
+        at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1182)
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6222)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211) 
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778) 
+        at android.os.Handler.dispatchMessage(Handler.java:107) 
+        at android.os.Looper.loop(Looper.java:214) 
+        at android.app.ActivityThread.main(ActivityThread.java:7116) 
+        at java.lang.reflect.Method.invoke(Native Method) 
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492) 
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925) 
+
+服务所在的应有在后台60秒后，不允许启动服务
+    @Override
+    protected void onPause() {
+        super.onPause();
+        new Handler().postDelayed(() -> {
+            startService(new Intent(MainActivity.this,BackService.class));
+        },TimeUnit.SECONDS.toMillis(65));
+
+    }
+    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{f7b20eb u0a129 LAST bg:+1m4s234ms idle change:idle procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.MainActivity.lambda$onPause$1$MainActivity(MainActivity.java:48)
+        at edu.ptu.gson.-$$Lambda$MainActivity$wl8e-hH5EF00KzpSg6rkpcKD2N8.run(Unknown Source:2)
+        at android.os.Handler.handleCallback(Handler.java:883)
+        at android.os.Handler.dispatchMessage(Handler.java:100)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+需要设置startForeground()
+startForegroundService(new Intent(MainActivity.this,BackService.class));
+    android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{266d400 u0 edu.ptu.gson/.BackService}
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1864)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+/**
+ * 8.0以上需要增加channel
+ */
+```
  
 ### Bluetooth驱动
 ```
@@ -2738,7 +2807,7 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 深层链接和 Android 应用链接
 ## 源码
 [1798个项目（2019-12-11统计）](https://source.codeaurora.cn/quic/la)
-```
+ 
 含有61个内置platform/system
 [platform/system/core](https://source.codeaurora.cn/quic/la/platform/system/core)
 adb，log
@@ -2749,8 +2818,37 @@ adb，log
 含有61个内置platform/frameworks
 [platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
 framework源码，开发必备
+ 
+```java
++---------------------------------------------------------------------------------------------------------------------------------------+
+|     Activity                                                                                                                          |
+|         startActivity(intent)                                                                                                         |
+|         mMainThread                                                                                                                   |
+|    Instrumentation                                                                                                                    |
+|       execStartActivity()                                                                                                             |
+|                                                ActivityManagerNative                                                                  |
+|                                                          :IActivityManager            ActivityManagerService:ActivityManagerNative    |
+|                                                   getDefault():IActivityManager            startActivity()                            |
+|                                                                                                                                       |
+|                                                                                            startActivityLocked()                      |
+|                                                                                                                                       |
+|                                                                                            resumeTopActivityLocked()                  |
+|                                                                                                                                       |
+|       ApplicationThread                        ApplicationThreadProxy                      startPausingLocked()                       |
+|           :ApplicationThreadNative                     :IApplicationThread                                                            |
+|                                                   scheduleLaunchActivity()                 startSpecificActivityLocked()              |
+|         scheduleLaunchActivity()                  mRemote:IBinder                                                                     |
+|                                                                                            realStartActivityLocked()                  |
+|                                                                                                                                       |
+|                                                                                            mProcessNames:ProcessMap<ProcessRecord>    |
+|                                                                                                                                       |
+|                                                                                                                                       |
+|                                                                                       ProcessRecord                                   |
+|                                                                                         thread:IApplicationThread                     |
++---------------------------------------------------------------------------------------------------------------------------------------+
 
 
+```
 含有118个内置platform/packages/apps
 [platform/packages/apps/PackageInstaller](https://source.codeaurora.cn/quic/la/platform/packages/apps/PackageInstaller)
 “点击通知”需要访问文件权限intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -2764,8 +2862,8 @@ jni_android.cc
 
 
 [浏览器源码](https://cs.chromium.org/chromium/)
+ 
 
-```
 ### [platform/packages/providers 系统交互providers]()
 
 含有18个内置platform/packages/providers
@@ -2988,6 +3086,26 @@ tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshot
   031_GestureDetecotr 1ce805e30800bf2852fa5421b7277a18e089ee31 Add GestureDetectorCompat
   032_ViewDragHelper  c56ba65d20be8742ff717907a3a2cd81dd0e5f3c Factor ViewDragHelper out from SlidingPaneLayou
   033_DrawerLayout    1d26501f0c8e9f3577f651938a03f6b3a1a672c7 Initial DrawerLayout implementation
+            +-------------------------------------------------------------------------------------------------------------------------+
+            |                DrawerLayout:ViewGroup                                                                                   |
+            |                        onLayout()                                                                                       |
+            |                        isContentView()                                                                                  |
+            |                                                                                                                         |
+            |                        mLeftDragger:ViewDragHelper                                                                      |
+            |                        mRightDragger:ViewDragHelper                                                                     |
+            |                        computeScroll()                                                                                  |
+            |                        closeDrawer()                                                                                    |
+            |        ViewDragHelper                                                                                                   |
+            |           mCapturedView:View                             Callback                                                       |
+            |           captureChildView()                                onViewDragStateChanged(state)                               |
+            |           mCallback:Callback                                onViewPositionChanged()                                     |
+            |                                                             onViewPositionChanged()                                     |
+            |           mScroller:ScrollerCompat                                 ...                                                  |
+            |           smoothSlideViewTo()                                                                                           |
+            |           continueSettling()                                                                                            |
+            |                                                                                                                         |
+            +-------------------------------------------------------------------------------------------------------------------------++
+
   034_PopupMenu       dbfc21aa98c4a1092204854b99830a50557aa969 Add support version of PopupMenu to AppCompat
   034_multidex        acedbc72ca7c30a24d869f5067ed89ec4dead7c8 Add ADT project for android-support-multidex.
   035_recyclerview    009b4ef9d97e1cc237477e3284fc305bb1438cc9 Add RecylerView to the support library
@@ -3005,9 +3123,63 @@ tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshot
   054_snackbar        b7f9224b1495db47eb8fd813b5912250e900770a Snackbar
   055_vd              4fcaa70c2362e58a3fb30d140f0a0eeda8e35b44 Add the support lib for VD and AVD
 * 056_percentage      f9cabe2ad76a19d555b5b656d8167bdb167c9d03 Percentage based layouts.
+                      过时，使用ConstraintLayout
   057_newpermission   36c328cb8d2b86ce99c9e7c7382478b2b496bdd3 Add support lib shims for new permissions APIs
   060_ripple          8c3f75732bc35cf683f9014816b26c77d9c8f4e8 Add workaround for ripple + alpha animation bug
  
+```
+[ConstraintLayout布局 where to find ConstraintLayout source](http://source.codeaurora.cn/quic/la/platform/frameworks/opt/sherpa)
+
+```java
++-------------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                         |
+|                ConstraintLayout                                                                                         |
+|                     onLayout()                                                                                          |
+|                     mConstrainedWidgets:List<ConstraintWidget>                                                          |
+|                     mLayoutWidget                                                                                       |
+|                     mConstrainedTargets:List<ConstraintWidget>                                                          |
+|                     onFinishInflate()                                                                                   |
+|                     updateHierarchy()                                   Guideline:View                                  |
++-------------------------------------------------------------------------------------------------------------------------+
+|                ConstraintWidget:Solvable                                Guideline:ConstraintWidget                      |
+|                         getCompanionWidget():View                                                                       |
+|                         getLeft()                                                                                       |
+|                         getTop()                                                                                        |
+|                         getRight()                                      ConstraintWidgetContainer:ConstraintWidget      |
+|                         getBottom()                                                                                     |
+|                         connect()                                                                                       |
+|                         getAnchor()                                                                                     |
+|                         setHorizontalDimensionBehaviour()                                                               |
+|                         setVerticalDimensionBehaviour()                                                                 |
+|                                                                                                                         |
++-------------------------------------------------------------------------------------------------------------------------+
+
+>两个控件联合，位于Relative居中，Relative宽度是WrapContent会出问题,部分视图不可见
++-----------------------+
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|   +-----+  +------+   |
+|   |     |  |      |   |
+|   | V1  |  | V2   |   |
+|   |     | .|      |   |
+|   |     |  |      |   |
+|   +-----+  +------+   |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
+|                       |
++-----------------------+
+
 ```
 ### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
 ### 编程源码
@@ -3019,10 +3191,54 @@ tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshot
 [mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/software?id=software)
 broker/server
 [ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
-[eclipse mosquitto](https://github.com/eclipse/mosquitto)
+[eclipse mosquitto mqtt broker](https://github.com/eclipse/mosquitto)
+[moquette](https://gitee.com/mirrors/moquette.git)
+```
+  001_initial   422fbc4d2c644844d4886afd55c912626d1c4054 First import of moquette proto parser
+  002_client    aadff9c9bd9a2efe7b90931b7dbed1c350f1d52d Added trivial client implementation
+  003_server    463aa256936010b9c61252ca703623e4b98adda7 Implemented the raw connect message  handling
+  004_subscribe b5903bbf8471f0baaeb8b71346ef96cccabf3ab0 Added simple implementation for handle subscribe message
+
+```
 [apache activemq](https://github.com/apache/activemq.git)
 client lib
 [Eclipse Paho Java MQTT client library](https://github.com/eclipse/paho.mqtt.java)
+```
+* 001_initial 40f75663f7f9715a6452940005d615b5c1eadda6 First version of MQTT v3 Java Client+----------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                      |
+|    MqttClient:DestinationProvider                ClientComms                                                         |
+|        serverURI                                    networkModule:NetworkModule                                      |
+|        clientId                                     clientState                                                      |
+|        serverURIType                                sender:CommsSender                                               |
+|        tokenStore:CommsTokenStore                   receiver:CommsReceiver                                           |
+|        persistence:MqttDefaultFilePersistence                                                                        |
+|        comms:ClientComms                                                                                             |
+|        topics:HashTable                                                                                              |
+|        connect()                                                                                                     |
+|        publish()                                                                                                     |
+|        disconnect()                                                                                                  |
++---------------------------------+------------------------------------------------------------------------------------+
+|                                 | TCPNetworkModule       LocalNetworkModule                                          |
+|    NetworkModule                | //tcp://               //local://                                                  |
+|        start()                  |                                                                                    |
+|        getInputStream()         | SSLNetworkModule                                                                   |
+|                                 | //ssl://                                                                           |
+|                                 |                                                                                    |
++---------------------------------+------------------------------------------------------------------------------------+
+|                                                                                                                      |
+|                         CommsReceiver                                                                                |
+|                            in:MqttInputStream                                                                        |
+|                            lifecycle                                                                                 |
+|                         MqttInputStream                                                                              |
+|                           readMqttWireMessage():MqttWireMessage                                                      |
++-------------------------+--------------------------------------------------------------------------------------------+
+|                         |                                MqttPersistableWireMessage            MqttSubscribe         |
+|     MqttMessage         |MqttAck    MqttConnect          MqttPingReq                                 qos:int[]       |
+|                         |           MqttDisconnect                                             MqttUnsubscribe       |
++-------------------------+--------------------------------------------------------------------------------------------+
+
+
+```
 tools
 [IBM IA92 (java -jar wmqttSample.jar) ](http://www-01.ibm.com/support/docview.wss?rs=171&uid=swg24006006&loc=en_US&cs=utf-8&lang=en)
 
@@ -3033,8 +3249,9 @@ openfire
 asmack
 #### 插件化
 编译打包多渠道多模块插件化
-[dynamic-load-apk]
+[dynamic-load-apk]()
 [EventBus]()
+[tinker]()
 
 #### 浏览器chromium
 
@@ -3043,7 +3260,7 @@ asmack
 [Glide.md](../阅读代码/Glide.md)
 [DiskLruCache.md](..\阅读代码\DiskLruCache.md)
 [Okhttp.md](..\阅读代码\http\Okhttp.md)
- [rxjava.ReactiveX Dagger.Android.di (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)
+[rxjava.ReactiveX Dagger.Android.di (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)
 [gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
 
 

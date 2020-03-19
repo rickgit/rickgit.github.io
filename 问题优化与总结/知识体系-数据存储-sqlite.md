@@ -43,3 +43,27 @@ SELECT Substr(rule_key,3,2) FROM BlockFilter GROUP BY Substr(rule_key,4,2);
 
 SELECT length(rule_key) FROM BlockFilter GROUP BY length(rule_key);
 */
+
+
+```CPP
+
++-------------------------------------------------------------------------------------------------+
+|                           shell.c                                                               |
+|                              main()                                                             |
+|       main.c                                               struct Parse {                       |
+|         sqlite_open():sqlite                                 sqlite *db;                        |
+|         sqliteDbbeOpen():Dbbe                                sqlite_callback xCallback;         |
+|         sqliteOpenCb():int                                   void *pArg;                        |
+|                                                              char *zErrMsg;                     |
+|                                                              Token sErrToken;                   |
+|                                                              Token sFirstToken;                 |
+|  struct sqlite {                  struct Dbbe {              Token sLastToken;                  |
+|    Dbbe *pBe;                       char *zDir;              Table *pNewTable;                  |
+|    int flags;                       int write;               Vdbe *pVdbe;                       |
+|    Table *apTblHash[N_HASH];        BeFile *pOpen;           int explain;                       |
+|    Index *apIdxHash[N_HASH];        int nTemp;               int initFlag;                      |
+|  };                                 FILE **apTemp;           int nErr;                          |
+|                                   };                       };                                   |
++-------------------------------------------------------------------------------------------------+
+
+```

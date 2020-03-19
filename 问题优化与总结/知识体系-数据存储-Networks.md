@@ -1,3 +1,29 @@
+## 糟糕的翻译
+socket 套接字（信口 a device on a piece of electrical equipment that you can fix a plug, alight BULB, etc. into）
+context 上下文（the situation within which something exists or happens, and that can help explain it）
+handle 句柄(control ,to control a vehicle, an animal, a tool, etc)
+、macro宏
+
+## 网络不可靠
+### 物理层不可靠解决
+以太网增加冗余链路，提高可靠。带来环路等问题
+[轻松应用IEEE 802.1w协议](https://blog.csdn.net/CTO_51/article/details/8425881)
+
+### 数据链路解决物理层不可靠
+https://blog.csdn.net/CTO_51/article/details/8425881
+
+以太网的MAC地址格式是12个16进制数，比如0800200A8C6D
+因特网IP地址格式是4个点分10进制数，比如192.168.201.160
+以太网的MAC地址，翻译成因特网的IP地址，这就是ARP的作用
+
+数据链路层为了上层服务，链路上通过流量控制、分段/重组和差错控制来保证数据传输的可靠性，将物理层提供的可能出错的物理连接改造成为逻辑上无差错的数据链路
+### 网络层不可靠
+确定主机到主机，点对点
+网络层的目的是实现两个端系统之间的数据透明传送，主要工作是路径选择、路由及逻辑寻址
+### 传输层解决链路层的不可靠
+确定端口到端口
+传输层的一些协议是面向链接的，这就意味着传输层能保持对链路层分段的跟踪，并且重传那些失败的分段。
+
 ## TLS
 ### 基础
 欧拉公式、费马小定理、中国剩余定理，可以说是三大加密算法的基础
@@ -341,6 +367,7 @@ XMPP的优点：协议成熟、强大、可扩展性强、目前主要应用于�
 MQTT的优点：协议简洁、小巧、可扩展性强、省流量、省电。缺点：不够成熟、实现较复杂、服务端组件rsmb不开源，部署硬件成本较高。
 
 ## mqtt 
+mqtt提供了qos0、qos1和qos2的不同的消息发送的服务质量，增强可靠性
 [Protocol Specifications](http://mqtt.org/documentation)
 ```
 +-----------------------------------------------------------------+                     +-----------------------------------+
@@ -438,3 +465,41 @@ XMPP通信原语有3种：message、presence和iq。
 [UA 介绍](https://www-archive.mozilla.org/build/revised-user-agent-strings.html)
 http://useragentstring.com/
 https://developer.chrome.com/multidevice/user-agent
+
+
+## Netty
+
+```
+* 001_initial aef2ab453a8b11984c4fe64ba27612a1308ee490 Initial import.  Needs to: * rename packages * update license information
+
++------------------------------------------------------------------------------------------------------------+
+|  ServerBootstrap:Bootstrap                                                                                 |
+|         factory:NioServerSocketChannelFactory                                                              |
+|         bind()                                                                                             |
++------------------------------------------------------------------------------------------------------------+
+|  NioServerSocketChannelFactory                     DefaultChannelPipeline                                  |
+|       bossExecutor:Executor                           name2ctx                          head,tail          |
+|       sink:NioServerSocketPipelineSink                channel:NioServerSocketChannel                       |
+|       newChannel():NioClientSocketChannel             sink:NioServerSocketPipelineSink  sendUpstream()     |
+|                                                       attach()                          sendDownstream()   |
++------------------------------------------------------------------------------------------------------------+
+|  Boss:Runnable  NioServerSocketPipelineSink       NioServerSocketChannel:AbstractChannel                   |
+|                      workers:NioWorker[]               socket:ServerSocketChannel                          |
+|                      bind()                            pipeline:ChannelPipeline                            |
++------------------------------------------------------------------------------------------------------------+
+|   NioWorker:Runnable                                          DefaultChannelHandlerContext                 |
+|      executor:Executor                                              :ChannelHandlerContext                 |
+|      selector:Selector                                            handler:ChannelHandler                   |
+|      processSelectedKeys()                                                                                 |
+|      fireMessageReceived()                                    SimpleChannelHandler                         |
+|      register(channel,future)                                      :ChannelUpstreamHandler                 |
++------------------------------------------------------------------------------------------------------------+
+|      Channels                                                 Binder:SimpleChannelHandler                  |
+|         pipeline():DefaultChannelPipeline                        channelOpen()                             |
+|         fireMessageReceived()                                                                              |
+|                                                                                                            |
++------------------------------------------------------------------------------------------------------------+
+
+
+
+```
