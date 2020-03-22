@@ -664,8 +664,9 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 +-----------------+---------------------------------------+
 |  misc           | athrow   monitorenter,monitorexit     |
 +---------------------------------------------------------+
-|                 |-load_<n>  -store_<slot>               |lvt <-> OperandStack
-|  stack operator |-const_<num>   -push -ldc  -pop   dup  |constant ->OperandStack     
+|                 |-load_<n>  -store_<slot>               |lvt -> OperandStack; lvt <- OperandStack
+|  stack operator |-const_<num>  -push  -ldc              |constant ->OperandStack     
+|                 | -pop   dup                            |OperandStack     
 +---------------------------------------------------------+
 |  type conversion|  i2b, i2c,f2i                         |
 +----------------------------+----------------------------+
@@ -2737,45 +2738,67 @@ RSA
 ```
   070001_initial 686d76f7721f9e5f4ccccf0f4e7147bd3ba5da6f Initial load
   071201_hotspot 8153779ad32d1e8ddd37ced826c76c7aafc61894 Initial load
-+-------------------------------------------------------------------------------------------------------------------------------+
-|  java.c                                                                java_md.c                                              |
-|    options:JavaVMOption*                                                                                                      |
-|    main()                                                                                                                     |
-|    SelectVersion(char **main_class)                                      LocateJRE(manifest_info* info):char*                 |
-|    ParseArguments():jboolean                                             LoadJavaVM()                                         |
-|    InitializeJVM(JavaVM **pvm, JNIEnv **penv, InvocationFunctions *ifn)                                                       |
-|    GetMainClassName():jstring                                                                                                 |
-|    LoadClass(JNIEnv *env, char *name):jclass                                                                                  |
-|    CreateExecutionEnvironment()                                                                                               |
-|                                                                                                                               |
-|   *JNIEnv:JNINativeInterface_       *JavaVM:JNIInvokeInterface_                                                               |
-|       CallStaticVoidMethod()              DestroyJavaVM()                                                                     |
-|                                           AttachCurrentThread()                                                               |
-|                                           DetachCurrentThread()                                                               |
-|     jni.cpp                               GetEnv()                                                                            |
-|       DT_RETURN_MARK_DECL()               AttachCurrentThreadAsDaemon()                                                       |
-|       JNIWrapper(arg)                                                                                                         |
-|       JNITraceWrapper()                JavaThread                                                                             |
-|       jni_invoke_static()                                                                                                     |
-|   dtrace.hpp                                                                                                                  |
-|      HS_DTRACE_PROBE_DECL1()                                                                                                  |
-|      DTRACE_PROBE1()                                                                                                          |
-|                                                                                                                               |
-+-------------------------------------------------------------------------------------------------------------------------------+
-|        JavaCalls                                                                                                              |
-|             call()                                                                                                            |
-|             call_helper()     CompileBroker                                                     StubRoutines.cpp              |
-| os_linux.cpp                   _method_queue:CompileQueue*   compiler_thread_loop()                call_stub()                |
-|   os::os_exception_wrapper()   _task_free_list:CompileTask*  invoke_compiler_on_method()        stubGenerator_x86_64.cpp      |
-|                                compile_method()                                                  generate_call_stub()         |
-|                                compile_method_base()                                                                          |
-|                                create_compile_task()                                                                          |
-|                                allocate_task():CompileTask*                                     assembler.cpp                 |
-|                                                                                                                               |
-|                                                                                                                               |
-|                               CompileTask                     ciEnv.cpp                                                       |
-|                                     initialize()                 get_method_from_handle()                                     |
-+-------------------------------------------------------------------------------------------------------------------------------+
++-------------------------------------------------------------------------------------+-----------------------------------------+
+|  java.c                                                                             | classLoader                  Class      |
+|    options:JavaVMOption*                        java_md.c                           |      loadClass()               forName()|
+|    main()                                                                           |      findClass()                        |
+|    SelectVersion(char **main_class)               LocateJRE():char*                 |      findBootstrapClassOrNull()         |
+|    ParseArguments():jboolean                      LoadJavaVM()//dlsym()             |                                         |
+|    InitializeJVM( vm, env, ifn)                                                     |                 Constructor             |
+|    GetMainClassName():jstring                                                       |                    newInstance()        |
+|    LoadClass(JNIEnv *env, char *name):jclass                                        |                    constructorAccessor  |
+|    CreateExecutionEnvironment()                                                     |                                         |
+|                                                                                     |  jvm.cpp                                |
+|jni.cpp                    Threads              vmSymbols.hpp                        |     JVM_NewInstance(cls)                |
+|  jni_invoke_static()          create_vm()                                           |     JVM_LoadClass0                      |
+|  JNI_CreateJavaVM()           add()                                                 |     find_class_from_class_loader()      |
+|  get_method_id()                                                                    |     thread_entry()                      |
+|  jni_FindClass()         JavaThread:Thread   VMThread :Thread     Universe          |                                         |
+|  jni_DefineClass()           _osthread         _vm_queue           universe_init()  | systemDictionary.cpp                    |
+|                              create()           :VMOperationQueue  initialize_heap()|    resolve_or_fail(name,loader):klassOop|
+|                              run()             vm_thread()                          |                                         |
+|                              entry_point()     execute(op)                          |    resolve_or_null(name,loader):klassOop|
+|dtrace.hpp                                                                           |    load_instance_class()                |
+|  HS_DTRACE_PROBE_DECL1()                                                            |    find_class()                         |
+|  DTRACE_PROBE1()         ciInstanceKlass.cpp  os                  GCCause           |    parse_stream()                       |
+|                                find_method()   create_thread()        to_string()   | dictionary.cpp                          |
+|                           instanceKlass.cpp       //pthread_create()                |    find_class()                         |
+|                                 find_method()  start_thread()                       |    get_entry()                          |
+|                                                java_start()                         |                                         |
+|                                                pd_start_thread()                    |                                         |
+|                                                                                     |                                         |
+|                                                                                     |                                         |
+|                                                                                     |                                         |
++-----------------------------------------------------------+-------------------------++----------------------------------------+
+|JavaCalls                    CompileBroker                 | VM_Operation             |  ClassLoader.cpp                       |
+|  call()                      _method_queue:CompileQueue*  |      evaluate()          |      first_entry:ClassPathEntry        |
+|  call_helper()               _task_free_list:CompileTask* |      doit()              |      load_classfile()                  |
+|  call_default_constructor()  compile_method()             |                          |  ClassPathEntry                        |
+|  can_not_compile_call_site() compile_method_base()        | VM_GC_Operation          |      open_stream(name):ClassFileStream |
+|  call_virtual()              create_compile_task()        |        :VM_Operation     |                                        |
+|                              allocate_task():CompileTask* |                          |  ClassPathDirEntry:ClassPathEntry      |
+|os_linux.cpp                  compiler_thread_loop()       |                          |  ClassPathZipEntry:ClassPathEntry      |
+|  os::os_exception_wrapper()  invoke_compiler_on_method()  | ConcurrentMarkSweepThread|  LazyClassPathEntry:ClassPathEntry     |
+|                                                           |    :ConcurrentGCThread   |                                        |
+|                              StubRoutines.cpp             |                          |  ClassFileParser                       |
+|  CompileTask                    call_stub()               |                          |     _stream:ClassFileStream            |
+|        initialize()          stubGenerator_x86_64.cpp     |                          |     parseClassFile()                   |
+|                               generate_call_stub()        |                          |                                        |
+| ciEnv.cpp                                                 |                          |                                        |
+|    get_method_from_handle()                               |                          |                                        |
+|                              assembler.cpp                |                          |                                        |
+|                                                           |                          |                                        |
++--------------------------------------+--------------------+--------------------------+--------------+-------------------------+
+| verifier.cpp                         |               CollectedHeap                                  |                         |
+|                                      |                    obj_allocate()                            |                         |
+| linkResolver.cpp                     |                                                              |                         |
+|       check_klass_accessability()    |  parallelScavengeHeap    GenCollectedHeap                    |                         |
+|                                      |        GenerationSizer       MarkSweepPolicy                 |                         |
+|                                      |                              ASConcurrentMarkSweepPolicy     |                         |
+|                                      |                              ConcurrentMarkSweepPolicy       |                         |
+|                                      |                                                              |                         |
+|                                      |                                                              |                         |
++--------------------------------------+--------------------------------------------------------------+-------------------------+
 
   071201_jdk     319a3b994703aac84df7bcde272adfcb3cdbbbf0 Initial load
   000006_langtools       84e2484ba645990f4c35e60d08db791806ae40be Initial load
