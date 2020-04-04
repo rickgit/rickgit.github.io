@@ -3204,7 +3204,8 @@ broker/server
 client lib
 [Eclipse Paho Java MQTT client library](https://github.com/eclipse/paho.mqtt.java)
 ```
-* 001_initial 40f75663f7f9715a6452940005d615b5c1eadda6 First version of MQTT v3 Java Client+----------------------------------------------------------------------------------------------------------------------+
+* 001_initial 40f75663f7f9715a6452940005d615b5c1eadda6 First version of MQTT v3 Java Client
++----------------------------------------------------------------------------------------------------------------------+
 |                                                                                                                      |
 |    MqttClient:DestinationProvider                ClientComms                                                         |
 |        serverURI                                    networkModule:NetworkModule                                      |

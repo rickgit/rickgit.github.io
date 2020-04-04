@@ -2738,71 +2738,104 @@ RSA
 ```
   070001_initial 686d76f7721f9e5f4ccccf0f4e7147bd3ba5da6f Initial load
   071201_hotspot 8153779ad32d1e8ddd37ced826c76c7aafc61894 Initial load
-+-------------------------------------------------------------------------------------+-----------------------------------------+
-|  java.c                                                                             | classLoader                  Class      |
-|    options:JavaVMOption*                        java_md.c                           |      loadClass()               forName()|
-|    main()                                                                           |      findClass()                        |
-|    SelectVersion(char **main_class)               LocateJRE():char*                 |      findBootstrapClassOrNull()         |
-|    ParseArguments():jboolean                      LoadJavaVM()//dlsym()             |                                         |
-|    InitializeJVM( vm, env, ifn)                                                     |                 Constructor             |
-|    GetMainClassName():jstring                                                       |                    newInstance()        |
-|    LoadClass(JNIEnv *env, char *name):jclass                                        |                    constructorAccessor  |
-|    CreateExecutionEnvironment()                                                     |                                         |
-|                                                                                     |  jvm.cpp                                |
-|jni.cpp                    Threads              vmSymbols.hpp                        |     JVM_NewInstance(cls)                |
-|  jni_invoke_static()          create_vm()                                           |     JVM_LoadClass0                      |
-|  JNI_CreateJavaVM()           add()                                                 |     find_class_from_class_loader()      |
-|  get_method_id()                                                                    |     thread_entry()                      |
-|  jni_FindClass()         JavaThread:Thread   VMThread :Thread     Universe          |                                         |
-|  jni_DefineClass()           _osthread         _vm_queue           universe_init()  | systemDictionary.cpp                    |
-|                              create()           :VMOperationQueue  initialize_heap()|    resolve_or_fail(name,loader):klassOop|
-|                              run()             vm_thread()                          |                                         |
-|                              entry_point()     execute(op)                          |    resolve_or_null(name,loader):klassOop|
-|dtrace.hpp                                                                           |    load_instance_class()                |
-|  HS_DTRACE_PROBE_DECL1()                                                            |    find_class()                         |
-|  DTRACE_PROBE1()         ciInstanceKlass.cpp  os                  GCCause           |    parse_stream()                       |
-|                                find_method()   create_thread()        to_string()   | dictionary.cpp                          |
-|                           instanceKlass.cpp       //pthread_create()                |    find_class()                         |
-|                                 find_method()  start_thread()                       |    get_entry()                          |
-|                                                java_start()                         |                                         |
-|                                                pd_start_thread()                    |                                         |
-|                                                                                     |                                         |
-|                                                                                     |                                         |
-|                                                                                     |                                         |
-+-----------------------------------------------------------+-------------------------++----------------------------------------+
-|JavaCalls                    CompileBroker                 | VM_Operation             |  ClassLoader.cpp                       |
-|  call()                      _method_queue:CompileQueue*  |      evaluate()          |      first_entry:ClassPathEntry        |
-|  call_helper()               _task_free_list:CompileTask* |      doit()              |      load_classfile()                  |
-|  call_default_constructor()  compile_method()             |                          |  ClassPathEntry                        |
-|  can_not_compile_call_site() compile_method_base()        | VM_GC_Operation          |      open_stream(name):ClassFileStream |
-|  call_virtual()              create_compile_task()        |        :VM_Operation     |                                        |
-|                              allocate_task():CompileTask* |                          |  ClassPathDirEntry:ClassPathEntry      |
-|os_linux.cpp                  compiler_thread_loop()       |                          |  ClassPathZipEntry:ClassPathEntry      |
-|  os::os_exception_wrapper()  invoke_compiler_on_method()  | ConcurrentMarkSweepThread|  LazyClassPathEntry:ClassPathEntry     |
-|                                                           |    :ConcurrentGCThread   |                                        |
-|                              StubRoutines.cpp             |                          |  ClassFileParser                       |
-|  CompileTask                    call_stub()               |                          |     _stream:ClassFileStream            |
-|        initialize()          stubGenerator_x86_64.cpp     |                          |     parseClassFile()                   |
-|                               generate_call_stub()        |                          |                                        |
-| ciEnv.cpp                                                 |                          |                                        |
-|    get_method_from_handle()                               |                          |                                        |
-|                              assembler.cpp                |                          |                                        |
-|                                                           |                          |                                        |
-+--------------------------------------+--------------------+--------------------------+--------------+-------------------------+
-| verifier.cpp                         |               CollectedHeap                                  |                         |
-|                                      |                    obj_allocate()                            |                         |
-| linkResolver.cpp                     |                                                              |                         |
-|       check_klass_accessability()    |  parallelScavengeHeap    GenCollectedHeap                    |                         |
-|                                      |        GenerationSizer       MarkSweepPolicy                 |                         |
-|                                      |                              ASConcurrentMarkSweepPolicy     |                         |
-|                                      |                              ConcurrentMarkSweepPolicy       |                         |
-|                                      |                                                              |                         |
-|                                      |                                                              |                         |
-+--------------------------------------+--------------------------------------------------------------+-------------------------+
+                +-------------------------------------------------------------------------------------+-----------------------------------------+
+                |  java.c                                                                             | classLoader                  Class      |
+                |    options:JavaVMOption*                        java_md.c                           |      loadClass()               forName()|
+                |    main()                                                                           |      findClass()                        |
+                |    SelectVersion(char **main_class)               LocateJRE():char*                 |      findBootstrapClassOrNull()         |
+                |    ParseArguments():jboolean                      LoadJavaVM()//dlsym()             |                                         |
+                |    InitializeJVM( vm, env, ifn)                                                     |                 Constructor             |
+                |    GetMainClassName():jstring                                                       |                    newInstance()        |
+                |    LoadClass(JNIEnv *env, char *name):jclass                                        |                    constructorAccessor  |
+                |    CreateExecutionEnvironment()                                                     |                                         |
+                |                                                                                     |  jvm.cpp                                |
+                |jni.cpp                    Threads              vmSymbols.hpp                        |     JVM_NewInstance(cls)                |
+                |  jni_invoke_static()          create_vm()                                           |     JVM_LoadClass0                      |
+                |  JNI_CreateJavaVM()           add()                                                 |     find_class_from_class_loader()      |
+                |  get_method_id()                                                                    |     thread_entry()                      |
+                |  jni_FindClass()         JavaThread:Thread   VMThread :Thread     Universe          |                                         |
+                |  jni_DefineClass()           _osthread         _vm_queue           universe_init()  | systemDictionary.cpp                    |
+                |                              create()           :VMOperationQueue  initialize_heap()|    resolve_or_fail(name,loader):klassOop|
+                |                              run()             vm_thread()                          |                                         |
+                |                              entry_point()     execute(op)                          |    resolve_or_null(name,loader):klassOop|
+                |dtrace.hpp                                                                           |                                         |
+                |  HS_DTRACE_PROBE_DECL1()                                                            |    resolve_from_stream()                |
+                |  DTRACE_PROBE1()         ciInstanceKlass.cpp  os                  GCCause           |    load_instance_class()                |
+                |                                find_method()   create_thread()        to_string()   |    find_class()                         |
+                |                           instanceKlass.cpp       //pthread_create()                |    parse_stream()                       |
+                |                                 find_method()  start_thread()                       | dictionary.cpp                          |
+                |                                                java_start()                         |    find_class()                         |
+                |                                                pd_start_thread()                    |    get_entry()                          |
+                |                                                                                     |                                         |
+                |                                                                                     |                                         |
+                |                                                                                     |                                         |
+                +-----------------------------------------------------------+-------------------------++----------------------------------------+
+                |JavaCalls                    CompileBroker                 | VM_Operation             |  ClassLoader.cpp                       |
+                |  call()                      _method_queue:CompileQueue*  |      evaluate()          |      first_entry:ClassPathEntry        |
+                |  call_helper()               _task_free_list:CompileTask* |      doit()              |      load_classfile()                  |
+                |  call_default_constructor()  compile_method()             |                          |  ClassPathEntry                        |
+                |  can_not_compile_call_site() compile_method_base()        | VM_GC_Operation          |      open_stream(name):ClassFileStream |
+                |  call_virtual()              create_compile_task()        |        :VM_Operation     |                                        |
+                |                              allocate_task():CompileTask* |                          |  ClassPathDirEntry:ClassPathEntry      |
+                |os_linux.cpp                  compiler_thread_loop()       |                          |  ClassPathZipEntry:ClassPathEntry      |
+                |  os::os_exception_wrapper()  invoke_compiler_on_method()  | ConcurrentMarkSweepThread|  LazyClassPathEntry:ClassPathEntry     |
+                |                                                           |    :ConcurrentGCThread   |                                        |
+                |                              StubRoutines.cpp             |                          |  ClassFileParser                       |
+                |  CompileTask                    call_stub()               |                          |     _stream:ClassFileStream            |
+                |        initialize()          stubGenerator_x86_64.cpp     |                          |     parseClassFile()                   |
+                |                               generate_call_stub()        |                          |                                        |
+                | ciEnv.cpp                                                 |                          |                                        |
+                |    get_method_from_handle()                               |                          |                                        |
+                |                              assembler.cpp                |                          |                                        |
+                |                                                           |                          |                                        |
+                +--------------------------------------+--------------------+--------------------------+--------------+-------------------------+
+                | verifier.cpp                         |               CollectedHeap                                  |                         |
+                |                                      |                   *obj_allocate()                            |                         |
+                | linkResolver.cpp                     |                                                              |                         |
+                |       check_klass_accessability()    |  parallelScavengeHeap    GenCollectedHeap                    |                         |
+                |                                      |        GenerationSizer                                       |                         |
+                |                                      |                                                              |                         |
+                | TemplateTable                        |                                                              |                         |
+                |     resolve_cache_and_index()        |                              _gens[max_gens]:Generation*     |                         |
+                |                                      |                              initialize()                    |                         |
+                +--------------------------------------+                              _gen_specs: GenerationSpec      +-------------------------+
+                | InterpreterMacroAssembler            |                               do_collection()                                          |
+                |       get_cache_and_index_at_bcp()   |                                                                                        |
+                | InterpreterRuntime                   |                                                                                        |
+                |       resol^e_get_put()              |                               GenCollectorPolicy       MarkSweepPolicy                 |
+                |       resolve_in^oke()               |                                     generations()      ASConcurrentMarkSweepPolicy     |
+                |       resolve_invokehandle()         |                                                        ConcurrentMarkSweepPolicy       |
+                |       resolve_invokedynamic()        |                                                                                        |
+                |                                      |                               GenerationSpec                                           |
+                |                                      |                                     init():Generation                                  |
+                |                                      |                                                                                        |
+                +--------------------------------------+----------------------------------------------------------------------------------------+
+                |                                                                      ConcurrentMarkSweepGeneration                            |
+                |                                                                            ref_processor_init()                               |
+                |                                                                            _ref_processor                                     |
+                |                                                                                                                               |
+                |                                                                            allocate()                                         |
+                |                                                                            should_collect()                                   |
+                |                                                                            collect()                                          |
+                |                                                                      ReferenceProcessor                                       |
+                |                                                                            process_discovered_references()                    |
+                |                                                                                                                               |
+                |                                                                                                                               |
+                +-------------------------------------------------------------------------------------------------------------------------------+
+
+          [模板解释器--字节码的resolve过程](https://www.cnblogs.com/foreach-break/p/hotspot_jvm_resolve_and_link.html)
+
 
   071201_jdk     319a3b994703aac84df7bcde272adfcb3cdbbbf0 Initial load
   000006_langtools       84e2484ba645990f4c35e60d08db791806ae40be Initial load
 * 000007_init_load_merge 0d206a7adbbc58f8b70c96d1b65da1e391c62474 Merge
+
+
+
+
+
+
+https://blog.csdn.net/li1376417539/article/details/102009807
 
 
 ```

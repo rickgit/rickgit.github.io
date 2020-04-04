@@ -374,14 +374,223 @@ tree: <mode> + <space> + <file name> + <byte\0> + <sha1>
   000041_git-revert        045f82cbee3135a3d75256828b0cf101eedf38c8 git-revert: revert an existing commit.
   000042_ssh_pull          f71a69ab055c47056d0270b29b8f7455278c2422 Be more backward compatible with git-ssh-{push,pull}.
   000100_v1.0rc1           f7a2eb735982e921ae4379f1dcf5f7a023610393 GIT 0.99.9h
+                          +-------------------------------------------------------------------------------------+
+                          |                                 git.sh                                              |
+                          |                                                                                     |
+                          +-------------------------------------------------------------------------------------+
+                          |  add                        update-index.c                                          |
+                          |  apply                                                                              |
+                          |  archimport                                                                         |
+                          |  bisect                     git-bisect.sh                                           |
+                          |  branch                     /refs/heads/$branchname                                 |
+                          |  checkout                   read-tree.c   checkout-index.c    update-index.c        |
+                          |  cherry                                                                             |
+                          |  clone                      curl                                                    |
+                          |  commit                     diff-files.c  update-index.c   update-ref.c             |
+                          |  count-objects                                                                      |
+                          |  cvsimport                                                                          |
+                          |  diff                                                                               |
+                          |  fetch                                                                              |
+                          |  format-patch                                                                       |
+                          |  fsck-objects                                                                       |
+                          |  get-tar-commit-id                                                                  |
+                          |  init-db                                                                            |
+                          |  log                         rev_list.c                                             |
+                          |  ls-remote                                                                          |
+                          |  octopus                                                                            |
+                          |  pack-objects                                                                       |
+                          |  parse-remote                                                                       |
+                          |  patch-id                                                                           |
+                          |  prune                                                                              |
+                          |  pull                                                                               |
+                          |  push                        http-push.c                                            |
+                          |  rebase                                                                             |
+                          |  relink                                                                             |
+                          |  rename                                                                             |
+                          |  repack                                                                             |
+                          |  request-pull                                                                       |
+                          |  reset                                                                              |
+                          |  resolve                                                                            |
+                          |  revert                                                                             |
+                          |  send-email                                                                         |
+                          |  shortlog                                                                           |
+                          |  show-branch                                                                        |
+                          |  status                                                                             |
+                          |  tag                                                                                |
+                          |  verify-tag                  cat-file.c                                             |
+                          |  whatchanged                                                                        |
+                          +-------------------------------------------------------------------------------------+
+
   060216_git-svn           3397f9df53092871de2c33c143f1f4413654c40d Introducing contrib/git-svn.
   060422_buildin           70827b15bfb11f7aea52c6995956be9d149233e1 Split up builtin commands into separate files from git.c
   070304_git-revert        9509af686bffdbd7c3f17faf3c07d2034d480ffc Make git-revert & git-cherry-pick a builtin
   070630_git-stash         f2c66ed196d1d1410d014e4ee3e2b585936101f5 Add git-stash script
   070911_reset             0e5a7faa3a903cf7a0a66c81e20a76b91f17faab Make "git reset" a builtin.
   080228_branch            a0a80f1e8ac367634314ee8e2ca159c527da3a24 Merge branch 'git-p4' of git://repo.or.cz/git/git-p4
-  000101_git               8e49d50388211a0f3e7286f6ee600bf7736f4814 C implementation of the 'git' program, take two.
+  101_git                  8e49d50388211a0f3e7286f6ee600bf7736f4814 C implementation of the 'git' program, take two.               
+* 200_v2.0.0-rc0           cc291953df19aa4a97bee3590e708dc1fc557500 Git 2.0-rc0                                                    
+                          +-------------------------------------------------------------------------------------+-----------+
+                          |                                 git.c                                               |           |
+                          |                                   handle_builtin()                                  |           |
+                          |                                                                                     |           |
+                          +-------------------------------------------------------------------------------------+-----------+
+                          | builtin                                                                             |           |
+                          +-------------------------------+-----------------------------------------------------+-----------+
+                          |  	{ "add", cmd_add, RUN_SETUP | NEED_WORK_TREE },                                   |           |
+                          |  	{ "annotate", cmd_annotate, RUN_SETUP },                                          |           |
+                          |  	{ "apply", cmd_apply, RUN_SETUP_GENTLY },                                         |           |
+                          |  	{ "archive", cmd_archive },                                                       |           |
+                          |  	{ "bisect--helper", cmd_bisect__helper, RUN_SETUP },                              |           |
+                          |  	{ "blame", cmd_blame, RUN_SETUP },                                                |           |
+                          |  	{ "branch", cmd_branch, RUN_SETUP },                                              |           |
+                          |  	{ "bundle", cmd_bundle, RUN_SETUP_GENTLY },                                       |           |
+                          |  	{ "cat-file", cmd_cat_file, RUN_SETUP },                                          |           |
+                          |  	{ "check-attr", cmd_check_attr, RUN_SETUP },                                      |           |
+                          |  	{ "check|ignore", cmd_check_ignore, RUN_SETUP | NEED_WORK_TREE },                 |           |
+                          |  	{ "check|mailmap", cmd_check_mailmap, RUN_SETUP },                                |           |
+                          |  	{ "check-ref-format", cmd_check_ref_format },                                     |           |
+                          |  	{ "checkout", cmd_checkout, RUN_SETUP | NEED_WORK_TREE },                         |           |
+                          |  	{ "checkout-index", cmd_checkout_index,	RUN_SETUP | NEED_WORK_TREE},              |           |
+                          |  	                                                                                  |           |
+                          |  	{ "cherry", cmd_cherry, RUN_SETUP },                                              |           |
+                          |  	{ "cherry-pick", cmd_cherry_pick, RUN_SETUP | NEED_WORK_TREE },                   |           |
+                          |  	{ "clean", cmd_clean, RUN_SETUP | NEED_WORK_TREE },                               |           |
+                          |  	{ "clone", cmd_clone },                                                           |           |
+                          |  	{ "column", cmd_column, RUN_SETUP_GENTLY },                                       |           |
+                          |  	{ "commit", cmd_commit, RUN_SETUP | NEED_WORK_TREE },                             |           |
+                          |  	{ "commit-tree", cmd_commit_tree, RUN_SETUP },                                    |           |
+                          |  	{ "config", cmd_config, RUN_SETUP_GENTLY },                                       |           |
+                          |  	{ "count-objects", cmd_count_objects, RUN_SETUP },                                |           |
+                          |  	{ "credential", cmd_credential, RUN_SETUP_GENTLY },                               |           |
+                          |  	{ "describe", cmd_describe, RUN_SETUP },                                          |           |
+                          |  	{ "diff", cmd_diff },                                                             |           |
+                          |  	{ "diff-files", cmd_diff_files, RUN_SETUP | NEED_WORK_TREE },                     |           |
+                          |  	{ "diff|index", cmd_diff_index, RUN_SETUP },                                      |           |
+                          |  	{ "diff|tree", cmd_diff_tree, RUN_SETUP },                                        |           |
+                          |  	{ "fast-export", cmd_fast_export, RUN_SETUP },                                    |           |
+                          |  	{ "fetch", cmd_fetch, RUN_SETUP },                                                |           |
+                          |  	{ "fetch-pack", cmd_fetch_pack, RUN_SETUP },                                      |           |
+                          |  	{ "fmt-merge-msg", cmd_fmt_merge_msg, RUN_SETUP },                                |           |
+                          |  	{ "for-each-ref", cmd_for_each_ref, RUN_SETUP },                                  |           |
+                          |  	{ "format-patch", cmd_format_patch, RUN_SETUP },                                  |           |
+                          |  	{ "fsck", cmd_fsck, RUN_SETUP },                                                  |           |
+                          |  	{ "fsck-objects", cmd_fsck, RUN_SETUP },                                          |           |
+                          |  	{ "gc", cmd_gc, RUN_SETUP },                                                      |           |
+                          |  	{ "get-tar-commit-id", cmd_get_tar_commit_id },                                   |           |
+                          |  	{ "grep", cmd_grep, RUN_SETUP_GENTLY },                                           |           |
+                          |  	{ "hash-object", cmd_hash_object },                                               |           |
+                          |  	{ "help", cmd_help },                                                             | help.c    |
+                          |  	{ "index-pack", cmd_index_pack, RUN_SETUP_GENTLY },                               |           |
+                          |  	{ "init", cmd_init_db },                                                          |           |
+                          |  	{ "init-db", cmd_init_db },                                                       |           |
+                          |  	{ "log", cmd_log, RUN_SETUP },                                                    |           |
+                          |  	{ "ls-files", cmd_ls_files, RUN_SETUP },                                          |           |
+                          |  	{ "ls|remote", cmd_ls_remote, RUN_SETUP_GENTLY },                                 |           |
+                          |  	{ "ls-tree", cmd_ls_tree, RUN_SETUP },                                            |           |
+                          |  	{ "mailinfo", cmd_mailinfo },                                                     |           |
+                          |  	{ "mailsplit", cmd_mailsplit },                                                   |           |
+                          |  	{ "merge", cmd_merge, RUN_SETUP | NEED_WORK_TREE },                               |           |
+                          |  	{ "merge-base", cmd_merge_base, RUN_SETUP },                                      |           |
+                          |  	{ "merge|file", cmd_merge_file, RUN_SETUP_GENTLY },                               |           |
+                          |  	{ "merge|index", cmd_merge_index, RUN_SETUP },                                    |           |
+                          |  	{ "merge|ours", cmd_merge_ours, RUN_SETUP },                                      |           |
+                          |  	{ "merge|recursi^e", cmd_merge_recursive, RUN_SETUP | NEED_WORK_TREE },           |           |
+                          |  	{ "merge|recursive-ours", cmd_merge_recursive, RUN_SETUP | NEED_WORK_TREE },      |           |
+                          |  	{ "merge|recursive-theirs", cmd_merge_recursive, RUN_SETUP | NEED_WORK_TREE },    |           |
+                          |  	{ "merge|subtree", cmd_merge_recursive, RUN_SETUP | NEED_WORK_TREE },             |           |
+                          |  	{ "merge-tree", cmd_merge_tree, RUN_SETUP },                                      |           |
+                          |  	{ "mktag", cmd_mktag, RUN_SETUP },                                                |           |
+                          |  	{ "mktree", cmd_mktree, RUN_SETUP },                                              |           |
+                          |  	{ "mv", cmd_mv, RUN_SETUP | NEED_WORK_TREE },                                     |           |
+                          |  	{ "name-rev", cmd_name_rev, RUN_SETUP },                                          |           |
+                          |  	{ "notes", cmd_notes, RUN_SETUP },                                                |           |
+                          |  	{ "pack-objects", cmd_pack_objects, RUN_SETUP },                                  |           |
+                          |  	{ "pack|redundant", cmd_pack_redundant, RUN_SETUP },                              |           |
+                          |  	{ "pack-refs", cmd_pack_refs, RUN_SETUP },                                        |           |
+                          |  	{ "patch-id", cmd_patch_id },                                                     |           |
+                          |  	{ "pickaxe", cmd_blame, RUN_SETUP },                                              |           |
+                          |  	{ "prune", cmd_prune, RUN_SETUP },                                                |           |
+                          |  	{ "prune-packed", cmd_prune_packed, RUN_SETUP },                                  |           |
+                          |  	{ "push", cmd_push, RUN_SETUP },                                                  |           |
+                          |  	{ "read-tree", cmd_read_tree, RUN_SETUP },                                        |           |
+                          |  	{ "receive-pack", cmd_receive_pack },                                             |           |
+                          |  	{ "reflog", cmd_reflog, RUN_SETUP },                                              |           |
+                          |  	{ "remote", cmd_remote, RUN_SETUP },                                              |           |
+                          |  	{ "remote-ext", cmd_remote_ext },                                                 |           |
+                          |  	{ "remote-fd", cmd_remote_fd },                                                   |           |
+                          |  	{ "repack", cmd_repack, RUN_SETUP },                                              |           |
+                          |  	{ "replace", cmd_replace, RUN_SETUP },                                            |           |
+                          |  	{ "rerere", cmd_rerere, RUN_SETUP },                                              |           |
+                          |  	{ "reset", cmd_reset, RUN_SETUP },                                                |           |
+                          |  	{ "rev-list", cmd_rev_list, RUN_SETUP },                                          |           |
+                          |  	{ "re<-parse", cmd_rev_parse },                                                   |           |
+                          |  	{ "revert", cmd_revert, RUN_SETUP | NEED_WORK_TREE },                             |           |
+                          |  	{ "rm", cmd_rm, RUN_SETUP },                                                      |           |
+                          |  	{ "send-pack", cmd_send_pack, RUN_SETUP },                                        |           |
+                          |  	{ "shortlog", cmd_shortlog, RUN_SETUP_GENTLY | USE_PAGER },                       |           |
+                          |  	{ "show", cmd_show, RUN_SETUP },                                                  |           |
+                          |  	{ "show-branch", cmd_show_branch, RUN_SETUP },                                    |           |
+                          |  	{ "show-ref", cmd_show_ref, RUN_SETUP },                                          |           |
+                          |  	{ "stage", cmd_add, RUN_SETUP | NEED_WORK_TREE },                                 |           |
+                          |  	{ "status", cmd_status, RUN_SETUP | NEED_WORK_TREE },                             |           |
+                          |  	{ "stripspace", cmd_stripspace },                                                 |           |
+                          |  	{ "symbolic-ref", cmd_symbolic_ref, RUN_SETUP },                                  |           |
+                          |  	{ "tag", cmd_tag, RUN_SETUP },                                                    |           |
+                          |  	{ "unpack-file", cmd_unpack_file, RUN_SETUP },                                    |           |
+                          |  	{ "unpack|objects", cmd_unpack_objects, RUN_SETUP },                              |           |
+                          |  	{ "update|index", cmd_update_index, RUN_SETUP },                                  |           |
+                          |  	{ "update|ref", cmd_update_ref, RUN_SETUP },                                      |           |
+                          |  	{ "update|server-info", cmd_update_server_info, RUN_SETUP },                      |           |
+                          |  	{ "upload|archi^e", cmd_upload_archive },                                         |           |
+                          |  	{ "upload-archive--writer", cmd_upload_archive_writer },                          |           |
+                          |  	{ "^ar", cmd_var, RUN_SETUP_GENTLY },                                             |           |
+                          |  	{ "verify-pack", cmd_verify_pack },                                               |           |
+                          |  	{ "verify-tag", cmd_verify_tag, RUN_SETUP },                                      |           |
+                          |  	{ "version", cmd_version },                                                       |           |
+                          |  	{ "whatchanged", cmd_whatchanged, RUN_SETUP },                                    |           |
+                          |  	{ "write-tree", cmd_write_tree, RUN_SETUP },                                      |           |
+                          |                                                                                     |           |
+                          |                                                                                     |           |
+                          +-------------------------------------------------------------------------------------+-----------+
 
+
+```
+
+### cUrl
+curl --range 0-19999999 -o fran.pdf.part1 http://dl227.zlibcdn.com/dtoken/e
+curl --range 20000000-39999999 -o fran.pdf.part2 http://dl227.zlibcdn.com/dtoken/e
+curl --range 40000000-59999999 -o fran.pdf.part3 http://dl227.zlibcdn.com/dtoken/e
+curl --range 60000000-79999999 -o fran.pdf.part4 http://dl227.zlibcdn.com/dtoken/e
+curl --range 80000000-99999999 -o fran.pdf.part5 http://dl227.zlibcdn.com/dtoken/e
+curl --range 100000000- -o fran.pdf.part6 http://dl227.zlibcdn.com/dtoken/e
+
+
+curl --range 0-19999999 -O d.pdf.part1 http://booksdl.org/get.php?md5=ec0c1093fcb13280afd9bc37201e7133&key=D4S4ELJSFZUQ285C&mirr=1
+curl --range 20000000-39999999 -o f.pdf.part2 http://dl49.zlibcdn.com/dtoken/b21c1157dc3d146845aa2779778ed1b6
+curl --range 40000000-59999999 -o f.pdf.part3 http://dl49.zlibcdn.com/dtoken/b21c1157dc3d146845aa2779778ed1b6
+curl --range 60000000-79999999 -o f.pdf.part4 http://dl49.zlibcdn.com/dtoken/b21c1157dc3d146845aa2779778ed1b6
+curl --range 80000000-99999999 -o f.pdf.part5 http://dl49.zlibcdn.com/dtoken/b21c1157dc3d146845aa2779778ed1b6
+curl --range 100000000- -o f.pdf.part6 http://dl49.zlibcdn.com/dtoken/b21c1157dc3d146845aa2779778ed1b6
+
+cat f.pdf.part? > f.pdf
+
+```
+            +-----------------------------------------------------------------------------------+
+            |                              main.c                                               |
+            |                                                                                   |
+            +-----------------------------------------------------------------------------------+
+            |                                                                                   |
+            |                         url.c                                                     |
+            |                            curl_urlget()                                          |
+            |                                                                                   |
+            |                         http.c                                                    |
+            |                             http()                                                |
+            |                                                                                   |
+            |                                                                                   |
+            |                         sendf.c                                                   |
+            |                             sendf()                                               |
+            |                                                                                   |
+            +-----------------------------------------------------------------------------------+
 
 ```
 
