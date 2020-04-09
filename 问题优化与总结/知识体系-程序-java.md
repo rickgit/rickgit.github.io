@@ -706,7 +706,7 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 **Jasmin** 是一种免费的开源的 JAVA 汇编器 ，它将使用Java虚拟机指令集以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
 
 #### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
- 
+ [mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
 3. Java垃圾回收算法及垃圾收集器
    标记-清除算法(mark-sweep), dalvikvm
    标记-压缩算法(mark-compact),

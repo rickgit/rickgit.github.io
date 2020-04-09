@@ -34,6 +34,8 @@
 
 ```
 ## 系统
+
+C语言产生的原因：汇编需要操作地址，C语言不用关注代码物理地址,编译器已经做了看护工作，保证地址不会出问题
 ### 概念
 [UNIX](https://en.wikipedia.org/wiki/Unix)
 ![UNIX家族](https://upload.wikimedia.org/wikipedia/commons/7/77/Unix_history-simple.svg)

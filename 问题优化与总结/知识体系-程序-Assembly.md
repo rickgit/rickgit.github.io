@@ -52,10 +52,10 @@
 |                      |  The result is usually returned in the EAX register                          |
 +---------------------------------------------------+-----------------------------+---------+---------+
 |            |CS (code)|Flag  :              O  D   | 32+bit                      |         |         |
-|            |DS (data)|Bit no: 15 14 13 12 11 10   |   EAX,  EBX,  ECX, EDX      |         |16+bit   |
+|            |DS (data)|Bit no: 15 14 13 12 11 10   |   EAX,   EBX,  ECX,  EDX    |         |16+bit   |
 | Processor  |SS (stack)                            | 16+bit                      |IP,      |   SI, DI|
-|            |ES,FS    |      I T S Z   A   P   C   |    AX,   BX,   CX,  DX      |SP,      |32+bit   |
-| Registers  |,GS      |      9 8 7 6 5 4 3 2 1 0   | AH,AL;BH,BL;CH,CL;DH,DL     |BP       |  ESI,EDI|
+|            |ES,FS    |      I T S Z   A   P   C   |   AX,    BX,   CX,   DX     |SP,      |32+bit   |
+| Registers  |,GS      |      9 8 7 6 5 4 3 2 1 0   | AH,AL; BH,BL; CH,CL; DH,DL  |BP       |  ESI,EDI|
 |            +----------------------------------------------------------------------------------------+
 |(CPU        |         |                            | Data                        |Pointer  |Index    |
 | internal   |         |                            | registers                   |registers|registers|
