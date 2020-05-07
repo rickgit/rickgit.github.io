@@ -688,24 +688,19 @@ git clean -xdf
 
 ## Git 删除仓库中的提交纪录
 1. git reset --soft
-```
-1. 本地备份修改后的代码
-git checkout -b delly <hashcode>
-
-
-2. 切换到主干
+```  
+1. 切换到主干
 git checkout master
 git reset --soft <hashcode>
 git commit -m ""
 
-3.git push --force
-
- 
+3.git push --force 
 
 ```
-2. 删除中间记录（中间一个或连续多个的提交用 rebase，不连续的使用 cherry-pick **）
+2. 删除中间记录 rebase（衍合）
 - Interactive Rebase；删除历史记录里是最近提交，而后面还有很多需要保留的提交
-  git rebase -i HEAD~3 最近两个记录合并到最近第三个记录。把需要删除的记录由pick改为squash
+    git rebase -i  [startpoint]  [endpoint]//不指定endpoint，默认是当前分支的Head，前开后闭区间（最近的记录取得到，最后的记录取不到），可以采用上一个版本是HEAD^，上上一个版本就是HEAD^^，往上100个版本写成HEAD~100。
+  git rebase -i HEAD~3 打开编辑器，将最近两个记录合并到最近第三个记录，把需要删除的记录由pick改为squash
 ```
 # p, pick = use commit
 # r, reword = use commit, but edit the commit message
@@ -715,8 +710,12 @@ git commit -m ""
 # x, exec = run command (the rest of the line) using shell
 # d, drop = remove commit
 ```
-- Onto Rebase：删除的历史记录是连续的
-git rebase --onto <branch name>~<first commit number to remove> <branch name>~<first commit to be kept> <branch name>
+- Onto Rebase：删除的历史记录是连续的（中间一个或连续多个的提交用 rebase（衍合），不连续的使用 cherry-pick **）。前开后闭区间（最近的记录取得到，最后的记录取不到）
+
+    git rebase   [startpoint]   [endpoint]  --onto  [branchName] //只是单纯复制其他分支记录到branchName分支，原来的分支记录还在。
+
+
+git rebase --onto <branch name>~<first commit number to remove> <branch name>~<first commit to be kept> <branch name>//当前分支衍合
 
 - Orphan Branch；删除的历史记录很多，要保留的则很少
 - git replace ；历史记录分成两份（或更多份）
