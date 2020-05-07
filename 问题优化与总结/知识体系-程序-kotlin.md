@@ -326,19 +326,45 @@ https://blog.csdn.net/weixin_34283445/article/details/89580460
 
 1. [官方文档执行入口](https://kotlinlang.org/docs/tutorials/command-line.html)
 ```shell
-$ kotlinc hello.kt -d hello.jar
-$ kotlin -classpath hello.jar HelloKt
+$ kotlinc hello.kt -include-runtime -d hello.jar
+$ java -jar hello.jar
 ```
-2. 源码阅读
 
-
+2. 调试
+```
+将kotlin release的jar加入环境，调试
+K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"});
+```
+3. 源码阅读
 ```
 
   001_collection    369b1974782b821e44b7aa6cd68e2e41eb2ba036 Initial
   002_io            54ccb2e184b822db5f4ec3a8e2390f7bf74c0f94 Enhanced iterator
   003_grammar       6d6a22de1d8bc6a4faff1618e8202c65b9a42c32 Projections & Initial grammar
+        +----------------------------------------------------------------------+
+        |                       class.grm                                      |
+        +----------------------------------------------------------------------+
+        |                   class_members.grm                                  |
+        +----------------------------------------------------------------------+
+        |                   expressions.grm                                    |
+        +----------------------------------------------------------------------+
+        |                  types.grm        other.grm      lexical.grm         |
+        |----------------------------------------------------------------------|
+
   004_control       807062a1f8914c24d84884b9753064e4baf1c92a Binary operations, control structures
   005_bit           661931469b96e1f645553709e3ed5a1529eb9fab Expressions
+  006_Extensions    171a5250f85f411aa1b37c38e89863338a65c63a Extensions
+        +----------------------------------------------------------------------+
+        |                      toplevel.grm                                    |
+        +----------------------------------------------------------------------+
+        |                       class.grm                                      |
+        +----------------------------------------------------------------------+
+        |                   class_members.grm                                  |
+        +----------------------------------------------------------------------+
+        |                   expressions.grm                                    |
+        +----------------------------------------------------------------------+
+        |                  types.grm        other.grm      lexical.grm         |
+        |----------------------------------------------------------------------|
   006_Anonymous     8beb0da924b18145059bd78f18d3e5d693fe2f4a Anonymous Objects
   007_with          73b12271c06078b74bce9548a207dfaa9918f8b7 Calling closures on objects
   008_Default       dd49fc6ce2e18909ca8fd8be379283f22d7a68f0 Default parameters, function type examples fixed, tuples with named entries
@@ -349,28 +375,171 @@ $ kotlin -classpath hello.jar HelloKt
   013_keywords      274cf80336940757365d16e84b3d84e474e4b80f Preliminary list of keywords
   014_lexer         a7919fdc1db453fd228739a94652ebf2ae8a6159 lexer/highlighting initial
   015_parser        4f18686978ebcfa5970dfafdbe5143e0d507bc9f Stub parser
+        [Intellij IDEA插件开发（五）自定义语言支持](https://www.tuicool.com/articles/eQJNRzb)
+        [custom_language_support](https://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support.html)
+        [idea-jflex](https://github.com/jflex-de/idea-jflex)
+        +----------------------------------------------------------------------------------------------------------+
+        |                                idea                                                                      |
+        +----------------------------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                                   |
+        +----------------------------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                                                  |
+        |                                                                                                          |
+        |  JetLexer:FlexAdapter         JetParser:PsiParser      JetFile:PsiFileBase  PsiElement      asm          |
+        |    (Scanning)                      (Parsing)               (semantic)                    (codegen)       |
+        |                                                                                                          |
+        |                                                                                                          |
+        |  Jet.flex                         JetParsing                                                             |
+        |                                        parseFile()                                                       |
+        |    JFlex                           ANTLR/psi                                                             |
+        +----------------------------------------------------------------------------------------------------------+
 * 016_Soft_keywords 17d9240d148e721c06da86f494a6c693f2103e3e parser, baby steps. Soft keywords highlighting
   017_parsingtest   5a31694d70c1371361422afb012d69bca76c843c Parsing tests
+        +----------------------------------------------------------------------------------------------------------+
+        |                                idea                                                                      |
+        +----------------------------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                                   |
+        +----------------------------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                                                  |
+        |                                                                                                          |
+        |  JetLexer:FlexAdapter         JetParser:PsiParser      JetFile:PsiFileBase  PsiElement      asm          |
+        |    (Scanning)                      (Parsing)               (semantic)                    (codegen)       |
+        |                                                                                                          |
+        |                                                                                                          |
+        |  Jet.flex                         JetParsing           JetParsingTest:ParsingTestCase                    |
+        |                                        parseFile()                                                       |
+        |    JFlex                           ANTLR/psi                                                             |
+        +----------------------------------------------------------------------------------------------------------+
+
   018_psi_nodes     fce72774392674d579a16237499e230530a5f51a psi nodes, initial
-  019_codegen       c5d8aae5152 codegen, initial
-                    objectweb
+  019_resolve       1ce2ed8 ("Initial stub version of resolve for types", 2011-01-24)
+        +----------------------------------------------------------------------------------------------------------+
+        |                                idea                                                                      |
+        +----------------------------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                                   |
+        +----------------------------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                                                  |
+        |                                                                                                          |
+        |  JetLexer:FlexAdapter         JetParser:PsiParser                                           asm          |
+        |    (Scanning)                      (Parsing)                           (semantic)        (codegen)       |
+        |                                                                                                          |
+        |                                                                                                          |
+        |  Jet.flex              JetParsing           JetParsingTest        TypeResolver                           |
+        |                             parseFile()         :ParsingTestCase       resolveClass()                    |
+        |    JFlex                 ANTLR/psi                                                                       |
+        +----------------------------------------------------------------------------------------------------------+
+
+
+  
+  019_codegen       c5d8aae5152e7e3838dd7d609cc491ded0b30513 codegen, initial objectweb
+        +----------------------------------------------------------------------------------------------------------+
+        |                                idea                                                                      |
+        +----------------------------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                                   |
+        +----------------------------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                                                  |
+        |                                                                                                          |
+        |  JetLexer:FlexAdapter         JetParser:PsiParser                                           asm          |
+        |    (Scanning)                      (Parsing)                           (semantic)        (codegen)       |
+        |                                                                                                          |
+        |                                                                                                          |
+        |  Jet.flex              JetParsing           JetParsingTest        TypeResolver      LightDaemonAnalyzerTestCase |
+        |                             parseFile()         :ParsingTestCase       resolveClass()                    |
+        |    JFlex                 ANTLR/psi                                                                       |
+        +----------------------------------------------------------------------------------------------------------+
   020_psvm          26c5a07a6bb55c0163084be86f129ea9bf138bab dummy test
+        +----------------------------------------------------------------------------------------------------------+
+        |                                idea                                                                      |
+        +----------------------------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                                   |
+        +----------------------------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                                                  |
+        |                                                                                                          |
+        |  JetLexer:FlexAdapter         JetParser:PsiParser                                           asm          |
+        |    (Scanning)                      (Parsing)                           (semantic)        (codegen)       |
+        |                                                                                                          |
+        |                                                                                                          |
+        |  Jet.flex              JetParsing           JetParsingTest        TypeResolver           LightDaemonAnalyzerTestCase |
+        |                             parseFile()         :ParsingTestCase       resolveClass()    LightCodeInsightFixtureTestCase |
+        |    JFlex                 ANTLR/psi                                                                       |
+        +----------------------------------------------------------------------------------------------------------+
+
   021_return        8e6c2995d0a542bf0105039dfa37f6bc9bfc6224 return 42
   022_as            445736bfbd83b97c19515fd992730098f95c5705 Priorities for ":" and "as" changed
   023_!             2e8b828ee009afa115465a8e548a559f4b06807c Resolve for "!"
 * 024_in            e414413112078b4739943174f06dcb98ada4c27a Contains (in, !in)
   025_helloWorld    af4c77719768df7f5476abc1341f2c70e2e8612f hello world can be compiled
   026_cf            5888ac5a606a286a1c7ea43657a63e1c1c202c54 Working on CFG building
+        +---------------------------------------------------------------------------------------+
+        |                                idea                                                   |
+        +---------------------------------------------------------------------------------------+
+        |                             plugin.xml                                                |
+        +---------------------------------------------------------------------------------------+
+        |                    JetParserDefinition:ParserDefinition                               |
+        |                                                                                       |
+        |JetLexer:FlexAdapter                           JetParser:PsiParser                     |
+        |  (Scanning)                                        (Parsing)                          |
+        |                                                                                       |
+        |                                                                                       |
+        |Jet.flex                                       JetParsing       JetParsingTest         |
+        |                                                    parseFile()   :ParsingTestCase     |
+        |  JFlex                                                                                |
+        |                                               AST(abstract syntax tree)/              |
+        |                                               psi(Program Structure Interface,ANTRL)  |
+        +---------------------------------------------------------------------------------------+
+        |   (semantic)                                                                          |
+        |                              (cfg tree)               (codegen)                       |
+        |                              (Context Free Grammar)    asm                            |
+        |   TypeResolver                                                                        |
+        |        resolveClass()        TopDownAnalyzer          LightDaemonAnalyzerTestCase     |
+        |                              JetControlFlowProcessor  LightCodeInsightFixtureTestCase |
+        |                                    generate()                                         |
+        +---------------------------------------------------------------------------------------+
+
+
   027_mockJDK       dd3f2b3afbc21487e0ce7524c12fe918c7354c71 add mock JDK to Jet repo
   028_bottles       1d01d519b98d5ab5317217b32658292461fa721f a working version of 99 bottles
+* 029_stblib        b95498624fe04e35390994ec27dfa32045716e63 range literals initial
   029_24game        93b30bd7c7ed5f737b2e5b40540e42166857efd5 TwentyFourGame wip
+* 030_Confluence     bf7be08e3b9ba79dc2f18928f5a922f33a3e595b Working on the Confluence highlighter
   030_kt            9bfa61bfb23618d705f2ea5ead44bc45a04e7e16 accept .kt extension for Kotlin files
   031_split2frontend 07e0a332c335aeb5fb57022f0c9e6cd4db1577f7 Project split into four modules
   032_compiler       116f35c650c411e7a3477dc5bde85f9273eb6824 "compiler" folder created
   033_Docs          7629ebe272d90be0f810df337f7def0a3b49a06b Docs
-  034_kotlinc       3083fde2dda88949a0c80564f9a161633a02812f binary distribution for Kotlin
-  
-  033_j2k            8cf4c809511530577a6c074917b4fd10e90c4aa7 initial commit for j2k
+  034_bin_kotlin       8336c647878562f10c315461d259fa69abd43e48 bin/kotlin script
+        +-----------------------------------------------------------------------------------------------------------------+
+        |(compiler)                                                                                                       |
+        +-----------------------------------------------------------------------------------------------------------------+
+        |(cli)                      kotlinc.bat                                                                           |
+        +-----------------------------------------------------------------------------------------------------------------+
+        |                          KotlinCompiler                                                                         |
+        +-----------------------------------------------------------------------------------------------------------------+
+        |                          CompileEnvironment                                                                     |
+        |                          initializeKotlinRuntime()                                                              |
+        |    compileModuleScript()                       compileBunchOfSources()                                          |
+        +-----------------------------------------------------------------------------------------------------------------+
+        |  CompileSession                                                                                                 |
+        |      addSources()            analyze()                                      generate()                          |
+        +-----------------------+------------------------------------------------+----------------------------------------+
+        | (intellij)            |   AnalyzerFacade                               |  GenerationState                       |
+        | PsiManager            |                                                |      compileCorrectFiles()             |
+        |     findFile():PsiFile|                                                |       generateNamespace()              |
+        |                       |                                                |                                        |
+        |                       |   AnalyzingUtils                               |                                        |
+        | (intellij)            |         analyzeFilesWithGivenTrace()           |  NamespaceCodegen                      |
+        | PsiManager            |  TopDownAnalyzer                               |       generate()                       |
+        |     findFile():PsiFile|         process()                              |       v:ClassBuilder                   |
+        |                       |                                                |  (asm)                                 |
+        |                       |   TypeHierarchyResolver  BodyResolver          |     ClassBuilder                       |
+        |                       |   DeclarationResolver    ControlFlowAnalyzer   |                                        |
+        |                       |   DelegationResolver     DeclarationsChecker   |                                        |
+        |                       |   O^errideResol^er                             |                                        |
+        |                       |   OverloadResolver                             |                                        |
+        +-----------------------+------------------------------------------------+----------------------------------------+
+        [参见](https://zhuanlan.zhihu.com/p/76622754)
+  034_buildTools     28044c18cdcb9a4450d256809784e3dc3d4008ad "build-tools" module + "buildTools" Ant target added
+  034_jdkHeaders     3e29aad6dd1bb5909c5dd94682c2f586b1e699aa KT-987 Unboxing_nulls: Kotlinized versions of basic Java collections
+  034_j2k            8cf4c809511530577a6c074917b4fd10e90c4aa7 initial commit for j2k
   034_codegenDOC     f82259ae84f2bd48b7fa4eb020c73aba014638e6 Detailed session desc for CodeGen
   035_k2js           27bddcd2a4b08dde73812ebc42cf28d3e78e297e initial commit
   036_puzzlers       89fa7cd29a386b37c079a5f058cc85d80f7ee36a More Kotlin vs Java puzzlers
@@ -387,38 +556,130 @@ $ kotlin -classpath hello.jar HelloKt
 ```
 
 
+## Regular languages and lexer generators
+### jflex 词法分析（java fast lexer generator）
+[Comparison of parser generators](https://en.wikipedia.org/wiki/Comparison_of_parser_generators)
+《编译原理（第三章第五节）》
+1. [使用说明 ](wwww.jflex.de)
+    1.1 [How to get it building](wwww.jflex.de/manual.html#running-jflex)
+    ```bat
+        jflex java-lang.flex
+    ``` 
+    1.2 [example standalone.flex](http://wwww.jflex.de/manual.html#Example)
+    ```
+        +----------------------------------------------------------------------------------------------------+
+        |                                 SubstTest.java                                                     |
+        |                                                                                                    |
+        +----------------------------------------------------------------------------------------------------+
+        |                                                                                                    |
+        |                                Subst.java                                                          |
+        |                                main()                                                              |
+        |                                                                                                    |
+        |                                ZZ_TRANS         zzBuffer                                           |
+        |                                ZZ_ROWMAP        zzStartRead                                        |
+        |                                ZZ_ATTRIBUTE     zzMarkedPos                                        |
+        |                                yylex()          yytext()                                           |
+        +----------------------------------------------------------------------------------------------------+
 
-### jflex 词法分析
-
-1. [使用说明 How to get it building](http://wwww.jflex.de/manual.html#Installing)
-    - Install JFlex
-
-    - If you have written your specification file (or chosen one from the examples directory), save it (say under the name java-lang.flex).
-
-    - Run JFlex with
-
-        ```shell   
-            jflex java-lang.flex
-        ```
-    - JFlex should then show progress messages about generating the scanner and write the generated code to the directory of your specification file.
-
-    - Compile the generated .java file and your own classes. (If you use CUP, generate your parser classes first)
-
-    - That’s it.
+    ```
 2. 源码从init开始阅读，读到第一步提交入口的commit
 3. release note 选择版本阅读
     [release note ](https://jflex.de/changelog.html)
+    ```
+    +------------------------------------------------------------------------------------+
+    |                                   JFlex.Main                                       |
+    +------------------------------------------------------------------------------------+
+    |     LexParse.java    sym.java                      LexParse.java                   |
+    |                                                 skeleton.nested                    |
+    |    java_cup.Main  LexParse.cup                   JFlex/LexScan.flex                |
+    |                                                                                    |
+    +------------------------------------------------------------------------------------+
+
+
+    ```
+
+
+## 语法解析（Parsing, and Context-Free Grammars）
+### java_cup Parser Generator 
+
+[official website of CUP](http://www2.cs.tum.edu/projects/cup)
+[github](github.com/duhai-alshukaili/CUP)
+[](https://www.youtube.com/watch?v=zWoDiDy5c-U)
+
 ```
-+------------------------------------------------------------------------------------+ 
-|                                                                                    |
-|                                   JFlex.Main                                       |
-|                                                                                    |
-+------------------------------------------------------------------------------------+
-|     LexParse.java    sym.java                      LexParse.java                   |
-|                                                 skeleton.nested                    |
-|    java_cup.Main  LexParse.cup                   JFlex/LexScan.flex                |
-|                                                                                    |
-+------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
+|  generate files                                                                         |
+|                    parser.cup( parse.java     sym.java  )                               |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+|                           Main   //System.in                                            |
+|                             parse_grammar_spec()                                        |
+|                             action_table                                                |
+|                             reduce_table                                                |
+|                             start_state:lalr_state                                      |
+|                             build_parser()                                              |
+|                                                                                         |
+|                             emit_parser()                                               |
++-----------------------------------------------------------------------------------------+
+|   parse:lr_parser                        lalr_state                  emit               |
+|       parse():Symbol                        build_machine()            symbols()        |
+|       action_obj:CUP$parser$actions         build_table_entries()      parser()         |
+|       scan()                                                                            |
+|       stack:Stack                                                                       |
++-----------------------------------------------------------------------------------------+
+|                               java cup                                                  |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
 
 
 ```
+
+## antllr 
+1. [Getting started with v4](https://github.com/antlr/antlr4/blob/master/doc/getting-started.md)
+    1.1 Hello.g4
+    ```
+        grammar Hello;
+        r  : 'hello' ID ;         // match keyword hello followed by an identifier
+        ID : [a-z]+ ;             // match lower-case identifiers
+        WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+    ```
+    1.2
+    java  -jar .\antlr-4.8-complete.jar Hello.g4
+    javac -cp ".;.\antlr-4.8-complete.jar" Hello*.java
+
+    1.3
+    java -cp ".;.\antlr-4.8-complete.jar" org.antlr.v4.gui.TestRig Hello r -tree
+2. Structure main entrance
+    ```
+        +--------------------------------------------------------------------------------------+
+        |                       g4 file                                                        |
+        +--------------------------------------------------------------------------------------+
+        |                       org.antlr.v4.Tool                                              |
+        +--------------------------------------------------------------------------------------+
+        |                       java files (HelloLexer.java HelloParse.java)                   |
+        +--------------------------------------------------------------------------------------+
+        |                        org.antlr.v4.gui.TestRig                                      |
+        |                        process()                                                     |
+        |                                                                                      |
+        +--------------------------------------------------------------------------------------+
+        |      //+tree System.out.println             //+gui                                   |
+        |                                             org.antlr.v4.gui.Trees                   |
+        |                                             inspect()                                |
+        +--------------------------------------------------------------------------------------+
+        |                             HelloParse:Parser                                        |
+        |                                 r()//rule     _input:CommonTokenStream               |
+        |                                 match()       _ctx:ParserRuleContext                 |
+        |                                                                                      |
+        +--------------------------------------------------------------------------------------+
+        |                                                                                      |
+        |       ParserRuleContext:RuleContext       CommonTokenStream:BufferedTokenStream      |
+        |           start:Token                        LT():Token                              |
+        |           parent:RuleContext                  tokens:ArrayList                       |
+        |                                                                                      |
+        +--------------------------------------------------------------------------------------+
+
+    ```
+《The Definitive ANTLR 4 Reference》
+《编译原理（第四章第4.4节）》
+
+3.[Release notes](https://github.com/antlr/antlr4/releases)

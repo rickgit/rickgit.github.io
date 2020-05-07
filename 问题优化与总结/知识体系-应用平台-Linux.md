@@ -1,7 +1,7 @@
 
 
 ## Linux
-《计算机组成原理》[《计算机体系结构》](https://www.bilibili.com/video/av15123338/?p=1)《操作系统》《计算机网络》《数据结构与算法》
+[PIC](https://zhuanlan.zhihu.com/p/25894102)
 ## 计算机硬件 - 主板架构
 运算器                      控制器                             存储器                                            输入设备                  输出设备
 CPU(4% ALU)             南桥北桥芯片(中断控制器)              Register，Cache/SRAM  

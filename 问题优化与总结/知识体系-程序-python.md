@@ -445,3 +445,11 @@ ModuleNotFoundError: No module named 'pip'
 
 python37._pth 文件中，#import site 这行的第一个字符 # 删掉
 ```
+
+## webdriver
+却换到iframe
+```
+driver.get(url)
+iframe = driver.find_elements_by_tag_name('iframe')[0]
+driver.switch_to.frame(iframe)
+```

@@ -27,9 +27,18 @@ then [书籍阅读页切图] starts 2020/04/03
 then [调节接口] starts 2020/04/07
 then [书城精选-女生最爱，出版-xx最爱（未找到）；] starts 2020/04/07
 then [书城精选-女生最爱，出版-xx最爱（未找到）；] starts 2020/04/08
-then [搜索数量限制；对话框全面屏高度设置；] starts 2020/04/08
-then [封板] starts 2020/04/10
-then [提交发布稳定包] starts 2020/04/22
+then [搜索数量限制；对话框全面屏高度设置；] starts 2020/04/09
+then [封板；搜索限制行数；夜间模式兼容旧版本；review代码] starts 2020/04/10
+-- 第六周 --
+then [修改开屏；福利自动跳动；部分样式] starts 2020/04/13
+then [修改bug（1.开屏；2.书城推荐banner，搜索）] starts 2020/04/14
+then [修改bug（书籍详情界面模糊处理，首页界面标题高度调整，及部分界面微调）] starts 2020/04/15
+then [修改bug（环境出问题；阅读页面）] starts 2020/04/16
+then [修改bug（调整UI），tapd问题] starts 2020/04/17
 
+-- 第七周 --
+then [修改bug（批量打包，调整UI）] starts 2020/04/20
+then [增加书城接口，调整阅读界面] starts 2020/04/21
+then [批量打包，标题修改，提交发布稳定包] starts 2020/04/21
 
 @endgantt

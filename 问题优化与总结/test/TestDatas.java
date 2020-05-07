@@ -106,12 +106,12 @@ public class TestDatas {
 
     @NotNull
     private static String getNovelUrl() {
-        return "http://test.book.lieying.cn/Public/view/active_all/getcash/sucesspage.html";
+        return "http://test.website.cn/Public/view/active_all/getcash/sucesspage.html";
     }
 
     @NotNull
     private static String getNovelApiUrl() {
-        return "http://test.book.lieying.cn/Order/orderList";
+        return "http://test.website.cn/Order/orderList";
     }
 
     @NotNull

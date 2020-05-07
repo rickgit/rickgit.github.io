@@ -130,6 +130,17 @@ https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
 git merge squash/rebase 
 
 
+```js
+git config --system
+D:\Program\Git/etc/gitconfig
+
+git config --global 
+C:\Users\Administrator\.gitconfig
+
+git config
+G:\workspace\ws-github\.git\config
+```
+
 git config --global http.postbuffer 524288000 
  
 
@@ -212,8 +223,8 @@ remote            +              tag
 ```shell
 Please move or remove them before you can switch branches.
 # git clean  -d  -fx ""
-
-
+git reset --hard HASH
+git reset --soft HASH
 ```
 [常见GUI](https://git-scm.com/downloads/guis)
 git-cola Gitg
@@ -232,6 +243,20 @@ gitk
 ```shell
 # git config --global url.https://source.codeaurora.org.insteadOf git://codeaurora.org
 ```
+#### 删除submodule
+```cmd
+
+# 逆初始化模块，其中{MOD_NAME}为模块目录，执行后可发现模块目录被清空
+git submodule deinit {MOD_NAME} 
+# 删除.gitmodules中记录的模块信息（--cached选项清除.git/modules中的缓存）
+git rm --cached {MOD_NAME} 
+# 提交更改到代码库，可观察到'.gitmodules'内容发生变更
+git commit -am "Remove a submodule." 
+
+.gitmodules 删除子模块
+
+```
+
 
 ### [Git内部原理/源码](https://zhuanlan.zhihu.com/p/71577255)
 ```
@@ -636,8 +661,22 @@ fi
 Repo是谷歌用Python脚本写的调用git的一个脚本，可以实现管理多个git库。
 
 Gerrit,一种免费、开放源代码的代码审查软件,使用网页界面。
+### 合并两个不同仓库
+```
+MainRepo(https://git1),DecorationRepo(https://git2)
 
-[git删除本地所有的更改 ](https://www.cnblogs.com/ryanzheng/p/8573155.html?_t=1561774191)
+cd MainRepo
+git remote add DecorationRepo  https://git2
+git fetch DecorationRepo
+git checkout -b branch_decorate DecorationRepo/master
+git checkout master
+git merge branch_decorate --allow-unrelated-histories
+
+ 
+git -c diff.mnemonicprefix=false -c core.quotepath=false --no-optional-locks checkout 4d1e6f058e0de5c5895668722d3c378888c8a3d9 --progress
+git -c diff.mnemonicprefix=false -c core.quotepath=false --no-optional-locks merge 0ff1b31fc1ed6bf477e0e7a4d5301be0e7b1ed23 --allow-unrelated-histories
+```
+### [git删除本地所有的更改 ](https://www.cnblogs.com/ryanzheng/p/8573155.html?_t=1561774191)
 ```
 git checkout -f
  
@@ -647,3 +686,20 @@ git clean -xdf
 
 ```
 
+## Git 删除一些记录
+```
+1. 本地备份修改后的代码
+git checkout -b delly <hashcode>
+
+
+2. 切换到主干
+git checkout master
+git reset --hard <hashcode>
+
+3.git push --force
+
+4.合并delly代码到master上
+```
+
+### Filename too long error
+git config --system core.longpaths true
