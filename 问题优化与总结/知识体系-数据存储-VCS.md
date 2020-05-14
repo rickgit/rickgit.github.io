@@ -3,6 +3,7 @@
 
 ## 中央版本库来进行集中控制(CCVS) svn (Apache Subversion) 
 [](https://subversion.apache.org/docs/)
+[存储原理](https://www.cnblogs.com/jiangzhaowei/p/5554489.html)
 
 ```
 Repository
@@ -687,7 +688,10 @@ git clean -xdf
 ```
 
 ## Git 删除仓库中的提交纪录
-1. git reset --soft
+0. 最近一条
+   git commit –amend
+1. 最近几条
+  git reset --soft
 ```  
 1. 切换到主干
 git checkout master
@@ -711,12 +715,10 @@ git commit -m ""
 # d, drop = remove commit
 ```
 - Onto Rebase：删除的历史记录是连续的（中间一个或连续多个的提交用 rebase（衍合），不连续的使用 cherry-pick **）。前开后闭区间（最近的记录取得到，最后的记录取不到）
+    git rebase    --onto   [newbase]   [from] [to] //只是单纯复制其他分支记录到branchName分支，原来的分支记录还在。
 
-    git rebase   [startpoint]   [endpoint]  --onto  [branchName] //只是单纯复制其他分支记录到branchName分支，原来的分支记录还在。
 
-
-git rebase --onto <branch name>~<first commit number to remove> <branch name>~<first commit to be kept> <branch name>//当前分支衍合
-
+ 
 - Orphan Branch；删除的历史记录很多，要保留的则很少
 - git replace ；历史记录分成两份（或更多份）
 
