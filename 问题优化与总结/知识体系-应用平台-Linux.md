@@ -44,6 +44,9 @@ os
 
 《Operating Systems：Design and Implention（Minix）【操作系统设计与实现】》文件系统
 《unix操作系统设计》第三章高速缓存
+## 设备
+
+[linux write系统调用如何实现](https://www.cnblogs.com/alantu2018/p/8460365.html)
 
 ## 源码
 

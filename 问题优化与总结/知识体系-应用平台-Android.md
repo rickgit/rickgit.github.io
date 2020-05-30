@@ -204,12 +204,12 @@ times    +---------------+-------------------------------------------+----------
         "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
     ],                                                                               ],
     "mComponent": {                                                                  "mComponent": {
-        "mClass": "com.xp.browser.activity.SplashActivity",                              "mClass": "com.xp.browser.activity.SplashActivity",
-        "mPackage": "com.xp.browser"                                                     "mPackage": "com.xp.browser"
+        "mClass": "com.example.proj.activity.SplashActivity",                              "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"                                                     "mPackage": "com.example.proj"
     },                                                                               },
     "mContentUserHint": -2,                                                          "mContentUserHint": -2,
     "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
-    "mPackage": "com.xp.browser"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+    "mPackage": "com.example.proj"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
 }                                                                                        "mSourceBounds": {
                                                                                          "bottom": 395,
                                                                                          "left": 540,
@@ -227,8 +227,8 @@ times    +---------------+-------------------------------------------+----------
         "android.intent.category.LAUNCHER"
     ],
     "mComponent": {
-        "mClass": "com.xp.browser.activity.SplashActivity",
-        "mPackage": "com.xp.browser"
+        "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"
     },
     "mContentUserHint": -2,
     "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
@@ -1193,6 +1193,8 @@ executeQuery()
  
 #### RPC - Protocol Buffer
 #### OKIO
+ 装饰者模式、享元模式、模板模式
+
 Source（io InputStream）,Sink（io OutputStream）,Buffer（io BufferedInputStream,BufferedOutputStream）
 ```java
 public class ByteString implements Serializable, Comparable<ByteString> {
@@ -2324,16 +2326,16 @@ Push   代码重用,多次提交Review
 ##### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000
-adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
 
 
-adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
 
 heisha:
-adb -s 127.0.0.1:7555 shell monkey -p com.xp.browser -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
 
 [--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
-[-p, com.xp.browser, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
+[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
 
 
 停止 monkey
@@ -2425,9 +2427,9 @@ LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有�
 
 ```sh
 
-adb shell am dumpheap $(ps | grep com.xp.browser | awk '{print $2}') /mnt/sdcard/my_heap/dumpheap.hprof
+adb shell am dumpheap $(ps | grep com.example.proj | awk '{print $2}') /mnt/sdcard/my_heap/dumpheap.hprof
 
-adb shell 'am dumpheap com.xp.browser /mnt/sdcard/dumpheap.hprof'
+adb shell 'am dumpheap com.example.proj /mnt/sdcard/dumpheap.hprof'
 
 
 >adb shell dumpsys meminfo edu.ptu.java.kotlinbase
@@ -2499,7 +2501,7 @@ Uptime: 53403267 Realtime: 53403267
 # adb shell "dumpsys cpuinfo | grep <package | pid>"
 # adb shell "top -n 5 | grep <package | pid>" 
 
-# adb shell "dumpsys gfxinfo com.xp.browser" //GPU 帧数 fps
+# adb shell "dumpsys gfxinfo com.example.proj" //GPU 帧数 fps
 
 
 # adb shell "dumpsys batterystats < package | pid>" //电量采集
@@ -2839,7 +2841,8 @@ adb，log
 [android studio profilers源码](https://github.com/JetBrains/android)
 
 含有61个内置platform/frameworks
-[platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
+[程序入口包（java_lang_Object）](http://source.codeaurora.cn/quic/la/platform/dalvik/)
+[应用入口 Binder及AIDL（Activity,Brocast,Content provider,Service）platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
 framework源码，开发必备
  
 ```java
@@ -2931,7 +2934,20 @@ public class MediaScannerReceiver extends BroadcastReceiver
 ### [Monkey](https://source.codeaurora.cn/quic/la/platform/development/)
 包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
 tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
+### [APKsigner源码签名](http://source.codeaurora.cn/quic/la/platform/tools/apksig)
+```
+    +-------------------------------------------------------------------+
+    |                          ApkSignerTool                            |
+    |                                                                   |
+    |                         OptionsParser                             |
+    |                                                                   |
+    |                       ApkSigner     SignerParams                  |
+    |                                                                   |
+    +-------------------------------------------------------------------+
 
+```
+
+### [zipalign ](http://source.codeaurora.cn/quic/la/platform/build)
 ### [support 各类控件](https://source.codeaurora.cn/quic/la/platform/frameworks/support/)
 
 ```java
@@ -3263,6 +3279,8 @@ client lib
 
 
 ```
+
+
 tools
 [IBM IA92 (java -jar wmqttSample.jar) ](http://www-01.ibm.com/support/docview.wss?rs=171&uid=swg24006006&loc=en_US&cs=utf-8&lang=en)
 

@@ -180,6 +180,11 @@ print(sum)
 +----------------------------------------------------------------+
 |  with   |  x             |  x                |  x              |
 +---------+----------------+-------------------+-----------------+
++----------------------------------------------------------------+
+|  use    |                |                   |                 |
++---------+----------------+-------------------+-----------------+
+
+
 ```
 
 ```java
@@ -480,22 +485,21 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
         |JetLexer:FlexAdapter                           JetParser:PsiParser                     |
         |  (Scanning)                                        (Parsing)                          |
         |                                                                                       |
-        |                                                                                       |
-        |Jet.flex                                       JetParsing       JetParsingTest         |
+        |                   (cfg tree)                                                          |
+        |Jet.flex           (Context Free Grammar)      JetParsing       JetParsingTest         |
         |                                                    parseFile()   :ParsingTestCase     |
-        |  JFlex                                                                                |
-        |                                               AST(abstract syntax tree)/              |
-        |                                               psi(Program Structure Interface,ANTRL)  |
+        |  JFlex            TopDownAnalyzer                                                     |
+        |                   JetControlFlowProcessor     AST(abstract syntax tree)/              |
+        |                         generate()            psi(Program Structure Interface,ANTRL)  |
         +---------------------------------------------------------------------------------------+
-        |   (semantic)                                                                          |
-        |                              (cfg tree)               (codegen)                       |
-        |                              (Context Free Grammar)    asm                            |
+        |   (semantic)        (ir)                                                              |
+        |                                                       (codegen)                       |
+        |                                                        asm                            |
         |   TypeResolver                                                                        |
-        |        resolveClass()        TopDownAnalyzer          LightDaemonAnalyzerTestCase     |
-        |                              JetControlFlowProcessor  LightCodeInsightFixtureTestCase |
-        |                                    generate()                                         |
+        |        resolveClass()                                 LightDaemonAnalyzerTestCase     |
+        |                                                       LightCodeInsightFixtureTestCase |
+        |                                                                                       |
         +---------------------------------------------------------------------------------------+
-
 
   027_mockJDK       dd3f2b3afbc21487e0ce7524c12fe918c7354c71 add mock JDK to Jet repo
   028_bottles       1d01d519b98d5ab5317217b32658292461fa721f a working version of 99 bottles
@@ -537,6 +541,11 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
         |                       |   OverloadResolver                             |                                        |
         +-----------------------+------------------------------------------------+----------------------------------------+
         [参见](https://zhuanlan.zhihu.com/p/76622754)
+        1. 词法分析 
+        2. 语法分析
+        3. 语义分析及中间代码生成 
+        4. 目标代码生成
+        [Java 中调用 Kotlin](https://www.kotlincn.net/docs/reference/java-to-kotlin-interop.html)
   034_buildTools     28044c18cdcb9a4450d256809784e3dc3d4008ad "build-tools" module + "buildTools" Ant target added
   034_jdkHeaders     3e29aad6dd1bb5909c5dd94682c2f586b1e699aa KT-987 Unboxing_nulls: Kotlinized versions of basic Java collections
   034_j2k            8cf4c809511530577a6c074917b4fd10e90c4aa7 initial commit for j2k

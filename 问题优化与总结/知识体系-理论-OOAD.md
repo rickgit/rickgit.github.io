@@ -14,7 +14,7 @@
 4级，组件，模块
 
 ```
-编写代码功能，
+编写内聚的代码（《高效程序员的45个习惯》）代码功能，
 1. 降低耦合（语言，性能，内存/代码数量，可拓展），LKP（最少知识原则,LoD），SOLID原则；
     函数式编程->AOP（通过预编译时期APT实现静态代理或运行期动态代理实现程序功能的统一维护的一种技术。）；
     IoC（配置文件，如反射，注解，xml等，决定接口的实现类，而不是代码）/DI
@@ -73,21 +73,21 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 |         |low coupling,       |     Design Patterns - Elements of Reusable Object-Oriented Software                              |
 |         |polymorphism,       |                                                                                                  |
 |         |pure fabrication    |                                                                                                  |
-+---------------------------------------------------------------+---------------------------------------------+-------------------+
-|         |                    |                                |        S.R.P                  LoD/PLK       |                   |
-|         |                    | Dependency Inversion Principle |        for short              loose coupling|                   |
-|         |                    |   depend on abstractions       |                                             |                   |
-|         |                    |   not on concretions           |                                             |                   |
++---------+--------------------+---------------------------------------+--------------------------------------+-------------------+
+|         |                    | Interface segregation principle       |                                      |                   |
+|         |                    |   never be forced to implement        |  Dependency Inversion Principle      |                   |
+|         |                    |   an interface that it doesn't use;   |    depend on abstractions            |                   |
+|         |                    |   or shouldn't be forced to depend on |    not on concretions                |                   |
+|         |                    |   methods they do not use             |                                      |                   |
 |         |                    +------------------------------------------------------------------------------+                   |
-|         |                    | Liskov substitution principle  |      Interface segregation principle        |                   |
-|         | protected          |   every subclass/derived class |        never be forced to implement         |                   |
-|         | variations         |   should be                    |        an interface that it doesn't use;    |                   |
-|   GRASP |                    |   for their base/parent class  |        or shouldn't be forced to depend on  |                   |
-|         |                    |                                |        methods they do not use              |                   |
-|         |                    +--------------------------------+---------------------------------------------+                   |
-|         |                    |   Open-closed Principle                                                      |                   |
-|         |                    |     open for extension,                                                      |CARP/CRP reusablity|
-|         |                    |     but closed for modification                                              |                   |
+|         | protected          |                                       |  Liskov substitution principle       |                   |
+|         | variations         | S.R.P                  LoD/LKP        |    every subclass/derived class      |                   |
+|   GRASP |                    | for short              loose coupling |    should be                         |                   |
+|         |                    |                                       |    for their base/parent class       |                   |
+|         |                    +---------------------------------------+--------------------------------------+                   |DRY > KISS > YAGNI原则
+|         |                    |                    Open-closed Principle                                     |                   |
+|         |                    |                      open for extension,                                     |CARP/CRP reusablity|
+|         |                    |                      but closed for modification                             |                   |
 |         |                    |                                                                              |                   |
 +---------+--------------------+------------------------------------------------------------------------------+-------------------+ 
                                                       SOLID Principles 

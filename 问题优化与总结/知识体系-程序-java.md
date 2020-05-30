@@ -31,17 +31,17 @@ hotspot,jdk,corba,jaxp,jaxws,langtools(javac,javadoc,javap)
 +------------------------------+------------+----------------------+-------------------+-----------------------+
 |                             conditional/decision-making/loops                                                |
 +-------------------------+--------------------------------+-----------+-+------------+-------------+----------+
-|                         |       |true ,10b(2) ,1f(float) |           | |            |             |          |
-|  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   oops/.. | |            |             |          |
-|  comment                | memory|        1(10),""(Str)   |  decision | |            |             | other    |
+|                         |       |                        |   reserved| |            |             |          |
+|                         |       |                        |Declaration| |            |             |          |
+|                         |       |true ,10b(2) ,1f(float) | Modifier  | |            |             |          |
+|  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   decision| |            |             |          |
+|  comment                | memory|        1(10),""(Str)   | Expression| |            |             | other    |
 |  separator sign(;)      |       |      0x1(16),[](Arr)   |  Data Type| |            |             | symbol/  |
 +                         |       |escape char   ADT       |           | |            |             | token    |
 +---------------------------------+------------------------------------+-+            |             | token    |
 |     separator           |  Literals(num)                 |  keywords   |  Operators | Identifiers |          |
 +-------------------------+--------------------------------+-------------+------------+-------------+----------+
-|                                            Character set (Unicode,UTF-8)                                     |
-+--------------------------------------------------------------------------------------------------------------+
-|                                            Byte                                                              |
+|                                Byte /Character set (Unicode,UTF-8)                                           |
 +--------------------------------------------------------------------------------------------------------------+
 
 identifiers（标识符）："对象"的名字( a name of  a unique object )
@@ -2827,16 +2827,41 @@ RSA
 
 
   071201_jdk     319a3b994703aac84df7bcde272adfcb3cdbbbf0 Initial load
+                +-------------------------------------------------------------------------------+
+                |javac                                                                          |
+                |                         sun.tools.javac.Main                                  |
+                |                                                                               |
+                |                                                                               |
+                |                           BatchEnvironment:Environment                        |
+                |                                 parseFile(file:ClassFile )                    |
+                |                                                                               |
+                |                           BatchParser:Parser                                  |
+                |                                 parseFile()                                   |
+                |                                 imports:Imports                               |
+                |                                 classes:Vector                                |
+                |                          Parser:Scanner                                       |
+                |                                parseFile()                                    |
+                |                                scan()                                         |
+                |                                actions:ParserActions                          |
+                |                                                                               |
+                +-------------------------------------------------------------------------------+
+                |                          TreeMaker      ParserActions                         |
+                |                                              packageDeclaration()             |
+                |                                              importClass()                    |
+                |                                              importPackage()                  |
+                |                                              beginClass()                     |
+                |                                              endClass()                       |
+                |                                              defineField()                    |
+                |                                                                               |
+                |                                                                               |
+                |                           Imports:Constants                                   |
+                |                               resolve()                                       |
+                |                                                                               |
+                +-------------------------------------------------------------------------------+
 
-  ```
-+----------------------------------------------------------------------+
-|                    sun.tools.javac.Main                              |
-|                                                                      |
-+----------------------------------------------------------------------+
-|                                                                      | 
-|                                                                      |
-|                                                                      |
-+----------------------------------------------------------------------+
+
+https://www.cnblogs.com/wade-luffy/p/5925728.html
+  ``` 
 
 
   ```

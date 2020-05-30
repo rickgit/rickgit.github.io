@@ -25,7 +25,11 @@
 |             Configuration                                        |                 Builder                                       |                                 |              |                                         |
 +------------------------------------------------------------------+---------------------------------------------------------------+---------------------------------+--------------+-----------------------------------------+
 
-
+Singleton: Platform 
+Builder:OkHttpClient、Request、Response、MultipartBody、HttpUrl
+Strategy: CookieJar
+Observer:EventListener， WebSocketListener
+Chain of Responsibility:Interceptor
 
   001_initial_code          1903a3ba2b980fd5c0556bfe869333a34411f5f5 initial commit of source from project
   002_presenter_imageloader f9a436a1bfb5e4b6901506ea61dc490a9b2fe5ae Add presenter system for wrapping imageviews
