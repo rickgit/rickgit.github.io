@@ -2840,7 +2840,12 @@ adb，log
 
 [android studio profilers源码](https://github.com/JetBrains/android)
 
+[art](https://source.codeaurora.cn/quic/la/platform/art/)
+object.cc IdentityHashCode()
+[libcore](https://mirrors.ustc.edu.cn/aosp/platform/libcore.git )
+    FileSystem native代码
 含有61个内置platform/frameworks
+
 [程序入口包（java_lang_Object）](http://source.codeaurora.cn/quic/la/platform/dalvik/)
 [应用入口 Binder及AIDL（Activity,Brocast,Content provider,Service）platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
 framework源码，开发必备

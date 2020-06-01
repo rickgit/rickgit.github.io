@@ -389,3 +389,33 @@ class Solution {
 6. ZigZag Conversion               3 ms 37.8 MB
 7. Reverse Integer                 15 ms  35.6 MB
 ```
+
+
+
+### 算法
+
+字符哈希算法
+```
+Brian Kernighan 与 Dennis Ritchie 《The C Programming Language》 多项式 hash
+BKDRHash java.lang.String.hashCode() 简单快捷，正确率高 
+
+APHash
+
+DJBHash
+JSHash
+
+Robert Sedgwicks 《Algorithms in C》
+RSHash
+SDBMHash
+PJWHash
+ELFHash 
+
+DEKHash, FNVHash, DJB2Hash, PJWHash
+```
+对象一致性Hash
+```
+随机数+三个确定值，运用Marsaglia's xorshift scheme随机数算法得到的一个随机数
+xor-shift >=java9
+
+32位的monitor_ 描述对象的Hash Code信息
+```
