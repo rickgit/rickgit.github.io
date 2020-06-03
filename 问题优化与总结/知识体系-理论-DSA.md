@@ -414,8 +414,14 @@ DEKHash, FNVHash, DJB2Hash, PJWHash
 ```
 对象一致性Hash
 ```
-随机数+三个确定值，运用Marsaglia's xorshift scheme随机数算法得到的一个随机数
-xor-shift >=java9
+java9随机数+三个确定值，运用Marsaglia's xorshift scheme随机数算法得到的一个随机数
+xor-shift
 
-32位的monitor_ 描述对象的Hash Code信息
+Android 32位的monitor_ 描述对象的Hash Code信息
+Object::hash_code_seed(987654321U + std::time(nullptr))
+ do {
+    expected_value = hash_code_seed.load(std::memory_order_relaxed);
+    new_value = expected_value * 1103515245 + 12345;
+  } while (!hash_code_seed.CompareAndSetWeakRelaxed(expected_value, new_value) ||
+      (expected_value & LockWord::kHashMask) == 0);
 ```

@@ -98,7 +98,7 @@ cp /share/jenkins.war /usr/share/jenkins/jenkins.war
 ### canaconda3+kotlin
 [jupyter notebook + kotlin](https://blog.jetbrains.com/kotlin/2020/05/kotlin-kernel-for-jupyter-notebook-v0-8/?_ga=2.246012621.813816282.1590907491-895964087.1587827860)
  
-conda: conda install kotlin-jupyter-kernel -c jetbrains //需要设置添加清华源
+conda: conda install kotlin-jupyter-kernel -c jetbrains //需要设置添加[清华源](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/),中科大暂时用不了
 或
 pip install kotlin-jupyter-kernel -i https://pypi.tuna.tsinghua.edu.cn/simple //-i 临时设置tsinghua源
 
@@ -110,6 +110,19 @@ sudo apt-get update
 sudo add-apt-repository ppa:openjdk-r/ppa
 
 mkdir -p /usr/share/man/man1 //dpkg: error processing package openjdk-8-jre:amd64 (--configure):
+
+
+#### 安装 C++/C
+apt-get install libgcc
+
+conda create -n clang
+conda activate clang
+conda install xeus-cling -c conda-forge
+
+pip install jupyter-c-kernel
+install_c_kernel
+jupyter kernelspec list
+
 
 ### 家庭版
 [Windows10家庭版安装Docker Desktop（非Docker Toolbox）](https://www.jianshu.com/p/1329954aa329)
