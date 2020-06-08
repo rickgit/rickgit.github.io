@@ -37,11 +37,11 @@
 |Libraries|   SGL(Skia 2d)                   SSL/TLS                       |              +----------------+ |
 |         |   FreeType                       libc(bionic)                  +---------------------------------+
 +------------------------------------------------------------------------------------------------------------+
-|         |   Bind (IPC) Driver   Display Driver   USB Driver     Power Management                           |
-|  Linux  |                       (FrameBuffer)                                                              |
-|         |   Bluetooth Driver    Camera Driver    Flash Driver                                              |
+|         |   Bind (IPC) Driver   Display Driver               USB Driver     Power Management               |
+|  Linux  |                       (FrameBuffer[VESA Standard])                                               |//[Framebuffer](https://www.cnblogs.com/sky-heaven/p/8934568.html)
+|         |   Bluetooth Driver    Camera Driver                Flash Driver                                  |
 |  kernel |                         (V4L2)                                                                   |
-|         |   WIFI Driver         Audio Driver     KeyPad Driver                                             |
+|         |   WIFI Driver         Audio Driver                 KeyPad Driver                                 |
 |         |                       (oss/alsa)                                                                 |
 +---------+------------------------------+-------------------------------------------------------------------+
 |                                        ^                                                                   |
@@ -3304,9 +3304,8 @@ asmack
 
 
 #### 多媒体（图片音视频zxing,ffmpeg）
-[Glide.md](../阅读代码/Glide.md)
-[DiskLruCache.md](..\阅读代码\DiskLruCache.md)
-[Okhttp.md](..\阅读代码\http\Okhttp.md)
+
+
 [rxjava.ReactiveX Dagger.Android.di (2.11-2.17)](..\问题优化与总结\知识体系-理论-OOAD.md)
 [gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
 

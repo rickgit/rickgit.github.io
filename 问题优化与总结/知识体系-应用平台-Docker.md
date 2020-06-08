@@ -19,11 +19,14 @@ docker rmi **imageid**
 docker save -o ./docker-ubuntu-14.04.tar ubuntu:14.04
 docker save -o ./docker-jenkins-latest.tar jenkins:latest
 docker save -o ./docker-anaconda3_kotlin.tar docker-anaconda3_kotlin:latest
+docker save -o ./docker-minicoda3_cpp.tar minicoda3_cpp:latest
+docker save -o ./docker-miniconda3_lang.tar miniconda3_lang:latest
 
 docker load --input docker-ubuntu-14.04.tar
 docker load --input docker-jenkins-latest.tar
 docker load --input docker-alpine-latest.tar
 docker load --input docker-anaconda3_kotlin.tar 
+docker load --input docker-miniconda3_lang.tar 
 
 //容器转为镜像
 docker commit containername newImageName
@@ -35,9 +38,15 @@ docker run -p 8080:8080 -p 50000:50000 --name jenkins --user root -v /c/Users/do
 docker run -it --user root --name ubuntu-latest -v /c/Users/docker:/share ubuntu:latest  //创建容器并使用容器
 docker run -it --user root --name alpine -v /c/Users/docker:/share alpine:latest  //创建容器并使用容器
 
-docker run -it --user root --name anaconda3 -v /c/Users/docker:/share  -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser --allow-root"
+docker run -it --user root --name anaconda3 -v /c/Users/docker:/share  -p 8888:8888 continuumio/anaconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=8888 --no-browser --allow-root"
 
 docker run -it --user root --name anaconda3_kotlin -v /c/Users/docker:/share  -p 8888:8888 anaconda3_kotlin /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet   && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=8888 --no-browser --allow-root"
+
+docker run -i -t -p 8888:8888 continuumio/miniconda3 /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/opt/notebooks --ip='*' --port=8888 --no-browser"
+
+docker run -it --user root --name miniconda3 -v /c/Users/docker:/share  -p 9999:9999 continuumio/miniconda3 /bin/bash -c "sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && /opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
+
+docker run -it --user root --name miniconda3 -v /c/Users/docker:/share  -p 9999:9999 minicoda3_lang /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet   && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
 
 
 docker container ls -a
@@ -97,27 +106,34 @@ cp /share/jenkins.war /usr/share/jenkins/jenkins.war
 
 ### canaconda3+kotlin
 [jupyter notebook + kotlin](https://blog.jetbrains.com/kotlin/2020/05/kotlin-kernel-for-jupyter-notebook-v0-8/?_ga=2.246012621.813816282.1590907491-895964087.1587827860)
- 
+ conda config
+ conda config --show channels
+ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge 
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/ 
+conda config --set show_channel_urls yes
+cat ~/.condarc
+
 conda: conda install kotlin-jupyter-kernel -c jetbrains //需要设置添加[清华源](https://mirrors.tuna.tsinghua.edu.cn/help/anaconda/),中科大暂时用不了
 或
 pip install kotlin-jupyter-kernel -i https://pypi.tuna.tsinghua.edu.cn/simple //-i 临时设置tsinghua源
 
 apt-cache search openjdk
-apt-get install openjdk-8-jre
+apt-get install openjdk-11-jre
 或
 sudo apt install software-properties-common
 sudo apt-get update
-sudo add-apt-repository ppa:openjdk-r/ppa
+sudo add-apt-repository ppa:openjdk-r/ppa //sudo add-apt-repository ppa:webupd8team/java
 
 mkdir -p /usr/share/man/man1 //dpkg: error processing package openjdk-8-jre:amd64 (--configure):
 
 
 #### 安装 C++/C
-apt-get install libgcc
+apt-get install gcc
 
 conda create -n clang
 conda activate clang
-conda install xeus-cling -c conda-forge
+conda install xeus-cling -c conda-forge //用 minicondas 安装
 
 pip install jupyter-c-kernel
 install_c_kernel

@@ -453,3 +453,66 @@ driver.get(url)
 iframe = driver.find_elements_by_tag_name('iframe')[0]
 driver.switch_to.frame(iframe)
 ```
+
+## 源码
+```
+  001_initial_doc 7f777ed95a19224294949e1b4ce56bbffcb1fe9f Initial revision
+  002_libs        c636014c430620325f8d213e9ba10d925991b8d7 Initial revision
+* 003_parser      85a5fbbdfea617f6cc8fae82c9e8c2b5c424436d Initial revision
+                  +-----------------------------------------------------------------------------------+
+                  |                                                                                   |
+                  |  pythonmain.c                               +---------------+---------------------+
+                  |         initsys()                           | cstubs        |   Grammar           |
+                  |         inittime()                          |               |       (ebnf)        |
+                  |         initmath()                          |[Modules]      |[parser]             |
+                  |           ...                               | cgen.py       |   pgenmain.c        |
+                  |         runfile()                           |    generate() |     getgrammar()    |
+                  |         parsefile()                         |               |   pgen.c            |
+                  |                                             |               |     newnfagrammar() |
+                  +-----------------------------------------+   |               |     makedfa()       |
+                  | [parser]                                |   |               |     simplify()      |
+                  |    parsetok.c                           |   |               |     convert()       |
+                  |      parsefile()                        |   |               |     maketables()    |
+                  |      parsetok()                         |   |               |     addfirstsets()  |
+                  |    parser.c                             |   | glmodule.c    |   graminit.c        |
+                  |     newparser()                         |   |               |                     |
+                  |     classify()//which label of token    |   +-------------------------------------+
+                  |                                         +-----------------------------------------+
+                  |                                tokenizer.c                                        |
+                  |  parser_state                    tok_setups():tok_state                           +
+                  |    p_grammar:_grammar            tok_get(): token.h                              +
+                  |     p_stack:_stack	              addtoken()//parser.c                            +
+                  |    *p_tree:_node //parse tree    tok_backup()                                     +
+                  |                                                                                   |
+                  |                                tok_state                                          |
+                  |                                                                                   |
+                  +-----------------------------------------------------------------------------------+
+
+  004_compile     10dc2e8097e7a431367e72f46ddba91be93aa159 Initial revision
+  098_v0.9.8      c636014c430620325f8d213e9ba10d925991b8d7 Initial revision
+                  +-----------------------------------------------------------------------------------+
+                  |                                                                                   |
+                  |  pythonmain.c                                                                     |
+                  |                                                                                   |
+                  |  pythonrun.c                                                                      |
+                  |                                                                                   |
+                  |     run_script()    run_command()                                                 |
+                  |     run()           run_string()                                                  |
+                  |     run_file()      parse_string()                                                |
+                  |                                                                                   |
+                  |                                                                                   |
+                  |          run_err_node()                                                           |
+                  |          run_node()                                                               |
+                  |                                                                                   |
+                  |   compile.c                                                                       |
+                  |      compile():codeobject                                                         |
+                  |                                                                                   |
+                  |                                                                                   |
+                  |   ceval.c                                                                         |
+                  |        eval_code()//Interpreter main loop                                         |
+                  |                                                                                   |
+                  +-----------------------------------------------------------------------------------+
+
+  301_v3.0a1      3540ef16c19f2260e347a679cb27d44ba734bec6 Tagging for release of Python 3.0a1.
+
+```

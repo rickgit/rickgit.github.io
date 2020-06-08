@@ -1,5 +1,5 @@
 ## 内存篇
-LeakCanary&shark
+### LeakCanary&shark
 ```
 * 001_initial f0cc04dfbf3cca92a669f0d250034d410eb05816 Initial import
                 +-----------------------------------------------------------------------------------------------------+------------------------------+
@@ -81,3 +81,14 @@ LeakCanary&shark
 ```
 
 ### [Studio Profiler](https://github.com/JetBrains/android/tree/master/profilers/src/com/android/tools/profilers/memory)
+
+
+## 缓存篇
+
+### 图片
+[Glide.md](../阅读代码/Glide.md)
+[DiskLruCache.md](..\阅读代码\DiskLruCache.md)
+[Okhttp.md](..\阅读代码\http\Okhttp.md)
+
+
+## 界面优化
