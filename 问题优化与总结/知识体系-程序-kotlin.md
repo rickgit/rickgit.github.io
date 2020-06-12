@@ -165,16 +165,16 @@ ints.filter { it > 0 }.forEach {
 }
 print(sum)
 ```
-### 扩展函数
+### 作用域扩展函数
 ```
 +---------+----------------+-------------------+-----------------+
 |         | object as param|  object as return |  extension fun  |
 +----------------------------------------------------------------+
 |  also   |  √             |  √                |  √              |
 +----------------------------------------------------------------+
-|  let    |  √             |  x                |  √              |
-+----------------------------------------------------------------+
 |  apply  |  x             |  √                |  √              |
++----------------------------------------------------------------+
+|  let    |  √             |  x                |  √              |
 +----------------------------------------------------------------+
 |  run    |  x             |  x                |  √              |
 +----------------------------------------------------------------+
@@ -324,17 +324,18 @@ org.gradle.jvmargs=-Xmx1536m -XX\:MaxHeapSize\=1536m
 
 5. APK大小增加600k
  
-
+```
 ## 源码
 [Kotlin源码分析](https://zhuanlan.zhihu.com/p/76622754)
 https://blog.csdn.net/weixin_34283445/article/details/89580460
 
-1. [官方文档执行入口](https://kotlinlang.org/docs/tutorials/command-line.html)
+1. [Quick Start](https://kotlinlang.org/docs/tutorials/command-line.html)
 ```shell
 $ kotlinc hello.kt -include-runtime -d hello.jar
 $ java -jar hello.jar
 ```
-
+认知所有语法糖。
+Intellj IDA 的 Kotlin ByteCode插件，查看编译成Java代码
 2. 调试
 ```
 将kotlin release的jar加入环境，调试
@@ -545,7 +546,7 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
         2. 语法分析
         3. 语义分析及中间代码生成 
         4. 目标代码生成
-        [Java 中调用 Kotlin](https://www.kotlincn.net/docs/reference/java-to-kotlin-interop.html)
+        [Java 中调用 Kotlin](www.kotlincn.net/docs/reference/java-to-kotlin-interop.html)
   034_buildTools     28044c18cdcb9a4450d256809784e3dc3d4008ad "build-tools" module + "buildTools" Ant target added
   034_jdkHeaders     3e29aad6dd1bb5909c5dd94682c2f586b1e699aa KT-987 Unboxing_nulls: Kotlinized versions of basic Java collections
   034_j2k            8cf4c809511530577a6c074917b4fd10e90c4aa7 initial commit for j2k
@@ -563,8 +564,27 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
 * 103_v1.0.3        2f47e30a1a12347759dbb8707f5137178de65696 Fixed UnsupportedOperationException when a namespace is used in place of an expression.
 
 ```
+### 协程
+[kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines.git)
+```
+[](https://blog.csdn.net/qfanmingyiq/article/details/105184822)
+            +---------------------------------------------------------------------------------------------------+
+            |                                                                                                   |
+            |      CoroutineScheduler:Executor            CoroutineDispatcher:ContinuationInterceptor           |
+            |                                                    interceptContinuation()                        |
+            |                                                                                                   |
+            |                                                                                                   |
+            |                                             DispatchedContinuation:DispatchedTask                 |
+            |                                                                                                   |
+            |                                                  dispatcher: CoroutineDispatcher                  |
+            |                                                  continuation: Continuation                       |
+            |                                                  resumeWith()                                     |
+            |                                                                                                   | 
+            |                                                                                                   |
+            +---------------------------------------------------------------------------------------------------+
 
 
+```
 ## Regular languages and lexer generators
 ### jflex 词法分析（java fast lexer generator）
 [Comparison of parser generators](https://en.wikipedia.org/wiki/Comparison_of_parser_generators)

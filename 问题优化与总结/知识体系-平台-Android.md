@@ -2408,6 +2408,9 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 [jd-gui](https://github.com/java-decompiler/jd-gui)
 [Apktool](https://github.com/iBotPeaches/Apktool)
 [jad（不维护）](http://www.kpdus.com/jad.html)
+
+[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
+try{Looper.loop()}
 ##### 内存泄漏
  
  工具：profiler，eclipse mat

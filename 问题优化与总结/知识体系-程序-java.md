@@ -30,18 +30,18 @@ hotspot,jdk,corba,jaxp,jaxws,langtools(javac,javadoc,javap)
 |            Structured        | Imperative |  Declarative         |  Metaprogramming  |                       |
 +------------------------------+------------+----------------------+-------------------+-----------------------+
 |                             conditional/decision-making/loops                                                |
-+-------------------------+--------------------------------+-----------+-+------------+-------------+----------+
-|                         |       |                        |   reserved| |            |             |          |
-|                         |       |                        |Declaration| |            |             |          |
-|                         |       |true ,10b(2) ,1f(float) | Modifier  | |            |             |          |
-|  Whitespace(tab space)  |       |false, 01(8) ,1d(double)|   decision| |            |             |          |
-|  comment                | memory|        1(10),""(Str)   | Expression| |            |             | other    |
-|  separator sign(;)      |       |      0x1(16),[](Arr)   |  Data Type| |            |             | symbol/  |
-+                         |       |escape char   ADT       |           | |            |             | token    |
-+---------------------------------+------------------------------------+-+            |             | token    |
-|     separator           |  Literals(num)                 |  keywords   |  Operators | Identifiers |          |
-+-------------------------+--------------------------------+-------------+------------+-------------+----------+
-|                                Byte /Character set (Unicode,UTF-8)                                           |
++-------+------------------------+-------------+-------------+------------+-------------------------+----------+
+|       |                        |   reserved| |             |            |                         |          |
+|       |                        |Declaration| |             |            |                         |          |
+|       |true ,10b(2) ,1f(float) | Modifier  | |             |            |                         |          |
+|       |false, 01(8) ,1d(double)|   decision| |             |            |  Whitespace(tab space)  |          |
+| memory|        1(10),""(Str)   | Expression| |             |            |  comment                | other    |
+|       |      0x1(16),[](Arr)   |           | |             |            |  separator sign(;)      | symbol/  |
+|       |escape char   ADT       | DataType  | |             |            |                         | token    |
++--------------------------------------------+-+             |            +-------------------------+ token    |
+|  Literals(num)                 |  keywords   | Identifiers |  Operators |     separator           |          |
++--------------------------------+-------------+-------------+------------+-------------------------+----------+
+|                                Byte-Value /CharsSet-msg (Unicode,UTF-8)                                      |
 +--------------------------------------------------------------------------------------------------------------+
 
 identifiers（标识符）："对象"的名字( a name of  a unique object )
@@ -475,6 +475,8 @@ dx --dex --output=Hello.dex Hello.class
 javap -c  Hello.class
 
 javap –verbose Hello.class 可以看到更加清楚的信息
+
+[在线查看java字节码](https://javap.yawk.at/)
 ```
 [**Jasmin**](http://jasmin.sourceforge.net/guide.html) 是一种免费的开源的 JAVA 汇编器 ，它将使用**Java虚拟机指令集**以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
 [Dalvik寄存器指令](http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html)，有64k个寄存器，只用到前256个

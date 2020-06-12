@@ -1,4 +1,182 @@
-# Gradle
+# 持续集成(Jenkins/TeamCity)
+ Continuous integration (CI)
+## Apache-commons-cli
+```
++---------------------------+--------------------+----------------------+
+|                           |                    |                      |
+| opt  longOpt hasArg       |    GnuParser       |                      |
+| description  required     |                    |     <char,values>    |
+| multipleArgs type  values |    PosixParser     | args  options  types |
+|                           |                    |                      |
++-----------------------------------------------------------------------+
+|         Option            |    parser          | CommandLine          |
++---------------------------+--------------------+----------------------+
+|                                                                       |
+|                 apache-commons-cli                                    |
++-----------------------------------------------------------------------+ 
+
+
+  001_initial         aae50c585ec3ac33c6a9af792e80378904a73195 moved cli over from the sandbox to commons proper
+  002_posixparser     4cca25d72b216bfc8f2e75e4a99afb608ceb6df8 configurable parser support added, PosixParser added
+  003_gnuparser       ead3757ef361f85cfb92754e808dafd74eb15702 GNU parser, one unit test for Ant
+  004_parser          dde69934d7f0bee13e4cd1fc99a7d60ce95a0c78 separated the argument flattening from the Option processing
+  005_optionvalidator 347bbeb8f98a49744501ac50850457ba8751d545 refactored the option string handling, added property support for options with an argument value
+  006_cli2            8f95e4a724350f9f80429c2af1c3ac9bb2b2c2db Merged RESEARCH_CLI_2_ROXSPRING branch back to HEAD
+  007_Avalon          107ea069b95617c3c3e537abdaffe11b858d3e16 Added the old Avalon Excalibur CLI package Submitted by: Sebb Issue: 34672
+* 008_pom             4b799deefa16558f8af0eaab299e8c0b09c9e2aa Create minimal POM
+
+```
+## Apache Ant
+使用技术：Java内省
+gnu make->git->ant->maven->groovy->gradle->Android gradle sdl
+gnu make->Cmake
+```
+[organisation]-[module]-[revision]-[type].[ext]
++------------+------------------------------------------------------+
+|            |                                                      |
+|            |                                                      |
+|            |        install report  publish                       |
+|            |                                                      |
+|            +---------------+--------------------------------------+
+|            |    retrieve   |   ivy.retrieve.pattern               |
+|            |               |   (project libs path)                |
+|            +------------------------------------------------------+
+|            |               |   ivy.xml                            |
+|            |    resolve    |(which dependencies should be resolved)|
+|            |               |   .ivy-cache (cache path)            |
+| Ant Task   +------------------------------------------------------+
+|            |   Configure   |   ivyconf.xml (resolvers)            |
+|            |               |   ivy.properties                     |
+|            |               |typedef.properties (resolvers,Strategy,Conflict)|
+|            |               |   repository.properties              |
++------------+---------------+--------------------------------------+
+|                   build.xml(antlib.xml:fr.jayasoft.ivy.ant)       |
++-------------------------------------------------------------------+
+|                        ivy                                        |
++-------------------------------------------------------------------+
+
+
++---------------------------------------------------------------+
+|                          execute()                            |
++---------------------------------------------------------------+
+|     Introspector               replaceProperties              |
++---------------------------------------------------------------+
+|                            property                           |
++---------------------------------------------------------------+ 
+|  mkdir javac chmod deltree  jar copydir copyfile rmic         | 
+|  cvs get expand echo javadoc2 keysubst zip gzip               | 
+|  replace java  tstamp property  taskdef ant exec              | 
++---------------------------------------------------------------+
+|   Task (taskdefs/defaults.properties)                         |
++---------------------------------------------------------------+
+|  initTarget   depends       execute()                         |
+|   Target                                                      |
++---------------------------------------------------------------+
+|     Project                                                   |
++---------------------------------------------------------------+
+|               org.apache.tools.ant.Main     properties        |
++---------------------------------------------------------------+ 
+|                      build.xml                                |
++---------------------------------------------------------------+
+
+
+```
+## Apache Maven
+
+``` 
+  001_initial_maven-mboot             f646e34f614ca93b7ca3319834582422b5f07a8b Initial revision
+  002_modello                         323b3bdaab45eb94f69e52bab77b6a4f28688997 o adding a script for modello which is now used to generate the maven model   sources from a modello model file.
+  
+  003_compiler-jar-resources-surefire ee951b16093bdbfc264108732cd894e83097d3ab Initial revision
+  004_clean                           fe5c4741abbceee024b6197f3616d079fb7fe53f A simple clean plugin
+  005_core-it                         34b0e98e97fead5f2319e6b3579e069df851b60a Initial revision
+  006_pom                             85107479c032e250ec212915e7693758c30f7f1d Initial version of pom plugin
+  007_mboot2                          65a5fee93523664945a532ec541c225ad18c6a03 Initial revision
+  008_repository                      b85639283fffaadc8168c68f290bca4ffea15f94 *** empty log message ***
+  009_marmalade                       859b2cac34dd248c31334152ee0077b898be077f o Added marmalade scripted mojo discoverer and tests. o Minimal modifications to the MavenPluginDescriptor to allow building of instances without privileged field access. o Still need to add a pom.xml for the marmalade-plugin-loader (or whatever we should call it).
+  
+  010_core_m2                         601320d28fe961c1d5f01de7af6273488ca0f7a9 Initial revision
+  011_diagram                         63c6bcdcc03e321c6f73c87be0dcfb484225519c o Cleaned up a bit. Made the diagram prettier, and cleaned up the footnotes.
+  012_archetype                       9a893526e582c9f3c5bb572bcc709638025222af Initial revision
+  013_reporting                       7b7f7659d812310dcc0a9763bde554d103e0f310 Initial revision
+ 
+```
+
+```
+Maven Sources Overview
++--------------------------------------------------------------------------------+
+|       mvn clean dependency:copy-dependencies package                          |
+|             ^        ^           ^             ^                              |
+|             |        |           |             |                              |
+|           phase  plugin        goal           goal                            |
++-------------------------------------------------------------------------------+
+|         LifecycleMapping                                                      |
+|     goal->plugin(mojo#execute())                                              |
+|        phase                   properties         Model(project.xml,pom.xml)  |
+|                           (system,build.properties,*)                         |
+|    MavenLifecycleManager                    MavenProject                      |
+|       #execute()                       MavenProjectBuilder                    |
++----------+--------------------------------------------------------------------+
+|   core:  | maven                                                              |
++-------------------------------------------------------------------------------+
+|          |core: clean compiler deploy install resource site surefire verifier |
+|  plugins |package: jar                                                        |
+|          |reporting:                                                          |
+|          | Tools: archetype assembly dependency    plugin repository          | 
++----------+--------------------------------------------------------------------+
+|   doxia:                                                                      |
+|   misc ：       archetypes poms wago                                          |
++----------+--------------------------------------------------------------------+
+|   shared |     jar resources                                                  |
++-------------------------------------------------------------------------------+
+|   plexus | classloadworld (classloader)  containers (IOC) Modello (code gen)  |
++----------+--------------------------------------------------------------------+
+|     convention over configuration       commons-cli                           |
++-------------------------------------------------------------------------------+
+
+```
+
+
+[Maven运行原理](https://blog.csdn.net/shaoweijava/article/details/74370312)
+
+#### Plexus
+容器
++-----------------------------------------+---------------------------------------+
+|          RealmClassLoader               |                                       |
+|                   addConstituent        |                                       |
++-----------------------------------------+                                       |
+|            ClassWorld                   |                                       |
+|                  Map<ClassRealm>        |                                       |
++-----------------------------------------+                                       |
+|             Launcher                    |                                       |
++-----------------------------------------+                                       |
+|           Configurator                  |                                       |
+|                  classworlds.conf       |  components.xml                       |
++---------------------------------------------------------------------------------+
+|           Plexus classworlds            |   Plexus Container                    |
++-----------------------------------------+---------------------------------------+
+
+
+
+####  plugins
+```
+Maven is - at its heart - a plugin execution framework; 
+```
+[Maven Plugin](http://maven.apache.org/plugins/index.html)
+   
++--------------------------------------------------------------+
+|    reportClassNames   batteries                              |
+|             BatteryExecutor                                  |
++--------------------------------------------------------------+
+|                                surefire-battery      junit   |
++--------------------------------------------------------------+
+|                        maven-surefire                        |
++--------------------------------------------------------------+  
+
+ 
+## Gradle 
+
+[](https://juejin.im/post/5cf3e4dfe51d454d56535790)
 
 Gradle provides a Domain Specific Language (DSL), for describing builds. 
 
@@ -64,7 +242,7 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 
 [官方文档](https://docs.gradle.org/current/userguide/dependency_types.html)
 
-## Android-DSL
+#### Android-DSL
 ```
 +---------------------------------------------+
 |                                             |
@@ -83,7 +261,7 @@ implement不传递依赖库
 [Android Plugin DSL Reference](http://google.github.io/android-gradle-dsl/current/index.html)
 [Android Plugin new future](https://developer.android.com/studio/releases/gradle-plugin)
 
-### 问题
+#### 问题
 ```
 Could not find com.android.tools.build:aapt2 AndroidStudio
 
@@ -94,7 +272,7 @@ Could not find com.android.tools.build:aapt2 AndroidStudio
 [JetBrains intellij android](https://github.com/JetBrains/android.git)
 [android gradl dsl com.android.tools](https://beijing.source.codeaurora.org/quic/la/platform/prebuilts/gradle-plugin)
 [android gradle-plugin relsease notes](https://developer.android.google.cn/studio/releases/gradle-plugin)
-## Android gradle
+#### Android gradle
 
 ```gradle
 
@@ -104,7 +282,7 @@ Could not find com.android.tools.build:aapt2 AndroidStudio
 ```
 
 
-## 源碼
+### 源碼
 
 ```
 * 001_code c296cd129b7e2b647cf1302042d9fbedb59fca32 Move HEAD to trunk directory
@@ -448,3 +626,199 @@ android gradle plugin
 ```
 
 ### kotlin-gradle-plugin
+
+
+
+
+### Dependency injector(dagger-google)
+```
+  002_injector            04892c03bad8cc45a3c509880c33e7f1d41f5a47 First draft of a new, fast dependency JSR-330 injector.
+  003_code_gen            576136ba600e81192960350f58503dfed9d824f4 New, very basic Java code generator.
+  004_modules             2ecf2ed141990194e89d88f7d159aca86a39c5aa Add Modules.override().
+  005_stringKey           733a7f6431616202b248adc6cf9d619bd4750162 Use Strings for Keys.
+  006_ProvidesProcessor   2a5de416ac26b37cde2d07c66873931495db6da8 First draft of the @Provides processor.
+  007_InjectProcessor     6fd3de3797baa8b44789fd50a43b8daa5bc7fcd7 First draft of the @Inject processor.
+  008_DependencyGraph     4890139ad39ae959dc5b0bb9e638fc66ef702513 New annotation-driven API that uses entry points.
+  009_static_inject       34e2a25c3a6eed0b261c8be4b00610c6df782bc3 Support static injection.
+  010_google_guice        63a7e1ce3f7d202d907b4227ab51e98549d91d76 Minimal support for Guice annotations to ease migration and A/B testing.
+  011_@module             52a260e81054eec5bfd47f419537cbadc2045612 Replace @Injector with @Module.
+  012_ProblemDetector     3f013f16c6663fa023c1c64a4a291e7083712fe7 Detect problems at runtime.
+  013_LazyInjection       31ad32fd607773ac3c0d0f7fdde26591a459506e Support lazy object graphs.
+  014_androidmenifest     4136fd157588b3ea64f054e82d10e4c09419deb4 Initial infrastructure to generate modules from AndroidManifest.xml.
+  015_FullGraphProcessor  7b0c34fe4def38191eef738ab391b7a5810bc18a Build time graph construction and validation.
+  016_LazyBinding         69c9daf5931d27902dd2282d0e606a83bc993ead Add a Lazy<T> with a delegate binding, so consumers can @Inject a Lazy<T> if T is bound. Tighten up key mangling code
+  017_SetBinding          0656b1a9d346099d3138da9d50b20c4efa1486e8 Add support for multi-bindings, such that any method annotated with Provide AND Element contribute that binding to a set-binding, which builds an injectable set at injection time.
+  018_OneOf               4670896e18e3e748ac33ff42f388450c082e2c39 Rename Element to OneOf
+  019_dagger-compiler     f0de3941d22fa017c377f05822f225005d9dd7fc Migrate code-gen processors to their own project, and separate reflection code.
+* 020_ModuleGeneratorTask ecfce61047a6aee7b57d27dad9f7f1d7b6339535 Allow manifest module generator invocation as Ant task.
+  master                  a8a00fa96d0a2b661b9e2f05bbc91e091e978d14 [behind 9] Improvements to Dagger BindingGraphConverter performance (part 2).
+
+```
+类转化为Binding,通过获取泛型类型为Key，转化为Map，在最终调用Binding的get或injectMembers方法，反射实例化对象。
+最初实例用反射生成，改用生成模板代码，new 生成实例。
+代码生成器CodeGen(JavaPoet)
+注解处理器APT(google auto)
+ProvidesProcessor 将provideMode转化为类似于ProviderMethodBinding类；
+InjectProcessor 将含有InJect注解转化为类似于ConstructorBinding类；
+
+DependencyGraph替代原本com.squareup.injector類，com.squareup.injector變爲接口，作爲依賴圖的入口
+
+ObjectGraph替代DependencyGraph；Injector換爲Module，由入口含義改爲包含提供Object的對象
+
+使用Guice(Google Inject)
+
+```
+            +-------------------------------+
+            |                               |
+            v                               |
++-----------+-----------------+-----------+-+----------+-------------------+
+|  BuiltInBinding             |           |            |                   |
+|(Provider<T>,MeberrsInjector)|           |            |                   |
+|  ConstructorBinding         |           |Deferred    |Provider<T>.get()  |
+|  (AtInjectBinding)          |           |            |                   |
++-----------------------------+ unattached|Binding     |                   |
+| ProviderMethodBinding       |  Bindings |            |                   |
+|     (@Provides)             |           |            |                   |
+|Binding(singleInstance)      |           |            |                   |
+|(@Pro^ides @Singleton)       |           |            |                   |
++-----------------------------+           |            |MembersInjector<T>.|
+|  bindings                   |           |            |injectMembers(T t) |
+|(Keys<Type+Qualifier>,bindding)|         |            |                   |
+|                             |           |            |                   |
++-----------------------------------------+--------------------------------+
+|     Inject                  |   linker(attach)       |binding            |
++--------+--------------+-----+--------------------------------------------+
+|  Field | Constructor  | method parameters                                |
++--------+--------------+--------------------------------------------------+
+|         google  dagger   injecter                                        |
++--------------------------------------------------------------------------+
+
+
+
+```
+
+## 持续集成 Jenkins
+[持续集成、持续交付与持续部署](https://blog.csdn.net/shi_chang_zhi/article/details/80724801)
+
+### 源码
+1. [入门](https://www.jenkins.io/zh/doc/pipeline/tour/getting-started/)
+```
+下载 Jenkins.
+打开终端进入到下载目录.
+运行命令 java -jar jenkins.war --httpPort=8080.
+打开浏览器进入链接 http://localhost:8080.
+按照说明完成安装.
+```
+[加速](https://www.cnblogs.com/hellxz/p/jenkins_install_plugins_faster.html)
+```bash
+docker-machine ssh default // 先进入虚拟机，default 是默认的虚拟机名称
+sudo vi /var/lib/boot2docker/profile // 编辑这个文件，添加镜像源 --registry-mirror https://registry.docker-cn.com
+sudo /etc/init.d/docker restart // 重启 docker 进程
+exit // 退出虚拟机
+docker info // 看一下镜像源是否设置成功（是否有刚刚设置的 --registry-mirror 这一行）
+
+sed -i 's/http:\/\/updates.jenkins-ci.org\/download/https:\/\/mirrors.tuna.tsinghua.edu.cn\/jenkins/g' default.json && sed -i 's/http:\/\/www.google.com/https:\/\/www.baidu.com/g' default.json
+```
+
+2. 入口
+jenkins.war/META-INF/MANIFEST.MF
+
+```
++-----------------------------------------------------------------------+
+|    org.kohsuke.stapler.Stapler             hudson.WebAppMain          |
+|                                                                       |
+|                                                                       |
+|                                              HudsonIsLoading          |
+|                                                                       |
++-----------------------------------------------------------------------+
+
+
+```
+## GNU make,CMake
+
+```
+
++-------------------------------------------------------------------------------+
+|                                                                               |
+|   ar.dep         default.dep    expand.dep      rule.dep     variable.dep     |
+|                                                                               |
+|   arscan.dep     dir.dep        file.dep        signame.dep  version.dep      |
+|                                                                               |
+|   commands.dep                                               vpath.dep        |
+|                                                                               |
++-------------------------------------------------------------------------------+
+|                       GNU make                                                |
++-------------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------+--------------+------------+
+|                                            vfork execve                                   |              |            |
++-------------------------------------------------------------------------------------------+              |            |
+|                                         command(job.c) command.h                          |              |            |
++-------------------------------------------------------------------------------------------+--------------+------------+
+|                      switch                                                                                           |
++-----------------------------------------------------------------------------------------------------------------------+
+|                     GNU make                                                                                          |
++-----------------------------------------------------------------------------------------------------------------------+
+
++-----------------+-------------------------------------+ 
+|     a c d i p s |                                     |
++-------------------------------------------------------+
+|    -e   -f      |      -h     -n -V                   |
+|                 |                                     |
++-----------------+-------------------------------------+
+|               Gnu sed                                 |
++-------------------------------------------------------+
+
+[GNU 命令大全](https://www.runoob.com/linux/linux-comm-cat.html)
+
+[gnu](http://www.gnu.org/software/software.html)
+cat tr sed grep
+```
+
+
+##  depot_tools(gclient,Ninja,GN)
+[获取depot_tools](https://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools)
+
+```depot_tools         
+        +----------------------------------------------------------------------------------------------------------------------+
+        |  DEPS                                                                                                                |
+        |.gclient                                                                                                              |
+        |                                                                                                                      |
+        |                                                                                                                      |
+        |cleanup                                                                                                               |
+        |update                                                                                                                |
+        |revert                                                                                                                |
+        |status                                                                                                                |
+        |diff                                                                                                                  |
+        |runhooks                                                                                                              |
+        |                                                                                                                      |
+        |GClient                                                                                                               | 
+        +----------------------------------------------------------------------------------------------------------------------+
+        |                                                                                                                      |
+        |gclient              gcl/                                                                                             |
+        |(meta-checkout tool)/ git-cl  svn  drover  cpplint.py  pylint presubmit_support.py repo wtf weekly  git-gs zsh-goodies|
+        |fetch                                                                                                                 |
+        | (gclient wrapper)                                                                                                    |
+        +----------------------------------------------------------------------------------------------------------------------+
+        |                                              depot_tools                                                             |
+        +----------------------------------------------------------------------------------------------------------------------+
+
+```
+
+```
++------------------------------------------------------------------------------------+
+|                                                                                    |
+|                         Plan                                                       |
++------------------------------------------------------------------------------------+
+|                        State                                                       |
++-----------------+------------------------------------------------------------------+
+|   StatCache     |             Edge                                                 |
+|                 +------------------------------------------------------------------+
+|                 |             Rule        Node                                     |
+|                 +------------------------------------------------------------------+
+|                 |             command_   FileStat                                  |
++-----------------+------------------------------------------------------------------+
+|                              Ninga                                                 |
++------------------------------------------------------------------------------------+
+
+```
