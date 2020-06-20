@@ -147,7 +147,7 @@ git config --global http.postbuffer 524288000
 
 ```js
 
-freegete
+fg
 git config --global http.proxy 'socks://127.0.0.1:8580'
 git config --global --unset http.proxy
 

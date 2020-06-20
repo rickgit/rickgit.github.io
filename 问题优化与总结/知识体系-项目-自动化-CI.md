@@ -734,7 +734,7 @@ jenkins.war/META-INF/MANIFEST.MF
 
 
 ```
-## GNU make,CMake
+## GNU make,CMake，Ninja
 
 ```
 
@@ -757,7 +757,7 @@ jenkins.war/META-INF/MANIFEST.MF
 +-------------------------------------------------------------------------------------------+--------------+------------+
 |                      switch                                                                                           |
 +-----------------------------------------------------------------------------------------------------------------------+
-|                     GNU make                                                                                          |
+|                     GNU make (Automake)                                                                               |
 +-----------------------------------------------------------------------------------------------------------------------+
 
 +-----------------+-------------------------------------+ 
@@ -775,6 +775,75 @@ jenkins.war/META-INF/MANIFEST.MF
 cat tr sed grep
 ```
 
+[GNU make,makefile](https://www.gnu.org/software/make/manual/make.html)
+
+### Cmake
+gcc 编译少个源文件
+makefile 编译复杂多个源文件
+autotool（autoconf+automake） 生成makefile文件
+        [autoconf 文档](https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/autoconf.html#Making-configure-Scripts)
+```python
+apt-get install autoconf 
+    //涉及命令autoscan，aclocal，autoheader,autoconf，automake,configure，make
+    //-------------------------------------------------------------------------------------------------------------
+     your source files --> [autoscan*] --> [configure.scan] --> configure.ac
+     
+     configure.ac --.                                                      
+                    |   .------> autoconf* -----> configure
+     [aclocal.m4] --+---+
+                    |   `-----> [autoheader*] --> [config.h.in]
+     [acsite.m4] ---'
+     
+     Makefile.in（需要手动编写）
+
+    //-------------------------------------------------------------------------------------------------------------
+     [acinclude.m4] --.
+                      |
+     [local macros] --+--> aclocal* --> aclocal.m4
+                      |
+     configure.ac ----'
+     
+     configure.ac --.
+                    +--> automake* --> Makefile.in
+     Makefile.am ---'
+
+    //-------------------------------------------------------------------------------------------------------------
+                            .-------------> [config.cache]
+     configure* ------------+-------------> config.log
+                            |
+     [config.h.in] -.       v            .-> [config.h] -.
+                    +--> config.status* -+               +--> make*
+     Makefile.in ---'                    `-> Makefile ---'
+    //-------------------------------------------------------------------------------------------------------------
+1、autoscan
+2、修改生成的configure.scan为configure.ac，修改内容 ----- AC_INIT行下添加AM_INIT_AUTOMAKE(hello,1.0) --- AC_OUTPUT改为 AC_OUTPUT(Makefile)
+3、aclocal
+4、autoheader
+5、autoconf
+6、创建Makefile.am并进行具体内容的写入（touch Makefile.am INSTALL NEWS README AUTHORS ChangeLog COPYING  compile install-sh missing  depcomp ）
+    bin_PROGRAMS = hello
+    hello_SOURCES = hello.c
+7、automake
+8、./configure生成Makefile
+9、make得到可执行程序
+ [](https://blog.csdn.net/yygydjkthh/article/details/43197031)
+
+
+cmake 替换 autoconf+automake，因为其流程过于复杂
+      [](https://cmake.org/cmake/help/v3.18/guide/tutorial/index.html#a-basic-starting-point-step-1)
+ 
+1. 创建CMakeLists.txt（touch CMakeLists.txt）,并写入以下信息
+  cmake_minimum_required(VERSION  2.8.12.2) 
+  project(Tutorial) 
+  add_executable(Tutorial hello.c)
+2. mkdir build & cd build //创建编译文件夹
+3. cmake ..        //生成makefile
+4. cmake --build . //生成二进制文件
+``
+
+### ninja
+ ninja 代替 make
+  CMake或GN 生成 ninja 编译文件
 
 ##  depot_tools(gclient,Ninja,GN)
 [获取depot_tools](https://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools)

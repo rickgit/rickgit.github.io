@@ -46,8 +46,9 @@ docker run -i -t -p 8888:8888 continuumio/miniconda3 /bin/bash -c "/opt/conda/bi
 
 docker run -it --user root --name miniconda3 -v /c/Users/docker:/share  -p 9999:9999 continuumio/miniconda3 /bin/bash -c "sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list && /opt/conda/bin/conda install jupyter -y --quiet && mkdir /opt/notebooks && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
 
-docker run -it --user root --name miniconda3 -v /c/Users/docker:/share  -p 9999:9999 minicoda3_lang /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet   && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
+docker run -it --user root --name miniconda3 -v /c/Users/docker:/share  -p 9999:9999 miniconda3_lang /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet   && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
 
+docker run -it --user root    -v /c/Users/docker:/share  -p 9999:9999 -p 10000:10000 miniconda3_lang /bin/bash -c "/opt/conda/bin/conda install jupyter -y --quiet   && /opt/conda/bin/jupyter notebook --notebook-dir=/share --ip='*' --port=9999 --no-browser --allow-root"
 
 docker container ls -a
 docker start 4d10b6dc4d25
@@ -78,6 +79,7 @@ vim /etc/apt/sources.list
 
 [或更新debin源](http://mirrors.ustc.edu.cn/help/debian.html)
 sudo sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
+sudo sed -i "s/archive.ubuntu.com/mirrors.aliyun.com/g" /etc/apt/sources.list
 sudo apt-get update
 ### C语言环境
 ``` 

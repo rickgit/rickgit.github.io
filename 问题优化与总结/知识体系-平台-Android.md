@@ -1927,7 +1927,7 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
                                   +---+----+                                               +---------+            |
                                       v  stoped                       +--------------->    |onStop   |            |
                                   +---+----+                                               +---------+            |
-                                  |onDestroy                                                                      |
+                                  |onDestroy   *configChanges                                                     |
                                   |        +                                               +-v-----v------+       |
                                   +---+----+                                               |onDestroyView +-------+
                                       v  destroyed  +--------------------------------->    |onDestroy     |

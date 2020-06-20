@@ -8,7 +8,7 @@
 
 
 
-### dagger.android
+### google/dagger.android
 
 Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
 ，完全去除了反射。

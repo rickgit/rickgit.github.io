@@ -1,0 +1,11 @@
+@startgantt
+' printscale weekly alt+d
+saturday are closed
+sunday are closed
+Project starts the 2020/03/16 
+ 
+[协程kotlin] starts  2020/03/16 
+then [插件Tinker] starts 2020/03/17
+
+-- 第二周 -- 
+@endgantt
