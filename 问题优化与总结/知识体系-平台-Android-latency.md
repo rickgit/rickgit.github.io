@@ -64,9 +64,7 @@ valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解�
 
 ```
 
-## Okhttp
 
-[Okhttp.md](知识体系-平台-Android-Square.md)
 
 ## Glide
 ```
@@ -158,4 +156,8 @@ Chain of Responsibility:Interceptor
                           +-------------------------------------------------------------------+
 
 ```
-## 界面优化
+
+
+## Okhttp
+
+[Okhttp.md](知识体系-平台-Android-Square.md)

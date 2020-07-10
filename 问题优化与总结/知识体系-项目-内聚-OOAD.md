@@ -114,6 +114,9 @@ level          |  code line |  | function  |   |class    |   | package  |   | mo
 1. Strategy:
 Defines a family of algorithms, encapsulates each one, and make them interchangeable.
  Strategy lets the algorithm vary independently from clients who use it.
+    双检测：保证效率，再加锁检测。voliate保证指令不重排序，防止获取属性为null
+    静态内部类：cinit加锁，保证类加载只加载一次
+    枚举类： 枚举类实现
 2. Decorator:
 Attach additional responsibilities to an object dynamically.
 Decorators provide a flexible alternative to subclassing for extending functionality.

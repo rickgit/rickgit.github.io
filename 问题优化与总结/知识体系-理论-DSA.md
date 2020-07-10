@@ -107,29 +107,7 @@ DSA
 ### 排序涉及的元素
 由小到大排序,简单到高效算法
 
-```selectsort
-select mini num on unsorted sublist to sorted sublist
-+---------------+-----------------------------------+
-| Sorted sublist| Unsorted sublist                  |
-+-------------------------------+-------------------+
-|               | Least element |  unsorted         |
-+---------------+---------------+-------------------+
 
-for unsorted times
-    for unsorted select min
-```
-
-```insertsort
-insert a num on unsorted sublist to sorted sublist
-+--------------------------------+------------------+
-|          Sorted sublist        | Unsorted sublist |
-+---------------+-----------------------------------+
-| sort          |  Least element | unsorted         |
-+---------------+----------------+------------------+
-
-for unsorted times
-    for unsorted item to insert
-```
 
 ```bubblesort
 select max num to exchange
@@ -166,36 +144,7 @@ sort1/2   | <=pivot1 | >pivot1   | <=pivot2   |  >pivot2     |
 
 ```
 
-```heapsorts
-+---------------------------------------------------
-| Unsorted sublist                  |Sorted sublist|
-+--------------------------------------------------+
-|                                   |              |
-+-----------------------------------+--------------+
 
- <--------------------------------+   ^
-       ajust unsorted to max heap     |
-|                                     |
-|                                     |
-|                                     |
-+-------------------------------------+
-         select root value to final
-
-```
-
-```shell sort
-                 +--------------------------------------------------+
-                 | Unsorted sublist                                 |
-                 +--------------------------------------------------+
-
-sorted sublist   +--+    gap            +--+      gap             +-+
-                 +--+                   +--+                      +-+
-
-
-sorted sublist   +--+ gap1   +--+  gap1 +--+  gap1  +---+  gap1   +-+
-                 +--+        +--+       +--+        +---+         +-+
-
-```
 ```mergesort
                   +---------------------------------------------------     ^
                   | Unsorted sublist                                 |     |
@@ -219,7 +168,58 @@ split  unsorted   |item| item|      |     |      |      |      |     |     |
                    +-------------------------------------------------------+
 
 ```
- 
+```insertsort
+insert a num on unsorted sublist to sorted sublist
++--------------------------------+------------------+
+|          Sorted sublist        | Unsorted sublist |
++---------------+-----------------------------------+
+| sort          |  Least element | unsorted         |
++---------------+----------------+------------------+
+
+for unsorted times
+    for unsorted item to insert
+```
+```shell sort
+                 +--------------------------------------------------+
+                 | Unsorted sublist                                 |
+                 +--------------------------------------------------+
+
+sorted sublist   +--+    gap            +--+      gap             +-+
+                 +--+                   +--+                      +-+
+
+
+sorted sublist   +--+ gap1   +--+  gap1 +--+  gap1  +---+  gap1   +-+
+                 +--+        +--+       +--+        +---+         +-+
+
+```
+ ```selectsort
+select mini num on unsorted sublist to sorted sublist
++---------------+-----------------------------------+
+| Sorted sublist| Unsorted sublist                  |
++-------------------------------+-------------------+
+|               | Least element |  unsorted         |
++---------------+---------------+-------------------+
+
+for unsorted times
+    for unsorted select min
+```
+
+```heapsorts
++---------------------------------------------------
+| Unsorted sublist                  |Sorted sublist|
++--------------------------------------------------+
+|                                   |              |
++-----------------------------------+--------------+
+
+ <--------------------------------+   ^
+       ajust unsorted to max heap     |
+|                                     |
+|                                     |
+|                                     |
++-------------------------------------+
+         select root value to final
+
+```
  [其他排序](https://www.cnblogs.com/kkun/archive/2011/11/23/2260312.html)
 
 
@@ -244,8 +244,8 @@ k：次数
 
 ### Hash 冲突和溢出
  开放定址法
-    线行探查法、平方探查法、双散列函数探查法/再哈希法。
- 链地址法
+    线行探查法（ArrayMap）、平方探查法、双散列函数探查法/再哈希法。
+ 链地址法（HashMap）
  建立公共溢出区
  其他方法
 

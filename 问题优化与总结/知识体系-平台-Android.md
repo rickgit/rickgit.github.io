@@ -1,4 +1,4 @@
-## Android应用体系
+****## Android应用体系
 > 软件是计算机系统中与硬件相互依存的另一部分，它是包括程序，数据及其相关文档的完整集合 《软件工程概论》
 环境 Android 系统
 阅读应用流程（以APK文档为主线，程序Main方法为入口）
@@ -482,9 +482,8 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 
 在Android中，RefBase结合sp（strong pointer）和wp（weak pointer），实现了一套通过引用计数的方法来控制对象生命周期的机制。
 
-
 ### Dispaly 系统与图片适配（density）
-```
+```java
 显示屏幕信息
 adb shell wm size
 wm size 1080x1920
@@ -501,7 +500,7 @@ adb shell dumpsys window displays |head -n 3
  
 ```
 
-```
+```java
                            OpenGL/ES        Rasterization
                            convert to
                            polygons or textures
@@ -512,7 +511,7 @@ adb shell dumpsys window displays |head -n 3
 
 ```
 
-```
+```java
 
 显示数据类型
 1. UI界面的显示，这部分通常数据类型为RGB格式
@@ -521,7 +520,7 @@ adb shell dumpsys window displays |head -n 3
 
 ```
 大致分为构建，绘制，渲染，显示
-```
+```java
 +----------------------------------+
 |   GUI/View   draw                |
 +----------------------------------+
@@ -532,7 +531,7 @@ adb shell dumpsys window displays |head -n 3
 |   Display Driver (FrameBuffer)   |
 +----------------------------------+
 ```
-```
+```java
      sofeware draw                  Hardware acceleration
 
 +------------------+              +------------------+
@@ -658,7 +657,9 @@ skia 图形引擎
 
 ```
 
-
+### 屏幕刷新
+[](https://www.jianshu.com/p/0a54aa33ba7d)
+双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
 #### 数据渲染 SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
 
 SystemServer的RenderThread线程
@@ -1064,6 +1065,9 @@ semi_space算法:
 
 
 #### android触发垃圾回收
+[android gc](https://proandroiddev.com/collecting-the-garbage-a-brief-history-of-gc-over-android-versions-f7f5583e433c)
+[dalvik:tracing garbage collector, using a Mark and Sweep approach](https://android.googlesource.com/platform/dalvik.git/+/android-4.3_r2/vm/alloc/MarkSweep.cpp)
+[art 粘性CMS和部分CMS](https://android.googlesource.com/platform/art/+/master/runtime/gc/)
 当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
 系统需要更多内存的时候触发。
 HPROF时触发。
@@ -1707,95 +1711,13 @@ ps -t | grep -E "NAME| <zygote ps id> "
 ```
 
 ### 应用内消息机制（异步）
-- Handler        子线程与主线程通讯
 - Thread
+- Handler        子线程与主线程通讯
 - AsyncTask      界面回调，异步任务，一次性
 - HandlerThread  异步队列，子线程与子线程通讯
 - TimeTask       定时任务
 - IntentServices 无界面，异步任务
 - ThreadPool     并行任务
-#### handler
-管道pipe唤醒主线程和epoll机制
-```
-     +------------------------------------------+
-     |  Handler                                 |
-     +------------------------------------------+
-     | +---------------+  +---------------------+
-+----+ |enqueueMessage |  | dispatchMessage     |
-|    | |               |  |   Message#callback  |  <----+
-|    | +---------------+  |   mCallback         |       |
-|    |                    |   handleMessage()   |       |
-|    +--------------------+---------------------+       |
-|                                                       |
-|    +--------------+                                   |
-|    |Looper Thread |                                   |
-|    +--------------+----------------------------+      | (runOnLooperThread)
-|    |  Looper                                   |      |
-|    +-------------------------------------------+      |
-|    |   loop()                                  |      |
-|    |                                           |      |
-|    |  +---------------------+                  | +----+
-|    |  | MessageQueue        | epoll            |  +--------------------+
-+--> |  |  Message mMessages  +------>           |  | Message            |
-     |  |                     |                  |  |  Handler target    |
-     |  +---------------------+                  |  |  Runnable callback |
-     +-------------------------------------------+  +--------------------+
-
-Handler{
-    final Looper mLooper;
-    final MessageQueue mQueue;
-    final Callback mCallback;
-    final boolean mAsynchronous;
-    IMessenger mMessenger;
-}
-
-```
-[select/poll/epoll对比分析](http://gityuan.com/2015/12/06/linux_epoll/)
- [源码解读poll/select内核机制](http://gityuan.com/2019/01/05/linux-poll-select/)
-
-[MessageQueue采用epoll](http://gityuan.com/2019/01/06/linux-epoll/)
-```bash
-ls /proc/<pid>/fd/  //可通过终端执行，看到该fd
-```
-1. 监视的描述符数量不受限制，所支持的FD上限是最大可以打开文件的数目，具体数目可以
-```    
-cat /proc/sys/fs/file-max
-```
-2. epoll不同于select和poll轮询的方式，而是通过每个fd定义的回调函数来实现的
-
-####  AsyncTask
-```java
-                    +--------------------------------------------+  MESSAGE_POST_RESULT
-                    |   AsyncTask                                |  MESSAGE_POST_PROGRESS
-                    |                                            |              +-----------------------------+
-                    |   +----------------------------+           |              |   MainLooper                |
-way 1   +---------> |   | FutureTask(WorkerRunnable) |           |        +---> |                             |
-                    |   +----------+-----------------+           |        |     |                             |
-                    |              |                             |        |     +-----------------------------+
-                    |              |     +-----------------------+        |
-                    |              |     |Handle:InternalHandler | -------+
-                    |              |     |                       |
-                    |              |     +-----------------------+  <-----------------------------------------+
-                    |              |                             |                                            |
-                    +--------------------------------------------+                                            |
-                           mStatus |                                                                          |
-                           +-------+                                                                          |
-                                   |                                                                          |
-                           offer() v                                                                          |
- way 2                                                                  +--------------------+------------+   |
-+--------------+           +----------------------------+               | ThreadPoolExecutor |            |   |
-| Runnable     +------->   | SerialExecutor|            |   ArrayDeque  +--------------------+            |   |
-+--------------+           +---------------+            |   #poll()     | LinkedBlockingQueue             |   |
-+--------------+   offfer()|          mTasks:ArrayDeque |  +--------->  |    +-----------+ +------------+ |   |
-| Runable      +-------->  |                            |               |    |FeueureTask| | FutureTask | +---+
-+--------------+           +----------------------------+               |    +-----------+ +------------+ |
-                                                                        +---------------------------------+
-
-```        
-    容器类：ArrayDeque，LinkedBlockingQueue（ThreadPoolExecutor的线程队列）
-    并发类：ThreadPoolExecutor（包含 ThreadFactory属性，用于创建线程），AtomicBoolean，AtomicInteger，FutureTask(包含Callable属性，任务执行的时候调用Callable#call,执行AsyncTask#dobackgroud)
-
-
 
 ### 四大组件基础 - Context
 Context作用
@@ -1911,13 +1833,13 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
       | recreate                  |        |        +-----------+  |                                              |
 +-----+---------+                 +----+---+                       |                       +---------+            |
 | Process killed|                      v started                   |   +-------------->    |onStart  |            |
-+-----+---------+       +-------+ +----+---+                       |                       +---------+            |
++-----+---------+       +-------+ +----+---+   (singleTop/Task)    |                       +---------+            |
       |                 v         |onResume|  <-----+activity      |                                              |
       |             +---+------+  +--------+        |froreground   |                       +---------+            |
       |   other     |Running   |         resumed    |              |   +-------------->    |onResume |<-----+     |
       |   activity  +---+------+                    |              |                       +---------+      |     |
       |   foreground    |         +--------+        |              |                              Fragm is  |     |
-      |                 +-------> |onPause |        |    activity  |                              retaininstance  | onBack
+      |                 +-------> |onPause |        |    activity  |                        retaininstance  | onBack
       | <-----------------------+ |        | +----->+    foreground|                          onactivityRecreate  |
       |   other app               +---+----+                       |                       +---------+      |     |
       |   need memory                 v  paused                    |     +------------>    |onPause  |------|     |
@@ -1927,7 +1849,7 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
                                   +---+----+                                               +---------+            |
                                       v  stoped                       +--------------->    |onStop   |            |
                                   +---+----+                                               +---------+            |
-                                  |onDestroy   *configChanges                                                     |
+  *configChanges                  |onDestroy                                                                      |
                                   |        +                                               +-v-----v------+       |
                                   +---+----+                                               |onDestroyView +-------+
                                       v  destroyed  +--------------------------------->    |onDestroy     |
@@ -2835,54 +2757,92 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 深层链接和 Android 应用链接
 ## 源码
 [1798个项目（2019-12-11统计）](https://source.codeaurora.cn/quic/la)
- 
-含有61个内置platform/system
-[platform/system/core](https://source.codeaurora.cn/quic/la/platform/system/core)
-adb，log
+ [android studio profilers源码](https://github.com/JetBrains/android)
 
 
-[android studio profilers源码](https://github.com/JetBrains/android)
-含有61个内置platform/frameworks
 
+
+[libcore](https://mirrors.ustc.edu.cn/aosp/platform/libcore.git )
+    FileSystem native代码，正则表达式（libcore/luni/src/main/native/java_util_regex_Pattern.cpp,java_util_regex_Matcher.cpp）[正则实现](https://github.com/unicode-org/icu.git)
 [art](https://source.codeaurora.cn/quic/la/platform/art/)
 object.cc IdentityHashCode()
-[libcore](https://mirrors.ustc.edu.cn/aosp/platform/libcore.git )
-    FileSystem native代码
-
 [程序入口包（java_lang_Object）](http://source.codeaurora.cn/quic/la/platform/dalvik/)
+含有61个内置platform/system
+[platform/system/core](https://source.codeaurora.cn/quic/la/platform/system/core)
+adb，logcat	，fastboot
+
+含有61个内置platform/frameworks
 [应用入口 Binder及AIDL（Activity,Brocast,Content provider,Service）platform/frameworks/base](https://source.codeaurora.cn/quic/la/platform/frameworks/base/)
 framework源码，开发必备
- 
+
 ```java
-+---------------------------------------------------------------------------------------------------------------------------------------+
-|     Activity                                                                                                                          |
-|         startActivity(intent)                                                                                                         |
-|         mMainThread                                                                                                                   |
-|    Instrumentation                                                                                                                    |
-|       execStartActivity()                                                                                                             |
-|                                                ActivityManagerNative                                                                  |
-|                                                          :IActivityManager            ActivityManagerService:ActivityManagerNative    |
-|                                                   getDefault():IActivityManager            startActivity()                            |
-|                                                                                                                                       |
-|                                                                                            startActivityLocked()                      |
-|                                                                                                                                       |
-|                                                                                            resumeTopActivityLocked()                  |
-|                                                                                                                                       |
-|       ApplicationThread                        ApplicationThreadProxy                      startPausingLocked()                       |
-|           :ApplicationThreadNative                     :IApplicationThread                                                            |
-|                                                   scheduleLaunchActivity()                 startSpecificActivityLocked()              |
-|         scheduleLaunchActivity()                  mRemote:IBinder                                                                     |
-|                                                                                            realStartActivityLocked()                  |
-|                                                                                                                                       |
-|                                                                                            mProcessNames:ProcessMap<ProcessRecord>    |
-|                                                                                                                                       |
-|                                                                                                                                       |
-|                                                                                       ProcessRecord                                   |
-|                                                                                         thread:IApplicationThread                     |
-+---------------------------------------------------------------------------------------------------------------------------------------+
-
-
+            +---------------------------------------------------------------------------------------------------------------------------------------+
+            |     Activity                                                                                                                          |
+            |         startActivity(intent)                                                                                                         |
+            |         mMainThread                                                                                                                   |
+            |    Instrumentation                                                                                                                    |
+            |       execStartActivity()                                                                                                             |
+            |                                                ActivityManagerNative                                                                  |
+            |                                                          :IActivityManager            ActivityManagerService:ActivityManagerNative    |
+            |                                                   getDefault():IActivityManager            startActivity()                            |
+            |                                                                                                                                       |
+            |                                                                                            startActivityLocked()                      |
+            |                                                                                                                                       |
+            |                                                                                            resumeTopActivityLocked()                  |
+            |                                                                                                                                       |
+            |       ApplicationThread                        ApplicationThreadProxy                      startPausingLocked()                       |
+            |           :ApplicationThreadNative                     :IApplicationThread                                                            |
+            |                                                   scheduleLaunchActivity()                 startSpecificActivityLocked()              |
+            |         scheduleLaunchActivity()                  mRemote:IBinder                                                                     |
+            |                                                                                            realStartActivityLocked()                  |
+            |                                                                                                                                       |
+            |                                                                                            mProcessNames:ProcessMap<ProcessRecord>    |
+            |                                                                                                                                       |
+            |                                                                                                                                       |
+            |                                                                                       ProcessRecord                                   |
+            |                                                                                         thread:IApplicationThread                     |
+            +---------------------------------------------------------------------------------------------------------------------------------------+
 ```
+
+
+[agl（opengl\libagl，opengl es实现）+egl（实现平台无关） ](http://mirrors.ustc.edu.cn/aosp/platform/frameworks/native.git)
+[OpenGL ES：Android平台EGL环境](https://www.jianshu.com/p/d5ff1ff4ee2a)
+[OpenGL ES教程](https://zhuanlan.zhihu.com/p/56031071)https://www.cnblogs.com/kiffa/archive/2013/02/21/2921123.html
+[SurfaceFlinger整合layer的过程](https://blog.csdn.net/prike/article/details/72810027)
+```
+            +----------------------------------------------------------------------------------------------+
+            | [surfaceflinger]                                                                             |
+            |                                                                                              |
+            |       SurfaceFlinger                                                                         |
+            |               instantiate()                     LayerBaseClient:LayerBase                    |
+            |               createSurface() :sp<ISurface>                                                  |
+            |               threadLoop()                                                                   |
+            |               waitForEvent()                    SurfaceComposerClient                        |
+            |               handlePageFlip()                       createSurface():sp<Surface>             |
+            |               handleRepaint()                        mClient:sp<ISurfaceFlingerClient>       |
+            |               unlockClients()                                                                |
+            |               postFramebuffer()                                                              |
+            +----------------------------------------------------------------------------------------------+
+            |    DisplayHardware                                                                           |
+            |       init()                                                                                 |
+            |       mDisplaySurface:sp<EGLDisplaySurface>                                                  |
+            |       mDisplay:EGLDisplay                                                                    |
+            |       mSurface:EGLSurface                                                                    |
+            |       mContext:EGLContext                                                                    |
+            |       flip()                                                                                 |
+            +----------------------------------------------------------------------------------------------+
+            | [ui]                                            [libagl]                                     |
+            |       EGLDisplaySurface                              eglSwapBuffers()                        |
+            |              mapFrameBuffer():status_t                                                       |
+            |              // "/dev/graphics/fb%u"                                                         |
+            |                                                                                              |
+            |              // "/dev/fb%u"                                                                  |
+            |                                                                                              |
+            +----------------------------------------------------------------------------------------------+
+            |                      framebuffer                                                             |
+            +----------------------------------------------------------------------------------------------+               
+```
+
 含有118个内置platform/packages/apps
 [platform/packages/apps/PackageInstaller](https://source.codeaurora.cn/quic/la/platform/packages/apps/PackageInstaller)
 “点击通知”需要访问文件权限intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -2942,6 +2902,24 @@ public class MediaScannerReceiver extends BroadcastReceiver
 ### [Monkey](https://source.codeaurora.cn/quic/la/platform/development/)
 包含项目开发中apps,cmds（Monkey），模拟器，ndk，sample，
 tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshots,sdkstats）
+
+### test
+              // adb shell am instrument -w -r    -e debug false
+              // -e class 'edu.ptu.test.AndroidClassLoaderTest#testLooper'
+              // edu.ptu.test.test/androidx.test.runner.AndroidJUnitRunner
++------------------------------------------------------------------------------------------------+
+|                               AndroidJUnitRunner :Instrumentation                              |
+|                                                                                                |
+|                                                                                                |
+|                               Instrumentation                                                  |
+|                                  mRunner:InstrumentationThread                                 |
+|                                  start()                                                       |
+|                                                                                                |
+|                                                                                                |
+|                                                                                                |
+|                                                                                                |
++------------------------------------------------------------------------------------------------+
+
 ### [APKsigner源码签名](http://source.codeaurora.cn/quic/la/platform/tools/apksig)
 ```
     +-------------------------------------------------------------------+
@@ -3240,7 +3218,7 @@ broker/server
 [ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
 [eclipse mosquitto mqtt broker](https://github.com/eclipse/mosquitto)
 [moquette](https://gitee.com/mirrors/moquette.git)
-```
+```java
   001_initial   422fbc4d2c644844d4886afd55c912626d1c4054 First import of moquette proto parser
   002_client    aadff9c9bd9a2efe7b90931b7dbed1c350f1d52d Added trivial client implementation
   003_server    463aa256936010b9c61252ca703623e4b98adda7 Implemented the raw connect message  handling

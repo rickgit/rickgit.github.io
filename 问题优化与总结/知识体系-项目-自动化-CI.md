@@ -735,7 +735,64 @@ jenkins.war/META-INF/MANIFEST.MF
 
 ```
 ## GNU make,CMake，Ninja
+[GNU ](git clone https://git.savannah.gnu.org/git/make.git)
 
+[](https://www.gnu.org/software/make/manual/make.html#Simple-Makefile)
+
+```
+
+* 000_tex           9f8301ae1ac6d9076e38ec86f12d59ba40b851bd * Added RCS log.
+            +--------------------------------------------------------------------------+
+            |  make.texinfo                                                            |
+            +--------------------------------------------------------------------------+
+            |   @section                                                               |
+            |               Simple           Functions     Archives                    |
+            |               Makefiles  	     Running       Missing                     |
+            |               Rules                          Concept Index               |
+            |               Commands         Implicit      Name Index                  |
+            |               Variables                                                  |
+            |               Conditionals                                               |
+            |                                                                          |
+            +--------------------------------------------------------------------------+
+
+  001_initial       83fcf12d25ee341440cead2dcc87451c55dd8203 Initial revision
+  002_vpath         59fdb0d242076fc124f2049bd7590d7b451cd9bd Initial revision
+  003_expand        1a51e308e5009c9e98e431bc368c28aee644176d Initial revision
+  004_implicit      b9c983dee3c6aff460532d9b4fd7aaea079c672b Initial revision
+  005_arscan        bd3a693fd4cd0f91bc0a6e598dac260438d2acbd Initial revision
+  006_misc_variable 97d38d08176611af5e10ab84e4c812962bf98600 Initial revision
+  007_command       a4a1d4a78d32dfaf23f3ab96f4ea5771ef289446 Initial revision
+  008_dir           da136cba6f72f16396e1e9be07443b540dc97199 Initial revision
+  009_makefile      1eadb68598fde7e391414fd2651ee33906a2c5d7 Initial revision
+
+            +--------------------------------------------------------------------------------------------------+
+            |  make.texinfo                                                                                    |
+            |   @section                                                                                       |
+            |   Simple           Functions     Archives                                                        |
+            |   Makefiles  	     Running       Missing                                                         |
+            |   Rules                          Concept Index                                                   |
+            |   Commands         Implicit      Name Index                                                      |
+            |   Variables                                                                                      |
+            |   Conditionals                                                                                   |
+            |                                                                                                  |
+            +--------------------------------------------------------------------------------------------------+
+            |                           main.c                                                                 |
+            |                              decode_switches()              enter_file() :file                   |
+            |                              other_args:stringlist *        read_all_makefiles():dep             |
+            |                              switches:command_switch                                             |
+            |                                                                                                  |
+            |                              update_goal_chain():int                                             |
+            |   job.c                                                                                          |
+            |      child *children //xmalloc (sizeof (struct child))      stringlist:struct                    |
+            |      new_job ()                                                 list:char **                     |
+            |                                                                 idx:uint                         |
+            |                                                                 max:uint                         |
+            +--------------------------------------------------------------------------------------------------+
+
+  370_3.70.2        408e868fd24232052b37c7e188efb321acc0391f (Using Variables): Fixed @xref node to `Automatic'.
+ 
+
+```
 ```
 
 +-------------------------------------------------------------------------------+
@@ -841,40 +898,12 @@ cmake 替换 autoconf+automake，因为其流程过于复杂
 4. cmake --build . //生成二进制文件
 ``
 
-### ninja
+### ninja 构建Android和chromium
  ninja 代替 make
   CMake或GN 生成 ninja 编译文件
 
-##  depot_tools(gclient,Ninja,GN)
-[获取depot_tools](https://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools)
 
-```depot_tools         
-        +----------------------------------------------------------------------------------------------------------------------+
-        |  DEPS                                                                                                                |
-        |.gclient                                                                                                              |
-        |                                                                                                                      |
-        |                                                                                                                      |
-        |cleanup                                                                                                               |
-        |update                                                                                                                |
-        |revert                                                                                                                |
-        |status                                                                                                                |
-        |diff                                                                                                                  |
-        |runhooks                                                                                                              |
-        |                                                                                                                      |
-        |GClient                                                                                                               | 
-        +----------------------------------------------------------------------------------------------------------------------+
-        |                                                                                                                      |
-        |gclient              gcl/                                                                                             |
-        |(meta-checkout tool)/ git-cl  svn  drover  cpplint.py  pylint presubmit_support.py repo wtf weekly  git-gs zsh-goodies|
-        |fetch                                                                                                                 |
-        | (gclient wrapper)                                                                                                    |
-        +----------------------------------------------------------------------------------------------------------------------+
-        |                                              depot_tools                                                             |
-        +----------------------------------------------------------------------------------------------------------------------+
-
-```
-
-```
+```ninga
 +------------------------------------------------------------------------------------+
 |                                                                                    |
 |                         Plan                                                       |

@@ -164,6 +164,12 @@ Other Reserved Words(HTML and Window objects and properties)
 
 ## 数据类型 - 面向对象
 ## 数据-正则
+
+      Tompson alth           subset construction      hopcroft
+
+RE   +---------->    NFA   +------------->   DFA    +---------->
+
+
 ```Regex Quantifiers
                                                                    {n,}
                                                             +------------------------------------------>
@@ -181,6 +187,7 @@ Other Reserved Words(HTML and Window objects and properties)
 0           1                                               n                   m
 
 ```
+
 
 ```js
 

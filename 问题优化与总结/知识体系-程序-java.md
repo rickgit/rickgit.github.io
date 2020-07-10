@@ -86,39 +86,54 @@ BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
             |                             |
             |                             |
             +-----------------------------+
-17个0xffff，即0x10ffff
+ 
+       +--------------------------------+ colomns 256  +--------------------------------+
+
+ +    +---------------------------------------------------------------------------------+    +
+ |    |             ascii                 |                   latin1                    |BMP |
+ |    +---------------------------------------------------------------------------------+    |
+ |    |                                                                                 |    |
+ |    |                                                                                 |    |
+ |    |                                                                                 |    |
+ |    |                                                                           .     |    +
+ |    |                                                                           .     |   rows 256
+ |    |                                                                           .     |    +
+ |    |                                                                                 |    |
+ |    +---------------------------------------------------------------------------------+    +
+ |                                                                                       SMP
+ |                                                                                       SIP     
+ |                                           .
+                                             .
+planes 0x10                                  .                                           SSP
+ +                                                                                       SPUA-A
+ |    +---------------------------------------------------------------------------------+
+ |    |                                                                                 |SPUA-B
+ |    |                                                                                 |
+ |    |                                                                                 |
+ |    |                                                                                 |
+ |    |                                                                                 |
+ +    +---------------------------------------------------------------------------------+
+ 
+
+
+1字节 0xxxxxxx 
+2字节 110xxxxx 10xxxxxx 
+3字节 1110xxxx 10xxxxxx 10xxxxxx 
+4字节 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 
+5字节 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
+6字节 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
 ```
 [unicode 及位置](https://unicode-table.com/en/#control-character)
  [emoji位置](https://unicode-table.com/en/#emoticons)  80个字符(1F600— 1F64F)
 UCS-4 第1个字节2^7=128个group，第2个字节2^8=256个平面（plane）,第3个字节分为256行 （row），第4个字节代表每行有256个码位（cell）
 unicode 有0x10FFFF个cell，分为 17平面，(2^8=256)行，(2^8=256)单元
-
-```
-              2^8=256 cells
-          +----------------+
-
-          128 ascii
-          +-------+
-
-      +   +----------------+----------------+----------------+       +----------------+----------------+----------------+
-      |   ++ascii++        |                |                |       |                |                |                |
-256   |   |                |                |                |  ...  |                |                |                |
-lines |   |    plane 0     |    plane 1     |    plane 2     |       |     plane 14   |    plane 15    |    plane 16    |
-      |   |     BMP        |      SMP       |      SIP       |       |       SSP      |     SPUA-A     |     SPUA-B     |
-      +   |                |                |                |       |                |                |                |
-          +----------------+----------------+----------------+       +----------------+----------------+----------------+
-
-          +-------------------------------------------------------------------------------------------------------------+
-
-
-                                                            17 panes   (0x10FFFF cells)
-
-```
+ 
 - 涉及类
   1. [Character.UnicodeBlock](https://en.wikipedia.org/wiki/Unicode_block)
 - [Unicode与UTF-8转化](https://zh.wikipedia.org/wiki/UTF-8)
-- [UTF-16](https://en.wikipedia.org/wiki/UTF-16) UTF-16编码（二进制）就是：110110yyyyyyyyyy 110111xxxxxxxxxx
-  超过三个字节 Unicode 用四个字节的UTF-16编码
+- [UTF-16](https://en.wikipedia.org/wiki/UTF-16) 
+  UTF-16编码（二进制）就是：xxxxxxxx xxxxxxxx（0区）
+  或110110yy yyyyyyyy 110111xx xxxxxxxx（超过三个字节 Unicode 用四个字节的UTF-16编码）
   
 ```java
   System.out.println("a".getBytes(StandardCharsets.UTF_16).length);//结果为4，是因为加上BOM(字节顺序标记(ByteOrderMark))大端序，用FEFF表示，FEFF占用两个字节。
@@ -412,7 +427,7 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 [类](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html)
 [类加载器（日文）](http://fits.hatenablog.com/entry/2016/05/06/200824)
 [OpenJDK备忘录（日文）](http://hsmemo.github.io/index.html)
-
+[jclasslib 查看类结构]()
 ```
 JVM
 +--------------------------------------------------------------------+    +-------------------------------------------------+
@@ -424,12 +439,12 @@ JVM
 |                           |                                        |    | +--------------+ +-------------+                |
 +-----------+--------------------------------------------------------+    | +---------------------------------------------+ |
 |           | Initialization|                                        |    | | JVM Stacks      +-------------------------+ | |
-|           +------------------------------+-------------------------+    | |                 | Frame          |Frame   | | |
-|           |               | Resolution   |                         |    | |                 |   LVT          |        | | |
-|Continuity |               +--------------+                         |    | |                 |   Operand Stack|        | | |
-|Complete   | linking       | Preparation  |                         |    | |                 |   Frame Data   |        | | |
-|           |               +--------------+                         |    | |                 |                |        | | |
-|           |               | Verification |                         |    | |                 |                |        | | |
+|           +------------------------------+-------------------------+    | |                 | Frame                   | | |
+|           |               | Resolution   |                         |    | |                 |   LVT                   | | |
+|Continuity |               +--------------+                         |    | |                 |   Operand Stack         | | |
+|Complete   | linking       | Preparation  |                         |    | |                 |   Frame Data            | | |
+|           |               +--------------+                         |    | |                 |   method  return addr   | | |
+|           |               | Verification |                         |    | |                 |   dynamic addr          | | |
 |lifetime of+--------------------------------------------------------+    | |                 +-------------------------+ | |
 |class      | loaders       |  ClassLoader | Application ClassLoader |    | +---------------------------------------------+ |
 |           |               |              | Extension ClassLoader   |    +-------------------------------------------------+
@@ -442,6 +457,33 @@ JVM
 |     Compiling             |                javac                   |    |                     +-------------------------+ |
 +---------------------------+----------------------------------------+    +-------------------------------------------------+
 
+
+
+
+                                                                          executor
+
+                                                                          +-------------+----------+---------------+       +---------------+
+                                                                          |             |          |               |       |               |
+                                                                          |             |          |               |       |               |
+                                                                          |   interpret |   jit    | jvm           |       |    jni        |
+                                                                          |             |          |               |       |               |
+                                                                          +-------------+----------+---------------+       +---------------+
+
+                    heap                      method zone
++---------------------+----------------+------------------------+
+|                     |                |                        |
+|      Eden           |                |                        |
+|                     |                |                        |
++-----------+---------+                |                        |
+|           |         |                |                        |
+|  s0       |   s1    |                |                        |
+|           |         |                |                        |
++-----------+---------+----------------+------------------------+
+
+       yuang/new           tunure/old           permanent
+
+
+-xx:+PrintGCDetials 打印堆空间信息
 ```
 
 
@@ -941,411 +983,14 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 ```
 
 
-### 2.1 数据集合  - Collection 类（List, Queue, Map）
-数学-集合论
-```text
-                                            +--------------+                                          +----------------+
-                                            |              |                                          |                |
-                                            |   Collection |                                          |     Map        |
-                                            +------+-------+                                          +-------^--------+
-                                                   ^                                                     +-----------------------+------------+
-                           +---------------------------------------------+                               +                       +            |
-                           |                       |                     |                             .....                  ......          |
-                   +-------+-------+        +------+------+       ++-----+-----+                 +--+---------+-+         ++-----------+      |    +---------------+
-                   |unsort,no repeat        | sortable ,repeatable +                 +              +         +            +                  |    |               |
-                   |   Set         +        |   List      +       +    Queue   +                 + HashMap      +         +  SortMap   +      |    |  Dictionary   |
-                   +------+--------+        +-----+-------+       +-------+----+                 +-------+------+         +-------+----+      |    +---------------+
-                          ^                       ^                       ^                              ^                        ^           |
-       +--------------->  +                       + <---------------------+                              |                        |           |            ^
-    .......           .......                   ....                      |                              |                        |           |            |
-+--------------+   +---------------+  +-----------+  +---------+    +-----+-----------+         +--------+--------+        +------+------+    |  . +-------+--------+
-|              |   |               |  |           |  |         |    |                 |         |                 |        |             |    |  . |                |
-|  TreeSet     |   |   HashSet     |  | ArrayList |  | Vector  |    |   LinkedList    |         |   LinkedHashMap |        |   TreeMap   |    +--.-+   HashTable    |
-+--------------+   +---------------+  +-----------+  +---------+    +-----------------+         +-----------------+        +-------------+       . +----------------+
-
-
-
-```
-#### ArrayList
-```
-java.util.ArrayList object internals:
- OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
-      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                  int AbstractList.modCount                     0//在使用迭代器遍历集合的时候同时修改集合元素
-     12     4                  int ArrayList.size                            0
-     16     4   java.lang.Object[] ArrayList.elementData                     []
-     20     4                      (loss due to the next object alignment)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.ArrayList$Itr object internals:
- OFFSET  SIZE                  TYPE DESCRIPTION                               VALUE
-      0     4                       (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                       (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                   int Itr.cursor                                0
-     12     4                   int Itr.lastRet                               -1
-     16     4                   int Itr.expectedModCount                      0
-     20     4   java.util.ArrayList Itr.this$0                                (object)
-     24     8                       (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-```
-初始容量 10
-加载因子（0.0~1.0）  超过容量1.0，执行扩容
-扩容增量 
-```
-int newCapacity = oldCapacity + (oldCapacity >> 1);//整除则结果为 1.5倍，不能整除，结果为1.5倍加1
-
-java.util.ArrayList object internals:
- OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
-      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                  int AbstractList.modCount                     11
-     12     4                  int ArrayList.size                            11
-     16     4   java.lang.Object[] ArrayList.elementData                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, null, null, null]
-     20     4                      (loss due to the next object alignment)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-```
-#### LinkedList
-```
-java.util.LinkedList object internals:
- OFFSET  SIZE                        TYPE DESCRIPTION                               VALUE
-      0     4                             (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                             (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                         int AbstractList.modCount                     0
-     12     4                         int LinkedList.size                           0
-     16     4   java.util.LinkedList.Node LinkedList.first                          null //数据存放在双向链表
-     20     4   java.util.LinkedList.Node LinkedList.last                           null
-     24     8                             (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-java.util.LinkedList$ListItr object internals:
- OFFSET  SIZE                        TYPE DESCRIPTION                               VALUE
-      0     4                             (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                             (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                         int ListItr.nextIndex                         0
-     12     4                         int ListItr.expectedModCount                  0
-     16     4   java.util.LinkedList.Node ListItr.lastReturned                      null
-     20     4   java.util.LinkedList.Node ListItr.next                              null
-     24     4        java.util.LinkedList ListItr.this$0                            (object)
-     28     4                             (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-```
-#### Vector
-
-```
-java.util.Vector object internals:
- OFFSET  SIZE                 TYPE DESCRIPTION                               VALUE
-      0     4                      (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                      (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                  int AbstractList.modCount                     0
-     12     4                  int Vector.elementCount                       0
-     16     4                  int Vector.capacityIncrement                  0//自定义扩容大小
-     20     4   java.lang.Object[] Vector.elementData                        [null, null, null, null, null, null, null, null, null, null]
-     24     8                      (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-java.util.Vector$Itr object internals:
- OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
-      0     4                    (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                int Itr.cursor                                0
-     12     4                int Itr.lastRet                               -1
-     16     4                int Itr.expectedModCount                      0
-     20     4   java.util.Vector Itr.this$0                                (object)
-     24     8                    (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-```
-
-初始容量 10
-加载因子（0.0~1.0）  超过容量1.0，执行扩容
-扩容增量 增加一倍，或者自定义。ArrayList比较省空间。
-```
- int newCapacity = oldCapacity + ((capacityIncrement > 0) ?
-                                         capacityIncrement : oldCapacity);
-
-```
-
-与ArrayList区别是，所有方法都加Synchronized，性能没有ArrayList高
-#### HashSet
-```
-java.util.HashSet object internals:
- OFFSET  SIZE                TYPE DESCRIPTION                               VALUE
-      0     4                     (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                     (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.HashMap HashSet.map                               (object)
-     12     4                     (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.HashMap$KeyIterator object internals:
- OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
-      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                      int HashIterator.expectedModCount             0
-     12     4                      int HashIterator.index                        0
-     16     4   java.util.HashMap.Node HashIterator.next                         null
-     20     4   java.util.HashMap.Node HashIterator.current                      null
-     24     4        java.util.HashMap HashIterator.this$0                       (object)
-     28     4        java.util.HashMap KeyIterator.this$0                        (object)
-     32     8                          (loss due to the next object alignment)
-Instance size: 40 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-```
-初始容量 （HashMap决定）16
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍
-```
-
-newCap = oldCap << 1
-```
-#### TreeSet
-```
-java.util.TreeSet object internals:
- OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
-      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.NavigableMap TreeSet.m                                 (object) //默认TreeMap实现
-     12     4                          (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.TreeMap$KeyIterator object internals:
- OFFSET  SIZE                      TYPE DESCRIPTION                               VALUE
-      0     4                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                       int PrivateEntryIterator.expectedModCount     0
-     12     4   java.util.TreeMap.Entry PrivateEntryIterator.next                 null
-     16     4   java.util.TreeMap.Entry PrivateEntryIterator.lastReturned         null
-     20     4         java.util.TreeMap PrivateEntryIterator.this$0               (object)
-     24     4         java.util.TreeMap KeyIterator.this$0                        (object)
-     28     4                           (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-```
-初始容量 （HashMap决定）16
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍
-
-#### HashMap
-JDK7中HashMap采用的是位桶+链表的方式，即我们常说的散列链表的方式，而JDK8中采用的是位桶+链表/红黑树
-```
-java.util.HashMap object internals:
- OFFSET  SIZE                       TYPE DESCRIPTION                               VALUE
-      0     4                            (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                            (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4              java.util.Set AbstractMap.keySet                        null
-     12     4       java.util.Collection AbstractMap.values                        null
-     16     4                        int HashMap.size                              0
-     20     4                        int HashMap.modCount                          0
-     24     4                        int HashMap.threshold                         0//自增阀值，判断是否需要自增容量，等于容量*加载因子
-     28     4                      float HashMap.loadFactor                        0.75
-     32     4   java.util.HashMap.Node[] HashMap.table                             null// Node对象，包含key，value和下一个Node对象
-     36     4              java.util.Set HashMap.entrySet                          null
-     40     8                            (loss due to the next object alignment)
-Instance size: 48 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-
-java.util.HashMap$EntryIterator object internals:
- OFFSET  SIZE                     TYPE DESCRIPTION                               VALUE
-      0     4                          (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                      int HashIterator.expectedModCount             0
-     12     4                      int HashIterator.index                        0
-     16     4   java.util.HashMap.Node HashIterator.next                         null
-     20     4   java.util.HashMap.Node HashIterator.current                      null
-     24     4        java.util.HashMap HashIterator.this$0                       (object)
-     28     4        java.util.HashMap EntryIterator.this$0                      (object)
-     32     8                          (loss due to the next object alignment)
-Instance size: 40 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-```
-
-初始容量  16
-加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash表）  一倍
-```
-
-newCap = oldCap << 1
-```
-
-- 哈希碰撞
-```
-    static final int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);//位的亦或运算
-    }
-```
-hash bucket 大小设置为 length=2^n。
-2^n-1对应的二进制 1111...111，hash bucket的索引值是通过 hash & (tab.length - 1)，设置为2^n，减少哈希碰撞
-
-- 链地址过长，（红黑树）树化
-  TREEIFY_THRESHOLD = 8时，对哈希冲突链地址树化
-
-```
-哈希碰碰撞时的解决方法
-1. 开放地址法（HashTable），包括 线性探测再散列，二次探测再散列，伪随机探测再散列
-2. 链地址法（HashMap 用红黑树代替链表，加快搜索）
-3. 再哈希法
-4. 建立一个公共溢出区
-```
-[xorshift](http://csuncle.com/2018/08/03/梅森旋转安全性分析及改进/)
-#### HashTable
-开放地址法解决Hash冲突
-
-```
-java.util.Hashtable object internals:
- OFFSET  SIZE                          TYPE DESCRIPTION                               VALUE
-      0     4                               (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                               (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                           int Hashtable.count                           0
-     12     4                           int Hashtable.threshold                       8
-     16     4                         float Hashtable.loadFactor                      0.75
-     20     4                           int Hashtable.modCount                        0
-     24     4   java.util.Hashtable.Entry[] Hashtable.table                           [null, null, null, null, null, null, null, null, null, null, null]
-     28     4                 java.util.Set Hashtable.keySet                          null
-     32     4                 java.util.Set Hashtable.entrySet                        null
-     36     4          java.util.Collection Hashtable.values                          null
-     40     8                               (loss due to the next object alignment)
-Instance size: 48 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-java.util.Collections$EmptyIterator object internals:
- OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
-      0     4        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     8        (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
-```
-初始容量 11
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍+1
-```
-
-int newCapacity = (oldCapacity << 1) + 1;
-```
-#### LinkedHashMap
-
-LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
-HashMap节点类 Node 包好 next;
-```
-java.util.LinkedHashMap object internals:
- OFFSET  SIZE                            TYPE DESCRIPTION                               VALUE
-      0     4                                 (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                   java.util.Set AbstractMap.keySet                        null
-     12     4            java.util.Collection AbstractMap.values                        null
-     16     4                             int HashMap.size                              0
-     20     4                             int HashMap.modCount                          0
-     24     4                             int HashMap.threshold                         0
-     28     4                           float HashMap.loadFactor                        0.75
-     32     4        java.util.HashMap.Node[] HashMap.table                             null
-     36     4                   java.util.Set HashMap.entrySet                          null
-     40     1                         boolean LinkedHashMap.accessOrder                 false  //相比Hashmap多出的部分，访问顺序排序，可以LinkedEntryIterator，打印出来。LinkedHashMapEntry，相比Hashmap新增before,after两个字段，用来排序。false则保存插入顺序，true则按访问顺序
-     41     3                                 (alignment/padding gap)                  
-     44     4   java.util.LinkedHashMap.Entry LinkedHashMap.head                        null  //相比Hashmap多出的部分,双向链表
-     48     4   java.util.LinkedHashMap.Entry LinkedHashMap.tail                        null  //相比Hashmap多出的部分,双向链表
-     52     4                                 (loss due to the next object alignment)
-Instance size: 56 bytes
-Space losses: 3 bytes internal + 4 bytes external = 7 bytes total
-
-java.util.LinkedHashMap$LinkedEntryIterator object internals:
- OFFSET  SIZE                            TYPE DESCRIPTION                               VALUE
-      0     4                                 (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                             int LinkedHashIterator.expectedModCount       0
-     12     4   java.util.LinkedHashMap.Entry LinkedHashIterator.next                   null
-     16     4   java.util.LinkedHashMap.Entry LinkedHashIterator.current                null
-     20     4         java.util.LinkedHashMap LinkedHashIterator.this$0                 (object)
-     24     4         java.util.LinkedHashMap LinkedEntryIterator.this$0                (object)
-     28     4                                 (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-```
-初始容量（继承Hashmap）  16
-加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash表）  一倍
-```
-
-newCap = oldCap << 1
-```
-
-
-#### TreeMap
-红黑树排序
-
-初始容量 11
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍+1
-
-红黑树平衡调整
-二叉树搜索
-```
-public class TreeMap<K, V> extends AbstractMap<K, V> implements NavigableMap<K, V>, Cloneable, Serializable {
-    private final Comparator<? super K> comparator;
-    private transient TreeMap.Entry<K, V> root;
-    private transient int size = 0;
-    private transient int modCount = 0;
-    private transient TreeMap<K, V>.EntrySet entrySet;
-    private transient TreeMap.KeySet<K> navigableKeySet;
-    private transient NavigableMap<K, V> descendingMap;
-}
-
-
-java.util.TreeMap object internals:
- OFFSET  SIZE                         TYPE DESCRIPTION                               VALUE
-      0     4                              (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                              (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                java.util.Set AbstractMap.keySet                        null
-     12     4         java.util.Collection AbstractMap.values                        null
-     16     4                          int TreeMap.size                              0
-     20     4                          int TreeMap.modCount                          0
-     24     4         java.util.Comparator TreeMap.comparator                        null
-     28     4      java.util.TreeMap.Entry TreeMap.root                              null
-     32     4   java.util.TreeMap.EntrySet TreeMap.entrySet                          null
-     36     4     java.util.TreeMap.KeySet TreeMap.navigableKeySet                   null
-     40     4       java.util.NavigableMap TreeMap.descendingMap                     null
-     44     4                              (loss due to the next object alignment)
-Instance size: 48 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.TreeMap$EntryIterator object internals:
- OFFSET  SIZE                      TYPE DESCRIPTION                               VALUE
-      0     4                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                       int PrivateEntryIterator.expectedModCount     1
-     12     4   java.util.TreeMap.Entry PrivateEntryIterator.next                 (object)
-     16     4   java.util.TreeMap.Entry PrivateEntryIterator.lastReturned         null
-     20     4         java.util.TreeMap PrivateEntryIterator.this$0               (object)
-     24     4         java.util.TreeMap EntryIterator.this$0                      (object)
-     28     4                           (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-
-```
-Charset#availableCharsets():SortedMap
-
-
 
 ### 数据类结构 - 类实现面向对象与设计模式
 三特性， 基于内聚与藕合(cohesion & coupling)五大基本原则(SOLID )：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
 23设计模式
 ```
 
-                                                               association   
-                                                               aggregation  
+                                                               association
+                                                               aggregation
                              inheritance                       composition
     encapsulation            polymorphism                      dependencies
 +----------------------+----------------------------------+---------------------------------------+
@@ -1380,12 +1025,12 @@ Charset#availableCharsets():SortedMap
 +----------------------+----------------------------------+---------------------------------------+
 
 ```
- 
+
   - 构建者模式
   Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
 
   - 单例模式
-  Application，LayoutInflater 
+  Application，LayoutInflater
   - 工厂方法
   BitmapFactory
   - 享元模式
@@ -1439,7 +1084,7 @@ Charset#availableCharsets():SortedMap
 
 ```
 
-## 声明式编程-函数式编程/响应式编程（java 1.8） 
+## 声明式编程-函数式编程/响应式编程（java 1.8）
 函数是一等公民
 1. 函数接口/SAM接口 **@FunctionalInterface**
 ```java
@@ -1483,11 +1128,11 @@ lambda表达式实例化函数接口，创建该接口的对象
 1. 增强接口方法
 - Default Methods。List/Collection interface can have a default implementation of forEach method
 - 静态方法
- 
+
 处理以上方法可以用，方法引用符号 **::**引用。构造方法也可以
 
 ### 函数式编程
- 
+
 #### **java 8 Stream API** 详解 (Map-reduce、Collectors收集器、并行流)
 ```
 +------------------------------------------------------------+
@@ -1531,411 +1176,14 @@ Rxjava实现
 #### CompletableFuture
 
 
-## 2.4 数据并发访问 - 线程与并发
-
-### 异步实现（多线程编程）
-[Java 异步编程：从 Future 到 Loom](https://www.jianshu.com/p/5db701a764cb)
-线程初始化三种方式： Thread,Runnable,Callable，Feature
-线程的生命周期
-```
-                                       +---------------+
-                            +----------+ Block         | <-----------------+   run synchronized
-                            |          +---------------+                   |
-                            |          +---------------+                   |
-                            +----------+ Time_waitting | <-----------------+   sleep(),wait(ms),join(ms)
-                            |          +---------------+                   |   LockSupport.parkNanos(),LockSupport.parkUntil()
-                            |          +---------------+                   |
-                            +----------+ Waitting      | <-----------------+   wait(),join(),LockSupport.park()
-                            v          +---------------+                   |
-                     +-------------------------------------------------------------+
-+---------+          |   +-----------+         system call        +------------+   |      +--------------+
-|         |          |   |           | +------------------------> |            |   |      |              |
-|  New    | +------> |   |  Ready    |                            |  Running   |   +----> |  Terminated  |
-|         |          |   |           |                            |            |   |      |              |
-+---------+          |   +-----------+ <------------------------+ +------------+   |      +--------------+
-                     |                          yield()                            |
-                     +-------------------------------------------------------------+
-                                                 Runnable
-
-```
-
-- 多线程
-  线程通讯：volatile/synchronized，wait()/nofity()，pipe,join(),ThreadLocal
-  线程（实现**异步**）
-  线程池（实现**并发**） 
-```
-                         //ThreadPoolExecutor/ScheduledThreadPoolExecutor
-                         +--------------------+---------------------------------+
-                         | ThreadPoolExecutor |              keepAliveTime      |
-                         +--------------------+              corePoolSize       |
-                         | RejectedExecutionHandler                             |
-   firstTask             |  ^                                                   |
-   +-------------+       |  | >maximumPoolSize                                  |
-   | Runnable    |       |  |   +----------------+                              |
-   +-------------+       |  |   |Worker          | +-------> works:set<Workser> |
-   | Callable    | +--------+-> | Thread         |                              |
-   +-------------+       |      +----------------+                              |
-   | FutureTask  |       +------------------------------------------------------+
-   +-------------+                  |
-                                    v            +-----------------------------------+
-                         +----------+----+       | +--------------+ +--------------+ |
-   queue Task            |  ThreadFactory| +---->+ |Thread(Worker)| |Thread(Worker)| |
-   +-------------+       +---------------+       | +--------------+ +--------------+ |
-   | Runnable    |                               +-----------------------------------+
-   +-------------+                                  ^
-   | Callable    |                                  | poll()
-   +-------------+   offer()    +-------------------+----+   //SynchronousQueue,
-   | FutureTask  | +--------->  |workQueue：BlockingQueue |   //LinkedBlockingDeque,
-   +-------------+              +------------------------+   //ArrayBlockingQueue
-
-```
-- 并发：为了提高效率，减少时间，引入多线程实现并发，同时多线程带来些问题，包括共享变量（内存可见的happens-before原则，避免重排序），锁活跃性问题(死锁,饥饿、活锁) ,性能问题
-
-
-- 风险
-  1. 安全(原子性，可见性，有序性)
-  2. 跳跃性
-  3. 性能（上下文切换，死锁，资源限制）
-
-### 并发底层实现
-```
-+-------------+--------------+----------------------+------------------+------------------------+-----------------------+
-|             |              |                      |                  |                        |                       |
-| Object      |  DCL problem |    synchronized      |  Object.wait()   |                        |                       |
-|             |              | (Reentrant,unfair)   |  Object.notify() |                        |                       |
-|             |              | (Exclusi^e,pessimism)|                  |                        |                       |
-+----------------------------+-----------------------------------------+------------------------+-----------------------+
-|             | J.U.C.atomic                                                                                            |
-|  volatile   +---------------------------------------------------------------------------------------------------------+
-|             | ConcurrentLinkedDeque                                                                                   |
-|             | ConcurrentSkipListMap                                                                                   |
-|             +---------------------------------------------------------------------------------------------------------+
-|             |              |ReentrantReadWriteLock                                                                    |
-|             |     AQS      |(shared Read)                                                                             |
-|             |              |StampedLock                                                                               |
-|             |              +----------------------+------------------+------------------------+-----------------------+
-|             |              |                      |   Condition      |    CountDownLatch      |   ArrayBlockingQueue  |
-|    CAS      |              |                      |                  |    CyclicBarrier       |   LinkedBlockingQueue |
-|             |              |  ReentrantLock       |                  |                        |                       |
-|             |              |(Exclusi^e,optimistic)|                  |   Semaphore,Exchanger  |   ConcurrentHashMap   |
-|             |              |                      |                  |                        |   CopyOnWriteArrayList|
-|             |              |                      |                  |                        |                       |
-|             |              |                      |                  |                        |   Fork/Join           |
-+-------------+--------------+----------------------+------------------+------------------------+-----------------------+
-
-
-
-```
-
-  1. volatile（内存可见性，其他线程看到的value值都是最新的value值，即修改之后的volatile的值; 指令有序序，解决重排序） + cas 原子操作(atomic operation)是不需要synchronized，不会被线程调度机制打断的操作。
-  2. synchronized。当synchronized锁住一个对象后，别的线程如果也想拿到这个对象的锁，就必须等待这个线程执行完成释放锁，才能再次给对象加锁，这样才达到线程同步的目的。
-  3. synchronized(Sync.class)/ static synchronized方法 为全局锁，相当于锁住了代码段。限制多线程中该类的**所有实例**同时访问jvm中该类所对应的代码块。
-上下文切换查看工具 **vmstat**,**LMbench**
-
-#### 内置锁（synchronized）
- [从jvm源码看synchronized](https://www.cnblogs.com/kundeg/p/8422557.html)
-    - 静态的锁顺序死锁。一个线程执行a方法且已经获得了A锁，在等待B锁；另一个线程执行了b方法且已经获得了B锁，在等待A锁。这种状态，就是发生了静态的锁顺序死锁。
-    - [动态的锁顺序死锁](https://www.androidos.net.cn/codebook/AndroidRoad/java/concurrence/deadlock.md)
-    ```java
-    //可能发生动态锁顺序死锁的代码
-    class DynamicLockOrderDeadLock {
-        public void transefMoney(Account fromAccount, Account toAccount, Double amount) {
-            synchronized (fromAccount) {
-                synchronized (toAccount) {
-                    //...
-                    fromAccount.minus(amount);
-                    toAccount.add(amount);
-                    //...
-                }
-            }
-        }
-    }
-    ```
-
-    -  协作对象之间发生的死锁
-- 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
-
-  - Object.wait(),Object.notify()
-
-#### volatile 与 CAS
-  定义：meaning that writes to this field are immediately made visible to other threads.
-  [正确使用 Volatile 变量](https://www.ibm.com/developerworks/cn/java/j-jtp06197.html)
-  保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
-[volatile的读写操作的过程: ](https://blog.csdn.net/jiuqiyuliang/article/details/62216574)
-
-```
-
-（1）线程写volatile变量的过程：  
-         1、改变线程工作内存中volatile变量的副本的值  
-         2、将改变后的副本的值从工作内存刷新到主内存  
-（2）线程读volatile变量的过程：  
-        1、从主内存中读取volatile变量的最新值到线程的工作内存中  
-        2、从工作内存中读取volatile变量的副本 
-```
-
-#### volatile 内存模型
- volatile 内存语义， 重排序,顺序一致性
- 内存可见性、volatile锁 
- final 内存语义，读写重排序规则
- hanpen before，指两个操作指令的执行顺序
-
- 可以保证变量的可见性 ，不能保证变量状态的“原子性操作”，原子性操作需要lock或cas
-#### 原子操作类：采用 volatile和[Unsafe#Unsafe_CompareAndSwapInt](/home/anshu/workspace/openjdk/hotspot/src/share/vm/prims)的CAS原子操作
-```
-java.util.concurrent.atomic.AtomicInteger object internals:
- OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
-      0     4        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4    int AtomicInteger.value                       0 //volatile修饰
-     12     4        (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-```
-
-```
-
-java.util.concurrent.atomic.AtomicStampedReference object internals:
- OFFSET  SIZE                                                      TYPE DESCRIPTION                               VALUE
-      0     4                                                           (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                                                           (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.concurrent.atomic.AtomicStampedReference.Pair AtomicStampedReference.pair               (object)  //volatile修饰
-     12     4                                                           (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.concurrent.atomic.AtomicStampedReference$Pair object internals:
- OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
-      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
-      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                int Pair.stamp                                0  //final修饰
-     12     4   java.lang.Object Pair.reference                            0  //final修饰
-     16     8                    (loss due to the next object alignment)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-```
-
-```
-java.util.concurrent.atomic.AtomicReference object internals:
- OFFSET  SIZE               TYPE DESCRIPTION                               VALUE
-      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
-      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.lang.Object AtomicReference.value                     null //volatile修饰
-     12     4                    (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-```
-
-AtomicInteger的cas原理
-```
-jdk/src/share/classes/sun/misc/Unsafe.java
-public final int getAndAddInt(Object o, long offset, int delta) {
-    int v;
-    do {
-        v = getIntVolatile(o, offset);//读取线程共享主存的最新值
-    } while (!compareAndSwapInt(o, offset, v, v + delta));//没有置换成功，继续循环直到竞争成功
-    return v;
-}
-
-hotspot/src/share/vm/prims/unsafe.cpp
-UNSAFE_ENTRY(jboolean, Unsafe_CompareAndSwapInt(JNIEnv *env, jobject unsafe, jobject obj, jlong offset, jint e, jint x))
-  UnsafeWrapper("Unsafe_CompareAndSwapInt");
-  oop p = JNIHandles::resolve(obj);
-  jint* addr = (jint *) index_oop_from_field_offset_long(p, offset);
-  return (jint)(Atomic::cmpxchg(x, addr, e)) == e;//只需要关注到这。将主存的副本和线程的新值传进去，后续cpu进行CAS操作。查看是否把主存原来的值置换出来，新增的值置换到主存
-UNSAFE_END 
-
-```
-  - 乐观锁思想-CAS原子操作。修改前，对比直到共享内存和当前值（当前线程临时内存）一致，才做修改，这个流程不会加锁阻塞（《Java 并发编程的艺术》2.3节）
-      - AtomicStampedReference来解决ABA问题；
-      - 循环时间长开销大
-      - AtomicReference类来多个共享变量合成一个共享变量来操作
-
-  
-
-#### AQS 实现 **乐观锁**
-```java
-public abstract class AbstractQueuedSynchronizer{
-    /**
-     * Head of the wait queue, lazily initialized.  Except for
-     * initialization, it is modified only via method setHead.  Note:
-     * If head exists, its waitStatus is guaranteed not to be
-     * CANCELLED.
-     */
-    private transient volatile Node head;
-
-    /**
-     * Tail of the wait queue, lazily initialized.  Modified only via
-     * method enq to add new wait node.
-     */
-    private transient volatile Node tail;
-
-    /**
-     * The synchronization state.
-     */
-    private volatile int state; 
-}
-```
-
-```
-1. 独占式获取与释放同步状态
-2. 共享式获取与释放同步状态
-3. 查询同步队列中的等待线程情况
-```
-
-**重入锁** ReentrantLock（**独享锁**,**互斥锁**）/ReentrantReadWriteLock（**读锁是共享锁，其写锁是独享锁**）/StampedLock （内部通过 AbstractQueuedSynchronizer同步器，实现**公平锁和非公平锁**，AbstractQueuedSynchronizer包含Condition，使用volatile修饰的state变量维护同步状态），解决复杂锁问题，如先获得锁A，然后再获取锁B，当获取锁B后释放锁A同时获取锁C，当锁C获取后，再释放锁B同时获取锁D。
-
-
-CountDownLatch，CyclicBarrier，Semaphore，Exchanger （这类使用AQS）
-- ReentrantLock: 使用了AQS的独占获取和释放,用state变量记录某个线程获取独占锁的次数,获取锁时+1，释放锁时-1，在获取时会校验线程是否可以获取锁。
-- Semaphore: 使用了AQS的共享获取和释放，用state变量作为计数器，只有在大于0时允许线程进入。获取锁时-1，释放锁时+1。
-- CountDownLatch: 使用了AQS的共享获取和释放，用state变量作为计数器，在初始化时指定。只要state还大于0，获取共享锁会因为失败而阻塞，直到计数器的值为0时，共享锁才允许获取，所有等待线程会被逐一唤醒
-  
-```
-java.util.concurrent.locks.ReentrantLock object internals:
- OFFSET  SIZE                                            TYPE DESCRIPTION                               VALUE
-      0     4                                                 (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
-      4     4                                                 (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.concurrent.locks.ReentrantLock.Sync ReentrantLock.sync                        (object)  //AQS子类
-     12     4                                                 (loss due to the next object alignment)
-Instance size: 16 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-java.util.concurrent.locks.ReentrantLock$NonfairSync object internals://继承AQS，没有加字段，只是重写lock()，tryRequire()方法
- OFFSET  SIZE                                                         TYPE DESCRIPTION                                        VALUE
-      0     4                                                              (object header)                                    01 00 00 00 (00000001 00000000 00000000 00000000) (1)
-      4     4                                                              (object header)                                    00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                                             java.lang.Thread AbstractOwnableSynchronizer.exclusiveOwnerThread   null //竞争到的线程
-     12     4                                                          int AbstractQueuedSynchronizer.state                   0     // volatile 修饰符
-     16     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.head                    null
-     20     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node AbstractQueuedSynchronizer.tail                    null
-     24     8                                                              (loss due to the next object alignment)
-Instance size: 32 bytes
-Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
-
- 
-
- 
-java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject object internals://new ReentrantLock().newCondition()
- OFFSET  SIZE                                                         TYPE DESCRIPTION                               VALUE
-      0     4                                                              (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                                                              (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node ConditionObject.firstWaiter               null
-     12     4   java.util.concurrent.locks.AbstractQueuedSynchronizer.Node ConditionObject.lastWaiter                null
-     16     4        java.util.concurrent.locks.AbstractQueuedSynchronizer ConditionObject.this$0                    (object)
-     20     4                                                              (loss due to the next object alignment)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-
-
-+-------------------------------------------------------------------------------------------+
-|                           await()                             doBussiness()               |
-|                           +---------------------------------+                             |
-|             +-------------+   block                         +----------->                 |
-|    WorkThread             +---------------------------------+                             |
-|                                                                                           |
-|                                                                                           |
-|   CountDownLatch(2)          1                              0                             |
-|   +--------------------------------------------------------->                             |
-|                                                                                           |
-|                              ^                              ^                             |
-|    Thread 1                  | cutdown()                    |                             |
-|             +----------------+--->                          |                             |
-|    Thread 2                                                 | cutdown()                   |
-|             +-----------------------------------------------+-------->                    |
-|                                                                                           |
-+-------------------------------------------------------------------------------------------+
-
-+-------------------------------------------------------------------------------------------+
-|                                                                                           |
-|   CyclicBarrier(3)                                                                        |
-|                           2      1                            0                           |
-|   +----------------------------------------------------------->                           |
-|                                                                                           |
-|   Thread 1                await()                                                         |
-|            doneSomething()+-----------------------------------+ doOther()                 |
-|   +-----------------------+            block                  +----------------->         |
-|                           +-----------------------------------+                           |
-|                                                                                           |
-|   Thread 2                       await()                                                  |
-|                 doneSomething()   +---------------------------+ doOther()                 |
-|   +-------------------------------+     block                 +----------------->         |
-|                                   +---------------------------+                           |
-|   Thread 3                                                                                |
-|                                          doneSomething()    await()                       |
-|   +----------------------------------------------------------------------------->         |
-|                                                                 doOther()                 |
-|                                                                                           |
-+-------------------------------------------------------------------------------------------+
-
-
-+-------------------------------------------------------------------------------------------+
-|                                                                                           |
-|  Semaphore                                                                                |
-|             1    2                        1                       0                       |
-|  +----------------------------------------------------------------------------->          |
-|                                                                                           |
-|  Thread 1              doSyncWork()                                                       |
-|           acquire()                   release()                                           |
-|  +----------------------------------------------------------------------------->          |
-|                                                                                           |
-|  Thread 2    acquire()                                        release()                   |
-|                +--------------------------+    doSyncWork()                               |
-|  +-------------+       block              +------------------------------------>          |
-|                +--------------------------+                                               |
-|                                                                                           |
-+-------------------------------------------------------------------------------------------+
-
-```
-
-- 生产者与消费者。Condition配合ReentrantLock，实现了wait()/notify()（阻塞与通知）
-
-
-
-#### 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
-  - ConcurrentHashMap。有并发要求，使用该类替换HashTable
-java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用CAS + synchronized保证并发更新的安全性，底层采用数组+链表+红黑树的存储结构。
-```
-java.util.concurrent.ConcurrentHashMap object internals:
- OFFSET  SIZE                                                   TYPE DESCRIPTION                               VALUE
-      0     4                                                        (object header)                           05 00 00 00 (00000101 00000000 00000000 00000000) (5)
-      4     4                                                        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
-      8     4                                          java.util.Set AbstractMap.keySet                        null
-     12     4                                   java.util.Collection AbstractMap.values                        null
-     16     8                                                   long ConcurrentHashMap.baseCount               0
-     24     4                                                    int ConcurrentHashMap.sizeCtl                 0 //volatile 并发利用CAS算法
-     28     4                                                    int ConcurrentHashMap.transferIndex           0
-     32     4                                                    int ConcurrentHashMap.cellsBusy               0
-     36     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.table                   null
-     40     4          java.util.concurrent.ConcurrentHashMap.Node[] ConcurrentHashMap.nextTable               null//用于迁移到table属性的临时属性
-     44     4   java.util.concurrent.ConcurrentHashMap.CounterCell[] ConcurrentHashMap.counterCells            null//用于并行计算每个bucket的元素数量。
-     48     4      java.util.concurrent.ConcurrentHashMap.KeySetView ConcurrentHashMap.keySet                  null
-     52     4      java.util.concurrent.ConcurrentHashMap.ValuesView ConcurrentHashMap.values                  null
-     56     4    java.util.concurrent.ConcurrentHashMap.EntrySetView ConcurrentHashMap.entrySet                null
-     60     4                                                        (loss due to the next object alignment)
-Instance size: 64 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-
-```
-桶初始容量  16
-加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash桶）  增加一倍
-树化
-帮助数据迁移：将原来的 tab 数组的元素迁移到新的 nextTab 数组中。在多线程条件下，当前线程检测到其他线程正进行扩容操作（Thread.yield()），则协助其一起进行数据迁移。扩容后  sizeCtl = (n << 1) - (n >>> 1);
-
-
-
-  - 并发框架 Fork/Join
-
+## 2.4 数据（吞吐量）并发访问 - 线程与并发
+[知识体系-程序-java-throughput.md](知识体系-程序-java-throughput.md)
 ## 元编程
 RTTI，即Run-Time Type Identification，运行时类型识别。RTTI能在运行时就能够自动识别每个编译时已知的类型。
 
 反射机制就是识别未知类型的对象。反射常用于动态代理中。
 
 ### 应用：内省（Introspector）
-
-
 
 ### 序列化Serializable
 
@@ -2022,23 +1270,23 @@ Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任�
 
 泛型是一种多态技术。而多态的核心目的是为了消除重复，隔离变化，提高系统的正交性。
 ```
-+----------------------------------------------------------------------------------------------------------+ 
++----------------------------------------------------------------------------------------------------------+
 |                                                                                                          |
 | GenericArrayType            ParameterizedType          TypeVariable            WildcardType         Class|
 |   getGenericComponentType()   getActualTypeArguments()  getBounds()              getUpperBounds()        |
 |                               getRawType()              getGenericDeclaration()  getLowerBounds()        |
 |                               getOwnerType()            getName()                                        |
 |                                                         getAnnotatedBounds()                             |
-+----------------------------------------------------------------------------------------------------------+ 
++----------------------------------------------------------------------------------------------------------+
 |                                      Type  (reflect)                                                     |
 +----------------------------------------------------------------------------------------------------------+
 
 ```
 ```
 javax annotation apt/serviceloader
-+-------------------------------------------------------------------------+------------------+ 
++-------------------------------------------------------------------------+------------------+
 |         VariableElement           ExecutableElement:Parameterizable     |                  |
-|TypeElement:Parameterizable,QualifiedNameable    TypeParameterElement    |                  |        
+|TypeElement:Parameterizable,QualifiedNameable    TypeParameterElement    |                  |
 |                    PackageElement:QualifiedNameable                     |                  |
 +-------------------------------------------------------------------------+------------------+
 |                        Element                                          | AnnotationMirror |
@@ -2107,7 +1355,7 @@ javax annotation apt/serviceloader
 +--------------------------------------------------------------------------------------------------------------------------------------+
 +--------------------------------------------------------------------------------------------------------------------------------------+
 |               |  X?   X, once or not at all     X{n}     X, exactly n times       |                     |                            |
-|  Quantifiers  |  X*   X, zero or more times     X{n,}    X, at least n times      |                     |                            | 
+|  Quantifiers  |  X*   X, zero or more times     X{n,}    X, at least n times      |                     |                            |
 |               |  X+   X,mone or more times      X{n,m}   X, at least n            |       ?             |                 +          |
 |               |                                         but not more than m times |                     |                            |
 |               +----------------------------------------------------------------------------------------------------------------------+
@@ -2206,7 +1454,7 @@ replaceAll: 用到了正则表达式（后溯，replaceAll("\\W","\\\\$0")）
 | |             |    |             |  initiate                |    initiate        |                 |   |
 | |             |    |             |     +                    |         +          |                 |   | copy from kernel
 | |             |    |             |     |  block             |         | block    |                 |   | to user
-| |             |    |             |     |                    |         |          |                 |   | 
+| |             |    |             |     |                    |         |          |                 |   |
 | v complete    |    v complete    |     v  complete          |         v complete |  notification   |   +
 |               |                  |                          |                    |                 |
 +---------------+------------------+--------------------------+--------------------+-----------------+
@@ -2237,9 +1485,9 @@ replaceAll: 用到了正则表达式（后溯，replaceAll("\\W","\\\\$0")）
 基于磁盘操作的 I/O 接口：File,RandomAccessFile
 基于网络操作的 I/O 接口：Socket
 ```
-UTF-8 
+UTF-8
 
- 
+
 
 #### NIO（BUffer,Channel ,Selector）
 IO是面向流的，NIO是面向缓冲区的。
@@ -2328,12 +1576,12 @@ awt/swing
 |     float        jfloat          32 bits                                   |f
 |     double       jdouble         64 bits                                   |d
 |     void         void            N/A                                       |
-+----------------------------------------------------------------------------+//other 
++----------------------------------------------------------------------------+//other
 |  Reference Types                                                           |
 |     jobject                                                                |L fully-qualified-class ; fully-qualified-class
 |         jclass                                                             |
 |         jstring                                                            |
-|         jarray                                                             |[ type type[] 
+|         jarray                                                             |[ type type[]
 |              jobjectArray                                                  |
 |              jbooleanArray                                                 |
 |              jbyteArray                                                    |
@@ -2445,7 +1693,7 @@ sudo tcpdump
 ```
 
 网络数据：报文格式
-- Socket 
+- Socket
 ### 编码
 Java 8 Base64
 使用64个字符（2^6）编码内容
@@ -2471,7 +1719,7 @@ MIME： A-Za-z0-9+/=
  TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。TCP是全双工模式，这就意味着，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了，主机1告诉主机2，它的数据已经全部发送完毕了
 
 [TCP Header Format](https://tools.ietf.org/html/rfc793)
-``` 
+```
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2589,7 +1837,7 @@ SYN_SENT  |                                                  |                  
 
 [wiredshark抓包](https://blog.csdn.net/u014530704/article/details/78842000)
 1. http contains  baidu.com （SSL 过滤 https）
-2.  ip.src==47.95.165.112 or ip.dst==47.95.165.112 
+2.  ip.src==47.95.165.112 or ip.dst==47.95.165.112
 
 > HTTP/2。HTTP/2**支持明文传输**，而SPDY强制使用HTTPS；HTTP/2消息头的压缩算法采用HPACK，而非SPDY采用的DEFLATE。
 相较于HTTP1.1，HTTP/2的主要优点有采用二进制帧封装，传输变成多路复用，流量控制算法优化，服务器端推送，首部压缩，优先级等特点。
@@ -2631,7 +1879,7 @@ NPN 的协商结果是在 Change Cipher Spec 之后加密发送给服务端；�
 ```
 JDBC
 +-----------------------------------------------------+
-|                                                     | 
+|                                                     |
 |                                                     |
 |                                                     |
 +-----------+--------------------+--------------------+
@@ -2642,7 +1890,7 @@ JDBC
 
 ```
 
-### Sql 
+### Sql
 基本操作：增删改查
 ```
 create database <dbName>
@@ -2685,7 +1933,7 @@ WHERE  column_name OPERATOR
       (SELECT column_name [, column_name ]
       FROM table1 [, table2 ]
       [WHERE])
- 
+
 SELECT * FROM student,(
     SELECT sno FROM SC WHERE cno=1//派生查询
 ) AS tempSC
@@ -2697,7 +1945,7 @@ WHERE student.sno = tempSC.sno
 - 嵌套查询
   与IN、ALL、ANY、EXISTS配合使用。
 - 派生表查询
- 
+
 - 集合查询
   UNION、UNION ALL、INTERSECT、EXCEPT
 - 事务
@@ -2896,7 +2144,7 @@ RSA
 
 
 https://www.cnblogs.com/wade-luffy/p/5925728.html
-  ``` 
+  ```
 
 
   ```

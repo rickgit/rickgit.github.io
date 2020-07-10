@@ -724,3 +724,92 @@ git commit -m ""
 
 ### Filename too long error
 git config --system core.longpaths true
+
+
+### code review checklist 
+[code review checklist](https://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653552455&idx=1&sn=8bbc7df1040d5d46b5d793e471e38265&chksm=813a6edfb64de7c9e4f19503b474ba8a7517af2e8cc4ceb061912ee2f36918d384dfc13c28df&scene=21#wechat_redirect)
+
+这些代码更改是否符合业务需求？
+
+这些代码更改是否符合团队的编码质量要求？
+
+这些代码更改是否有相关的测试？
+
+这些代码更改是否有截图或用户界面更改？
+
+是否为这些代码更改更新了变更日志？
+
+是否为这些代码更改更新了应用文档？
+
+## Android版本管理
+
+ 
+
+ +-----------------------------------------------------------------------------------------+
+|  [python]                          repo                                                 |
+|                                      init                                               |
+|                                      sync                                               |
+|                                                                                         |
++-----------------------------------------------------------------------------------------+
+
+
+##  chromium 版本管理depot_tools(gclient)
+[获取depot_tools](https://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools)
+
+```depot_tools         
+        +----------------------------------------------------------------------------------------------------------------------+
+        |  DEPS                                                                                                                |
+        |.gclient                                                                                                              |
+        |                                                                                                                      |
+        |                                                                                                                      |
+        |cleanup                                                                                                               |
+        |update                                                                                                                |
+        |revert                                                                                                                |
+        |status                                                                                                                |
+        |diff                                                                                                                  |
+        |runhooks                                                                                                              |
+        |                                                                                                                      |
+        |GClient                                                                                                               | 
+        +----------------------------------------------------------------------------------------------------------------------+
+        |                                                                                                                      |
+        |gclient              gcl/                                                                                             |
+        |(meta-checkout tool)/ git-cl  svn  drover  cpplint.py  pylint presubmit_support.py repo wtf weekly  git-gs zsh-goodies|
+        |fetch                                                                                                                 |
+        | (gclient wrapper)                                                                                                    |
+        +----------------------------------------------------------------------------------------------------------------------+
+        |                                              depot_tools                                                             |
+        +----------------------------------------------------------------------------------------------------------------------+
+
+
+
+
+        +--------------------------------------------------------------------------------------------------------------------+
+        |                  fetch.py                                                                                          |
+        |                    run_config_fetch(): json,json                                                                   |
+        |                    run()                                                                                           |
+        |                                                                                                                    |
+        |        CHECKOUT_TYPE_MAP = {                            GclientGitCheckout                  GitCheckout(Checkout)  |
+        |            'gclient':         GclientCheckout,                :GclientCheckout, GitCheckout      run_git()         |
+        |            'gclient_git':     GclientGitCheckout,          init()                                                  |
+        |            'git':             GitCheckout,                                                                         |
+        |        }                                                                                                           |
+        |                                                         GclientCheckout(Checkout)                                  |
+        |                                                              run_gclient()                                         |
+        |                                                                                                                    |
+        |                                                         Checkout                                                   |
+        |                                                             run()                                                  |
+        |                                                                                                                    |
+        +-------------------------------------------------------+------------------------------------------------------------+
+        |       fetch_configs.android.py :config_util.Config    |   GClient(GitDependency)       git_common.py               |
+        |                fetch_spec():json                      |      //config                                              |
+        |                                                       |      //sync                         run()                  |
+        |                                                       |                                     run_with_stderr()      |
+        |                                                       |                                                            |
+        |       fetch_configs.Chromium.py :config_util.Config   |  GitDependency(Dependency)          //submodule  config    |
+        |               fetch_spec():json                       |     run()                                                  |
+        |                                                       |                                                            |
+        |                                                       |                                                            |
+        +-------------------------------------------------------+------------------------------------------------------------+
+          
+
+```
