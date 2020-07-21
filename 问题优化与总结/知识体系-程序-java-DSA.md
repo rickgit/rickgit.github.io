@@ -1,5 +1,30 @@
 
+
+### 字符串
+stringbuilder 
+```
++----------------------------------------------------------------------------+
+|                 StringBuilder                StringBuffer                  |
+|                                                                            |
++----------------------------------------------------------------------------+
+|                                                                            |
+|                      AbstractStringBuilder                                 |
+|                            value:char[]                                    |
+|                            count:int                                       |
+|                                                                            |
++----------------------------------------------------------------------------+
+
+
+```
+初始 默认16
+扩容 插入时，期望数组长度大于value数组长度，(value.length << 1) + 2，如果不够直接用期望数组长度。[(value.length << 1) + 2](https://stackoverflow.com/questions/45094521/java-stringbuilderstringbuffers-ensurecapacity-why-is-it-doubled-and-incre)
+    （保证初始化长度为0，也能扩容。并且可能JVM内存结构有关，不考虑markword和clazz，数组长度 4byte+（16*2+2)*2byte(char) 有概率能被8整除，内存对齐）
+Arrays.copyof 扩容空间，拷贝源数组
+System.arraycopy 拷贝到新数据
+
 ### 2.1 数据集合  - Collection 类（List, Queue, Map）
+
+
 数学-集合论
 ```text
                                             +--------------+                                          +----------------+
@@ -24,6 +49,21 @@
 
 
 ```
+
+ 
+### 字符串
+```
++---------------+----------+----------+
+|               |  final   |  synchro |
++-------------------------------------+
+| String        |   √      |          |
++-------------------------------------+
+| StringBuffer  | char[]   |    √     |
++-------------------------------------+
+| StringBuilder | char[]   |    x     |
++---------------+----------+----------+
+
+```
 #### ArrayList
 ```java
             +----------------------------------------------------------------------------------+
@@ -42,8 +82,8 @@
 
 ```
 初始容量 0
-加载因子（0.0~1.0）  超过容量1.5倍或最初扩容DEFAULT_CAPACITY=10 
-扩容增量
+加载因子 首次扩容DEFAULT_CAPACITY=10，超过容量1.5倍//适用非线程安全，效率高，
+
 #### Vector
 
 ```java
@@ -60,34 +100,32 @@
 
 ```
 
-初始容量 10
-加载因子（0.0~1.0）  超过容量1.0，执行扩容
-扩容增量 增加一倍，或者自定义capacityIncrement。ArrayList比较省空间。 
+初始容量 默认10，超过容量，执行扩容
+扩容增量 增加一倍，或者自定义capacityIncrement。ArrayList比较省空间。 //同步方法，效率慢，需要扩容大，保证并发时，不用频繁扩容
 
 与ArrayList区别是，所有方法都加Synchronized，性能没有ArrayList高
 #### LinkedList
 ```java
             +----------------------------------------------------------------------------------+
-            |           LinkedList:AbstractSequentialList        AbstractSequentialList:       |
-            |               first:Node<E>                                  AbstractList        |
-            |               last:Node<E>                            modCount :int              |
-            |               size:int                                                           |
-            |                                     Deque:Queue       Queue                      |
-            |               add(e:E ):boolean       push(e:E )       offer(e:E)                |
-            |               linkLast( e:E)          addFirst()       linkLast()                |
+            |           LinkedList:AbstractSequentialList                                      |
+            |               last:Node<E>         first:Node<E>    size:int                     |
             |                                                                                  |
-            |                                       pop()            poll()                    |
-            |                                       removeFirst()    unlinkFirst()             |
-            |                                       peek()                                     |
-            +----------------------------------------------------------------------------------+ 
+            |               add(e:E ):boolean                                                  |
+            |               linkLast( e:E)                                                     |
+            +----------------------------------------------------------------------------------+
+            |               Queue                Deque:Queue      AbstractSequentialList:      |
+            |                offer(e:E)            push(e:E )               AbstractList       |
+            |                linkLast()            addFirst()          modCount :int           |
+            |                                                                                  |
+            |                poll()                pop()                                       |
+            |                unlinkFirst()         removeFirst()                               |
+            |                                      peek()                                      |
+            +----------------------------------------------------------------------------------+
             |              Node                                                                |
             |                item: E                                                           |
-            |                next:Node<E>                                                      |
-            |                                                                                  |
-            |                prev:Node<E>                                                      |
-            |                                                                                  |
+            |                next:Node^E^                                                      |
+            |                pre^:Node<E>                                                      |
             +----------------------------------------------------------------------------------+
-
 ```
 
 
@@ -103,27 +141,54 @@ JDK7中HashMap采用的是位桶+链表的方式，即我们常说的散列链�
             |      resize()        modCount:int                                                |
             |                      size:int                                                    |
             |                      threshold:int                                               |//threshold 容量*加载因子
-            |                                                                                  |
+            |           treeifyBin()                                                           |
             +----------------------------------------------------------------------------------+
- 
+            |         TreeNode: LinkedHashMap.LinkedHashMapEntry:.Node         .Node:Map.Entry |
+            |            parent;TreeNode       before, after                           hash    |
+            |            left;  TreeNode                                               key     |
+            |            right; TreeNode                                               value   |
+            |            prev;  TreeNode                                               next    |
+            |            red;   boolean                                                        |
+            |                                                                                  |
+            |            balanceDeletion()               removeTreeNode()                      |
+            |                                            untreeify()                           |
+            |                                            split()                               |
+            +----------------------------------------------------------------------------------+
+    static class Node<K,V> implements Map.Entry<K,V> {
+        final int hash;
+        final K key;
+        V value;
+        Node<K,V> next;
 ```
- MIN_TREEIFY_CAPACITY = 64
+MIN_TREEIFY_CAPACITY = 64
 TREEIFY_THRESHOLD = 8;
 UNTREEIFY_THRESHOLD = 6
 
-初始容量  DEFAULT_INITIAL_CAPACITY = 1 << 4
-加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash表）  一倍
-```
+**tab扩容**
+初始容量 table默认0，默认加载因子0.75（泊松分布有关）//tab长度不是质数或奇数，hash在tab上的分布不确定是否分散，需要用泊松分布来保证分散分布到tab位置
+扩容增量（扩容hash表）  
+    put 首次16（如果oldThr>0，优先取oldThr），Map阈值为table乘上加载因子；//2的幂次方，Boolean的hash 1101(2) 11
+    putAll 首次设置 expect/0.75+1，阈值是最接近容量的2次幂
+    Map阈值和 table扩容2倍（减少扩容后重新hash）//2的幂次方，容易位运算取tabindex=i = (n - 1) & hash；位运算代替取模效率高
+红黑树链表化
+    扩容，拆分红黑树，节点小于等于6
+    remove，当前红黑树满足一定条件 (root.right == null  || root.left == null,|| root.left.left == null )
 
-newCap = oldCap << 1
-```
+取消树化：table小于64
+
+
 
 - 哈希碰撞
-```
+```java
     static final int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);//位的亦或运算
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);//浮点型低位放位置有可能是0（SEEEEEEEEMMMMMMMMMMMMMMMMMMMMMMM）hash容易为0，hash冲突
+    }
+
+    class Map.Entry{
+        public final int hashCode() {
+            return Objects.hashCode(key) ^ Objects.hashCode(value);
+        }
     }
 ```
 hash bucket 大小设置为 length=2^n。
@@ -141,33 +206,83 @@ hash bucket 大小设置为 length=2^n。
 ```
 [xorshift](http://csuncle.com/2018/08/03/梅森旋转安全性分析及改进/)
 
+#### HashTable
+开放地址法解决Hash冲突
+
+```
+            +----------------------------------------------------------------------------------+
+            |Hashtable:Dictionary,Map                                                          |
+            |   put(K, V):V                count:int                table:HashtableEntry<?,?>[]|
+            |    addEntry(hash,K,V,index)  entrySet:Set<Map.Entry>  threshold:int              |
+            |   rehash()                   keySet:Set               values:Collection<V>       |
+            |                              loadFactor:float                                    |
+            |                              modCount:int                                        |
+            |                                                                                  |
+            |                                                                                  |
+            +----------------------------------------------------------------------------------+
+
+
+```
+初始容量 默认11，加载因子0.75，（Android 首次Map阈值和table容量一样）//默认初始化tab长度为奇数，保证分散分布到tab的位置
+扩容增量  2倍+1，保证奇数，有可能是质数//质数，奇数 hash的值在tab上更分散 index = (hash & 0x7FFFFFFF) % tab.length
+
+```java
+
+int newCapacity = (oldCapacity << 1) + 1;
+
+    class HashTableEntry{
+        public int hashCode() {
+            return hash ^ Objects.hashCode(value);//减少key的hash计算
+        }
+    }
+```
 #### HashSet
 ```
             +----------------------------------------------------------------------------------+
-            |                      HashSe: AbstractSet, Set                                    |
+            |                      HashSet: AbstractSet, Set                                    |
             |                               map :HashMap<E,Object>                             |
-            |                                                                                  |
-            |                                                                                  |
+            +----------------------------------------------------------------------------------+
+
+```
+
+
+#### LinkedHashMap
+
+LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
+HashMap节点类 Node 包好 next;
+```
+            +----------------------------------------------------------------------------------+
+            |                      LinkedHashMap:HashMap, MapbleMap                            | 
+            |                          head:LinkedHashMapEntry<K,V>                            | 
+            |                          tail:LinkedHashMapEntry<K,V>                            |
+            |                          accessOrder:boolean                                     |
+            |                                                                                  |   
+            +----------------------------------------------------------------------------------+
+            |         TreeNode: LinkedHashMap.LinkedHashMapEntry                               |
+            |            parent;TreeNode                                                       |
+            |            left;  TreeNode                                                       |
+            |            right; TreeNode                                                       |
+            |            prev;  TreeNode                                                       |
+            |            red;   boolean                                                        |
             |                                                                                  |
             |                                                                                  |
             |                                                                                  |
             |                                                                                  |
             +----------------------------------------------------------------------------------+
 
+
 ```
-初始容量 （HashMap决定）16
+初始容量（继承Hashmap）  16
 加载因子（0.0~1.0）  0.75f
-扩容增量  一倍
+扩容增量（扩容hash表）  一倍
 ```
 
 newCap = oldCap << 1
 ```
-#### TreeMap
-红黑树排序
 
-初始容量 11
-加载因子（0.0~1.0）  0.75f
-扩容增量  没有数组结构，不需要扩容
+
+#### TreeMap
+
 ```java
             +----------------------------------------------------------------------------------+
             |                      TreeMap:AbstractMap,NavigableMap                            |
@@ -192,14 +307,16 @@ newCap = oldCap << 1
             +----------------------------------------------------------------------------------+
 
 ```
+
+不允许null节点。先查找节点替换，如果不存在，则变红插入再平衡。
 红黑树平衡调整:
 叔父红色
-    1. 变三色（父叔黑，祖红）
-    2. 祖父节点继续转换
+    1. 祖父叔三角变色（父叔黑，祖红）
+    2. 祖节点继续转换
 叔父黑色，
-    1. 祖父子节点不是直线，做子父节点方向，父节点转换。父节点继续转换。
-    2. 变祖父两色（父黑祖红），子祖节点方向，祖节点旋转。
-    3. 当前节点继续转换。
+    1. 祖父子节点不是直线（否则进行步骤2），往子父直线方向，父节点转换。以转换后的父节点，继续步骤2。
+    2. 变父祖两色（父黑祖红），父祖节点方向，祖节点旋转。
+    3. 继续步骤1，知道根节点
 ```java
     private void fixAfterInsertion(TreeMapEntry<K,V> x) {
         x.color = RED;
@@ -259,61 +376,6 @@ Charset#availableCharsets():SortedMap
             +----------------------------------------------------------------------------------+
 
 ```
-初始容量 （HashMap决定）16
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍
-#### HashTable
-开放地址法解决Hash冲突
-
-```
-            +----------------------------------------------------------------------------------+
-            |Hashtable:Dictionary,Map                                                          |
-            |   put(K, V):V                count:int                table:HashtableEntry<?,?>[]|
-            |    addEntry(hash,K,V,index)  entrySet:Set<Map.Entry>  threshold:int              |
-            |   rehash()                   keySet:Set               values:Collection<V>       |
-            |                              loadFactor:float                                    |
-            |                              modCount:int                                        |
-            |                                                                                  |
-            |                                                                                  |
-            +----------------------------------------------------------------------------------+
-
-
-```
-初始容量 11
-加载因子（0.0~1.0）  0.75f
-扩容增量  一倍+1，保证奇数，有可能是质数
-
-```
-
-int newCapacity = (oldCapacity << 1) + 1;
-```
-#### LinkedHashMap
-
-LinkedHashMap节点类 LinkedHashMapEntry 包含 before, after;
-HashMap节点类 Node 包好 next;
-```
-            +----------------------------------------------------------------------------------+
-            |                      LinkedHashMap:HashMap, MapbleMap                            | 
-            |                          head:LinkedHashMapEntry<K,V>                            | 
-            |                          tail:LinkedHashMapEntry<K,V>                            |
-            |                          accessOrder:boolean                                     |
-            |                                                                                  |
-            +----------------------------------------------------------------------------------+
-            |                                                                                  |
-            |                      LinkedHashMapEntry:HashMap.Node                             |
-            |                                  before,after: LinkedHashMapEntry                |
-            |                                                                                  |
-            +----------------------------------------------------------------------------------+
-
-```
-初始容量（继承Hashmap）  16
-加载因子（0.0~1.0）  0.75f
-扩容增量（扩容hash表）  一倍
-```
-
-newCap = oldCap << 1
-```
-
 
 
 
@@ -321,5 +383,5 @@ newCap = oldCap << 1
 
 
 ## TimSort
-
+Arrays.sort
 https://blog.csdn.net/bryansun/article/details/105182778?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase

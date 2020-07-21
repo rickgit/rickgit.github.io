@@ -13,23 +13,11 @@ LRUCACHE
 |                                         currentSize:long                     |
 |                                                                              |
 |                                         put()                                |
-|                                         getSize()                            |
+|                                         getSize()           entryRemoved()   |
 |                                         onItemEvicted()                      |
 |                                         evict()                              |
 |                                                                              |
 |                                         get()                                |
-+------------------------------------------------------------------------------+
-|                                    LinkedHashMap:HashMap                     |
-|                                        accessOrder:true                      |
-|                                                                              |
-|                                    HashMap                                   |
-|                                        loadFactor:0.75                       |
-|                                        threshold:Int                         |
-|                                                                              |
-|                                        table:Node<K,V>[]                     |
-|                                         entrySet:Set<Map.Entry<K,V<>         |
-|                                        size:int                              |
-|                                        modCount:int                          |
 +------------------------------------------------------------------------------+
 
 

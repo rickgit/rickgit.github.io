@@ -144,10 +144,10 @@ G:\workspace\ws-github\.git\config
 
 git config --global http.postbuffer 524288000 
  
-
+### 代理设置
 ```js
 
-fg
+
 git config --global http.proxy 'socks://127.0.0.1:8580'
 git config --global --unset http.proxy
 
@@ -656,6 +656,12 @@ fi
 ### Git 分支
 ```shell
 # git branch -v  --abbrev=40 //打印详情，hash值长度40
+
+
+孤立分支
+#git checkout --orphan app_flutter
+#git rm --cached -r .
+#git clone -b app_flutter http://git/test.git
 
 ```
 ##  Repo

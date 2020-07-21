@@ -331,7 +331,7 @@ Long.MIN_VALUE ~ Long.MAX_VALUE
 
 第二步：在换算成内存格式（IEEE-754格式标准）  SEEEEEEE    EMMMMMMM    MMMMMMMM    MMMMMMMM
       S 0正数，1负数
-      E 第一位（1：大于1的十进制，0：0~1之间的十进制），整合（E=[小数点移位到个位1.左移1，右移0][其他7位，小数点移位的二进制] −1）
+      E 第一位（1：大于1的十进制，0：0~1之间的十进制），第2到8位（减法后的值： [占1位；小数点移位至到个位1.若右移0，否则1][占7位，小数点移位的二进制] −1）
       M 小数点移位到个位1后，截取后面23二进制
       即 0 10000110 0110000 00010000 00000000
 
@@ -968,19 +968,7 @@ public final class NumEnum extends java.lang.Enum<NumEnum> {
 } 
 
 ```
-### 字符串
-```
-+---------------+----------+----------+
-|               |  final   |  synchro |
-+-------------------------------------+
-| String        |   √      |          |
-+-------------------------------------+
-| StringBuffer  | char[]   |    √     |
-+-------------------------------------+
-| StringBuilder | char[]   |    x     |
-+---------------+----------+----------+
 
-```
 
 
 
@@ -1437,90 +1425,8 @@ replaceFirst: 用到了正则表达式
 replaceAll: 用到了正则表达式（后溯，replaceAll("\\W","\\\\$0")）
 
 ```
-### Unix 5种I/O模型
-```
-+---------------+------------------+--------------------------+--------------------+-----------------+
-|   blocking IO | nonblocking IO   |    IO multiplexing       |  signal driven IO  | asynchronous IO |
-|               |                  | select poll epoll(Linux) |                    |                 |
-|  Socket       |           | SocketServer,javaNIO , javaRAF  |                    |    Datagram     |
-+----------------------------------------------------------------------------------------------------+   +
-|               |                  |                          |                    |                 |   |
-|initiate       |  initiate        |   check                  |                    |  initiate       |   |
-| |             |  check           |     +                    |                    |                 |   | wait data
-| |             |  check           |     |  block             |                    |                 |   |
-| |             |  check           |     |                    |                    |                 |   |
-| |             |    +             |     v                    |                    |                 |
-| | block       |    |  block      |  ready                   |    notification    |                 |   + recvfrom block
-| |             |    |             |  initiate                |    initiate        |                 |   |
-| |             |    |             |     +                    |         +          |                 |   | copy from kernel
-| |             |    |             |     |  block             |         | block    |                 |   | to user
-| |             |    |             |     |                    |         |          |                 |   |
-| v complete    |    v complete    |     v  complete          |         v complete |  notification   |   +
-|               |                  |                          |                    |                 |
-+---------------+------------------+--------------------------+--------------------+-----------------+
-|               |                  | select    poll   epoll   |                    |                 |
-|               |                  | fd-limit   x      x      |                    |                 |
-|               |                  | poll-ready √ notify-ready|                    |                 |
-+---------------+------------------+--------------------------+--------------------+-----------------+
-```
 
-```
-+---------+----------------------------------+----------------------+----------------------+
-|         | fd|limit      |copy_kernel_user  |  event               |  event handle        |
-+-------------------------------------------------------------------+----------------------+
-|  select | Polling       |  copy fd         | polling fd structure |  sync handle  fd     |
-+-------------------------------------------------------------------+----------------------+
-|  poll   | linklist      |  copy fd         | polling fd structure |   sync handle fd     |
-+-------------------------------------------------------------------+----------------------+
-|  epoll  | epoll_create()|  epoll_ctl()     | epoll_wait()         |   epoll_wait() /1 fd |
-+---------+----------------------------------+----------------------+----------------------+
-
-```
-### BIO (阻塞 I/O)
-```
-
-基于字节操作的 I/O 接口：InputStream 和 OutputStream
-  内存字节流 I/O ：ByteArrayInputStream 和 ByteArrayOutputStream
-基于字符操作的 I/O 接口：Writer 和 Reader
-基于磁盘操作的 I/O 接口：File,RandomAccessFile
-基于网络操作的 I/O 接口：Socket
-```
-UTF-8
-
-
-
-#### NIO（BUffer,Channel ,Selector）
-IO是面向流的，NIO是面向缓冲区的。
-NIO机制，它是一种基于通道与缓冲区的新I/O方式，可以直接从操作系统中分配直接内存，即在堆外分配内存
-
-Channel 和 Selector
-```java
-public abstract class AbstractInterruptibleChannel
-    implements Channel, InterruptibleChannel
-{
-    private final Object closeLock = new Object();
-    private volatile boolean open = true;
-    private Interruptible interruptor;
-    private volatile Thread interrupted;
-
-}
-
-
-public abstract class AbstractSelector
-    extends Selector
-{
-    private AtomicBoolean selectorOpen = new AtomicBoolean(true);
-
-    // The provider that created this selector
-    private final SelectorProvider provider;
-    private final Set<SelectionKey> cancelledKeys = new HashSet<SelectionKey>();
-    private Interruptible interruptor = null;
- []
-
-
-}
-
-```
+ 
 ### 数据展示 - 图形化及用户组件
 awt/swing
 
