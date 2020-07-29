@@ -1,4 +1,8 @@
+
+
 ## 通讯 EventBus
+intent,接口，aidl，handler，broadcast，其他第三方
+livedata
 ## 数据路由/通讯 - ARouter
 - apt技术
 - spi技术
@@ -110,6 +114,9 @@ Tinker,Sophix
                                    |            Sophix   |
                                    +---------------------+
 
+andfix 替换方法 ArtMethod属性
+Sophix dlopen和dvm_dlsym
+
 
 ## Tinker
 发布。Tinker沒有免费发布于。 
@@ -205,3 +212,8 @@ ResDiffDecoder.patch/ loadTinkerResources/addAssetPath
 
 ## 插件
 Dynamic-Loader-Apk，Replugin
+
+
+## 跨进程通讯
+
+### 四大组件

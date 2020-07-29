@@ -23,7 +23,7 @@ LRUCACHE
 
 ```
 
-## DiskLruCache分析 
+### DiskLruCache分析 
 1. 文档及配置文件
 2. 源码
 3. 单元测试
@@ -51,7 +51,8 @@ LRUCACHE
 valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解决冲突 0,1,2,3
 
 ```
-
+### MMKV
+mmap（微信mars，美图logan，网易）
 
 
 ## Glide
@@ -149,3 +150,10 @@ Chain of Responsibility:Interceptor
 ## Okhttp
 
 [Okhttp.md](知识体系-平台-Android-Square.md)
+
+### Flatbuffer
+
+
+
+## Sqlite
+### h2 /JOOQ/SnakeYAML 

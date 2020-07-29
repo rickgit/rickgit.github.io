@@ -87,6 +87,30 @@ watch -n1 -d cat /proc/interrupts
 [Network Driver](http://www.tldp.org/LDP/LG/issue93/bhaskaran.html)
 
 [Linux 网络协议栈开发代码分析篇之VLAN（三）—— VLAN收发处理](https://blog.csdn.net/zqixiao_09/article/details/79185510?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-8.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-8.nonecase)
+
+
+## 内存管理
+
+```
+
+                       page table                   物理地址 
++----------+      +---------+---------+         +----------+
+| logic    |      |  page   | page    |         |          |
+| address  +----> |         | frame   |   +---> | memory   |
++----------+      +-------------------+         |          |
+| 28bit    |      |         |         |         |          |
+|          |      |         |         |         |          |
+|          |      |         |         |         |          |
++----------+      |         |         |         +----------+
+                  |         |         |
+                  |         |         |
+                  |         |         |
+                  |         |         |
+                  |         |         |
+                  +---------+---------+
+
+```
+[](http://lday.me/2019/09/09/0023_linux_page_cache_and_buffer_cache/)
 ## 源码
 
 +----------------------------------------------------------------------------------------+

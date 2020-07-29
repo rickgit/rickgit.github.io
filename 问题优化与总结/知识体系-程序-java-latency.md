@@ -3,7 +3,9 @@
 ### heap manager
 
 ### GC
-
+[](https://www.jianshu.com/p/8592ea9a408c)
+在JIT编译时，在安全点(safe point)记录栈和寄存器中的引用和对应的位置。
+安全点时，才可以GC：方法调用、执行跳转、异常跳转等处。
 
 #### Reference 
 ```
@@ -42,6 +44,8 @@
 
 
 ## io（同步、异步、阻塞、非阻塞）
+
+MMU/MMAP
 
 bio
    InputStream  、OutputStream基于字节操作的 IO

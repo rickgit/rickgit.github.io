@@ -2655,6 +2655,9 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 ```
 ### API level 27 (android-8.1)
+
+@FastNative注解
+
 - Safe Browsing API 的 WebView 实现
  ```xml
  <application>
@@ -2680,6 +2683,10 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
 
 深层链接和 Android 应用链接
+### API level 21 （android 5.0）
+Art正式替代Dalvik VM
+### API level 14 （android 4.0）
+VSYNC/Choreographer
 ## 源码
 [1798个项目（2019-12-11统计）](https://source.codeaurora.cn/quic/la)
  [android studio profilers源码](https://github.com/JetBrains/android)

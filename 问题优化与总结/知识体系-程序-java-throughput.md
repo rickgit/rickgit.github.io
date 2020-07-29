@@ -1,3 +1,96 @@
+## CPU文档
+[芯片硬件手册](https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.html)
+[](https://www.intel.cn/content/www/cn/zh/products/docs/processors/core/core-technical-resources.html)
+
+### 缓存一致性问题
+1. 总线加锁（性能低）
+2. MESI 缓存一致性协议 和总线嗅探机制
+失效后，缓存到缓存行，**缓存行（Cache line）**64 字节 为单位的块（chunk）拿取。
+### 伪共享问题
+- 补齐（Padding）
+- @sun.misc.Contended
+### 重排序问题
+- 指令级重排序 （CPU）
+- 编译器优化的重排序 volatile缓存一致性
+
+##  Java 内存模型（Java Memory Model，简称 JMM）JSR133规范
+内存模型描述了执行轨迹是否是该程序的一次合法执行。并发过程中如何处理原子性、可见性和顺序性。抽象CPU结局硬件平台的差异性。
+https://www.cnblogs.com/chihirotan/p/6486436.html 
+ 
+### 原子性
+
+- 8个原子操作 read,load,store,write,use,assign,lock,unlock（monitorenter和monitorexit来隐式地使用这两个操作）
+[IA32 指令](https://www.intel.cn/content/www/cn/zh/architecture-and-technology/64-ia-32-architectures-software-developer-vol-1-manual.html)
+
+```
+ 
+http://vorboss.dl.sourceforge.net/project/fcml/fcml-1.1.1/hsdis-1.1.1-win32-amd64.zip 解压文件放到 jdk/jre/bin/server
+-Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly   -XX:CompileCommand=dontinline,*Test.testFieldNoVolatile -XX:CompileCommand=compileonly,*Test.testFieldNoVolatile 
+
+
+       work memeory                                 main memory
+
++----------------------+                       +------------------+
+|                      |                       |                  |
+| +------------------+ |      jmm  control     |                  |
+| |   Thread         | |                       |                  |
+| |     var copy     | |   <---------------->  |     share var    |
+| +------------------+ |                       |                  |
+|                      |                       |                  |
+| +------------------+ |                       |                  |
+| |                  | |                       |                  |
+| |                  | |   <---------------->  |                  |
+| |                  | |                       |                  |
+| +------------------+ |                       |                  |
+|                      |                       |                  |
+| +------------------+ |                       |                  |
+| |                  | |                       |                  |
+| |                  | |   <---------------->  |                  |
+| |                  | |                       |                  |
+| +------------------+ |                       |                  |
+|                      |                       |                  |
+|                      |                       |                  |
++----------------------+                       +------------------+
+
+
+
+JMM
+                  +--------------------------------------------------------------------+
+    +---------->  |main memory                                                         |
+    |             |                                                                    |
+    |   +-------+ |                                                                    |
+    |   |         +--------------------------------------------------------------------+
+    |   |
+    |   |
+    |   |
+    |   |    +----------------------------------------------------------------------------------+
+    |   |    | bus                                                                              |
+    |   |    +----------------------------------------------------------------------------------+
+    |   |
+    |   |            CPU                                  CPU
+    |   |            +-----------------+                  +-----------------+
+write   v            | +-------------+ |                  |                 |
+    ^  read          | | Thread      | +--+               |                 |
+    |   +            | | exec engine | |  |               |                 |
+    |   |            | |             | |  |asign          |                 |
+    |   |            | +------^------+ |  |               |                 |
+    |   |            |        | use    |  |               |                 |
+    |   |            | +------+------+ |  |               |                 |
+    |   |            | |  work memory| |  |               |                 |
+    |   |      load  | |             | +<-+               |                 |
+    |   +--------->  | |             | |                  |                 |
+    |                | |             | |                  |                 |
+    +--------------+ | +-------------+ |                  |                 |
+               store +-----------------+                  +-----------------+
+ 
+```
+### 可见性
+### 有序性
+
+#### happens-before 关系（8个）
+
+final 语义：在 退出构造器后，不管是异常还是正常退出，对象的 final_field 上都会发生冻结动作。反射修改后，马上冻结，且不能反射修改static fianl 字段
+  
 ## 提高吞吐量 J.U.C
 - 内存原理（AQS）
 - 并发容器与阻塞队列
@@ -5,46 +98,61 @@
 
 ## 数据安全共享访问
 ### volatile
-
+volatile原理是基于CPU内存屏障指令实现的
 ```
 +-------------+--------------+----------------------+------------------+------------------------+-----------------------+
 |             |              |                      |                  |                        |                       |
 | Object      |  DCL problem |    synchronized      |  Object.wait()   |                        |                       |
 |             |              | (Reentrant,unfair)   |  Object.notify() |                        |                       |
 |             |              | (Exclusi^e,pessimism)|                  |                        |                       |
-+----------------------------+-----------------------------------------+------------------------+-----------------------+
-|             | J.U.C.atomic                                                                                            |
-|  volatile   +---------------------------------------------------------------------------------------------------------+
-|             | ConcurrentLinkedDeque                                                                                   |
-|             | ConcurrentSkipListMap                                                                                   |
-|             +---------------------------------------------------------------------------------------------------------+
-|             |              |ReentrantReadWriteLock                                                                    |
-|             |     AQS      |(shared Read)                                                                             |
-|             |              |StampedLock                                                                               |
-|             |              +----------------------+------------------+------------------------+-----------------------+
-|             |              |                      |   Condition      |    CountDownLatch      |   ArrayBlockingQueue  |
-|    CAS      |              |                      |                  |    CyclicBarrier       |   LinkedBlockingQueue |
-|             |              |  ReentrantLock       |                  |                        |                       |
-|             |              |(Exclusi^e,optimistic)|                  |   Semaphore,Exchanger  |   ConcurrentHashMap   |
-|             |              |                      |                  |                        |   CopyOnWriteArrayList|
-|             |              |  ThreadPoolExecutor  |                  |                        |                       |
-|             |              |                      |                  |                        |   Fork/Join           |
-+-------------+--------------+----------------------+------------------+------------------------+-----------------------+
-
++-------------+--------------+------------------------------------------------------------------------------------------+
+|  volatile   | J.U.C.atomic |                                                                                          |
+|             |              |                                                                                          |
+|             |              |                                                                                          |
+|             |              |                                                                                          |
+|             +-------------------------------------+----------------+------------------------+-------------------------+
+|             |              |  ReentrantLock       |                |                        |                         |
+|             |     AQS      |(Exclusi^e,optimistic)| CountDownLatch |  CopyOnWriteArrayList  |                         |
+|             |              |   Condition          | CyclicBarrier  |  ConcurrentHashMap     |                         |
+|             |              +----------------------+   Semaphore    |  ConcurrentLinkedDeque |                         |
+|             |              |                      |   ,Exchanger   |  ConcurrentSkipListMap |                         |
+|    CAS      |              |ReentrantReadWriteLock|                |                        |ThreadPoolExecutor       |
+|             |              |    (shared Read)     |                |                        |                         |
+|             |              |                      |                |                        |                         |
+|             |              +----------------------+                |  ArrayBlockingQueue    |                         |
+|             |              | StampedLock          |                |  LinkedBlockingQueue   |                         |
+|             |              |                      |                |                        |                         |
+|             |              |                      |                |  Fork/Join             |                         |
+|             |              |                      |                |                        |                         |
+|             |              |                      |                |                        |                         |
++-------------+--------------+----------------------+----------------+------------------------+-------------------------+
 
 
 ```
 
-#### volatile 内存模型
- volatile 内存可见性，重排序,顺序一致性
- final 内存语义，读写重排序规则
+#### volatile JMM内存模型
+ volatile 内存可见性， 顺序一致性(重排序)
+ final 内存语义：在退出构造器后，不管是异常还是正常退出，对象的 final_field 上都会发生冻结动作。反射修改后，马上冻结，且不能反射修改static fianl 字段
  hanpen before，指两个操作指令的执行顺序
  CAS 读改写原子性
 
  可以保证变量的可见性 ，不能保证变量状态的“原子性操作”，原子性操作需要lock或cas
+
+##### Happens-before
+
+1. 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
+2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
+3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
+4. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
+5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
+6. join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。
+7. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
+8. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
+ [](https://juejin.im/post/5ae6d309518825673123fd0e#heading-5)
+ [](https://www.cnblogs.com/skorzeny/p/6480012.html)
 #### 原子性问题（CAS 保证读改写）
 
--  Lock-Free操作中ABA问题（AtomicStampedReference ）
+
   定义：meaning that writes to this field are immediately made visible to other threads.
   [正确使用 Volatile 变量](https://www.ibm.com/developerworks/cn/java/j-jtp06197.html)
   保证修改的值会立即被更新到主存，当有其他线程需要读取时，它会去内存中读取新值。在某些情况下性能要优于synchronized，但对变量的写操作不依赖于当前值。
@@ -95,7 +203,9 @@ UNSAFE_END
 
 ```
 AtomicInteger,AtomicLong,AtomicBoolean...,AtomicReference
-##### AtomicStampedReference
+基本数据类型，数组，引用，原子更新字段类，
+#####  Lock-Free操作中ABA问题（AtomicStampedReference ）
+ 
 ```
 
 +--------------------------------------------------------------------------------------+
@@ -117,9 +227,17 @@ AtomicInteger,AtomicLong,AtomicBoolean...,AtomicReference
       - 循环时间长开销大
       - AtomicReference类来多个共享变量合成一个共享变量来操作
 
+##### VarHandle 
+cas 频繁占用总线，导致总线风暴
+SPI 占用CPU
+- AtomicInteger 增加了空间开销，还会导致额外的并发问题
+- FieldUpdaters 利用了反射机制，操作开销也会更大
+- Unsafe 方式比较快，但它会损害安全性和可移植性
+随着原子API的不断扩大而越来越遭。VarHandle解决这类问题
 
+#### 同步问题（AQS 实现 **乐观锁**）解决共享对象的竞争现象
+CAS，SPIN，LockSupport
 
-#### 同步问题（AQS 实现 **乐观锁**）
 **os::PlatformEvent::park()** 相对于 wait/notify 能精确唤醒线程
 饥饿现象（即某个线程长时间未竞争到锁）使用公平锁，ReentrantLock默认用非公平锁
   -非公平锁，非是按照申请锁的时间前后给等待线程分配锁的
@@ -358,6 +476,7 @@ AtomicInteger,AtomicLong,AtomicBoolean...,AtomicReference
 
 
 ### SynChronized
+[](https://github.com/farmerjohngit/myblog/issues/12)
 ```
 object moniter 重量级锁流程:
         +--------------------------------------+    +----------------------+
@@ -381,6 +500,12 @@ object moniter 重量级锁流程:
         |                          +---------+ |    | +------------------+ |
         +--------------------------------------+    +----------------------+
 
+
+[markOop.h]
+//    [ptr             | 00]  locked             ptr points to real header on stack
+//    [header      | 0 | 01]  unlocked           regular object header
+//    [ptr             | 10]  monitor            inflated lock (header is wapped out)
+//    [ptr             | 11]  marked             used by markSweep to mark an object
 
 
 源碼：
@@ -416,6 +541,40 @@ object moniter 重量级锁流程:
       |                                                                                  |
       +----------------------------------------------------------------------------------+
 
++---------------------------------------------------------------------------------------------+
+|                      Thread                                                                 |
+|                         is_lock_owned() //objectLock or monitor                             |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|   [Thread]                                          Object                                  |
+|                                                        mark():markOop                       |
+|                                                                                             |
+|        ObjectSynchronizer                            markOop:markOopDesc: oopDesc           |
+|                                                         set_unlocked():OopDesc              |
+|                fast_enter()//1                          has_monitor()                       |
+|                slow_enter()//2                          monitor():ObjectMonitor*            |
+|                inflate ():ObjectMonitor*                                                    |
+|                                                      oopDesc                                |
+|                                                          _mark; markOop                     |
+|                                                          _klass;klassOop                    |
+|                                                          _bs;BarrierSet*                    |
+|                                                                                             |
+|     BasicObjectLock//LockRecord           BasicLock                                         |
+|           _lock;BasicLock                   _displaced_header:markOop                       |
+|           _obj;oop                                                                          |
+|           set_displaced_header()                                                            |
++---------------------------------------------------------------------------------------------+
+|    ObjectMonitor//thread shared                    ObjectWaiter                             |
+|         _cxq:ObjectWaiter *                            _next;ObjectWaiter *                 |
+|         _EntryList:ObjectWaiter                        _prev;ObjectWaiter *                 |
+|         _WaitSet:ObjectWaiter *                        _thread;Thread*                      |
+|                                                        _event; ParkEvent *                  |
+|        _owner:void * //thread or basic lock            _notified ; int                      |
+|        _header:markOop                                    TState ; TStates                  |
+|         enter()                                        _Sorted ;  Sorted                    |
+|         EnterI()                                       _active ;  bool                      |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
 
 ```
 
@@ -449,9 +608,7 @@ object moniter 重量级锁流程:
 - 内置的锁 synchronized，可重入非公平锁（是独占锁，是一种悲观锁），会导致饥饿效应，不可中断
 
   - Object.wait(),Object.notify()
-
-
-
+ 
 ## 并发集合 (ArrayBlockingQueue,LinkedBlockingQueue)，Fork/Join框架，工具类
 Collections.synchronized
 ArrayList ->                                      CopyOnWriteArrayList
@@ -521,10 +678,43 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
      5. 同步插入，确保锁桶底位置没变，插入操作，判断是否树化
 树化
 帮助数据迁移：将原来的 tab 数组的元素迁移到新的 nextTab 数组中。在多线程条件下，当前线程检测到其他线程正进行扩容操作（Thread.yield()），则协助其一起进行数据迁移。扩容后  sizeCtl = (n << 1) - (n >>> 1);
-### SkipMap
+### ConcurrentSkipListMap(SkipList)
+```
++-----------------------------------------------------------------------------------+
+|      ConcurrentSkipListMap                                                        |
+|              head;Index                                                           |
+|             adder;LongAdder                                                       |
+|             keySet;KeySet                                                         |
+|             values;Values                                                         |
+|             entrySet;EntrySet                                                     |
+|             descendingMap;SubMap                                                  |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+|    Index                 LongAdder :Striped64    SubMap                           |
+|       level:int                                      m:ConcurrentSkipListMap<K,V> |
+|       node; Node                                     isDescending;boolean         |
+|       right;Index                                    lo;K                         |
+|       down;Index         Striped64 :Number           hi;K                         |
+|                                cells;Cell[]          loInclusive; boolean         |
+|   Node                         base;long             hiInclusive; boolean         |
+|       K key;                   cellsBusy;int         isDescending;boolean         |
+|       V val;                                                                      |
+|       next;Node<K,V>                                 keySetView; KeySet           |
+|                                                      valuesView; Values           |
+|                                                    entrySetView; EntrySet         |
+|                                                                                   |
+|                                                          KeySet                   |
+|    VarHandle                                                 m:ConcurrentHashMap  |
+|        acquireFence()                                    Values                   |
+|                                                             m:ConcurrentHashMap   |
+|                                                          EntrySet                 |
+|                                                             m:ConcurrentHashMap   |
++-----------------------------------------------------------------------------------+
 
+
+```
 ### 阻塞队列
-#### LinkedBlockingQueue（newFixedThreadPool）
+#### LinkedBlockingQueue（newFixedThreadPool）/LinkedBlockingDeque 
 
 ```
 +----------------------------------------------------------------------------------------------+
@@ -581,13 +771,46 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
 
 
 ```
-#### DelayQueue
+#### DelayQueue （java.util.concurrent.ScheduledThreadPoolExecutor.ScheduledFutureTask）
 #### ArrayBlockingQueue
+```
++-----------------------------------------------------------------------------------+
+|        ArrayBlockingQueue                                                         |
+|            items;Object[]              lock;ReentrantLock                         |
+|            count;     int              notEmpty; Condition                        |
+|            takeIndex; int              notFull;  Condition                        |
+|            putIndex;  int                                                         |
+|            itrs;Itrs                                                              | 
+|                                                                                   |
+|            offer(E e)       take()                                                |
+|            poll()                                                                 |
+|                                                                                   |
++-----------------------------------------------------------------------------------+
+|        Itrs                                                                       |
+|           cycles;int                                                              |
+|           head;   Node                                                            |
+|           sweeper;Node                                                            |
+|                                                                                   |
+|        Node:WeakReference<Itr>                                                    |
+|              Node next                                                            |
++-----------------------------------------------------------------------------------+
+
+```
+
+#### PriorityBlockingQueue
 
 #### 框架
   - 并发框架 Fork/Join
 
 ## 线程
+### 
+线程生命周期 
+join
+
+
+### 线程之间的通信和同步问题
+
+1. 线程之间的通信机制有两种共享内存(共享对象)和消息传递(wait/notify)
 ### Timer 调度；吞吐量
 单线程，串行
 ```
@@ -669,6 +892,33 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
    | FutureTask  | +--------->  |workQueue：BlockingQueue |   //LinkedBlockingDeque,
    +-------------+              +------------------------+   //ArrayBlockingQueue
 
+
+
+
+
+```
+#### ScheduledThreadPoolExecutor
+
+```
++----------------------------------------------------------------------------------+
+|            ScheduledThreadPoolExecutor:ThreadPoolExecutor                        |
+|                                                                                  |
+|                 continueExistingPeriodicTasksAfterShutdown;boolean               |
+|                 executeExistingDelayedTasksAfterShutdown;boolean=true            |
+|                 removeOnCancel;boolean                                           |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|                                                                                  |
+|       ScheduledFutureTask:FutureTask                                             |
+|                  ::: RunnableScheduledFuture                                     |
+|             sequenceNumber;long                                                  |
+|             time;long                                                            |
+|              period;long                                                         |
+|             outerTask;RunnableScheduledFuture<V>= this                           |
+|             heapIndex;int                                                        |
+|                                                                                  |
++----------------------------------------------------------------------------------+
 
 
 

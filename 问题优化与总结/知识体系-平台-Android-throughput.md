@@ -3,7 +3,7 @@
 
 ## Looper 封装线程
 
-```
+```java
             +------------------------------------------------------------------------------------------+
             |                           LooperThread                                                   |
             +-------------------------------------------------------------------+----------------------+
@@ -15,21 +15,22 @@
             |                                          sMainLooper:Looper       |                      |
             +-------------------------------------------------------------------+                      |
             |   MessageQueue                                                    |                      |
-            |      mMessages:Message                                            |                      |
+            |      mMessages:Message                    postSyncBarrier()       |                      |
             |      mPtr:long                                                    |                      |
             |      mIdleHandlers:ArrayList<IdleHandler>()                       |                      |
             |      mFileDescriptorRecords:SparseArray<FileDescriptorRecord>     |                      |
             |      mPendingIdleHandlers:IdleHandler[]                           |                      |
             |                                                                   |                      |
             |      nativePollOnce() //epoll         enqueueMessage(msg) :boolean|                      |
-            |      next():Message                                               |                      |
+            |      next():Message //may be block     nativeWake()//pipe         |                      |
             +-------------------------------------------------------------------+                      |
             |   Message                            IdleHandler                  |                      |
             |      mPtr:long                            queueIdle()             |                      |
             |      target:Handler                                               |                      |
             |      callback:Runnable                                            |                      |
             |      recycleUnchecked()                                           |                      |
-            +      sendToTarget()                                               -                      |
+            |      sendToTarget()                                               |                      |
+            |      obtain(h:Handler,callback:Runnable):Message                  |                      |
             +--------------------------------------------------------------------                      |
             |                                                                                          |
             |      dispatchMessage()                                          post(r:Runnable )        |
@@ -37,10 +38,16 @@
             |      mCallback:Callback                                                                  |
             |      handleMessage(msg:Message)                                                          |
             +------------------------------------------------------------------------------------------+
+            |                                                                                          |
+            |      epoll                                                                               |
+            +------------------------------------------------------------------------------------------+
+异步消息与同步消息，屏蔽消息（ message.target ==null为屏障消息)）
+空闲任务
 
 
 ```
-管道pipe唤醒主线程和epoll机制
+
+
 ```java
      +------------------------------------------+
      |  Handler                                 |
@@ -66,13 +73,7 @@
      |  +---------------------+                  |  |  Runnable callback |
      +-------------------------------------------+  +--------------------+
 
-Handler{
-    final Looper mLooper;
-    final MessageQueue mQueue;
-    final Callback mCallback;
-    final boolean mAsynchronous;
-    IMessenger mMessenger;
-}
+ 
 
 ```
 [select/poll/epoll对比分析](http://gityuan.com/2015/12/06/linux_epoll/)
@@ -89,6 +90,8 @@ cat /proc/sys/fs/file-max
 2. epoll不同于select和poll轮询的方式，而是通过每个fd定义的回调函数来实现的
 
  
+
+
 
 ## AsyncTask 封装handle
 
