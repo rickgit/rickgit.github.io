@@ -1,4 +1,152 @@
+## 打包
+稳定（编码/io问题），精简/包大小，续航/CPU占用率，流程/内存占用率-刷新率，
+### 编译，打包，优化，签名，安装
+gradle,Transform的应用
+批量打包
+```打包流程
+G: gradle build tools
+B: android build tools
+J: JDK tools
 
+
++--------------------------------------------------------------------------------------+
+| /META-INF                                                                            |
+| /assets                                                                              |
+| /res                                                                                 |
+| /libs                                                                                |
+| class.dex                                                                            |
+| resources.arsc                                                                       |
+| AndroidManifest.xml                                                                  |
++--------------------------------------------------------------------------------------+
+|G                                                                                     |
+|    multiple agent tool                                                               |
++--------------------------------------------------------------------------------------+
+|B                                                                                     |
+|   zipalign                                                                           |
++--------------------------------------------------------------------------------------+
+|J                                                                                     |
+|   javasigner  V1, V2(N), V3(P)                                                       |
++--------------------------------------------------------------------------------------+
+|G                                                                                     |
+|   ApkBuilder                                                                         |
++--------------------+                          +--------------------------------------+
+|B                   |                          |B                                     |
+|  linker            |                          |    dex                               |
++--------------------------------------------------------------------------------------+
+|B                   |B                         |G             +-----------------------+
+|  bcc compat        |   AAPT                   |    proguard  |          Preveirfy    |
+|                    |                          |              |          Obfuscate    |
+|                    |                          |              |          Optimize     |
+|                    |                          |              |          Shrink       |
+|                    |                          |              +-----------------------+
++--------------------+                          +--------------------------------------+
+|B                   |                          |        J                             |
+|  llvm-rs-cc        |                          +-------+    javac                     |
+|                    |                          | R.java|                              |
+|                    +--------------------------+--------------------------------------+
+|                    |G                                 |B                             |
+|                    |   menifest/assets/resource merger|    aidl                      |
++--------------------+-----------------------------------------------------------------+
+
+                                                                                              
+
+```
+
+walle
+```
++---------------------------------------------------------------------------------------------+
+|                                        walle-cli                                            |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                         jcommander                                                          |
+|                                                               Batch2Command                 |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                                                                                             |
+|                      ChannelReader                ChannelWriter                             |
+|                                                                                             |
+|                                                                                             |
+|                      PayloadReader                                                          |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                      ApkUtil                                                                |
+|                         findApkSigningBlock()                                               |
++---------------------------------------------------------------------------------------------+
+
+```
+
+
+
+## 界面开发系统
+
+
+
+```
+      +->  TextView  +-+-->   EditText
+      |                |
+      |                |
+      |                +-->   Button    +------>  CompoundButton +--+>  CheckBox
+      |                                                             |   RadioButton
+View -+                                                             |
+      |                                                             |   Switch
+      |                                                             +>  ToggleButton
+      |
+      +->  ImageView  +---->  ImageButton +--->  VisibilityAwareImageButton  +->  FloatingActionButton
+      |
+      +->  SurfaceView +-+->  GLSurfaceView
+      |    TextureView   |
+      |                  +->  VideoView
+      +->  Space
+      |    ViewStub
+      |
+      +--> ViewGroup ++--->  AbsoluteLayout +->  WebView
+                      |
+                      +--->  LinearLayout +--+->  TableLayout
+                      |                      |    AppBarLayout
+                      |                      |
+                      |                      |    TextInputLayout
+                      |                      |    RadioGroup
+                      |                      |    NumberPicker
+                      |                      +->  ActionMenuView
+                      |
+                      +--->  RelativeLayout
+                      +--->  GridLayout
+                      |
+                      +--->  FrameLayout +-+-->   ViewAnimator   +-+->  ViewFlipper
+                      |                    |                       |
+                      |                    |                       |
+                      |                    |                       |
+                      |                    |                       +--> ViewSwitcher +-+->  TextSwitcher
+                      |                    |                                           |
+                      |                    |      CardView                             +->  ImageSwitcher
+                      |                    |
+                      |                    |      ScrollView
+                      |                    |      NestedScrollView
+                      |                    |      HorizontalScrollView
+                      |                    |
+                      |                    |      ScrimInsetsFrameLayout +--> NavigationView
+                      |                    |      BottomNavigationView
+                      |                    |
+                      |                    |      ActionBarContainer
+                      |                    +-->   CollapsingToolbarLayout
+                      |
+                      |       ViewPager
+                      |       PagerTitleStrip
+                      |
+                      |       RecyclerView
+                      |       AdapterView  +--->  AbsListView  +------+-->   ListView  +--->  ExpandableListView
+                      |                                               |
+                      |       CoordinatorLayout                       +-->   GridView
+                      |
+                      |       Toolbar
+                      |       DrawerLayout
+                      |       SwipeRefreshLayout
+                      |       SlidingPaneLayout
+                      |       ConstraintLayout
+                      |
+                      +-->    FlowLayout
+
+```
 ## 界面优化
 
 

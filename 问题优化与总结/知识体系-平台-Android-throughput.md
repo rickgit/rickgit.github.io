@@ -44,7 +44,8 @@
 异步消息与同步消息，屏蔽消息（ message.target ==null为屏障消息)）
 空闲任务
 
-
+6.0 eventfile+epoll阻塞唤醒
+<6.0 epoll+pipe
 ```
 
 

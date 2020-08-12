@@ -1,4 +1,5 @@
 ## 
+
 ```
 +----------------------------------------------------------------------------------------------------+
 |                                                                                                    |
@@ -69,7 +70,8 @@
 identifiers：对象的名字( a name of  a unique object )
 ```
 
-``` Operators
+``` 
+Operators
 +-------------+--------------------------------------------------------------+
 |             | ?:(elvis operator)  []( indexed access operator)  ..(Range)  |
 | Misc        | ;(separates on same lines)                                   |
@@ -627,6 +629,135 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
 
     ```
 
+```                                                                                  runBlocking
++----------------------------------------------------------------------------------+
+|  GlobalScope                                                                     |
+|        launch()                                          async()                 |
+|                                                                                  |
+|                                                                                  |
++----------------------------------------------------------------------------------+
+|  CombinedContext                                                                 |
+|      left:CorountineId                                                           |
+|      ele: Dispatchers.Default                                                    |ele:ThreadLocalEventLoop
++--------------------------------------------------------+-------------------------+
+|  StandaloneCoroutine  : AbstractCoroutine,Continuation | DeferredCoroutine       |BlockingCoroutine
+|        parentContext: CoroutineContext,                |                         |
+|        active: Boolean                                 |                         |
+|                                                        |                         |
+|        start()                                         |                         |
+|        startCoroutine()                                |                         |
+|                                                        |                         |
++--------------------------------------------------------+-------------------------+
+|                                                                                  |
+|      block: Callable,DispatchedTask :: continuation                              |
+|         startCoroutineCancellable()     intercepted():DispatchedContinuation     |
+|                                                                                  |
+|                                                                                  |
+|       DispatchedContinuation                                                     |
+|                  dispatcher:CoroutineDispatcher                                  |dispatcher:BlockingEventLoop
+|                             //DefaultScheduler                                   |
+|                  resumeCancellable()                                             |
+|                                                                                  |
+|        DefaultScheduler :ExperimentalCoroutineDispatcher:Runnable                |BlockingEventLoop
+|             dispatch()                                                           |  enqueueImpl()
+|             coroutineScheduler:DefaultDispatcher                                 |  thread: Thread
+|             run()                                                                |
+|             notifyStartup()                                                      |
+|                                                                                  |
++----------------------------------------------------------------------------------+
+|[threadpool]                                                                      |
+|      DefaultDispatcher: CoroutineScheduler :Executor                             |
+|              dispatch(block:)                                                    |
+|              createTask()                                                        |
+|                                                                                  |
+|              globalQueue: GlobalQueue//LockFreeTaskQueueCore                     |
+|              submitToLocalQueue()                                                |
+|              requestCpuWorker()                                                  |
+|              tryUnpark()                                                         |
+|                                                                                  |
+|              corePoolSize://12                                                   |
+|                                                                                  |
++----------------------------------------------------------------------------------+
+|  LockFreeTaskQueue    LockFreeTaskQueueCore                                      |Parksupport   
+|                                                                                  |   park() 
++----------------------------------------------------------------------------------+
+
+//---------------delay
+delay
+
+
+CancellableContinuationImpl
+     disposeOnCancellation()
+     invokeOnCancellation()
+ DefaultExecutor : EventLoopImplBase()
+    scheduleResumeAfterDelay()
+     run()
+     _delay:DelayedTaskQueue
+DelayedResumeTask
+    scheduleTask()
+
+DelayedTaskQueue
+    addLastIf()
+//---------------job cancel
+JobSupport  : Job
+cancelInternal()
+makeCancelling()
+
+//---------------time out
+withTimeout()
+setupTimeout()
+
+TimeoutCoroutine:AbstractCoroutine
+    disposeOnCompletion()
+    startUndispatchedOrReturnIgnoreTimeout()
+
+
+/// runBlocking， launch ，withContext ，async，doAsync
+
+
+线程池
++------------------------------------------------------------------------------------------------------+
+| CoroutineScheduler : Executor                                                                        |
+|            //core = 12, max = 1536                                                                   |
+|                                                                                                      |
+|         controlState:atomic                                                                          |
+|         cpuPermits:Semaphore                                                                         |
+|         globalQueue: GlobalQueue                                                                     |
+|         execute(command:Runnable)                                                                    |
+|         dispatch(block: Runnable,                                                                    |
+|                 taskContext: TaskContext = NonBlockingContext,                                       |
+|                 fair: Boolean = false)                                                               |
+|                                                                                                      |
+|                                                                                                      |
+| Worker: Thread       DispatchedContinuation:DispatchedTask  GlobalQueue : LockFreeTaskQueue          |
+|    state:WorkerState                       :Runnable           _cur = LockFreeTaskQueueCore          |
+|                        dispatcher: CoroutineDispatcher,                                              |
+|    findTask():Task     continuation: Continuation<T>                                                 |
+|    queue: WorkQueue          //client block                                                          |
+|    run()                                                   //ThreadLocal container                   |
+|                                                            BlockingEventLoop : EventLoopImplBase     |
+|WorkerState                                                                                           |
+|    CPU_ACQUIRED,                                                 joinBlocking()                      |
+|    BLOCKING,                                                     processNextEvent()                  |
+|    PARKING,                                                      dequeue(): Runnable                 |
+|    RETIRING,                                                                                         |
+|    TERMINATED                                                    _queue = atomic<Any?>               |
+|                                                                                                      |
+|WorkQueue                                                                                             |
+|    lastScheduledTask = atomic<Task?>                       EventLoopImplPlatform                     |
+|    buffer: AtomicReferenceArray<Task?>                         :  EventLoopImplPlatform(), Delay     |
+|                                                                  _queue = atomic<Any?>               |
+|                                                                                                      |
+|                                                                                                      |
+|                                                                                                      |
+|                                                            EventLoopImplPlatform: EventLoop          |
+|                                                                 thread: Thread//blocking thread      |
+|                                                                                                      |
+|                                                            EventLoop : CoroutineDispatcher           |
+|                                                                                                      |
++------------------------------------------------------------------------------------------------------+
+
+```
 
 ## 语法解析（Parsing, and Context-Free Grammars）
 ### java_cup Parser Generator 

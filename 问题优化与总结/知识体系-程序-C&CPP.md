@@ -898,3 +898,16 @@ clang+llvm
 
 [clang get_started](https://clang.llvm.org/get_started.html)
 [llvm GettingStarted.html#an-example-using-the-llvm-tool-chain](http://llvm.org/docs/GettingStarted.html#an-example-using-the-llvm-tool-chain)
+
+
+## Linux 内核
+
+### 系统调用定义
+声明：
+linux\include\asm-arm\unistd.h
+定义：
+linux\arch\arm\kernel\calls.S
+函数地址：
+...
+
+### 驱动函数注册

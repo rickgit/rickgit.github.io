@@ -215,5 +215,46 @@ Dynamic-Loader-Apk，Replugin
 
 
 ## 跨进程通讯
+```
++------------------------------------------------------------------------------------------------+
+|  [kernel]                                     |[servicemanager]                                |
+|       binder.c                                |   servicemanager.c                             |
+|          binder_init()//misc_register         |       main()                                   |
+|                                               |       svcmgr_handler()                         |
+|                                               |   binder.c                                     |
+|          binder_get_thread()                  |      binder_open():binder_state                |
+|                 :binder_thread                |      binder_loop()                             |
+|                                               |      binder_mmap()                             |
+|   binder_proc                                 |      binder_update_page_range()                |
+|      buffer:void * //virtual mem              |                                                |
+|      user_buffer_offset:size_t                |      binder_parse()                            |
+|      *vma:vm_area_struct                      |      binder_release()    svclist:svcinfo*      |
+|      buffers:list_head                        |                                                |
+|                                               |               // binder_ref : BpBinder client  |
+|  vm_area_struct       binder_buffer           |               // binder_node: BBinder  server  |
+|                       binder_transaction_data |               // adb shell service list        |
+|  vmalloc.c                                    |                               // BC_ACQUIRE    |
+|     map_kernel_range_noflush()//kernel map    |  binder_state                 // BC_INCREFS    |
+|     vm_insert_page() //user map               |    fd;int                     // BC_RELEASE    |
+|                                               |    mapped;void *              // BC_DECREFS    |
+|                                               |    mapsize;size_t                              |
++-----------------------------------------------+------------------------------------------------+
+| [jni-app]                                                                                      |
+|    ProcessState                                                                                |
+|         open_driver():int //binder fd                //BR_RELEASE                              |
+|                                                      mPendingStrongDerefs:Vector<BBinder*>     |
+|         mDriverFD;int                                                                          |
+|         mHandleToObject;Vector<handle_entry>                                                   |
+|         startThreadPool()                                                                      |
+|                                                                                                |
+|         spawnPooledThread()                          talkWithDriver()                          |
+|                                                                                                |
+|                                                                                                |
+|                                                                                                |
+|       PoolThread:Thread  IPCThreadState              Parcel      BpBinder                      |
+|         threadLoop()        writeTransactionData()                   mHandle                   |
+|                                                                                                |
++------------------------------------------------------------------------------------------------+
 
+```
 ### 四大组件

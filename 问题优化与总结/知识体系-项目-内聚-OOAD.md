@@ -425,7 +425,28 @@ D:\workspace\ws-component\Dagger2App\app\build\tmp\kapt3\stubs\debug\edu\ptu\jav
 
 
 ## 数据异步链式开发框架-Rxjava+Rxlife+RxCache
-[Rxjava ](./知识体系-理论-OOAD-Observer.md)
+### [Rxjava ](./知识体系-理论-OOAD-Observer.md)
+Rxjava 
+工厂方法 构建Observer，通过Observable，Single，Maybe，Completable构建**io.reactivex.rxjava3.internal.operators包**内的 Observable 对象
+模板模式
+      public interface Observer<@NonNull T> { 
+          void onSubscribe(@NonNull Disposable d); 
+          void onNext(@NonNull T t); 
+          void onError(@NonNull Throwable e); 
+          void onComplete();
+
+      }
+
+      public interface Subscriber<T> { 
+          public void onSubscribe(Subscription s); 
+          public void onNext(T t); 
+          public void onError(Throwable t); 
+          public void onComplete();
+      }
+
+代理模式 onSubscribe()代理subscribeActual()方法，subscribeActual(Observer<? super T> observer)调用的时候，用装饰模式装饰当前的observer
+装饰模式 Observer装饰下游 Observer的 subscribe() 方法，装饰调度器
+
 RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察者模式。
 ```
   001_Jersey              697fd66aae9beed107e13f49a741455f1d9d8dd9 Initial commit, working with Maven Central
@@ -590,22 +611,23 @@ RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察�
 ReactiveX provides a collection of operators with which you can filter, select, transform, combine, and compose Observables.
 ```
 +------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Create                  Debounce                              Delay                                                                           |
-|  Defer                   Distinct                              Do                                                                              |
-|  Empty                   ElementAt                             Materialize                                                                     |
-|  /Never                  Filter                                /Dematerialize All                                                              |
-|  /Throw                  First                                 ObserveOn      Amb                                                              |
-|  From      Buffer        IgnoreElement  And/Then/When          Serialize      Contains          Average                                        |
-|  Interval  FlatMap       Last           CombineLatest          Subscribe      DefaultIfEmpty    Concat                                         |
-|  Just      GroupBy       Sample         Join                   SubscribeOn    SequenceEqual     Count                                          |
-|  Range     Map           Skip           Merge                  TimeInterval   SkipUntil         Max                         Connect            |
-|  Repeat    Scan          SkipLast       StartWith              Timeout        SkipWhile         Min                         Publish            |
-|  Start     Window        Take           Switch        Catch    Timestamp      TakeUntil         Reduce                      RefCount           |
-|  Timer                   TakeLast       Zip           Retry    Using          TakeWhile         Sum                         Replay        to   |
+|  Create     Debounce                                                                         Delay                                             |
+|  Defer      Distinct                                                                         Do                                                |
+|  Empty      ElementAt                                                                        Materialize                                       |
+|  /Never     Filter        All                                                                /Dematerialize                                    |
+|  /Throw     First         Amb                         And/Then/When                          ObserveOn                                         |
+|  From       IgnoreElement Contains         Buffer     CombineLatest     Average              Serialize                                         |
+|  Interval   Last          DefaultIfEmpty   FlatMap    Join              Concat               Subscribe                                         |
+|  Just       Sample        SequenceEqual    GroupBy    Merge             Count                SubscribeOn                                       |
+|  Range      Skip          SkipUntil        Map        StartWith         Max                  TimeInterval                   Connect            |
+|  Repeat     SkipLast      SkipWhile        Scan       Switch            Min                  Timeout                        Publish            |
+|  Start      Take          TakeUntil        Window     Zip               Reduce       Catch   Timestamp                      RefCount           |
+|  Timer      TakeLast      TakeWhile                                     Sum          Retry   Using                          Replay        to   |
 +------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Creating  Transforming  Filtering     Combining      Error    Utility        Conditional     Mathematical                                     |
-|                                                       Handling                and Boolean     and Aggregate  Backpressure  Connectable  Convert|
+|  Creating   Filtering     Conditional   Transforming  Combining       Mathematical   Error    Utility                                          |
+|                           and Boolean                                 and Aggregate  Handling                Backpressure  Connectable  Con^ert|
 +------------------------------------------------------------------------------------------------------------------------------------------------+
+
 
 ```
 [Rxjava Operater](https://github.com/ReactiveX/RxJava/wiki/Alphabetical-List-of-Observable-Operators)
@@ -656,6 +678,35 @@ onBackpressureLatest()
 |  workQueue      |              |     |              |           |           |               |
 +-----------------+--------------+-----+--------------+-----------+-----------+---------------+
 
+
+
+                    RxThreadFactory :ThreadFactory
+                         Thread newThread()
+
+
+ //RxComputationThreadPool          //RxSchedulerPurge
+ComputationScheduler :Scheduler     SchedulerPoolFactory
+
+
+ //RxCachedThreadScheduler
+ //RxCachedWorkerPoolEvictor
+ IoScheduler :Scheduler
+                                                    CachedWorkerPool                                
+ //RxNewThreadScheduler                                   evictorService:ScheduledExecutorService
+ NewThreadScheduler :Scheduler                            allWorkers:CompositeDisposable
+                                                          createWorker():Worker
+ //RxSingleScheduler                                      expiringWorkerQueue:ConcurrentLinkedQueue<ThreadWorker> 
+ SingleScheduler :Scheduler                         ThreadWorker: NewThreadWorker
+
+                                                    EventLoopWorker:Scheduler.Worker//访问者模式，访问threadworker
+                                                          threadWorker:ThreadWorker
+                                                          schedule(run:Runnable):Disposable
+
+                                                    ScheduledRunnable :AtomicReferenceArray,Runnable
+
+
+FlowableSubscribeOn
+       scheduler:Scheduler
 ```
 线程间切换
 

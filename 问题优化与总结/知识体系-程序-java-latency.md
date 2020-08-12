@@ -1,5 +1,10 @@
 
 ## Cache
+
+- oop-klass模型
+- JMM模型
+- Unix 5种I/O模型
+
 ### heap manager
 
 ### GC
@@ -38,7 +43,8 @@
 +--------------------------------------------------------------------------------------------+
 
 ```
-
+softwareReference用在threadlocal value值
+ 反射保存在softwareReference
 ## 
 
 

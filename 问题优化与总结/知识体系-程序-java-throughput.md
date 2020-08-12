@@ -639,6 +639,8 @@ BlockingQueue
 
 #### ConcurrentHashMap。有并发要求，使用该类替换HashTable
 java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用CAS + synchronized保证并发更新的安全性，底层采用数组+链表+红黑树的存储结构。
+
+           树化操作                              计数操作                         扩容
 ```
       +----------------------------------------------------------------------------------------------+
       | ConcurrentHashMap                                                                            |
@@ -654,7 +656,7 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
       |                              treeifyBin()                                                    |
       +----------------------------------------------------------------------------------------------+
       |                                                                                              |
-      |           TreeBin:Node                       CounterCell           ForwardingNode<K,V>:Node  |
+      |           TreeBin:Node//Tree Bin root        CounterCell           ForwardingNode<K,V>:Node  |
       |             putTreeVal():TreeNode<K,V>           value                 hash:int=MOVE         |
       |             balanceInsertion():TreeNode<K,V>                           nextTable:Node<K,V>[] |
       |                                                                                              |
@@ -678,6 +680,13 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
      5. 同步插入，确保锁桶底位置没变，插入操作，判断是否树化
 树化
 帮助数据迁移：将原来的 tab 数组的元素迁移到新的 nextTab 数组中。在多线程条件下，当前线程检测到其他线程正进行扩容操作（Thread.yield()），则协助其一起进行数据迁移。扩容后  sizeCtl = (n << 1) - (n >>> 1);
+
+
+线程不安全的情况：
+            Integer key = map.get("key");
+            Integer newV = key + 1;
+            map.put("key", newV);
+ 解决方法是使用 replace 方法
 ### ConcurrentSkipListMap(SkipList)
 ```
 +-----------------------------------------------------------------------------------+
