@@ -1,85 +1,253 @@
-## 打包
+## 总览
+[](https://juejin.im/post/6844903974294781965#heading-61)
+
+
+## 界面
+### 四大组件基础 - Context
+Context作用
+```
+ ContextWrapper
+       ^   Context
+       |
+       +
+ ContextThemeWrapper
+       ^   Theme,LayoutInflater,Resources,Configuration
+       |
+ Activity
+       ^   Dialog,Cursor,Context
+       |
+ComponentActivity
+       ^     LifecycleRegistry,ViewModelStore,SavedStateRegistryController
+       |     OnBackPressedDispatcher,mContentLayoutId
+ FragmentActivity
+       ^     FragmentController,LifecycleRegistry
+       |
+AppCompatActivity
+             ActionBar
+
+
++--------------------------------------------------------------------------------------------+
+|   ContextImpl                                                                              |
++-----------------------------------------------------+--------------------------------------+
+|     ActivityThread mMainThread                      |  File mDatabasesDir                  |
+|                                                     |  File mPreferencesDir                |
+|     LoadedApk mPackageInfo                          |  File mFilesDir                      |
+|     Resources mResources                            |  File mNoBackupFilesDir              |
+|     ResourcesManager mResourcesManager              |  File mCacheDir                      |
+|     PackageManager mPackageManager                  |  File mCodeCacheDir                  |
+|                                                     |                                      |
++-----------------------------------------------------+                                      |
+|       Display mDisplay                              |  ArrayMap<String, File>              |
+|       Theme mTheme                                  |   mSharedPrefsPaths                  | 
++-----------------------------------------------------+--------------------------------------+
+|       Object[] mServiceCache                                                               |
+|       ApplicationContentResolver mContentResolver                                          |
+|       IBinder mActivityToken                                                               |
+|       UserHandle mUser                                                                     |
++--------------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------------+
+|   Activity                                                                                 |
++-----------------------------------------------------+--------------------------------------+
+|  ActivityThread mMainThread       Thread mUiThread  |  boolean mCalled                     |
+|  Activity mParent                 Intent mIntent    |  boolean mResumed                    |
+|  ComponentName mComponent         mResultData:Intent|  boolean mStopped                    |
+|  Application mApplication         String mReferrer  |  boolean mFinished;                  |
+|  mFragments:FragmentController                      |  boolean mStartedActivity            |
+|  Instrumentation mInstrumentation mHandler:Handler  |  boolean mDestroyed;                 |
+|  IBinder mToken                                     |  boolean mDoReportFullyDrawn         |
+|  TaskDescription mTaskDescription                   |  boolean mRestoredFromBundle         |
+|                                                     |                                      |
+|  Window mWindow                                                                            |
+|  WindowManager mWindowManager                       |  boolean mWindowAdded                |
+|  Configuration mCurrentConfig                       |  boolean mVisibleFromServer          |
+|  mLastNonConfigurationInstances                     |  boolean mVisibleFromClient          |
+|                                                     |  boolean mCanEnterPictureInPicture   |
+|  mDecor:View                                        |  boolean mEnableDefaultActionBarUp   |
+|  mActionBar:ActionBar          CharSequence mTitle  |                                      |
+|  mMenuInflater                                      |                                      |
+|  mSearchManager                   mSearchEvent      |                                      |
+|  mAutofillPopupWindow             mAutofillManager  |                                      |
+|  SparseArray<ManagedDialog>  mManagedDialogs        |                                      |
+|                                                     |                                      |
++-----------------------------------------------------+--------------------------------------+
+|                                                                                            |
+|  ArrayList<ManagedCursor> mManagedCursors                                                  |
+|  TranslucentConversionListener mTranslucentCallback  SpannableStringBuilder mDefaultKeySsb |
+|  VoiceInteractor mVoiceInteractor                                                          |
+|                                                                                            |
++--------------------------------------------------------------------------------------------+
+
+                                  PKMS
+                                +------------------->  Permission/Pkginfo/HindAPI 
+                                |                     
+                                |  AMS                 Activity
+                                |                      BrocastReceiver
+                                |------------------->  ContentProvider
+                  SystemServer  |                      Service
++------------------+            |
+|                  | +----------+   WMS
+|     context      |            +------------------->  Activity/Dialog/PopupWindow/Toast  ---->SurfaceFlipper
+|                  |
++------------------+ +----------+
+                                |
+                ActivityThread  |   AssetManager
+                                +------------------->  loadResource
+```
+
+
+## 4S (smooth，Stability，saving，streamline)快稳省简
 稳定（编码/io问题），精简/包大小，续航/CPU占用率，流程/内存占用率-刷新率，
-### 编译，打包，优化，签名，安装
-gradle,Transform的应用
-批量打包
-```打包流程
-G: gradle build tools
-B: android build tools
-J: JDK tools
+> <<Android High Performance Programming>>
+
+[Android性能测试（内存、cpu、fps、流量、GPU、电量）——adb篇](https://www.jianshu.com/p/6c0cfc25b038)
+稳定（monkey,bugreport），流畅（systrace，卡顿，动画，多线程，zxing），续航（battery historian 后台，发热，功耗），精简（apk），美观（布局layout inspector），安全（加固，插件化）
+am_crash
+ 
+性能（ the time taken to execute tasks）
+ 
+
+## 精简
+[参考](./知识体系-平台-Android-latency.md)
 
 
-+--------------------------------------------------------------------------------------+
-| /META-INF                                                                            |
-| /assets                                                                              |
-| /res                                                                                 |
-| /libs                                                                                |
-| class.dex                                                                            |
-| resources.arsc                                                                       |
-| AndroidManifest.xml                                                                  |
-+--------------------------------------------------------------------------------------+
-|G                                                                                     |
-|    multiple agent tool                                                               |
-+--------------------------------------------------------------------------------------+
-|B                                                                                     |
-|   zipalign                                                                           |
-+--------------------------------------------------------------------------------------+
-|J                                                                                     |
-|   javasigner  V1, V2(N), V3(P)                                                       |
-+--------------------------------------------------------------------------------------+
-|G                                                                                     |
-|   ApkBuilder                                                                         |
-+--------------------+                          +--------------------------------------+
-|B                   |                          |B                                     |
-|  linker            |                          |    dex                               |
-+--------------------------------------------------------------------------------------+
-|B                   |B                         |G             +-----------------------+
-|  bcc compat        |   AAPT                   |    proguard  |          Preveirfy    |
-|                    |                          |              |          Obfuscate    |
-|                    |                          |              |          Optimize     |
-|                    |                          |              |          Shrink       |
-|                    |                          |              +-----------------------+
-+--------------------+                          +--------------------------------------+
-|B                   |                          |        J                             |
-|  llvm-rs-cc        |                          +-------+    javac                     |
-|                    |                          | R.java|                              |
-|                    +--------------------------+--------------------------------------+
-|                    |G                                 |B                             |
-|                    |   menifest/assets/resource merger|    aidl                      |
-+--------------------+-----------------------------------------------------------------+
 
-                                                                                              
 
+## 稳定
+Crash 和 ANR
+
+android develop monkey
+AndroidJunitRunner
+
+
+### 代码Review：提高代码质量
+Commit 审阅 if，系统版本，模块管理
+Push   代码重用,多次提交Review
+### Android Lint、QAPlugins（Findbugs、Checkstyle、PMD）
+### 日志 Timer
+### MONKEY
+1. monkey tools 测试
+adb shell monkey -p com.bla.yourpackage -v 1000
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+heisha:
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
+
+[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
+[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
+
+
+停止 monkey
+adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
+
+基础参数 | 事件参数 | 调试参数
+|------:|---------:|---------:|
+-v |     -pct-touch| -hprof   |
+-s |            ...|--ignore-security-exceptions|
+-p |               |       ...|
+--throttle|  |  |
+
+```java
+    public static final int FACTOR_TOUCH        = 0;//点击
+    public static final int FACTOR_MOTION       = 1;//滑动
+    public static final int FACTOR_TRACKBALL    = 2;//滚动
+    public static final int FACTOR_NAV          = 3;
+    public static final int FACTOR_MAJORNAV     = 4;//back home menu
+    public static final int FACTOR_SYSOPS       = 5;//物理按键
+    public static final int FACTOR_APPSWITCH    = 6;//startActivity
+    public static final int FACTOR_ANYTHING     = 7;
 ```
 
-walle
+
 ```
-+---------------------------------------------------------------------------------------------+
-|                                        walle-cli                                            |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                         jcommander                                                          |
-|                                                               Batch2Command                 |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                                                                                             |
-|                      ChannelReader                ChannelWriter                             |
-|                                                                                             |
-|                                                                                             |
-|                      PayloadReader                                                          |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                      ApkUtil                                                                |
-|                         findApkSigningBlock()                                               |
-+---------------------------------------------------------------------------------------------+
+monkey network
+adb forward tcp:1080 tcp:1080
+adb shell monkey --port 1080
+telnet 127.0.0.1 1080
 
 ```
 
 
+2. 使用 adb 获取错误报告
+adb bugreport E:/bugs/
+3. anr文件
+adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 
-## 界面开发系统
+4. 日志
+- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
+- EXCEPTION,NullPointerException
+- ERROR
+
+[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
+[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
+
+### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
+```
+services/core/java/com/android/server/am/AppErrors.java:
+
+StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
+//                    .detectDiskReads()
+//                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyDialog() //弹出违规提示对话框
+                    .penaltyLog() //在Logcat 中打印违规异常信息
+                    .penaltyFlashScreen() //API等级11
+                    .build());
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .detectLeakedClosableObjects() //API等级11
+        .penaltyLog()
+        .detectFileUriExposure()
+        .penaltyDeath()
+        .build());
+```
+
+### 版本兼容问题
+
+### （异常 错误 安全）反编译
+[dex2jar](https://github.com/pxb1988/dex2jar)
+[jd-gui](https://github.com/java-decompiler/jd-gui)
+[Apktool](https://github.com/iBotPeaches/Apktool)
+[jad（不维护）](http://www.kpdus.com/jad.html)
+
+[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
+try{Looper.loop()}
 
 
+### 可维护性/通讯 - 架构之模块化（插件化及组件化）
+
+[详见《知识体系-平台-Android-cohesion.md》](./知识体系-平台-Android-cohesion.md)
+插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
+Activity校验，生命周期，Service优先级，资源访问，so插件化
+- Dynamic-loader-apk
+  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
+- Replugin
+
+组件化
+- 组件间解耦
+  1. MVVM-AAC 
+  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
+  2. MVP DI框架Dagger2解耦
+- 通信
+1. 对象持有
+2. 接口持有
+3. 路由 （ARouter）
+   Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
+
+
+
+## 流畅-界面开发系统
+1. Activity，View，Window
+   activity在attach时，创建PhoneWindow；onCreate创建DecorView；onResume后创建ViewRootImpl关联WindowManager
+
+2. 绘制invalidate方法
+   先申请绘画帧，然后再绘制；
+3. 事件
+   Activity dispatchTouchEvent；再传给ViewRootImpl的mView（DecorView）dispatchTouchEvent；当有接受事件时target；
+   下次传递的时候，走ontouch，判断释放是longclick；或者是否是touch_up，click事件；
 
 ```
       +->  TextView  +-+-->   EditText
@@ -147,10 +315,192 @@ View -+                                                             |
                       +-->    FlowLayout
 
 ```
-## 界面优化
+### 界面优化
+优化LayoutInflater ：缓存避免重复解析（RecyclerView的四级缓存）；iReaderAndroid/X2C 生成Java代码，减少xml转化Java对象的解析时间；异步解析
+优化DecorView onDraw/layout ：减少层级（使用merge、Viewstub标签优化）；使用默认背景减少绘制；Litho 异步layout/measure；开发者工具的绘制工具
+flutter：不用解析xml，绘制图层
+异步耗时业务代码：Handler，线程池，协程，动画
+
+> 性能（ the time taken to execute tasks）
+
+```shell 
+#adb shell "getprop | grep heapgrowthlimit"
+#adb shell "getprop|grep dalvik.vm.heapstartsize"
+#adb shell "getprop|grep dalvik.vm.heapsize"
+
+#adb shell getprop | grep product 获取手机型号
+
+#adb shell "dumpsys meminfo -s <pakagename | pid>"
+# while true;do adb shell procrank|grep <proc-keywords>; sleep 6;done
 
 
-viewstub,
+# adb shell "cat  /proc/cpuinfo" //查看cpu核心数
+# adb shell "dumpsys cpuinfo | grep <package | pid>"
+# adb shell "top -n 5 | grep <package | pid>" 
+
+# adb shell "dumpsys gfxinfo com.example.proj" //GPU 帧数 fps
+
+
+# adb shell "dumpsys batterystats < package | pid>" //电量采集
+```
+#### 官方定义
+[识别与负载能力相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_capacity)
+[识别与抖动相关的卡顿](https://source.android.google.cn/devices/tech/debug/jank_jitter)
+
+systrace
+
+离线获取systrace
+adb shell "atrace -z -b 40000 gfx input view wm am camera hal res dalvik rs sched freq idle disk mmc -t 15 > /data/local/tmp/trace_output &"
+
+
+```
++-------------+-------------------+----------------------+---------------------------+---------------+
+|             |    info           |    tools             |  fix                      |  extension    |
++----------------------------------------------------------------------------------------------------+
+|  memory     |                   |                      |                           |  keep alive   |
+|             | gc time>frame rate|     profiler cpu     |  ResourceCanary           |               |
+|             | leaks             |                      |  Bitmap&Activity          |               |
+|             | Memory Churn      |    dumpsys meminfo   |  APKsize                  |    +----------+
++-----------------------------+---+-------------------------------------------------------+ network& |
+|  battery    | wakelock time |                          |   Doze /standby           |    | secure   |
+|             | gps time      |        battery-historian |   jobscheduler API        |    +----------+
+|             | network time  |                          |AlarmManager、Syncs Adapter|+              |
++----------------------------------------------------------------------------------------------------+
+|             |   vsync       |                          |                           |               |
+|  draw       |               |                          |  canvas.quickreject()     |               |
+|  (cpu)      |Refresh Rate/  +---------+----------------+                           |               |
+|             |frame Rate     |         | gpu overdraw   |  canvas.cliprect()        | multiThread&  |
+|             |               |on-device| gpu render     |  hierachy viewer          | mainThread    |
+|             |               |  tools  | gup view update|                           |               |
+|             | Activity      |         |                |                           | Webview       |
+|             | LauchTime     +---------+----------------+                           |               |
+|             | (am start)    |     profiler cpu/gpu     |                           |               |
+|             |reportFullyDrawn|                         |                           |               |
++-------------+---------------+--------------------------+---------------------------+---------------+
+|   secure    |    debug      |   apktool                |                           | drizzleDumper |  
+|             |   https       |   smali                  |                           |               |
+|             |               |   (reverse engineering)  |                           |   FDex2       |
++-------------+---------------+--------------------------+---------------------------+---------------+
++-------------+-----------------------+
+|             network                 |
++-------------+-----------------------+
+|   fast      |  compress data/charge |
++-------------------------------------+
+| <60ms GOOD  | compress image        |
+|             | serialize data        |
+| <200ms OK   |                       |
+|             | cache                 |
+| other BAD   | jms                   |
++-------------+-----------------------+
+
+
+[smali](https://blog.csdn.net/linchaolong/article/details/51146492)
+```
+[Android官网](https://developer.android.com/topic/performance/)
+[RelativeLayout的性能损耗](https://zhuanlan.zhihu.com/p/52386900?utm_source=androidweekly.io&utm_medium=website)
+[battery-history](https://www.cnblogs.com/jytian/p/5647798.html,https://yeasy.gitbooks.io/docker_practice/install/ubuntu.html)
+
+[启动时间](https://developer.android.com/topic/performance/vitals/launch-time)
+
+[Android 内存泄漏](https://android.jlelse.eu/9-ways-to-avoid-memory-leaks-in-android-b6d81648e35e)
+
+[冷启动](开始记录跟踪数据的位置调用 Debug.startMethodTracing()，要停止跟踪的位置请调用 Debug.stopMethodTracing())
+```
++-----------------------------------+
+| memory leaks                      |
++-----------------------------------+
+| unrelease                         |
++-----------------------------------+
+| static Fields                     |
+| (View,Context)                    |
+|                                   |
+| Inner Classes                     |
+| That Reference                    |
+| Outer Classes/LongLifecycle       |
+| (Async Handler)                   |
+| (WeakReference view)              |
+|                                   |
+| ThreadLocals                      |
+|                                   |
+| Unclosed Resources                |
+|(unregisterReceiver)               |
+|                                   |
++-----------------------------------+
+
+
+
+```
+ 
+>《Android开发艺术探索》
+方法：布局，绘制，内存泄漏，响应速度，Listview及Bitmap，线程优化
+- 渲染速度
+  [https://developer.android.com/studio/profile/inspect-gpu-rendering](https://developer.android.com/studio/profile/inspect-gpu-rendering)
+    1. GPU呈现模式(Swap Buffers,Command Issue,Draw,Sync&Upload,Measure&LayoutAnimation,Input Handling,Misc/Vsync Delay)
+```
++--------------------+---------------------------------------------+
+|  Swap Buffers      |  too much work on the GPU                   |
++------------------------------------------------------------------+
+|  Command Issue     |  renderer issuing commands to OpenGL        |
+|                    |  to draw and redraw display lists           |
++------------------------------------------------------------------+
+|  Sync & Upload     |  take to upload bitmap information          |
+|                    |  to the GPU                                 |
++------------------------------------------------------------------+
+|  Draw              |   create and update the view's display lists|
++------------------------------------------------------------------+
+|  Measure /         |  spent on onLayout and onMeasure callbacks  |
+|  Layout            |  in the ^iew hierarchy                      |
++------------------------------------------------------------------+
+|  Animation         |  evaluate all the animators that were       |
+|                    |  running that frame                         |
++------------------------------------------------------------------+
+|  Input Handling    |  spent executing code                       |
+|                    |  inside of an input e^ent callback          |
++------------------------------------------------------------------+
+|  Misc Time /       |  executing operations in                    |
+|  VSync Delay       |  between two consecuti^e frames.            |
++--------------------+---------------------------------------------+
+
+```
+    2. 显示CPU使用情况(查看后台运行)，耗电
+    3. 绘制优化(profiler) CPU/Memory/Network
+控件边界图，绘制条状图
+```
++---------+--------+-------------------+---------+--------+------+------+--------+--------+-------+--------+------+-------+--------+
+|         |        | Wall clock time/  |         |        |      |      |        |        |       |        |      |       |        |
+|         |        |  Thread time      |         |        |      |      |        |        |       |        |      |       |        |
+| Call    | Flame  |---------+---------|         |  app   | image|zygote|        |        |       |        |      |       |        |
+| Chart   | Chart  |Top down |Bottom up|         |--------+------+------|        |        |       |        |      |       |        |
+|         |        |         |         |forece gc|      Dump javaHeap   |        |        |       |        |      |       |        |
++---------+--------+---------+------------------------------------------+        |        |       |        |      |       |        |
+|             Threads                  | Image   | Zygote | app  |  JNI |        |        |       |        |      |       |        |
+|                                      | Heap    | Heap   | Heap |  Heap| timing |        |       |        |      |       |        |
+|                                      |         |        |      |      |        |        |       |        |      |       |        |
++---------+--------+---------+-------------------+--------+------+-----------------------------------------------------------------+
+| sample  | Trac   | Sample  |  Trac   | Allocation                     |        |        |       |        |      |       |        |
+| java    | java   | C/C++   |  System |  Java/Native/Graphic           |overview|Responce|Request|CallStak| CPU  |Network|Location|
+| Method  | Method | Function|  Calls  |     /Stack/Code/other          |        |        |       |        |      |       |        |
++---------+--------+-------------------+--------------------------------+--------+--------+-------+--------+------+-------+--------+
+|                                                               Activity Lifecyle                                                  |
++--------------------------------------+--------------------------------+----------------------------------+-----------------------+
+|          recod CPU                   |          Memory                |               network            |        Energy         |
++--------------------------------------+--------------------------------+----------------------------------+-----------------------+
+
+
+Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行的相对时间
+
+[Flame chart](https://blog.csdn.net/sinat_20059415/article/details/80584621)
+```
+    1. **Studio Inspect Code** Android-Lint-Performace 代码Review不必要不加载（include merge, viewstub），ConstaintLayout
+    2. LayoutInspector 布局优化（include merge, viewstub）
+    3. 动画硬件加速，勿滥用
+    
+    尽量用Drawable  
+    1. ListView/RecycleView及Bitmap优化
+    2. 线程优化 
+
+ [动画大全](https://github.com/OCNYang/Android-Animation-Set)
+
 ### RecyclerView 缓存
 ```
 +---------------------------------------------------------------------------------+
@@ -177,7 +527,16 @@ viewstub,
 +---------------------------------------------------------------------------------+
 
 ```
-##  刷新 （绘制，局部重绘）View#invalite
+### 刷新
+invalidate只会调onDraw方法且必须在UI线程中调用
+      mPrivateFlags |= PFLAG_INVALIDATED;
+postInvalidate只会调onDraw方法，可以再UI线程中回调
+      mPrivateFlags |= PFLAG_INVALIDATED;
+requestLayout会调onMeasure、onLayout和onDraw(特定条件下)方法
+      mPrivateFlags |= PFLAG_FORCE_LAYOUT;
+      mPrivateFlags |= PFLAG_INVALIDATED;
+
+####  刷新 （绘制，局部重绘）View#invalite
 VSynch 垂直同步
 Triple Buffer 三重缓存
 Choreographer 编舞者
@@ -238,7 +597,7 @@ Choreographer 编舞者
 
 
 ```
-## 事件相应 InputManager.getInstance().injectInputEvent
+##@ 事件相应 InputManager.getInstance().injectInputEvent
 ```
          +-----------------------------------------------------------------------------------------+
          |  ImputManager                                                                           |
@@ -328,9 +687,9 @@ Choreographer 编舞者
 
 
 ```
-## 动画
+### 动画
 https://dribbble.com/
-### TWeen Animation
+#### TWeen Animation
 修改matrix，刷新界面，等待下一帧时候，绘制界面
 
 ```
@@ -368,7 +727,7 @@ https://dribbble.com/
 
 ```
 
-### ViewPropertyAnimator
+#### ViewPropertyAnimator
 ```
 +---------------------------------------------------------------------------------------------+
 |  [Android 4.4]                                                                              |
@@ -399,21 +758,29 @@ https://dribbble.com/
 
 
 ```
-### GIF
+#### GIF
 Glide播放多个gif文件卡
 
 android-gif-drawable性能好
 
 android-1.6_r1\external\giflib 系统源码利用
+### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
 
-## 界面跨平台 flutter
+```shell
+# pidof  system_server
+1956
+
+# cat /proc/1956/limits
+
+```
+### 自定义解析 flutter
 - 第一代 ionic(webview),PhoneGap，Cordova      H5                语言：js/css      环境：webview
 
 - 第二代 RN（v8,Hermes/jscore）> weex(js,vue)  jit运行时编译     语言：JavaScript  环境：nodejs/v8 
    [RN](https://www.reactnative.cn/docs/components-and-apis)
 - 第三代 Flutter（Skia）                                     语言：dart
-### Flutter 路由，UI
-### dart
+#### Flutter 路由，UI
+#### dart
 https://dart.dev/samples
 
 https://dart.dev/guides/language/language-tour
@@ -545,3 +912,41 @@ https://dart.dev/guides/language/language-tour
 
 
 ```
+
+
+
+
+
+## 续航
+```
+ pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "keep bright");
+
+
+ adb shell dumpsys "power|grep -i wake" 
+ 查看
+```
+
+###  battery-historian
+
+docker search battery-historian
+
+go run setup.go 
+
+ 
+docker run -it --user root --name battery -v /c/Users/docker:/share  -p 9995:9995 bhaavan/battery-historian /bin/bash -c "go run setup.go && go run cmd/battery-historian/battery-historian.go --port 9995"
+
+
+[第三方 battery-historian （需代理访问）](https://bathist.ef.lc/)
+
+
+
+到处文件
+adb bugreport > bugreport.txt
+
+### Battery Historian
+
+AlarmManager/Timer
+GPS
+
+JobScheduler
+

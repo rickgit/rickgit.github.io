@@ -43,8 +43,9 @@
 +--------------------------------------------------------------------------------------------+
 
 ```
-softwareReference用在threadlocal value值
- 反射保存在softwareReference
+ 注解，反射保存在softwareReference
+ 弱引用，Glide以及缓存；Activity内存管理
+ 虚引用，堆外内存管理
 ## 
 
 
@@ -228,7 +229,7 @@ src/java.base/linux/native/libnio/ch/EPoll.c:59:Java_sun_nio_ch_EPoll_create
             |                                pos:int                      handles:HandleTable           connect(src:PipedOutputStream) |
             |                               getInIfOpen():InputStream     vlist:ValidationList          receive()                      |
             |                                                             enableOverride:bool                                          |
-            |                                                                                                                          |
+            |                               Gzip,Base64,Chiper...                                                                      |
             |                                                                                                                          |
             +--------------------------------------------------------------------------------------------------------------------------+
             | [OutputStream]                                                                                                           |
@@ -287,3 +288,10 @@ cache 是加速 读，而 buffer 是缓冲 写
 
 ```
 selector 不好直接管理socket，使用channel做适配
+
+## 网络
+### 数据交换格式
+Gson
+工厂方法： com.google.gson.Gson#factories用来创建TypeAdapter
+适配器模式：com.google.gson.internal.bind.TypeAdapters适配类型解析
+装饰模式：com.google.gson.reflect.TypeToken装饰class

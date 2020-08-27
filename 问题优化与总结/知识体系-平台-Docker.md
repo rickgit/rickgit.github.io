@@ -8,8 +8,11 @@ sudo /etc/init.d/docker restart
 
 docker-machine ip default //虚拟机地址
 
-
+[设置国内镜像](https://developer.aliyun.com/article/29941)
+[](https://mirrors.ustc.edu.cn/help/dockerhub.html)
+[](http://hub-mirror.c.163.com)
 ## 安装镜像
+docker search xxxxxx
 docker pull ubuntu:14.04 //拉取镜像
 docker images 
 docker rmi **imageid**

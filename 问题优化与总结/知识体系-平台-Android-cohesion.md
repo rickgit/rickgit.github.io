@@ -1,9 +1,36 @@
 
+## 
 
-## 通讯 EventBus
+常见优化
+ButterKnife、Dagger2、Router、eventbus
+## 服务
+IntentService
+JobService
+
+
+
+
+## 组件化
+组件指的是单一的功能组件，如 [视频组件]、[支付组件] 等，每个组件都可以以一个单独的 module 开发，并且可以单独抽出来作为 SDK 对外发布使用。
+- 组件单独调试
+- 组件间界面跳转 Arouter
+
+
+组件化
+- 组件间解耦
+  1. MVVM-AAC 
+  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
+  2. MVP DI框架Dagger2解耦
+- 通信
+  1. 对象持有
+  2. 接口持有
+  3. 路由 （ARouter）
+     Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
+
+### 通讯 EventBus
 intent,接口，aidl，handler，broadcast，其他第三方
 livedata
-## 数据路由/通讯 - ARouter
+### 数据路由/通讯 - ARouter
 - apt技术
 - spi技术
  
@@ -72,12 +99,17 @@ livedata
             +-----------------------------------------------+------------------------------------------------------------------------------+
 
 ```
+### 依赖注入 dagger2/ 视图注入 ButterKnife
 
-## 组件
-组件指的是单一的功能组件，如 [视频组件]、[支付组件] 等，每个组件都可以以一个单独的 module 开发，并且可以单独抽出来作为 SDK 对外发布使用。
-- 组件单独调试
-- 组件间界面跳转 Arouter
-## 插件/补丁
+
+## 插件/补丁（客户端动态运行加载）
+插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
+Activity校验，生命周期，Service优先级，资源访问，so插件化
+- Dynamic-loader-apk
+  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
+- Replugin
+
+
 Tinker,Sophix
 饿了吗的Amigo,美团的Robust,大众Nuwa
                +--------------------------+
@@ -118,7 +150,7 @@ andfix 替换方法 ArtMethod属性
 Sophix dlopen和dvm_dlsym
 
 
-## Tinker
+### 补丁-Tinker
 发布。Tinker沒有免费发布于。 
      Bugly：热修复（闭源）
      GitHub：tinker-manager
@@ -210,11 +242,15 @@ ResDiffDecoder.patch/ loadTinkerResources/addAssetPath
 ```
 
 
-## 插件
+### 插件
 Dynamic-Loader-Apk，Replugin
 
+## 通讯
 
-## 跨进程通讯
+
+
+### 跨进程通讯
+
 ```
 +------------------------------------------------------------------------------------------------+
 |  [kernel]                                     |[servicemanager]                                |
@@ -258,3 +294,23 @@ Dynamic-Loader-Apk，Replugin
 
 ```
 ### 四大组件
+
+
+## kotlin 封装，高效编程
+1. 封装
+     封装field 结构体声明var，val
+     封装static 默认都是static 嵌套类，除非用inner修饰
+     封装final 默认时final类，除非open class,abstract class,interface
+     拓展enum类，支持子类创建多个实例seal class
+2.  多态/复用
+     类型 typealise/inline
+     组合复用原则 委托（by 监听器/部分代理），拓展（内置作用域拓展函数）
+     优化泛型 
+3. 类型拓展
+   非空判断 
+     序列集合
+     方法
+4. 线程调度拓展-协程
+     协程Scope，协程Context，协程continuation，协程dispatcher：协程scheduler
+### Kotlin 详细
+[详见](./知识体系-平台-Android-cohesion-kotlin.md)
