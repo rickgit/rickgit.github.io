@@ -143,11 +143,12 @@ volatile原理是基于CPU内存屏障指令实现的
 1. 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
 2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
 3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
-4. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
 5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
 6. join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。
 7. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
 8. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
+9. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
+
  [](https://juejin.im/post/5ae6d309518825673123fd0e#heading-5)
  [](https://www.cnblogs.com/skorzeny/p/6480012.html)
 #### 原子性问题（CAS 保证读改写）
@@ -815,7 +816,10 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
 ### 
 线程生命周期 
 join
-
+小粒度：
+  原子性，可见性，有序性
+大粒度：
+  同步，通讯，调度问题
 
 ### 线程之间的通信和同步问题
 

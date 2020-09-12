@@ -598,6 +598,8 @@ clone
 
 ```
 #### JVM 内存区域与内存模型（JMM）
+OOP-KLASS模型
+
 
 [jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)
 - 数组 

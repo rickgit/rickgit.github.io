@@ -3,6 +3,8 @@
 环境 Android 系统
 阅读应用流程（以APK文档为主线，程序Main方法为入口）
 [启动流程](https://blog.csdn.net/qq_30993595/article/details/82714409#_2)
+
+![](https://developer.android.google.cn/guide/platform/images/android-stack_2x.png?hl=zh-cn)
 ```diagram
 +---------+--------------------------------------------------------------------------------------------------+
 | AppS    |   Browser.apk  Gallery.apk  Launcher3.apk SystemUI(RecentsActivity)   Home  Contacts.apk  Phone  |
@@ -2059,50 +2061,6 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 
 
-## 版本特性
-[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
-
-### 29(Android 10 )
-深色主题背景
-```xml
-<style name="AppTheme" parent="Theme.AppCompat.DayNight">
-
-<style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-
-```
-### API level 27 (android-8.1)
-
-@FastNative注解
-
-- Safe Browsing API 的 WebView 实现
- ```xml
- <application>
-            ...
-            <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
-                       android:value="true" />
-</application>
- ```
-
- ```java
-superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
-            @Override
-            public void onReceiveValue(Boolean success) {
-                safeBrowsingIsInitialized = true;
-                if (!success) {
-                    Log.e("MY_APP_TAG", "Unable to initialize Safe Browsing!");
-                }
-            }
-        });
- ```
- ### API level 23 (Android 6)
- 
-[Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
-
-深层链接和 Android 应用链接
-### API level 21 （android 5.0）
-Art正式替代Dalvik VM
-### API level 14 （android 4.0）
-VSYNC/Choreographer
 ## 源码
 [1798个项目（2019-12-11统计）](https://source.codeaurora.cn/quic/la)
  [android studio profilers源码](https://github.com/JetBrains/android)

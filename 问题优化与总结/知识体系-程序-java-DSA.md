@@ -7,6 +7,12 @@ collection
 Concurrent access
 
 
+模板方法
+### 可视化
+https://www.cs.usfca.edu/~galles/visualization/Algorithms.html
+### 基本数据类型封装类
+简单工厂 valueof
+
 ### 2.1 数据集合  - Collection 类（List, Queue, Map）
 
 
@@ -35,9 +41,7 @@ Concurrent access
 
 ```
 
- #### 可视化
 
-https://www.cs.usfca.edu/~galles/visualization/Algorithms.html
 
 #### 字符串
 stringbuilder 
@@ -217,6 +221,15 @@ hash bucket 大小设置为 length=2^n。
 
 
 红黑树插入，根据hash值，找节点，若没找到，找到叶子节点
+
+#### HashSet
+```
+            +----------------------------------------------------------------------------------+
+            |                      HashSet: AbstractSet, Set                                    |
+            |                               map :HashMap<E,Object>                             |
+            +----------------------------------------------------------------------------------+
+
+```
 #### HashTable
 开放地址法解决Hash冲突
 
@@ -246,14 +259,6 @@ int newCapacity = (oldCapacity << 1) + 1;
             return hash ^ Objects.hashCode(value);//减少key的hash计算
         }
     }
-```
-#### HashSet
-```
-            +----------------------------------------------------------------------------------+
-            |                      HashSet: AbstractSet, Set                                    |
-            |                               map :HashMap<E,Object>                             |
-            +----------------------------------------------------------------------------------+
-
 ```
 
 
@@ -290,6 +295,7 @@ HashMap节点类 Node 包好 next;
 
 newCap = oldCap << 1
 ```
+
 
 
 #### TreeMap
@@ -412,7 +418,7 @@ Charset#availableCharsets():SortedMap
 ```
 
 
-
+#### WeakHashMap
 
 
 

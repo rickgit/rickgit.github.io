@@ -44,9 +44,9 @@
 
 ```
  注解，反射保存在softwareReference
- 弱引用，Glide以及缓存；Activity内存管理
+ 弱引用，Glide以及缓存；Activity内存管理；weakHashMap
  虚引用，堆外内存管理
-## 
+ 
 
 
 
@@ -217,18 +217,18 @@ src/java.base/linux/native/libnio/ch/EPoll.c:59:Java_sun_nio_ch_EPoll_create
 
             +--------------------------------------------------------------------------------------------------------------------------+
             |  [InputStream]                                                                                                           |
-            |       ByteArrayInputStream   FilterInputStream           FileInputStream               PipedInputStream                  |
-            |           buf[]:byte               in:InputStream           fd:FileDescriptor             buffer :byte[]                 |
-            |           pos:int                                           channel:FileChannel           readSide:Thread                |
-            |           count:int          BufferedInputStream            path:String                   writeSide:Thread               |
-            |           mark:int                 :FilterInputStream       closeLock:Object              in:int                         |
+            |   ByteArrayInputStream       FilterInputStream           FileInputStream               PipedInputStream                  |
+            |      buf[]:byte                in:InputStream               fd:FileDescriptor             buffer :byte[]                 |
+            |      pos:int                                                channel:FileChannel           readSide:Thread                |
+            |      count:int               BufferedInputStream            path:String                   writeSide:Thread               |
+            |      mark:int                      :FilterInputStream       closeLock:Object              in:int                         |
             |                                buf[]:byte                                                 out:int                        |
-            |                                count:int                                                  connected:boolean              |
-            |                                marklimit: int            ObjectInputStream                closedByWriter:boolean         |
-            |                                markpos:int                  bin:BlockDataInputStream      closedByReader:boolean         |
-            |                                pos:int                      handles:HandleTable           connect(src:PipedOutputStream) |
-            |                               getInIfOpen():InputStream     vlist:ValidationList          receive()                      |
-            |                                                             enableOverride:bool                                          |
+            |                                count:int                 SocketInputStream                connected:boolean              |
+            |   ObjectInputStream            marklimit: int                                             closedByWriter:boolean         |
+            |     bin:BlockDataInputStream   markpos:int                                                closedByReader:boolean         |
+            |     handles:HandleTable        pos:int                                                    connect(src:PipedOutputStream) |
+            |     vlist:ValidationList       getInIfOpen():InputStream                                  receive()                      |
+            |     enableOverride:bool                                                                                                  |
             |                               Gzip,Base64,Chiper...                                                                      |
             |                                                                                                                          |
             +--------------------------------------------------------------------------------------------------------------------------+

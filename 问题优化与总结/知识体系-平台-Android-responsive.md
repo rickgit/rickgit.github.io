@@ -14,7 +14,7 @@ Context作用
        ^   Theme,LayoutInflater,Resources,Configuration
        |
  Activity
-       ^   Dialog,Cursor,Context
+       ^   Dialog,Cursor,Context,生命周期参数的NonConfigurationInstances
        |
 ComponentActivity
        ^     LifecycleRegistry,ViewModelStore,SavedStateRegistryController
@@ -204,9 +204,6 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
-
-### 版本兼容问题
-
 ### （异常 错误 安全）反编译
 [dex2jar](https://github.com/pxb1988/dex2jar)
 [jd-gui](https://github.com/java-decompiler/jd-gui)
@@ -218,6 +215,7 @@ try{Looper.loop()}
 
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
+
 
 [详见《知识体系-平台-Android-cohesion.md》](./知识体系-平台-Android-cohesion.md)
 插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
@@ -238,6 +236,78 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
    Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
 
 
+### 版本特性
+[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
+
+#### （Android 11）
+[行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
+
+- [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
+
+#### Android 10 API level 29
+[面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
+- 折叠屏（resizeableActivity）
+- 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
+ 
+ 
+#### Android  9 API level 28
+[行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
+- 支持最新的全面屏，其中包含为摄像头和扬声器预留空间的屏幕缺口。 通过 DisplayCutout 
+- ImageDecoder 类，可提供现代化的图像解码方法。 使用该类取代 BitmapFactory 和 BitmapFactory.Options
+- AnimatedImageDrawable类来绘制和显示GIF和WebP动画图像
+- AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
+- webview多进程需要设置setDataDirectorySuffix
+
+
+#### Android  8 API level 26
+[Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
+
+- 后台执行限制
+- Notification Channels 创建一个用户可自定义的频道。
+- 画中画
+
+[Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
+ 26 
+@FastNative注解
+
+- Safe Browsing API 的 WebView 实现
+ ```xml
+ <application>
+            ...
+            <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+                       android:value="true" />
+</application>
+ ```
+
+ ```java
+superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean success) {
+                safeBrowsingIsInitialized = true;
+                if (!success) {
+                    Log.e("MY_APP_TAG", "Unable to initialize Safe Browsing!");
+                }
+            }
+        });
+ ```
+#### Android  7 API Level 24
+[Android 7.0 行为变更](https://developer.android.google.cn/about/versions/nougat/android-7.0-changes?hl=zh-cn)
+- 低耗电
+- 夜间模式
+
+#### Android  6 API level 23
+[Android 6.0 变更](https://developer.android.google.cn/about/versions/marshmallow/android-6.0-changes?hl=zh-cn)
+
+- [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
+
+深层链接和 Android 应用链接
+#### Android  5 API level 21 
+[Android Lollipop](https://developer.android.google.cn/about/versions/lollipop?hl=zh-cn)
+- Material Design
+Art正式替代Dalvik VM
+#### Android  4 API level 14 
+[Android KitKat 4.4](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
+VSYNC/Choreographer
 
 ## 流畅-界面开发系统
 1. Activity，View，Window
@@ -500,6 +570,8 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     2. 线程优化 
 
  [动画大全](https://github.com/OCNYang/Android-Animation-Set)
+### 图片闪动
+滑动停止才进行显示图片
 
 ### RecyclerView 缓存
 ```
