@@ -3,6 +3,27 @@
 
 ## Looper 封装线程
 
+
+
+简单工厂  Looper.prepare()
+单例      sThreadLocal每个线程一个单例
+
+桥接      将获取下一个消息，移动到MessageQueue#next()
+静态代理  MessageQueue#next() 装饰 Message#next
+享元      Message#sPool/Message#obtain()
+
+观察者    Looper#sObserver
+状态模式  Handler#dispatchMessage
+迭代      Message#next
+责任      遇到屏蔽消息，处理异步消息
+
+Message类型  :
+          屏障消息(postSyncBarrier,target==null)
+          异步消息isAsynchronous：可以在屏障消息种被处理
+          普通消息按照时间排序和现在时间对比，判断是否调用message回调
+最后处理   IdleHandler#queueIdle
+  
+
 ```java
             +------------------------------------------------------------------------------------------+
             |                           LooperThread                                                   |

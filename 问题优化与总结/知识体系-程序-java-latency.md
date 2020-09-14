@@ -44,7 +44,7 @@
 
 ```
  注解，反射保存在softwareReference
- 弱引用，Glide以及缓存；Activity内存管理；weakHashMap
+ 弱引用，Glide以及缓存；Activity内存管理；weakHashMap；值动画WeakReference
  虚引用，堆外内存管理
  
 

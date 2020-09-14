@@ -305,11 +305,11 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 [Android Lollipop](https://developer.android.google.cn/about/versions/lollipop?hl=zh-cn)
 - Material Design
 Art正式替代Dalvik VM
-#### Android  4 API level 14 
-[Android KitKat 4.4](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
+#### Android  4 API level 14
+[Android KitKat 4.4(api level 19)](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
 VSYNC/Choreographer
 
-## 流畅-界面开发系统
+## 流畅（每秒25帧，限时20毫秒内执行完）-界面开发系统
 1. Activity，View，Window
    activity在attach时，创建PhoneWindow；onCreate创建DecorView；onResume后创建ViewRootImpl关联WindowManager
 
@@ -573,33 +573,9 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
 ### 图片闪动
 滑动停止才进行显示图片
 
-### RecyclerView 缓存
-```
-+---------------------------------------------------------------------------------+
-| [android 5.0]    RecyclerView                                                   |
-|                       mRecycler:Recycler                                        |
-|                       setAdapter()                                              |
-|                       setAdapterInternal()                                      |
-|                                                                                 |
-|                       dispatchLayout()                                          |
-|                                                                                 |
-|  Adapter<ViewHolder>        ViewHolder            LayoutManager                 |
-|      onCreateViewHolder()       itemView;View       mLayoutState:LayoutState    |
-|      onBindViewHolder()                             onLayoutChildren()          |
-|                                                     fill()                      |
-|                                                     layoutChunk()               | 
-+---------------------------------------------------------------------------------+
-|                                                                                 |
-|                                     LayoutState                                 |
-|                                        next(recycler:Recycler )                 |
-|                                    Recycler                                     |
-|                                        getRecycledViewPool():RecycledViewPool   |
-|                                        getViewForPosition() :View               |
-|                                                                                 |
-+---------------------------------------------------------------------------------+
 
-```
-### 刷新
+### 编舞者 Choreographer
+#### 刷新->绘制 traversal
 invalidate只会调onDraw方法且必须在UI线程中调用
       mPrivateFlags |= PFLAG_INVALIDATED;
 postInvalidate只会调onDraw方法，可以再UI线程中回调
@@ -608,7 +584,7 @@ requestLayout会调onMeasure、onLayout和onDraw(特定条件下)方法
       mPrivateFlags |= PFLAG_FORCE_LAYOUT;
       mPrivateFlags |= PFLAG_INVALIDATED;
 
-####  刷新 （绘制，局部重绘）View#invalite
+#####  刷新 （绘制，局部重绘）View#invalite
 VSynch 垂直同步
 Triple Buffer 三重缓存
 Choreographer 编舞者
@@ -759,10 +735,44 @@ Choreographer 编舞者
 
 
 ```
-### 动画
+#### 事件 
+##### ViewDragHelper 滑动工具类和computeScroll()
+移动控件方法： 
+        1. layoutparam.margin 
+        2. scrollx 
+        3. canvas translate
+ViewCompat.postInvalidateOnAnimation(Activity.this)
+应用常见 DrawerLayout，SlidingPaneLayout
+
+简单工厂 ViewDragHelper#create(ViewGroup, float,Callback)
+
+桥接    滑动判断，滑动处理有ViewDragHelper处理；
+静态代理  OverScroller
+
+中介    子view滑动由ViewDrawHelper控制
+观察者   Callback
+模板方法 ViewDragHelper#shouldInterceptTouchEvent；ViewDragHelper#processTouchEvent
+        ViewDragHelper#continueSettling
+观察者   ViewDragHelper#smoothSlideViewTo
+
+
+#### 动画
 https://dribbble.com/
-#### TWeen Animation
-修改matrix，刷新界面，等待下一帧时候，绘制界面
+##### 插值器
+策略模式    TimeInterpolator#getInterpolation
+      AccelerateDecelerateInterpolator
+      LinearInterpolator
+      AccelerateInterpolator
+      DecelerateInterpolator
+      OvershootInterpolator
+      AnticipateInterpolator
+      AnticipateOvershootInterpolator
+      BounceInterpolator
+      CycleInterpolator
+
+
+##### TWeen Animation
+修改matrix，刷新界面，等待下一帧时候，绘制界面，getInvalidateRegion更新父控件
 
 ```
 +---------------------------------------------------------------------------------------------+
@@ -798,8 +808,43 @@ https://dribbble.com/
 +---------------------------------------------------------------------------------------------+
 
 ```
+##### 帧动画 AnimationDrawable/ <animation-list>
+模板方法 Animatable#start()/Animatable#stop
+观察者   View#scheduleDrawable
+命令     AnimationDrawable#run
+状态    android.graphics.drawable.Drawable#scheduleSelf/
 
-#### ViewPropertyAnimator
+其他 :
+      AnimatedImageDrawable/<animated-image>
+      AnimatedVectorDrawable/<animated-vector>
+##### 属性动画（PropertyValuesHolder） 
+1. ValueAnimator 只对属性进行过渡
+2. ObjectAnimator 因为属性有其归属的对象，可以通过反射设置对象的属性值 PropertyValuesHolder#setupSetter；不用设置监听修改过渡值
+3. ViewPropertyAnimator 观察ValueAnimation回调事件AnimatorEventListener#onAnimationUpdate，更新invalidateViewProperty属性值
+   
+属性动画可以通过 ValueAnimator#ofPropertyValuesHolder对多个属性同时过渡， ValueAnimator#getAnimatedValue(String) 进行取值；
+
+简单工厂  Keyframe#ofObject(float, Object):Keyframe
+          PropertyValuesHolder#ofObject()
+          ValueAnimator#ofObject()//ObjectProperty 
+          ValueAnimator#ofPropertyValuesHolder()
+          AnimationHandler#getInstance ThreadLocal线程单例
+单例    AnimationHandler
+        ArgbEvaluator
+适配器  TypeEvaluator#evaluate():Object//ObjectAnimation返回对象的动画属性的值
+
+装饰者 
+        Keyframe装饰动画插值Object，添加mFraction，mValueType， mInterpolator；
+        PropertyValuesHolder装饰KeyframeSet，保存属性现在的值 mAnimatedValue
+        ObjectAnimator装饰ValueAnimator，需要设置 Property所属的Object
+中介者
+        AnimationHandler 统一管理所有的申请动画帧，如果mAnimationCallbacks有数据，就不断的申请动画帧
+类迭代器
+        KeyframeSet#getValue
+观察者 
+      AnimatorUpdateListener
+
+##### ViewPropertyAnimator
 ```
 +---------------------------------------------------------------------------------------------+
 |  [Android 4.4]                                                                              |
@@ -830,12 +875,40 @@ https://dribbble.com/
 
 
 ```
-#### GIF
+##### GIF
 Glide播放多个gif文件卡
 
 android-gif-drawable性能好
 
 android-1.6_r1\external\giflib 系统源码利用
+#### RecyclerView 缓存
+缓存ViewHolder，刷新控件，滑动停止加载数据
+
+```
++---------------------------------------------------------------------------------+
+| [android 5.0]    RecyclerView                                                   |
+|                       mRecycler:Recycler                                        |
+|                       setAdapter()                                              |
+|                       setAdapterInternal()                                      |
+|                                                                                 |
+|                       dispatchLayout()                                          |
+|                                                                                 |
+|  Adapter<ViewHolder>        ViewHolder            LayoutManager                 |
+|      onCreateViewHolder()       itemView;View       mLayoutState:LayoutState    |
+|      onBindViewHolder()                             onLayoutChildren()          |
+|                                                     fill()                      |
+|                                                     layoutChunk()               | 
++---------------------------------------------------------------------------------+
+|                                                                                 |
+|                                     LayoutState                                 |
+|                                        next(recycler:Recycler )                 |
+|                                    Recycler                                     |
+|                                        getRecycledViewPool():RecycledViewPool   |
+|                                        getViewForPosition() :View               |
+|                                                                                 |
++---------------------------------------------------------------------------------+
+
+```
 ### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
 
 ```shell

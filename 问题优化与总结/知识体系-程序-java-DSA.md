@@ -1,8 +1,8 @@
 ## 数据结构与算法
 
 Array
-String (char array)
-time
+String (装饰 char array)
+time/Date （装饰 long）
 collection
 Concurrent access
 
@@ -76,6 +76,8 @@ System.arraycopy 拷贝到新数据
 +---------------+----------+----------+
 
 ```
+#### 日期Date/Canadar
+装饰 long时间戳
 #### ArrayList
 ```java
             +----------------------------------------------------------------------------------+

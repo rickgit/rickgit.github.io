@@ -9,6 +9,50 @@ SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content p
 
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
+### SharedPreference
+```
+                +----------------------------------------------------------------------------------------+
+                |  ContextImpl                                                                           |
+                |    mSharedPrefsPaths:ArrayMap<String, File>                                            |
+                |    getSharedPreferencesPath(String name): File                                         |
+                |                                                                                        |
+                |    sSharedPrefsCache                                                                   |
+                |         :ArrayMap<String, ArrayMap<File, SharedPreferencesImpl> >                      |
+                |    getSharedPreferences():SharedPreferencesImpl                                        |
+                |                                                                                        |
+                |    getSharedPreferencesCacheLocked()                                                   |
+                |         :ArrayMap<File, SharedPreferencesImpl>                                         |
+                |                                                                                        |
+                +----------------------------------------------------------------------------------------+
+                |   SharedPreferencesImpl             mMap:Map<String, Object>        enqueueDiskWrite() |
+                |           makeBackupFile():File     edit():EditorImpl               writeToFile()      |
+                |           loadFromDisk()                                                               |
+                |                             +----------------------------------------------------------+
+                |                             | EditorImpl:Editor                                        |
+                |                             |    mModified:Map<String, Object>   mEditorLock:Object    |
+                |                             |    apply()                         mModified             |
+                |                             |    commit()                         :Map<String, Object> | 
+                |                             |                                                          |
+                |                             | commitToMemory():MemoryCommitResult                      |
+                |                             | mListeners                                               |
+                |                             |   :WeakHashMap<OnSharedPreferenceChangeListener, Object> |
+                +----------------------------------------------------------------------------------------+
+                |XmlUtils                     |                                                          |
+                |  readMapXml()               |     MemoryCommitResult                                   |
+                +-----------------------------+          writtenToDiskLatch //commit() wait return       |
+                |Xml                          |                                                          |
+                |  newPullParser():KXmlParser |                                                          |
+                |                             |                                                          |
+                +-----------------------------+                                                          |
+                |                             |                                                          |
+                | KXmlParser: XmlPullParser   |                                                          |
+                ------------------------------+----------------------------------------------------------+
+
+
+```
+
+###  MMKV for Android
+
 
 ## 包内精简 - APK打包 （编译，打包，优化，签名，安装）
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
@@ -94,13 +138,13 @@ walle
 ## 缓存篇
 
 ### Bitmp
-简单工厂 Bitmap：wrapHardwareBuffer，createScaledBitmap/createBitmap
-        BitmapFactory：decodeFile（decodeResource/decodeResourceStream）/decodeStream，decodeByteArray，decodeFileDescriptor
+简单工厂 Bitmap（无数据源）：wrapHardwareBuffer，createScaledBitmap/createBitmap 
+        BitmapFactory（有数据源）：decodeFile（decodeResource/decodeResourceStream）/decodeStream，decodeByteArray，decodeFileDescriptor
 
 ###  2 内存泄漏/内存抖动（Android Profiler- memory）
 GC Root :
 堆，方法区内存：static（对象，容器），final，
-栈：ActivityThread的activitys，Handler持有activity引用
+栈：ActivityThread的activitys，Handler使用WeakReference持有activity引用
 本地方法栈：File，Cursor，WebView
 
 #### GC
@@ -108,7 +152,60 @@ Reference
 Lrucache,Bitmap
 ArrayMap
 
+#### Handler/Dialog/Thread泄漏
 
+1. PopupWindow 
+
+```java 
+android.view.WindowManager$BadTokenException: Unable to add window -- token null is not valid; is your activity running?
+>  popwindow必须依附于某一个view
+
+1. onWindowFocusChanged()或使用view的post()显示界面
+2. if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){}
+
+```
+
+2.  AlertDialog不能使用application作为context 
+```
+android.view.WindowManager$BadTokenException: Unable to add window --token null is not for an application
+ 
+```
+3. dialog.show()
+```java
+android.view.WindowManager$BadTokenException
+if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){
+   dialog.show();
+}
+```
+
+4. Dialog.dismiss()
+```java
+ View not attached to window manager
+    if(mDialog != null) {
+        if(mDialog.isShowing()) {   
+            Context context = ((ContextWrapper)mDialog.getContext()).getBaseContext();  
+            if(context instanceof Activity) { 
+                if(!((Activity)context).isFinishing() && !((Activity)context).isDestroyed()) 
+                    mDialog.dismiss();
+            } else
+                mDialog.dismiss();
+        }
+        mDialog = null;
+    }
+```
+5. 没有及时关闭dialog
+```java
+  Activity xxxx has leaked， that was originally added here
+
+@Override
+public void onDestroy(){
+    super.onDestroy();
+    if ( mDialog!=null && mDialog.isShowing() ){
+        mDialog.cancel();
+    }
+}
+
+```
 #### 内存泄漏
  
  工具：profiler，eclipse mat
@@ -321,18 +418,25 @@ valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解�
 三级缓存 
 ActiveResources 活动缓存，weakreference提高命中率
 LruResourceCache 最近最少使用，剔除
-LruBitmapPool    缓存bitmap
-LruArrayPool     复用字节数组，避免频繁GC，导致内存抖动
+LruBitmapPool    缓存bitmap，复用
+LruArrayPool     复用字节/Integer数组，避免频繁GC，导致内存抖动
 InternalCacheDiskCacheFactory（装饰DiskLruCache） 磁盘缓存
 
+单例     Glide#get
+工厂方法 /request/transition/TransitionFactory#build
+        /manager/RequestManagerRetriever.RequestManagerFactory#build
+构建器   GlideBuilder#build
+外观模式 GlideContext ，Engine类
 
+ 
+策略   LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
+       Encoder#encode
+       /load/data/DataFetcher
+       /load/model/ModelLoader 工厂方法
+装饰   /load/model/LoadData 装饰DataFetcher
 
-外观模式 Glide类 ，Engine类
-
-观察者  CustomViewTarget
-
-策略 LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
-
+观察者 /request/target/ViewTarget
+适配器 /request/transition/Transition.ViewAdapter#transition
 模板。。。
 
 
@@ -1588,7 +1692,28 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 
 模板方法 ObjectSerializer 
 #### RPC - Protocol Buffer
+tlv 存储格式，可变长int
+
+构建器 ProtoModel.User#newBuilder()
+解析器 ProtoModel.User#parseFrom(byte[])
 #### Flatbuffer
+[flatbuffer编码的内存的结构](https://blog.csdn.net/weixin_42869573/article/details/83820166)
+向量表访问buffer
+
+类型：com.google.flatbuffers.Constants
+Table 定义（Table#__reset()）：
+      bb_pos=_bb.getInt(0) + 0：Object在buffer位置
+      vtable_start = bb_pos - bb.getInt(bb_pos)：回溯到vtable元信息
+      vtable_size = bb.getShort(vtable_start)：vtable的长度
+Table 结构：
+    （root_table：int）+（vtable元信息：长度+内容offset）+（object：offset+length+content）
+
+简单工厂    FbHello#getRootAsFbHello(java.nio.ByteBuffer)
+工厂方法    ByteBufferFactory#newByteBuffer
+构建器      FlatBufferBuilder
+
+解析器模式  Table；解释ByteBuffer里的复杂类型，如string，Table，
+装饰器      flatbuffer 生成的rootTable类；定位object字段在vtable的偏移量
 #### Gson
 工厂方法  Gson#factories 
 
@@ -1605,11 +1730,82 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 
 ##### Mson 优化Gson反射
 
+### 长连接
+轮询 Ajax
+长轮询 socket（mqtt实现方法） 有消息才返回，长期占用资源
+事件驱动/双向通信 websocket
 
-### 其他通讯协议
-#### vcard
+IM：
+增加重传和排重机制
+回执
+### 通讯协议
+#### TCP/UDP
 
+[](https://tools.ietf.org/html/rfc793#section-3.1)
+```
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |          Source Port          |       Destination Port        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                        Sequence Number                        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Acknowledgment Number                      |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |  Data |           |U|A|P|R|S|F|                               |
+   | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+   |       |           |G|K|H|T|N|N|                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |           Checksum            |         Urgent Pointer        |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                    Options                    |    Padding    |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                             data                              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                            TCP Header Format
+```
+#### HTTP
+快（缓存，字节），穩定/可靠（长连接，多路复用）
+[HTTP/1.1](https://httpwg.org/specs/rfc7230.html)
+  1. 缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match
+  2. 支持长连接
+[websocket] 基于HTTP/1.1
+  1. 第一次升级http协议，切换成功后，全双工通讯。
+   [WebSocket传输的数据：Frame（帧）](https://tools.ietf.org/html/rfc6455#section-5)
+  ```js
+          0                   1                   2                   3
+            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+          +-+-+-+-+-------+-+-------------+-------------------------------+
+          |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+          |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+          |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+          | |1|2|3|       |K|             |                               |
+          +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+          |     Extended payload length continued, if payload len == 127  |
+          + - - - - - - - - - - - - - - - +-------------------------------+
+          |                               |Masking-key, if MASK set to 1  |
+          +-------------------------------+-------------------------------+
+          | Masking-key (continued)       |          Payload Data         |
+          +-------------------------------- - - - - - - - - - - - - - - - +
+          :                     Payload Data continued ...                :
+          + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+          |                     Payload Data continued ...                |
+          +---------------------------------------------------------------+
+  ```
+[HTTP/2](https://httpwg.org/specs/rfc7540.html) 
+  1. 第一次升级http协议，切换成功后，然后面向字节流
+  2. head压缩，且双方cache一份header fields表
+  3. 多路复用（SocketChannel +Epoll机制 实现）
+  4. 支持服务端推送（只能主动将资源推送到客户端缓存，适合用于展示实时数据；WebSocket实时双向通信）
+  
+
+### 即时聊天协议
+[即时聊天协议](https://blog.csdn.net/netease_im/article/details/83823212)
+#### vcard 通讯录名片
 #### mqtt
+
+[协议](知识体系-存储-Networks.md)
 [mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/software?id=software)
 broker/server
 [ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
@@ -1681,5 +1877,6 @@ asmack
 ### 缓存GreenDAO /Jetpack-Room
 
 ### Mqtt服务器
-## 多媒体文件
+## 多媒体
 [zxing, ffmpeg]()
+[ ffmpeg](知识体系-平台-多媒体.md)
