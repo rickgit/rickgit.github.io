@@ -961,72 +961,6 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 
 ### 窗口，见WMS
 
-## ART-dalvik
-```
-              |java compiler(javac)
-    +-----------------------+
-    | java byte code(.class)|
-    +---------+-------------+
-              |   Dex compiler
-              v   (dx.bat)
-     +--------+--------------+
-     | Dalvik byte code(.dex)|
-     +---+-----------------+-+
-         | dex2oat         |dexopt
-+--------v---+       +-----+-------+
-|.oat(elf file)|     |    .odex    |
-+---+--------+       +----+--------+
-    |                     |   Register-based
-    |  +---------+        |   +---------------+
-    |  | ART     |        |   |   Dalvik VM   |
-    |  |      AOT|        |   |           JIT |
-    |  +---------+        |   +---------------+
-    |                     |
-    |moving collector     | MarkSweep collector
-    v                     v
-
-+--------+---------+------------------------+----------------------+
-|        | Active  |                        |                      |
-|        | Heap    |                        |    Live Bitmap       |
-|DalvikVM|         |                        |                      |
-|  Heap  |         |                        |                      |
-|(Ashmem)|         |   Mark-Sweep Collector +----------------------+
-| mspace |         |                        |                      |
-|        +---------+                        |                      |
-|        | Zygote  |                        |                      |
-|        | Heap    |                        |   Mark Bitmap        |
-|        | (shared)|                        |                      |
-+----------------------+--------------------+----------------------+
-|        |             | Image Space                               |
-|        | Continuous  +---------------+---------------------------+
-|        |             | Zygote Space  | Zygote Space              |
-|  ART   | Space       |               +---------------------------+
-|        |             |               | Allocation Space          |
-|  Heap  |             |               |     ....                  |
-|        +-------------+---------------+---------------------------+
-|        |Discontinuous  Large Object                              |
-|        |    Space    | Space                                     |
-+--------+-------------+-------------------------------------------+
-
-
-                                                    +
-                                                    |new ArrayList
-                                                    |
-                                                    v
-      +--------+  +-------+  +---------+ +------+ +-+-----+ +-------+
-      |  ART   |  | Zygote|  | No      | | Image| |       | | Large |
-Heap  |        |  | Space |  | Moving  | | Space| | Alloc | | Object|
-      |  L+    |  |       |  | space   | |      | | Space | | Space |
-      +--------+  +-------+  +---------+ +------+ +-------+ +-------+
-
-      +--------+  +-------+  +---------+ +------+
-      |DalvikVM|  | Linear|  | Zygote  | |Alloc |
-      |  <L    |  | Alloc |  | space   | |Space |
-      |        |  |       |  |         | |      |
-      +--------+  +-------+  +---------+ +------+
-
-
-```
 
 ### dalvik bytecode
 ```
@@ -1060,12 +994,7 @@ dx --dex --output=Hello.dex Hello.class
 
 
 
-[支持的垃圾回收机制](https://www.jianshu.com/p/153c01411352)
-Mark-sweep算法：还分为Sticky, Partial, Full，根据是否并行，又分为ConCurrent和Non-Concurrent
-MarkSweep::MarkSweep(Heap* heap, bool is_concurrent, const std::string& name_prefix)
-mark_compact 算法：标记-压缩（整理)算法
-concurrent_copying算法：
-semi_space算法: 
+
 
 
 #### android触发垃圾回收

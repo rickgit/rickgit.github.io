@@ -513,6 +513,69 @@ mqtt提供了qos0、qos1和qos2的不同的消息发送的服务质量，增强�
 
 ```
 
+### eclipse mqtt lib / ibm broker
+
+
+broker
+- [Eclipse Mosquitto](https://mosquitto.org/)
+- [moquette](https://github.com/andsel/moquette)
+[mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/software?id=software)
+broker/server
+[ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
+[eclipse mosquitto mqtt broker](https://github.com/eclipse/mosquitto)
+[moquette](https://gitee.com/mirrors/moquette.git)
+```java
+  001_initial   422fbc4d2c644844d4886afd55c912626d1c4054 First import of moquette proto parser
+  002_client    aadff9c9bd9a2efe7b90931b7dbed1c350f1d52d Added trivial client implementation
+  003_server    463aa256936010b9c61252ca703623e4b98adda7 Implemented the raw connect message  handling
+  004_subscribe b5903bbf8471f0baaeb8b71346ef96cccabf3ab0 Added simple implementation for handle subscribe message
+
+```
+[apache activemq](https://github.com/apache/activemq.git)
+client lib
+[Eclipse Paho Java MQTT client library](https://github.com/eclipse/paho.mqtt.java)
+```
+* 001_initial 40f75663f7f9715a6452940005d615b5c1eadda6 First version of MQTT v3 Java Client
++----------------------------------------------------------------------------------------------------------------------+
+|                                                                                                                      |
+|    MqttClient:DestinationProvider                ClientComms                                                         |
+|        serverURI                                    networkModule:NetworkModule                                      |
+|        clientId                                     clientState                                                      |
+|        serverURIType                                sender:CommsSender                                               |
+|        tokenStore:CommsTokenStore                   receiver:CommsReceiver                                           |
+|        persistence:MqttDefaultFilePersistence                                                                        |
+|        comms:ClientComms                                                                                             |
+|        topics:HashTable                                                                                              |
+|        connect()                                                                                                     |
+|        publish()                                                                                                     |
+|        disconnect()                                                                                                  |
++---------------------------------+------------------------------------------------------------------------------------+
+|                                 | TCPNetworkModule       LocalNetworkModule                                          |
+|    NetworkModule                | //tcp://               //local://                                                  |
+|        start()                  |                                                                                    |
+|        getInputStream()         | SSLNetworkModule                                                                   |
+|                                 | //ssl://                                                                           |
+|                                 |                                                                                    |
++---------------------------------+------------------------------------------------------------------------------------+
+|                                                                                                                      |
+|                         CommsReceiver                                                                                |
+|                            in:MqttInputStream                                                                        |
+|                            lifecycle                                                                                 |
+|                         MqttInputStream                                                                              |
+|                           readMqttWireMessage():MqttWireMessage                                                      |
++-------------------------+--------------------------------------------------------------------------------------------+
+|                         |                                MqttPersistableWireMessage            MqttSubscribe         |
+|     MqttMessage         |MqttAck    MqttConnect          MqttPingReq                                 qos:int[]       |
+|                         |           MqttDisconnect                                             MqttUnsubscribe       |
++-------------------------+--------------------------------------------------------------------------------------------+
+
+
+```
+
+
+tools
+[IBM IA92 (java -jar wmqttSample.jar) ](http://www-01.ibm.com/support/docview.wss?rs=171&uid=swg24006006&loc=en_US&cs=utf-8&lang=en)
+
 
 ### 消息体
 ``` [智物客](https://blog.csdn.net/illusion116/article/details/76623014 )
@@ -522,13 +585,6 @@ mqtt提供了qos0、qos1和qos2的不同的消息发送的服务质量，增强�
 （4）UNSUBSCRIBE，消息体内容是要订阅的主题。
 ``` 
   
-### eclipse mqtt lib / ibm broker
-
-
-broker
-- [Eclipse Mosquitto](https://mosquitto.org/)
-- [moquette](https://github.com/andsel/moquette)
-
 
 ## xmpp
 ```
@@ -558,7 +614,7 @@ broker
     3.SASL用来认证客户端的真实有效性。
 ### 协议
 Jabber协议
-XMPP通信原语有3种：message、presence和iq。
+#### XMPP通信原语有3种：message、presence和iq。
 
 
 ### 服务器实现 openfire，spark

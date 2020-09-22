@@ -1,7 +1,127 @@
+# 设计原则
+> [](https://java-design-patterns.com/principles)
+<<Design Patterns>> <<Enterprise Integration Patterns>> <<Code Complete>> <<POSA>>
 
-# OOAD
+1. 三大通用原则
+KISS
+YAGNI 
+  (关注分离，面向维护者代码，避免过早优化）
+DRY
+
+[Boy-Scout Rule:何一个成员都有义务去改善代码](《Bad Code, Craftsmanship, Engineering, and Certification》)
+
+1. 模块内部与模块间
+低耦合（模块间）高内聚（模块内）
+LoD（模块间），CARP（模块间，属OOAD），IoC（模块间）
+SOLID（模块内，属OOAD） 命令-查询分离原则（模块内）
+
+# 模式
+[](https://en.wikipedia.org/wiki/Software_design_pattern)
+GOF23
+其他：
+Creational 
+        Converter转换器
+        DI
+        Factory Kit
+        简单工厂/静态工厂
+        RAII
+        （实例）
+        MonoState
+        Multition  多例模式
+        Object Mother
+        动态属性
+        Step Builder //多个builder组成一个大的Builder
+        Value Object //重写equals()、hashCode()
+        （性能）
+        对象池
+        Lazy Loading
+
+ Structural
+        委托
+        Front Controller Pattern
+        Marker Interface 标记接口
+        Module
+        Event Aggregator
+        Flux
+        Page Object
+        Role Object
+        Strangler
+        Twin
+
+ Behavioral 
+        Null Object
+        Servant
+        
+       字节码
+        Acyclic Visitor
+        Extension objects
+        Feature Toggle
+        Game Loop
+        Intercepting Filter
+        Leader Election
+
+
+        （性能）
+        缓存（some fast-access storage， re-used to avoid having to acquire them again）
+        Circuit Breaker
+        Data Locality
+        Dirty Flag
+        Double Buffer
+        Retry
+        Sharding 分片模式
+        Spatial Partition 空闲分区
+        Throttling 节流模式
+        Trampoline
+ Concurrency 
+        Active Object	（POSA2）
+        Double-checked locking（POSA2）
+        Monitor object	（POSA2）
+        Reactor（POSA2）
+        Thread-specific storage（POSA2）
+        Scheduler	
+        Event Queue
+        （性能）
+        Half-Sync/Half-Async
+        Leader/Followers
+        Master-Worker
+        Queue based load leveling
+        Reader Writer Locker
+        Semaphore
+        Thread Pool
+        （reactive）
+        生产者消费者
+        异步方法调用
+        异步事件
+        Promise
+ Functional 
+        Collection Pipeline
+        Filterer
+        Fluent Interface
+        Monad
+ Architectural 
+        （数据访问）
+        DAO
+        Repository
+        Service Layer
+        Unit of Work
+        （解耦）
+        API GateWay
+        MVC/MVP
+ Idiom
+        CallBack（与观察者模式区别，被观察者维护一个观察者列表）
+        Private Class Data
+        Thread Local Storage
+        AAA
+ Integration 
+
+
+# OOAD IDEF4：面向对象设计(Object-Oriented Design)
+
 《Pattern-oriented Software Architecture 》五套书
 《Software Architecture: Perspectives on an Emerging Discipline》
+
+
+
 ## 封装性与内聚耦合
 
 >《UML面向对象程序设计基础》
@@ -515,27 +635,12 @@ RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察�
 
 需要有订阅，Observable才会执行
 
-[rx操作符](http://reactivex.io/documentation/operators.html)
-ReactiveX provides a collection of operators with which you can filter, select, transform, combine, and compose Observables.
+背压策略：即生产者的速度大于消费者的速度带来的问题，比如在Android中常见的点击事件，点击过快则经常会造成点击两次的效果。
+Flowable背压策略
 ```
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Create     Debounce                                                                         Delay                                             |
-|  Defer      Distinct                                                                         Do                                                |
-|  Empty      ElementAt                                                                        Materialize                                       |
-|  /Never     Filter        All                                                                /Dematerialize                                    |
-|  /Throw     First         Amb                         And/Then/When                          ObserveOn                                         |
-|  From       IgnoreElement Contains         Buffer     CombineLatest     Average              Serialize                                         |
-|  Interval   Last          DefaultIfEmpty   FlatMap    Join              Concat               Subscribe                                         |
-|  Just       Sample        SequenceEqual    GroupBy    Merge             Count                SubscribeOn                                       |
-|  Range      Skip          SkipUntil        Map        StartWith         Max                  TimeInterval                   Connect            |
-|  Repeat     SkipLast      SkipWhile        Scan       Switch            Min                  Timeout                        Publish            |
-|  Start      Take          TakeUntil        Window     Zip               Reduce       Catch   Timestamp                      RefCount           |
-|  Timer      TakeLast      TakeWhile                                     Sum          Retry   Using                          Replay        to   |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Creating   Filtering     Conditional   Transforming  Combining       Mathematical   Error    Utility                                          |
-|                           and Boolean                                 and Aggregate  Handling                Backpressure  Connectable  Con^ert|
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-
+onBackpressureBuffer()
+onBackpressureDrop()
+onBackpressureLatest() 
 
 ```
 [Rxjava Operater](https://github.com/ReactiveX/RxJava/wiki/Alphabetical-List-of-Observable-Operators)
@@ -557,15 +662,6 @@ ReactiveX provides a collection of operators with which you can filter, select, 
 
 
 ```
-背压策略：即生产者的速度大于消费者的速度带来的问题，比如在Android中常见的点击事件，点击过快则经常会造成点击两次的效果。
-Flowable背压策略
-```
-onBackpressureBuffer()
-onBackpressureDrop()
-onBackpressureLatest() 
-
-```
-
 ### Rxjava Scheduler / Worker / Runnable 
 
 ```

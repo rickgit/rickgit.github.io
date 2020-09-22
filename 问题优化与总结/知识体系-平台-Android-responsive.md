@@ -575,7 +575,7 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
 
 
 ### 编舞者 Choreographer
-#### 刷新->绘制 traversal
+#### 遍历刷新(测量，布局，绘制) traversal
 invalidate只会调onDraw方法且必须在UI线程中调用
       mPrivateFlags |= PFLAG_INVALIDATED;
 postInvalidate只会调onDraw方法，可以再UI线程中回调
@@ -735,6 +735,40 @@ Choreographer 编舞者
 
 
 ```
+
+##### 布局
+###### RecyclerView 缓存
+1. 缓存ViewHolder
+2. 刷新控件 
+3. 滑动停止加载数据 Glide.with(getContext()).resumeRequests();/Glide.with(getContext()).pauseRequests();
+4. 预加载 addOnScrollListener/RecyclerViewPreloader
+5. 销毁不可见图片 setRecyclerListener/Glide.with(this).clear()
+
+```
++---------------------------------------------------------------------------------+
+| [android 5.0]    RecyclerView                                                   |
+|                       mRecycler:Recycler                                        |
+|                       setAdapter()                                              |
+|                       setAdapterInternal()                                      |
+|                                                                                 |
+|                       dispatchLayout()                                          |
+|                                                                                 |
+|  Adapter<ViewHolder>        ViewHolder            LayoutManager                 |
+|      onCreateViewHolder()       itemView;View       mLayoutState:LayoutState    |
+|      onBindViewHolder()                             onLayoutChildren()          |
+|                                                     fill()                      |
+|                                                     layoutChunk()               | 
++---------------------------------------------------------------------------------+
+|                                                                                 |
+|                                     LayoutState                                 |
+|                                        next(recycler:Recycler )                 |
+|                                    Recycler                                     |
+|                                        getRecycledViewPool():RecycledViewPool   |
+|                                        getViewForPosition() :View               |
+|                                                                                 |
++---------------------------------------------------------------------------------+
+
+```
 #### 事件 
 ##### ViewDragHelper 滑动工具类和computeScroll()
 移动控件方法： 
@@ -745,7 +779,7 @@ ViewCompat.postInvalidateOnAnimation(Activity.this)
 应用常见 DrawerLayout，SlidingPaneLayout
 
 简单工厂 ViewDragHelper#create(ViewGroup, float,Callback)
-
+        
 桥接    滑动判断，滑动处理有ViewDragHelper处理；
 静态代理  OverScroller
 
@@ -844,7 +878,7 @@ https://dribbble.com/
 观察者 
       AnimatorUpdateListener
 
-##### ViewPropertyAnimator
+###### ViewPropertyAnimator
 ```
 +---------------------------------------------------------------------------------------------+
 |  [Android 4.4]                                                                              |
@@ -881,34 +915,7 @@ Glide播放多个gif文件卡
 android-gif-drawable性能好
 
 android-1.6_r1\external\giflib 系统源码利用
-#### RecyclerView 缓存
-缓存ViewHolder，刷新控件，滑动停止加载数据
 
-```
-+---------------------------------------------------------------------------------+
-| [android 5.0]    RecyclerView                                                   |
-|                       mRecycler:Recycler                                        |
-|                       setAdapter()                                              |
-|                       setAdapterInternal()                                      |
-|                                                                                 |
-|                       dispatchLayout()                                          |
-|                                                                                 |
-|  Adapter<ViewHolder>        ViewHolder            LayoutManager                 |
-|      onCreateViewHolder()       itemView;View       mLayoutState:LayoutState    |
-|      onBindViewHolder()                             onLayoutChildren()          |
-|                                                     fill()                      |
-|                                                     layoutChunk()               | 
-+---------------------------------------------------------------------------------+
-|                                                                                 |
-|                                     LayoutState                                 |
-|                                        next(recycler:Recycler )                 |
-|                                    Recycler                                     |
-|                                        getRecycledViewPool():RecycledViewPool   |
-|                                        getViewForPosition() :View               |
-|                                                                                 |
-+---------------------------------------------------------------------------------+
-
-```
 ### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
 
 ```shell

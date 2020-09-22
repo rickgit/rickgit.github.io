@@ -1,6 +1,12 @@
 ## CPU有限，防止抢占，降低吞吐量，不考虑低延时。用于消息传递
+main
+ReferenceQueueDaemon，FinalizerDaemon，FinalizerWatchdogDaemon，HeapTaskDaemon
+Signal Dispatcher
 
-
+Binder 
+     Binder_1 主线程，编号为1，并且主线程是不会退出的。
+     Binder_xx 普通线程
+     Binder 其他线程：其他线程是指并没有调用 spawnPooledThread 方法，而是直接调用 IPC.joinThreadPool()
 ## Looper 封装线程
 
 

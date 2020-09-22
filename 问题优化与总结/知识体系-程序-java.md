@@ -763,93 +763,6 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 ```
 **Jasmin** 是一种免费的开源的 JAVA 汇编器 ，它将使用Java虚拟机指令集以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
 
-#### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
- [mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
-3. Java垃圾回收算法及垃圾收集器
-   标记-清除算法(mark-sweep), dalvikvm
-   标记-压缩算法(mark-compact),
-   复制算法(copying)  hotspot
-   引用计数算法(reference counting)
-   分代收集算法（Generational Collection）
-4. JVM可回收对象判定方法 : 对象回收判定(可达性分析算法&对象引用) 
->《Inside the Java Virtual Machine》 ,Wiley (1996)《Garbage Collection- Algorithms for Automatic Dynamic Memory Management》 
-JVM给了三种选择收集器：串行收集器、并行收集器、并发收集器
-
-[垃圾回收概念Thread，Root Set of References，Reachable and Unreachable Objects，garbage collection](https://www.javarticles.com/2016/09/java-garbage-collector-reachable-and-unreachable-objects.html)
-```
-GC Roots 的对象包括下面几种： 
-虚拟机栈（栈帧中的本地变量表）中引用的对象
-方法区中类静态属性引用的对象
-方法区中常量引用的对象
-本地方法栈中 JNI （即一般说的 Native 方法）引用的对象
-```
-
-```
-
-+----------+-----------+----------------+---------------------------+
-|(generation collection)Minor GC/Full GC                            |
-+----------+-----------+----------------+---------------------------+
-|safepoint/Safe Region                                              |
-+----------+-----------+----------------+---------------------------+
-|          |           | G1             |                           |
-|          | concurrent| CMS            |                           |
-|          +----------------------------+                           |
-|          | parallel                   |                           |
-|Collector +----------------------------+                           |
-|          | ParallelOld                |                           |
-|          +----------------------------+                           |
-|          | Serial                     |                           |
-+-------------------------------------------------------------------+
-|Collection| mark-compact               |  reference counting       |
-|Algorithms| copying                    |                           |
-|          | mark-sweep                 |                           |
-+-------------------------------------------------------------------+
-| Garbage  |Reachability Analysis(java) |  Reference Counting       |
-|          | GC Roots Tracing           |  (objc,Python)            |
-+----------+----------------------------+---------------------------+
-
-Generational Collection
-+---------------------------------------------------------------------+
-|  new gen       copying        copying           copying             |
-| (Minor GC)     +--------+    +--------+     +------------------+    |
-|                | Serial |    | ParNew |     | Parallel Scavenge|    |
-|                +--+--+--+    +--+-+---+     +-----+----+-------+    |
-|                   |  |          | |               |    |            |
-|                +--+  +-----+    | |   +-----------+    |            |
-|                |           |    | |   |                |    +-----+ |
-+---------------- ----------- ---- - --- ---------------- ----+ G1  +-| mark-compact+copying
-| old gen        | +---------+----+ |   |                |    +-----+ |
-|                | |         |      |   |                |            |
-|            +---+-+        ++------+---+--+    +--------+-----+      |
-|            | CMS +--------+ Parallel Old |    | Serial Old   |      |
-|            +-----+        +--------------+    +--------------+      |
-|          mark-compact        mark-compact       mark-compact        |
-+---------------------------------------------------------------------+
-| Permanet Generation                                                 |
-+---------------------------------------------------------------------+
-并行（Parallel）：指多条垃圾收集线程并行工作，但此时用户线程仍然处于等待状态。
-并发（Concurrent）：指用户线程与垃圾收集线程同时执行（但不一定是并行的，可能会交替执行），用户程序在继续运行。而垃圾收集程序运行在另一个CPU上。
-```
-Reference Counting：难解决对象之间循环引用的问题
-
-[“长时间执行”](https://crowhawk.github.io/2017/08/10/jvm_2/)的最明显特征就是指令序列复用;
-例如方法调用、循环跳转、异常跳转等，所以具有这些功能的指令才会产生Safepoint。
-在GC发生时让所有线程（这里不包括执行JNI调用的线程）都“跑”到最近的安全点上再停顿下来。
-**安全区域**是指在一段代码片段之中，引用关系不会发生变化。在这个区域中的任意地方开始GC都是安全的。
-
-[HotSpot 虚拟机](http://openjdk.java.net/groups/hotspot/docs/HotSpotGlossary.html)
-[官方文档 Hotspot](https://openjdk.java.net/groups/hotspot/docs/RuntimeOverview.html)
-
-
-Generational Collection（分代收集）算法
-  1. 新生代都采取Copying算法
-  2. 老年代的特点是每次回收都只回收少量对象，一般使用的是Mark-Compact算法
-  3. 永久代（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：废弃常量和无用的类。
-
-
-《如何监控Java GC》中已经介绍过了jstat
-
-JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 
 ###  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
 高级特性：强类型，静态语言，混合型语言（编译，解释）
@@ -1800,6 +1713,7 @@ JDBC
 
 ### Sql
 基本操作：增删改查
+前缀索引
 ```
 create database <dbName>
 ```

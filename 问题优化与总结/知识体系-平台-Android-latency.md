@@ -152,6 +152,105 @@ Reference
 Lrucache,Bitmap
 ArrayMap
 
+##### ART-dalvik 
+```
+              |java compiler(javac)
+    +-----------------------+
+    | java byte code(.class)|
+    +---------+-------------+
+              |   Dex compiler
+              v   (dx.bat)
+     +--------+--------------+
+     | Dalvik byte code(.dex)|
+     +---+-----------------+-+
+         | dex2oat         |dexopt
++--------v---+       +-----+-------+
+|.oat(elf file)|     |    .odex    |
++---+--------+       +----+--------+
+    |                     |   Register-based
+    |  +---------+        |   +---------------+
+    |  | ART     |        |   |   Dalvik VM   |
+    |  |      AOT|        |   |           JIT |
+    |  +---------+        |   +---------------+
+    |                     |
+    |moving collector     | MarkSweep collector
+    v                     v
+
++--------+---------+
+|        | Active  |
+|        | Heap    |
+|DalvikVM|         |
+|  Heap  |         |
+|(Ashmem)|         |
+| mspace |         |
+|        +---------+
+|        | Zygote  |
+|        | Heap    |
+|        | (shared)|
++----------------------+--------------------+----------------------+
+|        |             | Image Space                               |
+|        | Continuous  +---------------+---------------------------+
+|        |             | Zygote Space  | Zygote Space              |
+|  ART   | Space       |               +---------------------------+
+|        |             |               | Allocation Space          |
+|  Heap  |             |               |     ....                  |
+|        +-------------+---------------+---------------------------+
+|        |Discontinuous  Large Object                              |
+|        |    Space    | Space                                     |
++--------+-------------+-------------------------------------------+
+
+
+                                           +
+                                           |new ArrayList
+                                           |
+                                           v
+      +--------+  +------+ +-------+  +-+-----+ +-------+ 
+      |  ART   |  | Image| | Zygote|  |       | | Large | 
+Heap  |        |  | Space| | Space |  | Alloc | | Object| 
+      |  L+    |  |      | |       |  | Space | | Space | 
+      +--------+  +------+ +-------+  +-------+ +-------+ 
+
+      +--------+           +-------+  +------+           
+      |DalvikVM|           | Zygote|  |Active|           
+      |  <L    |           | Heap  |  |Heap  |           
+      |        |           |       |  |      |           
+      +--------+           +-------+  +------+           
+
+
+```
+Art Java堆的主要组成包括Image Space、Zygote Space、Allocation Space和Large Object Space四个Space
+        （详细的话main space、image space、zygote space、non moving space、large object space）
+        Image Space用来存在一些预加载的类（boot.art ） 
+        Zygote Space和Allocation Space对应Dalvik虚拟机垃圾收集机制中的Zygote堆和Active堆的。
+        ( 创建进程时，已经使用了的那部分堆内存Zygote Space，还没有使用的堆内存划分为Allocation Space)
+        Large Object Space就是一些离散地址的集合
+
+###### GC分类
+日志：D/dalvikvm: <GC_Reason> <Amount_freed>, <Heap_stats>, <External_memory_stats>, <Pause_time>
+Dalvik 有两种基本的 GC 模式， GC_CONCURRENT 和 GC_FOR_ALLOC 。
+GC_CONCURRENT 对于每次收集将阻塞主线程大约 5ms 。GC_CONCURRENT 通常不会造成你的应用丢帧。
+              GC_MALLOC, 内存分配失败时触发
+              GC_CONCURRENT，当分配的对象大小超过384K时触发
+              GC_EXPLICIT，对垃圾收集的显式调用(System.gc)
+              GC_EXTERNAL_ALLOC，外部内存分配失败时触发
+              GC_HPROF_DUMP_HEAP：当你请求创建 HPROF 文件来分析堆内存时出现的GC。
+GC_FOR_ALLOC 是一种 stop-the-world 收集，可能会阻塞主线程达到 125ms 以上。
+              GC_FOR_ALLOC 几乎每次都会造成你的应用丢失多个帧，导致视觉卡顿，特别是在滑动的时候。
+
+I/art: <GC_Reason> <GC_Name> <Objects_freed>(<Size_freed>) AllocSpace Objects,<Large_objects_freed>(<Large_object_size_freed>) <Heap_stats> LOS objects, <Pause_time(s)>
+ART新增GC原因：
+              LOS_Space_Status
+
+###### GC回收
+Davik 仅有一种 Mark-Sweep。
+        Live Bitmap和Mark Bitmap分代标记上次GC存活和这次需标记被引用的对象。
+        mark阶段，其他线程可以并发执行（Concurrent GC）。CardTable记录非垃圾回收线程对对象的引用
+
+ART：
+ 
+zygote space 类似Davik
+
+ 
 #### Handler/Dialog/Thread泄漏
 
 1. PopupWindow 
@@ -414,34 +513,112 @@ valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解�
 ```
 
 
-#### Glide
+### Glide
+Glide是一个快速高效的Android图片加载库，注重于平滑的滚动。
+不同数据源加载Fetcher，解码decode，变换transform，平滑过渡transition
+三级缓存和ResourceManager及Target生命周期管理
+[中文文档](https://muyangmin.github.io/glide-docs-cn/)
 三级缓存 
-ActiveResources 活动缓存，weakreference提高命中率
-LruResourceCache 最近最少使用，剔除
-LruBitmapPool    缓存bitmap，复用
-LruArrayPool     复用字节/Integer数组，避免频繁GC，导致内存抖动
-InternalCacheDiskCacheFactory（装饰DiskLruCache） 磁盘缓存
+      ActiveResources 活动缓存，weakreference提高命中率
+      LruResourceCache 最近最少使用，剔除
+      InternalCacheDiskCacheFactory（装饰DiskLruCache） 磁盘缓存
+图片解码缓存
+      LruBitmapPool    缓存bitmap，复用                              //BitmapFactory.Options#inBitmap
+      LruArrayPool     复用字节/Integer数组，避免频繁GC，导致内存抖动 // BitmapFactory.Options#inTempStorage
 
-单例     Glide#get
-工厂方法 /request/transition/TransitionFactory#build
-        /manager/RequestManagerRetriever.RequestManagerFactory#build
-构建器   GlideBuilder#build
-外观模式 GlideContext ，Engine类
+单例     
+         Glide#get() //volatile+双检锁
+简单工厂      
+        //资源简单工厂
+        Glide#with(android.content.Context):RequestManager
+        RequestManager#as():RequestBuilder::BaseRequestOptions
+        RequestBuilder#into():Target//ViewTaget 对View的生命周期管理，构建Request下载到Target
+        RequestBuilder#buildRequest():Request/SingleRequest#obtain():Request
+        DecodeJob#getNextGenerator():DataFetcherGenerator// 数据请求，磁盘缓存
+        ModelLoader#buildLoadData():LoadData             //加载图片数据
+        BitmapResource#obtain():BitmapResource
 
- 
-策略   LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
-       Encoder#encode
-       /load/data/DataFetcher
-       /load/model/ModelLoader 工厂方法
-装饰   /load/model/LoadData 装饰DataFetcher
+工厂方法 
+        /request/transition/TransitionFactory#build
+        RequestManagerFactory#build():RequestManager
 
-观察者 /request/target/ViewTarget
-适配器 /request/transition/Transition.ViewAdapter#transition
+
+构建器   
+         GlideBuilder#build()
+原型    
+        BaseRequestOptions#clone
+
+转化器
+       ResourceTranscoder#transcode():T
+       Transformation#transform():Resource<T>
+桥接
+        RequestManagerRetriever#get(android.app.Activity):RequestManager//获取RequestManager 给RequestManagerRetriever实现
+
+外观模式 
+        Glide，GlideContext ，
+        Engine类：
+        Registry：
+                ModelLoaderRegistry       //判断是否可以加载数据，并构建 ModelLoader#buildLoadData():LoadData
+                EncoderRegistry          //流编码，写入文件等
+                ResourceEncoderRegistry   //流编码，写入文件等
+                ResourceDecoderRegistry   //数据源转化为Resource<T>
+                DataRewinderRegistry      //流或buffer可以重置状态
+                TranscoderRegistry         
+                ImageHeaderParserRegistry //解析文件类型 ImageHeaderParser#getType():ImageType
+享元  
+        SingleRequest#POOL//复用Request
+
+静态代理 
+      Glide代理Engine
+装饰   
+      EngineJob 封装 DecodeJob
+      LoadData 装饰 DataFetcher
+      BitmapResource 装饰 Bitmap ，增加 BitmapPool 回收功能
+      DataRewinder#rewindAndGet() //根据不同策略，增加流或buffer可以重置状态
+      EngineResource              //装饰Resource，增添acquired计数功能
+命令
+       Engine#load()              //先从缓存获取
+       DecodeJob#run()
+观察者 
+      /request/target/ViewTarget
+       RequestManagerFragment 观察生命周期，管理 RequestManager
+      DataFetcher.DataCallback#onDataReady                            //DataFetcherGenerator 观察 DataFetcher 返回图片数据数据
+      DataFetcherGenerator.FetcherReadyCallback#onDataFetcherReady() //DecodeJob观察DataFetcherGenerator返回原生图片数据
+      DecodeJob.DecodeCallback#onResourceDecoded                     //DecodeJob通过DecodeCallback，观察DecodePath，返回图片数据。并进行Transformation
+      EngineJob#onResourceReady                                      //EnginJob观察DecodeJob返回 DataSource
+      Engine#onEngineJobComplete()                                   //Engine观察EngineJob返回EngineResource数据
+      SingleRequest#onResourceReady()                                //Request观察Engine返回<Resource>
+      Target#onResourceReady()                                       //Target观察Request，返回<Resource>
+      OnAttachStateChangeListener#onViewAttachedToWindow()           //Target观察View添加到界面，启动Request或暂停Request
+      BaseTarget：观察Request生命周期状态                             //BaseTarget
+
+      RequestManager                                                 //RequestManager观察ApplicationLifecycle，ActivityFragmentLifecycle生命周期执行
+      ActivityFragmentLifecycle                                       //ActivityFragmentLifecycle观察RequestManagerFragment的onstart，onstop，onDestroy事件
+      TargetTracker                                                  //TargetTracker观察ActivityFragmentLifecycle，给Target发送事件
+      Target                                                         //Target通过TargetTracker#track，观察生命周期，并设置ViewHold，onResourceReady进行转场动画transition
+适配器 
+       ViewAdapter#transition
+
 模板。。。
 
+策略   LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
+       Encoder#encode()
+       DataFetcher#loadData()：AssetPathFetcher，HttpUrlFetcher，FileFetcher，HttpUrlFetcher
+       /load/model/ModelLoader 工厂方法
+       磁盘缓存策略：ResourceCacheGenerator，DataCacheGenerator，SourceGenerator
+      BitmapTransformation：
+              CenterCrop，CenterInside，CircleCrop，FitCenter，Rotate，RoundedCorners
 
+迭代 
+      DataCacheGenerator#hasNextModelLoader() //迭代ModelLoader，加载图片数据
 
 ##### 源码
+RequestManager：请求管理（ RequestManager#requestTracker）， 生命周期管理 （观察Fragment生命周期）
+      Request 构建器
+Engine（命令模式load；）：
+    EngineJob：图片加载。
+    DecodeJob：图片处理
+
 ```
 
 ----------------+---------------------------------------------------------------------+--------------------------------------------+---------------------------------+--------------+-----------------------------------------+
@@ -540,16 +717,75 @@ mmap（微信mars，美图logan，网易）
 ## 网络
 ###  Rxjava，线程切换 ，异步执行耗时代码
 流式构建，订阅及观察事件传递
+flowable，observable，single，maybe，completable，mixed，parallel
+响应式设计模式：
+  异步方法调用：
+  回调；
+  集合管道：filter、map和reduce
+  流接口：编写具有自然语言一样可读性的代码，即方法链
+  基于事件的异步模式：执行多个操作，每个操作完成后接收通知
+  事件驱动的架构：
+  毒丸模式：
+  生产者消费者：
+  承诺模式：
+  Reactor模式：处理一个或多个客户端同时传递到应用程序的服务请求
 
-类抽象工厂 Observer,flowable,single,maby,completation 
+
+[rx操作符](http://reactivex.io/documentation/operators.html)
+ReactiveX provides a collection of operators with which you can filter, select, transform, combine, and compose Observables.
+```
+定时分发：倒计时
+过滤：搜索防抖/点击防抖
+数据/流切换：缓存优先
+异常处理：token处理，重试机制
+调度：线程调度，时间调度，生命周期管理及观察
++--------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|  Create/Defer⭐  Debounce/throttleFirst⭐                                           SubscribeOn                                                            |
+|  Just/From       Distinct                                                             /ObserveOn⭐                                                           |
+|  Empty           First/Last                       Map/FlatMap                        Backpressure                                                             |
+|  /Never          ElementAt          All           /ConcatMap⭐                        Subscribe                                                             |
+|  /*Throw         IgnoreElement      *Amb          Window                                Delay/Timeout   And/Then/When                                           |
+|                                  Contains         Buffer                               TimeInterval     CombineLatest⭐  Concat⭐                              | 
+| Interval/Timer⭐ Filter         DefaultIfEmpty                                          /Timestamp        Merge            *Average                            |            
+|                  Sample        *SequenceEqual                                                                StartWith     Count                               |
+|  Range           Skip/Take                                                             Serialize          *Join            *Max                   Connect        |
+|  *Repeat         TakeLast/TakeLastTimed           Scan           onErrorResumeNext⭐    Materialize      *Switch         *Min                  Publish         |
+|  *Start          TakeLastOne                      GroupBy          Catch              /Dematerialize    *Zip            Reduce                RefCount          |
+|                  /TakeUntilPredicate        switchIfEmpty⭐     retryWhen⭐            Using             *Sum                                   Replay     to  |
+|                  TakeUntil/TakeWhile⭐                                                Do                                                                       |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|  Creating        Filtering     Conditional   Transforming      Error                  Utility        Combining       Mathematical                               |
+|                                and Boolean                     Handling                                              and Aggregate          Connectable  Con^ert|
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+```
+
+静态代理
+    构建时，Observable静态代理上游订阅方法subscribe
+    subscribe订阅时，upstream订阅，Observer静态代理下游的观察者方法
+
+
 门面模式 Observer,flowable,single,maby,completation
 
 适配器   
-静态代理 Observable 代理上游方法，Observer代理下游方法
+静态代理 
+      
+      Observable 代理上游方法，Observer代理下游方法
 
 命令 Publisher#subscribe，ObservableSource#subscribe
 观察者模式 rx.Observer#onNext；rx.Observer#onCompleted；
 策略 BackpressureStrategy（MissingEmitter，ErrorAsyncEmitter，DropAsyncEmitter...)
+
+装饰者
+      创建操作类，添加构造参数，装饰Observable，增加 subscribeActual 功能
+      过滤操作类，装饰观察者类，上游可以发送数据时，下游的观察类，onNext增加功能
+      Call CallEnqueueOnSubscribe#call()
+
+
+模板方法
+        flowable，observable，
+        single，completable，maybe，
+        mixed，parallel
 
 #### 源码
 RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察者模式。
@@ -687,36 +923,62 @@ RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察�
 +----------------------------------------------------------------------------------+
 
 ### Retrofit
-动态代理创建Service类，适配返回类型Call支持其他类型， 依赖注入ServiceMethod
+动态代理创建Service类，适配返回类型Call支持其他类型， 注解信息依赖注入ServiceMethod
 
-转换器注入 retrofit2.Converter#convert
-          retrofit2.HttpServiceMethod.CallAdapted#adapt
+转换器注入 Converter#convert
+          HttpServiceMethod.CallAdapted#adapt
 简单工厂 
-         Retrofit#create；
-         RequestFactory#create
+         Retrofit#create():Proxy.newProxyInstance()；//代理类
+         RequestFactory#parseAnnotations():RequestFactory //构建RequestFactory，使用Convert解析Request
+         ServiceMethod#parseAnnotations():ServiceMethod //API方法装饰类。装饰ServiceMethod，增加返参适配器，运用工厂方法，创///返参对象；
+         HttpServiceMethod#invoke()://使用适配器（适配返参）， 创建返参对象
+
+         //解析注解时候，创建RequestFactory，调用OkHttpCall 时
+         RequestFactory#create():Okhttp.Request //OkHttp请求类，此过程中convert RequestBody，生成 Request
+
+        //OkHttpCall#parseResponse() //创建Retrofit装饰类Response，封装Okhttp的Response
 工厂方法 
-        DefaultCallAdapterFactory#get；
-        OkHttpClient.kt#newCall
-抽象工厂 retrofit2.BuiltInConverters；
-单例 Retrofite对象；retrofit2.Platform#PLATFORM
-构造器 retrofit2.Retrofit.Builder
+        DefaultCallAdapterFactory#get():CallAdapter；//解析注解时候，创建适配器
+        HttpServiceMethod#adapt() //创建返参对象
+
+抽象工厂
+        Converter.Factory
+                Converter.Factory#requestBodyConverter//转化@Body为RequestBody
+                Converter.Factory#responseBodyConverter//转化ResponseBody为Bean
+
+单例 Retrofite对象；
+        retrofit2.Platform#PLATFORM
+构造器 
+        Retrofit.Builder
+        RequestFactory.Builder#Builder
+
+适配 retrofit2.CallAdapter#adapt // 将 Call接口 适配为 returnType
 
 
-适配 retrofit2.CallAdapter#adapt 将 Call接口 适配为 returnType
-
-
-
+观察者  Callback#onResponse                    //OkhttpCall 观察 Okhttp 回调
 命令 retrofit2.Platform#defaultCallbackExecutor
-装饰 retrofit2.HttpServiceMethod#invoke 装饰 
-    retrofit2.adapter.rxjava.BodyOnSubscribe 装饰 CallExecuteOnSubscribe，CallEnqueueOnSubscribe，支持
+装饰 
+      DefaultCallAdapterFactory.ExecutorCallbackCall //装饰OkHttpCall，增加接口返回的主线程调度器
+      retrofit2.HttpServiceMethod#invoke 装饰 
+
+     retrofit2.adapter.rxjava.BodyOnSubscribe 装饰 CallExecuteOnSubscribe，CallEnqueueOnSubscribe，支持
 代理 retrofit2.adapter.rxjava.CallExecuteOnSubscribe#call 静态代理 retrofit2.Call#execute
      retrofit2.adapter.rxjava.CallEnqueueOnSubscribe#call 静态代理retrofit2.Call#enqueue
 
 解释 类的annotation
 策略 retrofit2.Platform#findPlatform
      ParameterHandler#apply
-模板方法 retrofit2.Call
+     //根据Retrofit是否设置callbackExecutor
+     ExecutorCallbackCall
 
+      //不同的ParameterHandler ，不同的策略。Body使用的是自定义Convert
+       ParameterHandler.Body#apply()
+
+模板方法 retrofit2.Call#execute()
+
+#### Rxjava3
+
+工厂方法
 
 ```kotlin
 
@@ -737,12 +999,38 @@ val searchResult = service.getSearchResult()
 
 [Retrofit 2.6 对协程的支持](https://blog.csdn.net/weixin_44946052/article/details/93225439)
 ### Okhttp（Square）
+可加快内容加载速度并节省带宽。
+缓存
 
-[Okhttp.md](知识体系-平台-Android-Square.md)
+转化器  
+简单工厂 RealCall.kt#newRealCall():RealCall
+         Transmitter#newExchange():Exchange
+         ExchangeFinder:find():ExchangeCodec
+         ExchangeFinder#findHealthyConnection():RealConnection
+工厂方法 
+        Call.Factory#newCall(): Call //构造请求回调
+构建器 
+        OkHttpClient.Builder
+        Request.Builder      //构建请求，method，url，headers，body
 
-
+模板方法
+        Call#execute()， Call#enqueue()
+观察者
+        Callback.kt#onResponse() //RealCall观察回调网络请求
+装饰
+        RealConnection 装饰socket，对source，sink操作。
+命令
+        RealCall#run()
+        Dispatcher
 责任链 
+        RealInterceptorChain#proceed(Request) //负责处理Request
 
+状态 
+        RetryAndFollowUpInterceptor 重试 
+        BridgeInterceptor            CookieJar
+        CacheInterceptor             缓存
+        ConnectInterceptor           请求
+        CallServerInterceptor 
  
 >
 复用连接池 
@@ -1773,6 +2061,7 @@ IM：
 [websocket] 基于HTTP/1.1
   1. 第一次升级http协议，切换成功后，全双工通讯。
    [WebSocket传输的数据：Frame（帧）](https://tools.ietf.org/html/rfc6455#section-5)
+   [](https://github.com/abbshr/abbshr.github.io/issues/22)
   ```js
           0                   1                   2                   3
             0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -1803,71 +2092,62 @@ IM：
 ### 即时聊天协议
 [即时聊天协议](https://blog.csdn.net/netease_im/article/details/83823212)
 #### vcard 通讯录名片
-#### mqtt
 
+### moquette Broker
 [协议](知识体系-存储-Networks.md)
-[mqtt.github.io](https://github.com/mqtt/mqtt.github.io/wiki/software?id=software)
-broker/server
-[ibm RSMB(ibm开发，非开源，没维护，推荐 Mosquitto ) ]()
-[eclipse mosquitto mqtt broker](https://github.com/eclipse/mosquitto)
-[moquette](https://gitee.com/mirrors/moquette.git)
-```java
-  001_initial   422fbc4d2c644844d4886afd55c912626d1c4054 First import of moquette proto parser
-  002_client    aadff9c9bd9a2efe7b90931b7dbed1c350f1d52d Added trivial client implementation
-  003_server    463aa256936010b9c61252ca703623e4b98adda7 Implemented the raw connect message  handling
-  004_subscribe b5903bbf8471f0baaeb8b71346ef96cccabf3ab0 Added simple implementation for handle subscribe message
 
+#### 消息类型
+```c
+"lib\mqtt3_protocol.h"
+
+/* Message types */
+#define CONNECT 0x10
+#define CONNACK 0x20
+#define PUBLISH 0x30
+#define PUBACK 0x40
+#define PUBREC 0x50
+#define PUBREL 0x60
+#define PUBCOMP 0x70
+#define SUBSCRIBE 0x80
+#define SUBACK 0x90
+#define UNSUBSCRIBE 0xA0
+#define UNSUBACK 0xB0
+#define PINGREQ 0xC0
+#define PINGRESP 0xD0
+#define DISCONNECT 0xE0
 ```
-[apache activemq](https://github.com/apache/activemq.git)
-client lib
-[Eclipse Paho Java MQTT client library](https://github.com/eclipse/paho.mqtt.java)
+#### 消息体
+```c
+"lib\mosquitto_internal.h"
+struct _mosquitto_packet{
+	uint8_t command;
+	uint8_t have_remaining;
+	uint8_t remaining_count;
+	uint16_t mid;
+	uint32_t remaining_mult;
+	uint32_t remaining_length;
+	uint32_t packet_length;
+	uint32_t to_process;
+	uint32_t pos;
+	uint8_t *payload;
+	struct _mosquitto_packet *next;
+};
 ```
-* 001_initial 40f75663f7f9715a6452940005d615b5c1eadda6 First version of MQTT v3 Java Client
-+----------------------------------------------------------------------------------------------------------------------+
-|                                                                                                                      |
-|    MqttClient:DestinationProvider                ClientComms                                                         |
-|        serverURI                                    networkModule:NetworkModule                                      |
-|        clientId                                     clientState                                                      |
-|        serverURIType                                sender:CommsSender                                               |
-|        tokenStore:CommsTokenStore                   receiver:CommsReceiver                                           |
-|        persistence:MqttDefaultFilePersistence                                                                        |
-|        comms:ClientComms                                                                                             |
-|        topics:HashTable                                                                                              |
-|        connect()                                                                                                     |
-|        publish()                                                                                                     |
-|        disconnect()                                                                                                  |
-+---------------------------------+------------------------------------------------------------------------------------+
-|                                 | TCPNetworkModule       LocalNetworkModule                                          |
-|    NetworkModule                | //tcp://               //local://                                                  |
-|        start()                  |                                                                                    |
-|        getInputStream()         | SSLNetworkModule                                                                   |
-|                                 | //ssl://                                                                           |
-|                                 |                                                                                    |
-+---------------------------------+------------------------------------------------------------------------------------+
-|                                                                                                                      |
-|                         CommsReceiver                                                                                |
-|                            in:MqttInputStream                                                                        |
-|                            lifecycle                                                                                 |
-|                         MqttInputStream                                                                              |
-|                           readMqttWireMessage():MqttWireMessage                                                      |
-+-------------------------+--------------------------------------------------------------------------------------------+
-|                         |                                MqttPersistableWireMessage            MqttSubscribe         |
-|     MqttMessage         |MqttAck    MqttConnect          MqttPingReq                                 qos:int[]       |
-|                         |           MqttDisconnect                                             MqttUnsubscribe       |
-+-------------------------+--------------------------------------------------------------------------------------------+
+#### [qos](https://www.jianshu.com/p/ff04cbb21865)
+Qos衰减：以发布Qos为准，如果订阅qos小于发布Qos，接受方Qos以订阅Qos为准
+ QoS 0
+    消息偶尔丢失
+Qos 1
+    需要应用层处理重复消息
+Qos 2
+（消息的丢失会造成生命或财产的损失），且不希望收到重复的消息
+数据完整性与及时性要求较高的银行、消防、航空等行业。
 
-
-```
-
-
-tools
-[IBM IA92 (java -jar wmqttSample.jar) ](http://www-01.ibm.com/support/docview.wss?rs=171&uid=swg24006006&loc=en_US&cs=utf-8&lang=en)
-
-
-#### xmpp
+### xmpp
 openfire
 asmack
- 
+#### XMPP通信原语有3种：message、presence和iq。
+
 
 ## Sqlite
 ### h2 /JOOQ/SnakeYAML 

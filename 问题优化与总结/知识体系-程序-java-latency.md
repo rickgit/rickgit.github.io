@@ -12,7 +12,115 @@
 在JIT编译时，在安全点(safe point)记录栈和寄存器中的引用和对应的位置。
 安全点时，才可以GC：方法调用、执行跳转、异常跳转等处。
 
+分配内存：指针碰撞，空闲列表
+#### GC Roots
+```
+GC Roots 的对象包括下面几种： 
+虚拟机栈（栈帧中的本地变量表）中引用的对象
+方法区中类静态属性引用的对象
+方法区中常量引用的对象
+本地方法栈中 JNI （即一般说的 Native 方法）引用的对象
+
+```
+#### 可达性分析
+
+#### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
+ [mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
+3. Java垃圾回收算法及垃圾收集器
+   标记-清除算法(mark-sweep), dalvikvm；标记可达对象，线性扫描堆，回收不可达对象
+        x遍历两遍，效率不高；STW 体验不好；碎片化。
+        x空闲列表分配内存
+   复制算法(copying)  hotspot：分配两个内存，每次使用一块，赋值存活对象，到另一块。交替两块内存区间的角色
+        没有标记清除遍历两遍，相对高效；
+        指针碰撞分配对象
+        x浪费一个空闲空间
+        x引用对象需要调整
+   标记-压缩算法(mark-compact),
+        标记清除增加一个压缩过程，碎片整理
+        指针碰撞分配对象
+   分代收集算法（Generational Collection）
+        朝生夕死，复制算法，存活率较高，标记清除或标记整理
+4. JVM可回收对象判定方法 : 对象回收判定(可达性分析算法&对象引用) 
+>《Inside the Java Virtual Machine》 ,Wiley (1996)《Garbage Collection- Algorithms for Automatic Dynamic Memory Management》 
+JVM给了三种选择收集器：串行收集器、并行收集器、并发收集器
+
+[垃圾回收概念Thread，Root Set of References，Reachable and Unreachable Objects，garbage collection](https://www.javarticles.com/2016/09/java-garbage-collector-reachable-and-unreachable-objects.html)
+
+```
+
++----------+-----------+----------------+---------------------------+
+|(generation collection)Minor GC/Full GC                            |
++----------+-----------+----------------+---------------------------+
+|safepoint/Safe Region                                              |
++----------+-----------+----------------+---------------------------+
+|          |           | G1             |                           |
+|          | concurrent| CMS            |                           |
+|          +----------------------------+                           |
+|          | parallel                   |                           |
+|Collector +----------------------------+                           |
+|          | ParallelOld                |                           |
+|          +----------------------------+                           |
+|          | Serial                     |                           |
++-------------------------------------------------------------------+
+|Collection| mark-compact               |  reference counting       |
+|Algorithms| copying                    |                           |
+|          | mark-sweep                 |                           |
++-------------------------------------------------------------------+
+| Garbage  |Reachability Analysis(java) |  Reference Counting       |
+|          | GC Roots Tracing           |  (objc,Python)            |
++----------+----------------------------+---------------------------+
+
+Generational Collection
++---------------------------------------------------------------------+
+|  new gen       copying        copying           copying             |
+| (Minor GC)     +--------+    +--------+     +------------------+    |
+|                | Serial |    | ParNew |     | Parallel Scavenge|    |
+|                +--+--+--+    +--+-+---+     +-----+----+-------+    |
+|                   |  |          | |               |    |            |
+|                +--+  +-----+    | |   +-----------+    |            |
+|                |           |    | |   |                |    +-----+ |
++---------------- ----------- ---- - --- ---------------- ----+ G1  +-| mark-compact+copying
+| old gen        | +---------+----+ |   |                |    +-----+ |
+|                | |         |      |   |                |            |
+|            +---+-+        ++------+---+--+    +--------+-----+      |
+|            | CMS +--------+ Parallel Old |    | Serial Old   |      |
+|            +-----+        +--------------+    +--------------+      |
+|          mark-compact        mark-compact       mark-compact        |
++---------------------------------------------------------------------+
+| Permanet Generation                                                 |
++---------------------------------------------------------------------+
+并行（Parallel）：指多条垃圾收集线程并行工作，但此时用户线程仍然处于等待状态。
+并发（Concurrent）：指用户线程与垃圾收集线程同时执行（但不一定是并行的，可能会交替执行），用户程序在继续运行。而垃圾收集程序运行在另一个CPU上。
+```
+Reference Counting：难解决对象之间循环引用的问题
+
+[“长时间执行”](https://crowhawk.github.io/2017/08/10/jvm_2/)的最明显特征就是指令序列复用;
+例如方法调用、循环跳转、异常跳转等，所以具有这些功能的指令才会产生Safepoint。
+在GC发生时让所有线程（这里不包括执行JNI调用的线程）都“跑”到最近的安全点上再停顿下来。
+**安全区域**是指在一段代码片段之中，引用关系不会发生变化。在这个区域中的任意地方开始GC都是安全的。
+
+[HotSpot 虚拟机](http://openjdk.java.net/groups/hotspot/docs/HotSpotGlossary.html)
+[官方文档 Hotspot](https://openjdk.java.net/groups/hotspot/docs/RuntimeOverview.html)
+
+
+Generational Collection（分代收集）算法
+  1. 新生代都采取Copying算法
+  2. 老年代的特点是每次回收都只回收少量对象，一般使用的是Mark-Compact算法
+  3. 永久代（Permanet Generation），它用来存储class类、常量、方法描述等。对永久代的回收主要回收两部分内容：废弃常量和无用的类。
+
+
+《如何监控Java GC》中已经介绍过了jstat
+
+JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
+
+
 #### Reference 
+
+##### 对象访问方式：
+1. 句柄访问：维护一个句柄池，栈访问句柄池，再访问对象和类信息。这种方法栈维护堆引用稳定
+2. 直接指针（Hotspot）：直接访问对象，对象持有类信息
+[OOP-KLASS模型](知识体系-程序-java.md)
+
 ```
 +--------------------------------------------------------------------------------------------+
 |       ReferenceProcessor:CHeapObj                                                          |
@@ -43,12 +151,15 @@
 +--------------------------------------------------------------------------------------------+
 
 ```
- 注解，反射保存在softwareReference
- 弱引用，Glide以及缓存；Activity内存管理；weakHashMap；值动画WeakReference
- 虚引用，堆外内存管理
+ softwareReference，内存不够的时候回收
+    保存注解，反射信息
+ 弱引用，没有被引用，GC发现即回收
+    Glide以及缓存；Activity内存管理；weakHashMap；值动画WeakReference
+ 虚引用，观察加入引用队列
+    堆外内存管理
  
-
-
+#### 永久代的垃圾收集
+永久代的垃圾收集主要回收两部分内容：废弃常量和无用的类
 
 ## io（同步、异步、阻塞、非阻塞）
 

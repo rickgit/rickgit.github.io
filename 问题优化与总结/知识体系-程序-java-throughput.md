@@ -814,6 +814,12 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
   - 并发框架 Fork/Join
 
 ## 线程
+1-main    主线程，执行我们指定的启动类的main方法
+2-Reference Handler   处理引用的线程　
+3-Finalizer           调用对象的finalize方法的线程，就是垃圾回收的线程　
+4-Signal Dispatcher   分发处理发送给JVM信号的线程　　
+5-Attach Listener     负责接收外部的命令的线程
+
 ### 多线程问题
 线程生命周期 
 join
