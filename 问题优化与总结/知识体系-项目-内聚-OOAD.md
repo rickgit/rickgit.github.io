@@ -6,13 +6,13 @@
 KISS
 YAGNI 
   (关注分离，面向维护者代码，避免过早优化）
-DRY
+DRY1   
 
 [Boy-Scout Rule:何一个成员都有义务去改善代码](《Bad Code, Craftsmanship, Engineering, and Certification》)
 
 1. 模块内部与模块间
 低耦合（模块间）高内聚（模块内）
-LoD（模块间），CARP（模块间，属OOAD），IoC（模块间）
+CARP（模块间，属OOAD），LoD（模块间），IoC（模块间）
 SOLID（模块内，属OOAD） 命令-查询分离原则（模块内）
 
 # 模式

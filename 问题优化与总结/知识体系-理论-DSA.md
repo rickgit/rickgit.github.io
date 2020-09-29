@@ -242,15 +242,7 @@ k：次数
 最后还剩1个元素，n/(2^k)= 1，耗时 2^k=n，即k=log2(n)
 
 
-### Hash 冲突和溢出
- 开放定址法
-    线行探查法（ArrayMap）、平方探查法、双散列函数探查法/再哈希法。
- 链地址法（HashMap）
- 建立公共溢出区
- 其他方法
 
- [md5 冲撞](https://github.com/corkami/collisions)
-### Hash 与 Bloom Filter
 
 ### 字符串
 [String_processing_algorithms](https://en.wikipedia.org/wiki/String_(computer_science)#String_processing_algorithms)
@@ -276,8 +268,8 @@ Traversal （二叉树根节点访问顺序分为 先序遍历（中左右） �
 Verification
 ```
 
-
-### QR Code Graph
+ [md5 冲撞](https://github.com/corkami/collisions)
+## 多媒体 - QR Code Graph
 >History. The smallest QR codes are 21x21 pixels, and the largest are 177x177. The sizes are called versions. The 21x21 pixel size is version 1, 25x25 is version 2, and so on. The 177x177 size is version 40.Each version is 4 pixels larger than the previous version.[（引用）](https://www.thonky.com/qr-code-tutorial/introduction)
 
 
@@ -395,7 +387,7 @@ class Solution {
 ### 算法
 
 字符哈希算法
-```
+```java
 Brian Kernighan 与 Dennis Ritchie 《The C Programming Language》 多项式 hash
 BKDRHash java.lang.String.hashCode() 简单快捷，正确率高 
 
@@ -413,7 +405,7 @@ ELFHash
 DEKHash, FNVHash, DJB2Hash, PJWHash
 ```
 对象一致性Hash
-```
+```java
 java9随机数+三个确定值，运用Marsaglia's xorshift scheme随机数算法得到的一个随机数
 xor-shift
 

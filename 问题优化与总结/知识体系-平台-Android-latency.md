@@ -4,54 +4,7 @@
 常见优化库
 LeakCanary、Glide、Retrofit、OkHttp、RxJava、GreenDAO
 [Studio Profiler](https://github.com/JetBrains/android/tree/master/profilers/src/com/android/tools/profilers/memory)
-### 数据存储
-SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
 
-ContentProvider->保存和获取数据，并使其对所有应用程序可见
-
-### SharedPreference
-```
-                +----------------------------------------------------------------------------------------+
-                |  ContextImpl                                                                           |
-                |    mSharedPrefsPaths:ArrayMap<String, File>                                            |
-                |    getSharedPreferencesPath(String name): File                                         |
-                |                                                                                        |
-                |    sSharedPrefsCache                                                                   |
-                |         :ArrayMap<String, ArrayMap<File, SharedPreferencesImpl> >                      |
-                |    getSharedPreferences():SharedPreferencesImpl                                        |
-                |                                                                                        |
-                |    getSharedPreferencesCacheLocked()                                                   |
-                |         :ArrayMap<File, SharedPreferencesImpl>                                         |
-                |                                                                                        |
-                +----------------------------------------------------------------------------------------+
-                |   SharedPreferencesImpl             mMap:Map<String, Object>        enqueueDiskWrite() |
-                |           makeBackupFile():File     edit():EditorImpl               writeToFile()      |
-                |           loadFromDisk()                                                               |
-                |                             +----------------------------------------------------------+
-                |                             | EditorImpl:Editor                                        |
-                |                             |    mModified:Map<String, Object>   mEditorLock:Object    |
-                |                             |    apply()                         mModified             |
-                |                             |    commit()                         :Map<String, Object> | 
-                |                             |                                                          |
-                |                             | commitToMemory():MemoryCommitResult                      |
-                |                             | mListeners                                               |
-                |                             |   :WeakHashMap<OnSharedPreferenceChangeListener, Object> |
-                +----------------------------------------------------------------------------------------+
-                |XmlUtils                     |                                                          |
-                |  readMapXml()               |     MemoryCommitResult                                   |
-                +-----------------------------+          writtenToDiskLatch //commit() wait return       |
-                |Xml                          |                                                          |
-                |  newPullParser():KXmlParser |                                                          |
-                |                             |                                                          |
-                +-----------------------------+                                                          |
-                |                             |                                                          |
-                | KXmlParser: XmlPullParser   |                                                          |
-                ------------------------------+----------------------------------------------------------+
-
-
-```
-
-###  MMKV for Android
 
 
 ## 包内精简 - APK打包 （编译，打包，优化，签名，安装）
@@ -134,6 +87,12 @@ walle
 ### 打包自动化
 [gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
 ### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
+#### 资源打包 AAPT
+     [aapt2 适配之资源 id 固定](https://fucknmb.com/2017/11/15/aapt2%E9%80%82%E9%85%8D%E4%B9%8B%E8%B5%84%E6%BA%90id%E5%9B%BA%E5%AE%9A/)
+          aapt  -p public.xml
+          aapt2 --stable-ids ,--emit-ids
+#### ProGuard
+     代码混淆 -printmapping ，-applymapping
 
 ## 缓存篇
 
@@ -708,13 +667,63 @@ Chain of Responsibility:Interceptor
                           +-------------------------------------------------------------------+
 
 ```
-### “零拷贝问题” - MMKV- sharepreference优化
+
+
+## 数据存储
+SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
+ContentProvider->保存和获取数据，并使其对所有应用程序可见
+
+### 配置参数存储
+#### SharedPreference
+```
+                +----------------------------------------------------------------------------------------+
+                |  ContextImpl                                                                           |
+                |    mSharedPrefsPaths:ArrayMap<String, File>                                            |
+                |    getSharedPreferencesPath(String name): File                                         |
+                |                                                                                        |
+                |    sSharedPrefsCache                                                                   |
+                |         :ArrayMap<String, ArrayMap<File, SharedPreferencesImpl> >                      |
+                |    getSharedPreferences():SharedPreferencesImpl                                        |
+                |                                                                                        |
+                |    getSharedPreferencesCacheLocked()                                                   |
+                |         :ArrayMap<File, SharedPreferencesImpl>                                         |
+                |                                                                                        |
+                +----------------------------------------------------------------------------------------+
+                |   SharedPreferencesImpl             mMap:Map<String, Object>        enqueueDiskWrite() |
+                |           makeBackupFile():File     edit():EditorImpl               writeToFile()      |
+                |           loadFromDisk()                                                               |
+                |                             +----------------------------------------------------------+
+                |                             | EditorImpl:Editor                                        |
+                |                             |    mModified:Map<String, Object>   mEditorLock:Object    |
+                |                             |    apply()                         mModified             |
+                |                             |    commit()                         :Map<String, Object> | 
+                |                             |                                                          |
+                |                             | commitToMemory():MemoryCommitResult                      |
+                |                             | mListeners                                               |
+                |                             |   :WeakHashMap<OnSharedPreferenceChangeListener, Object> |
+                +----------------------------------------------------------------------------------------+
+                |XmlUtils                     |                                                          |
+                |  readMapXml()               |     MemoryCommitResult                                   |
+                +-----------------------------+          writtenToDiskLatch //commit() wait return       |
+                |Xml                          |                                                          |
+                |  newPullParser():KXmlParser |                                                          |
+                |                             |                                                          |
+                +-----------------------------+                                                          |
+                |                             |                                                          |
+                | KXmlParser: XmlPullParser   |                                                          |
+                ------------------------------+----------------------------------------------------------+
+
+
+```
+
+####  MMKV for Android “零拷贝问题” -  sharepreference优化
 mmap（微信mars，美图logan，网易）
-
-
-
+### 多媒体
+[zxing, ffmpeg]()
+[ffmpeg](知识体系-平台-多媒体.md)
 
 ## 网络
+[高性能浏览器网络](https://hpbn.co/)
 ###  Rxjava，线程切换 ，异步执行耗时代码
 流式构建，订阅及观察事件传递
 flowable，observable，single，maybe，completable，mixed，parallel
@@ -734,29 +743,29 @@ flowable，observable，single，maybe，completable，mixed，parallel
 [rx操作符](http://reactivex.io/documentation/operators.html)
 ReactiveX provides a collection of operators with which you can filter, select, transform, combine, and compose Observables.
 ```
-定时分发：倒计时
-过滤：搜索防抖/点击防抖
-数据/流切换：缓存优先
-异常处理：token处理，重试机制
+定时分发：注册倒计时
+过滤：点击防抖过滤/搜索词防抖过滤
+数据/流切换：缓存优先，数据转化
+异常处理：异常重试机制，token处理
 调度：线程调度，时间调度，生命周期管理及观察
 +--------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Create/Defer⭐  Debounce/throttleFirst⭐                                           SubscribeOn                                                            |
+|  Create/Defer⭐  Debounce/throttleFirst⭐                                           SubscribeOn                                                             |
 |  Just/From       Distinct                                                             /ObserveOn⭐                                                           |
-|  Empty           First/Last                       Map/FlatMap                        Backpressure                                                             |
-|  /Never          ElementAt          All           /ConcatMap⭐                        Subscribe                                                             |
-|  /*Throw         IgnoreElement      *Amb          Window                                Delay/Timeout   And/Then/When                                           |
-|                                  Contains         Buffer                               TimeInterval     CombineLatest⭐  Concat⭐                              | 
-| Interval/Timer⭐ Filter         DefaultIfEmpty                                          /Timestamp        Merge            *Average                            |            
-|                  Sample        *SequenceEqual                                                                StartWith     Count                               |
-|  Range           Skip/Take                                                             Serialize          *Join            *Max                   Connect        |
-|  *Repeat         TakeLast/TakeLastTimed           Scan           onErrorResumeNext⭐    Materialize      *Switch         *Min                  Publish         |
-|  *Start          TakeLastOne                      GroupBy          Catch              /Dematerialize    *Zip            Reduce                RefCount          |
-|                  /TakeUntilPredicate        switchIfEmpty⭐     retryWhen⭐            Using             *Sum                                   Replay     to  |
-|                  TakeUntil/TakeWhile⭐                                                Do                                                                       |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|  Creating        Filtering     Conditional   Transforming      Error                  Utility        Combining       Mathematical                               |
-|                                and Boolean                     Handling                                              and Aggregate          Connectable  Con^ert|
-+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  Empty           First/Last                       Map/FlatMap                        Backpressure                                                            |
+|  /Never          ElementAt          All           /ConcatMap⭐                        Subscribe                                                              |
+|  /*Throw         IgnoreElement      *Amb          Window                                Delay/Timeout   And/Then/When                                         |
+|                                  Contains         Buffer                               TimeInterval     CombineLatest⭐  Concat⭐                            | 
+| Interval/Timer⭐ Filter         DefaultIfEmpty                                          /Timestamp        Merge            *Average                           |
+|                  Sample        *SequenceEqual                                                                StartWith     Count                              |
+|  Range           Skip/Take                                                             Serialize          *Join            *Max                   Connect     |
+|  *Repeat         TakeLast/TakeLastTimed           Scan           onErrorResumeNext⭐    Materialize      *Switch         *Min                  Publish        |
+|  *Start          TakeLastOne                      GroupBy          Catch              /Dematerialize    *Zip            Reduce                RefCount         |
+|                  /TakeUntilPredicate        switchIfEmpty⭐     retryWhen⭐            Using             *Sum                                   Replay     to |
+|                  TakeUntil/TakeWhile⭐                                                Do                                                                      |
++---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|  Creating        Filtering     Conditional   Transforming      Error                  Utility        Combining       Mathematical                             |
+|                                and Boolean                     Handling                                              and Aggregate        Connectable  Con^ert|
++---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ```
 
@@ -2016,6 +2025,10 @@ Table 结构：
 备忘 JsonReader#stack 
 解析器 JsonParser,JsonReader
 
+Gson
+工厂方法： com.google.gson.Gson#factories用来创建TypeAdapter
+适配器模式：com.google.gson.internal.bind.TypeAdapters适配类型解析
+装饰模式：com.google.gson.reflect.TypeToken装饰class
 ##### Mson 优化Gson反射
 
 ### 长连接
@@ -2027,10 +2040,25 @@ IM：
 增加重传和排重机制
 回执
 ### 通讯协议
+字节流协议：TagVersionLengthValue
 #### TCP/UDP
+```js
+      0      7 8     15 16    23 24    31
+      +--------+--------+--------+--------+
+      |     Source      |   Destination   |
+      |      Port       |      Port       |
+      +--------+--------+--------+--------+
+      |                 |                 |
+      |     Length      |    Checksum     |
+      +--------+--------+--------+--------+
+      |
+      |          data octets ...
+      +---------------- ...
 
-[](https://tools.ietf.org/html/rfc793#section-3.1)
+          User Datagram Header Format
 ```
+[](https://tools.ietf.org/html/rfc793#section-3.1)
+```js
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -2053,41 +2081,270 @@ IM：
 
                             TCP Header Format
 ```
+##### 抓包
+// testSocket("104.31.70.56");//tcp http://www.plantuml.com/
+```plantuml
+@startuml
+Client -> Server++: [SYN]
+
+Server-> Client : [SYN,ACK]
+Server-> Client --: [ACK]
+ 
+Client -> Server++: [PSH,ACK](write bytes)
+Client -> Server: [FIN,ACK]
+Server-> Client --: [ACK]
+
+Client -> Server++: [FIN,ACK]
+Server-> Client  : [FIN,ACK]
+Client -> Server --: [ACK]
+@enduml
+```
+
 #### HTTP
+```js
+请求行（例如GET /images/logo.gif HTTP/1.1，表示从/images目录下请求logo.gif这个文件）
+请求头（例如Accept-Language: en）
+空行
+其他消息体
+```
 快（缓存，字节），穩定/可靠（长连接，多路复用）
+1989，由蒂姆·伯纳斯-李在欧洲核子研究组织（CERN）所发起。
+1991，HTTP V0.9 ，支持 GET 请求
+1996，HTTP/1.0 RFC 1945，支持GET、HEAD 和 POST ，为每个资源请求单独连接到同一服务器
+1997，HTTP/1.1首次记录在 RFC 2068 中，支持9种请求方法（PATCH 后来补充），多次重用连接，支持Range请求数据，ETag判断是否资源过期。
+2015，HTTP/2(RFC 7540)，“在线”语义，服务端推送，管线化，多路复用；头部压缩，cache header
+2019，HTTP/3，基于UDP的 QUIC，TCP 多路复用，丢包或重排序导致所有活动事务遇到停滞，即"线头阻塞"；QUIC 本机多路复用，丢包只会影响数据丢失的流。
+##### HTTP 1.0
+Connection:keep-alive：一次 TCP 连接中完成多个 HTTP 请求，但是对每个请求仍然要单独发 header；
+js 轮询：polling 是指从客户端（一般就是浏览器）不断主动的向服务器发 HTTP 请求查询是否有新数据
+
+##### HTTP 1.1
+
+默认采用持续连接（Connection: keep-alive），关闭 Connection:keep-alive。避免重复TCP初始握手活动，减少网络负荷和响应周期
+[HTTP 1.1 RCF](https://tools.ietf.org/html/rfc2068)
 [HTTP/1.1](https://httpwg.org/specs/rfc7230.html)
   1. 缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match
   2. 支持长连接
 [websocket] 基于HTTP/1.1
   1. 第一次升级http协议，切换成功后，全双工通讯。
-   [WebSocket传输的数据：Frame（帧）](https://tools.ietf.org/html/rfc6455#section-5)
-   [](https://github.com/abbshr/abbshr.github.io/issues/22)
-  ```js
-          0                   1                   2                   3
-            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-          +-+-+-+-+-------+-+-------------+-------------------------------+
-          |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-          |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
-          |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-          | |1|2|3|       |K|             |                               |
-          +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-          |     Extended payload length continued, if payload len == 127  |
-          + - - - - - - - - - - - - - - - +-------------------------------+
-          |                               |Masking-key, if MASK set to 1  |
-          +-------------------------------+-------------------------------+
-          | Masking-key (continued)       |          Payload Data         |
-          +-------------------------------- - - - - - - - - - - - - - - - +
-          :                     Payload Data continued ...                :
-          + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-          |                     Payload Data continued ...                |
-          +---------------------------------------------------------------+
-  ```
-[HTTP/2](https://httpwg.org/specs/rfc7540.html) 
-  1. 第一次升级http协议，切换成功后，然后面向字节流
-  2. head压缩，且双方cache一份header fields表
-  3. 多路复用（SocketChannel +Epoll机制 实现）
-  4. 支持服务端推送（只能主动将资源推送到客户端缓存，适合用于展示实时数据；WebSocket实时双向通信）
-  
+请求头第一个强制Host：
+Host: 123.207.136.134:9010
+
+#### HTTP/2
+ [HTTP/2](https://httpwg.org/specs/rfc7540.html) 
+ 减少 网络延迟
+  1. 对HTTP头字段进行数据压缩(即HPACK算法)，且双方cache一份header fields表
+  2. 支持服务端推送（只能主动将资源推送到客户端缓存，适合用于展示实时数据；WebSocket实时双向通信）
+  3. 请求管线化
+  4. 多路复用（SocketChannel +Epoll机制 实现），让多个请求合并在同一 TCP 连接内。
+   （第一次升级http协议，切换成功后，然后面向字节流，每个用户分配streamId 通道）
+
+
+```js
+Frame format
+ +-----------------------------------------------+
+ |                 Length (24)                   |
+ +---------------+---------------+---------------+
+ |   Type (8)    |   Flags (8)   |
+ +-+-------------+---------------+-------------------------------+
+ |R|                 Stream Identifier (31)                      |
+ +=+=============================================================+
+ |                   Frame Payload (0...)                      ...
+ +---------------------------------------------------------------+
+                   Frame Layout
+```
+
+##### SSL/TLS
+[SSL/TLS Handshake](http://blog.fourthbit.com/2014/12/23/traffic-analysis-of-an-ssl-slash-tls-session/#:~:text=Record%20Protocol%20format.%20The%20TLS%20Record%20header%20comprises,header%20itself%29.%20The%20maximum%20supported%20is%2016384%20%2816K%29.)
+###### TLS Handshake
+```js
+               TLS Handshake
+
+               +-----+                              +-----+
+               |     |                              |     |
+               |     |        ClientHello           |     |
+               |     o----------------------------> |     |
+               |     |                              |     |
+       CLIENT  |     |        ServerHello           |     |  SERVER
+               |     |       [Certificate]          |     |
+               |     |    [ServerKeyExchange]       |     |
+               |     |    [CertificateRequest]      |     |
+               |     |      ServerHelloDone         |     |
+               |     | <----------------------------o     |
+               |     |                              |     |
+               |     |       [Certificate]          |     |
+               |     |     ClientKeyExchange        |     |
+               |     |    [CertificateVerify]       |     |
+               |     |   ** ChangeCipherSpec **     |     |
+               |     |         Finished             |     |
+               |     o----------------------------> |     |
+               |     |                              |     |
+               |     |   ** ChangeCipherSpec **     |     |
+               |     |         Finished             |     |
+               |     | <----------------------------o     |
+               |     |                              |     |
+               +-----+                              +-----+
+ Optional messages
+ --------------------------------------------------------------------------------------------
+ Certificate (server)     needed with all key exchange algorithms, except for anonymous ones.
+ ServerKeyExchange        needed in some cases, like Diffie-Hellman key exchange algorithm.
+ CertificateRequest       needed if Client authentication is required.
+ Certificate (client)     needed in response to CertificateRequest by the server.
+ CertificateVerify        needed if client Certificate message was sent.
+```
+###### Record Protocol format
+```js
+        Record Protocol format
+
+         record type (1 byte)
+        /
+       /    version (1 byte major, 1 byte minor)
+      /    /
+     /    /         length (2 bytes)
+    /    /         /
+ +----+----+----+----+----+
+ |    |    |    |    |    |
+ |    |    |    |    |    | TLS Record header
+ +----+----+----+----+----+
+
+
+ Record Type Values       dec      hex
+ -------------------------------------
+ CHANGE_CIPHER_SPEC        20     0x14
+ ALERT                     21     0x15
+ HANDSHAKE                 22     0x16
+ APPLICATION_DATA          23     0x17
+
+
+ Version Values            dec     hex
+ -------------------------------------
+ SSL 3.0                   3,0  0x0300
+ TLS 1.0                   3,1  0x0301
+ TLS 1.1                   3,2  0x0302
+ TLS 1.2                   3,3  0x0303
+```
+Byte 0: TLS record type
+Bytes 1-2: TLS version (major/minor)
+Bytes 3-4: Length of data in the record (excluding the header itself). The maximum supported is 16384 (16K).
+###### Handshake Protocol format
+
+```js
+
+                           |
+                           |
+                           |
+         Record Layer      |  Handshake Layer
+                           |                                  |
+                           |                                  |  ...more messages
+  +----+----+----+----+----+----+----+----+----+------ - - - -+--
+  | 22 |    |    |    |    |    |    |    |    |              |
+  |0x16|    |    |    |    |    |    |    |    |message       |
+  +----+----+----+----+----+----+----+----+----+------ - - - -+--
+    /               /      | \    \----\-----\                |
+   /               /       |  \         \
+  type: 22        /        |   \         handshake message length
+                 /              type
+                /
+           length: arbitrary (up to 16k)
+
+
+   Handshake Type Values    dec      hex
+   -------------------------------------
+   HELLO_REQUEST              0     0x00
+   CLIENT_HELLO               1     0x01
+   SERVER_HELLO               2     0x02
+   CERTIFICATE               11     0x0b
+   SERVER_KEY_EXCHANGE       12     0x0c
+   CERTIFICATE_REQUEST       13     0x0d
+   SERVER_DONE               14     0x0e
+   CERTIFICATE_VERIFY        15     0x0f
+   CLIENT_KEY_EXCHANGE       16     0x10
+   FINISHED                  20     0x14
+```
+
+#### HTTP/HTTP2 历史
+ 
+[wiredshark抓包](https://blog.csdn.net/u014530704/article/details/78842000)
+1. http contains  baidu.com （SSL 过滤 https）
+2.  ip.src==47.95.165.112 or ip.dst==47.95.165.112
+
+> HTTP/2。HTTP/2**支持明文传输**，而SPDY强制使用HTTPS；HTTP/2消息头的压缩算法采用HPACK，而非SPDY采用的DEFLATE。
+相较于HTTP1.1，HTTP/2的主要优点有采用二进制帧封装，传输变成多路复用，流量控制算法优化，服务器端推送，首部压缩，优先级等特点。
+> Hypertext Transfer Protocol Secure (HTTPS) is an extension of the Hypertext Transfer Protocol (HTTP) for secure communication over a computer network, and is widely used on the Internet.（Https使用了安全协议SSL）
+
+> SSL更新到3.0时，IETF对SSL3.0进行了标准化，并添加了少数机制(但是几乎和SSL3.0无差异)，标准化后的IETF更名为TLS1.0(Transport Layer Security 安全传输层协议)，可以说TLS就是SSL的新版本3.1。
+
+SSL使用40 位关键字作为RC4流加密算法，这对于商业信息的加密是合适的。
+
+##### HTTP/2 前身 NPN和ALPN
+NPN（Next Protocol Negotiation，下一代协议协商），是一个 TLS 扩展，由 Google 在开发 SPDY 协议时提出。随着 SPDY 被 HTTP/2 取代，NPN 也被修订为 ALPN（Application Layer Protocol Negotiation，应用层协议协商）。二者目标一致，但实现细节不一样，相互不兼容。以下是它们主要差别：
+
+NPN 是服务端发送所支持的 HTTP 协议列表，由客户端选择；而 ALPN 是客户端发送所支持的 HTTP 协议列表，由服务端选择；
+NPN 的协商结果是在 Change Cipher Spec 之后加密发送给服务端；而 ALPN 的协商结果是通过 Server Hello 明文发给客户端；
+
+[](https://imququ.com/post/enable-alpn-asap.html)
+####  WebSocket
+TCP三次握手后，HTTP/1.1 升级协议 **Upgrade: websocket**
+[升级后，WebSocket frame 格式](https://tools.ietf.org/html/rfc6455#section-5.2)
+[](https://github.com/abbshr/abbshr.github.io/issues/22)
+```js
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
+```
+ 
+[在线测试及WireShark捕获](http://coolaf.com/tool/chattest)
+```js
+客户端（请求升级 websocket）：
+GET /ajaxchattest HTTP/1.1
+Host: 123.207.136.134:9010
+Connection: Upgrade
+Pragma: no-cache
+Cache-Control: no-cache
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36 Edg/85.0.564.44
+Upgrade: websocket
+Origin: http://coolaf.com
+Sec-WebSocket-Version: 13
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
+Sec-WebSocket-Key: PJ4FKzlQx176GkF30UIu1Q==
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+
+服务端（升级协议）
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: ps47fOR7Y0K9tgpbHog3Zw6H7/4=
+
+升级后，8s左右心跳包，服务端【TCP Keep-Alive】,客户端【TCP Keep-Alive ACK】
+
+发送数据，客户端发送【WebSocket FIN/MASKED】,服务器接受响应【Websocket FIN】
+
+断开连接
+  客户端发送【TCP PSH，ACK】0x88804e30bea2（字符串：xxNOxx），服务端相应【TCP ACK】
+  服务端发送【TCP PSH，ACK】0x..454f46（字符串：...EOF）
+  客户端发送【TCP FIN，ACK】
+  客户端发送【TCP ACK】
+  服务端发送【TCP ACK】
+  服务端发送【TCP ACK】
+```
+#### WebRTC
+[](知识体系-平台-多媒体.md)
 
 ### 即时聊天协议
 [即时聊天协议](https://blog.csdn.net/netease_im/article/details/83823212)
@@ -2137,10 +2394,57 @@ struct _mosquitto_packet{
 Qos衰减：以发布Qos为准，如果订阅qos小于发布Qos，接受方Qos以订阅Qos为准
  QoS 0
     消息偶尔丢失
+```plantuml
+@startuml
+Publisher -> Broker: publish(Qos0,msg)
+Broker -> Subscriber: publish(Qos0,msg)
+
+Publisher -> Publisher : Delete Message
+@enduml
+```
 Qos 1
     需要应用层处理重复消息
+```plantuml
+@startuml
+Publisher -> Publisher : Store Message
+Publisher -> Broker: publish(Qos1,msg)
+
+Broker -> Broker : Store Message
+Broker -> Subscriber: publish(Qos1,msg)
+Broker -> Publisher: pubback
+Publisher -> Publisher : Delete Message
+Subscriber -> Broker: pubback
+Broker -> Broker : Delete Message
+@enduml
+```
 Qos 2
 （消息的丢失会造成生命或财产的损失），且不希望收到重复的消息
+```plantuml
+@startuml
+Publisher -> Publisher : Store Message
+Publisher -> Broker: publish(Qos2,msg)
+
+Broker -> Broker : Store Message
+Broker -> Subscriber: publish(Qos2,msg)
+
+Subscriber -> Broker: pubrec
+Broker -> Subscriber: pubbrel
+
+Broker -> Publisher: pubrec
+Publisher -> Broker: pubbrel
+
+Subscriber -> Broker: pubcomp
+Subscriber -> Subscriber : Store Message
+Broker -> Broker : Delete Message
+
+Broker -> Publisher: pubcomp
+
+Publisher -> Publisher : Delete Message
+Subscriber -> Subscriber: push message
+Subscriber -> Subscriber: Delte message
+
+@enduml
+```
 数据完整性与及时性要求较高的银行、消防、航空等行业。
 
 ### xmpp
@@ -2157,6 +2461,3 @@ asmack
 ### 缓存GreenDAO /Jetpack-Room
 
 ### Mqtt服务器
-## 多媒体
-[zxing, ffmpeg]()
-[ ffmpeg](知识体系-平台-多媒体.md)

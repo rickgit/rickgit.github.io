@@ -479,7 +479,14 @@ CAS，SPIN，LockSupport
 
 ### SynChronized
 [](https://github.com/farmerjohngit/myblog/issues/12)
-```
+
+[Synchronization](https://wiki.openjdk.java.net/display/HotSpot/Synchronization)
+[](https://www.itqiankun.com/article/bias-lightweight-synchronized-lock)
+
+safepoint 在该状态下所有线程都是暂停的。
+偏向锁 epoch，在 obj 的类 O 信息里面也有一个 epoch。每次系统到达安全点会对类的 epoch 加 1，变成 epoch_new，然后扫描所有的类 O 的实例，判断该偏向锁是否还被持有，如果被持有则将 epoch_new 复制给对象头的 epoch 字段。每次去获取偏向锁的时候回去判断对象实例的 epoch 和 类的 epoch 是否相等，如果不等代表对象是未锁定、可偏向、未偏向状态，可以偏向新的线程。
+
+```java
 object moniter 重量级锁流程:
         +--------------------------------------+    +----------------------+
         |         waiting Queue                |    |  ReadyThread         |

@@ -111,204 +111,6 @@ am_crash
 
 
 
-
-## 稳定
-Crash 和 ANR
-
-android develop monkey
-AndroidJunitRunner
-
-
-### 代码Review：提高代码质量
-Commit 审阅 if，系统版本，模块管理
-Push   代码重用,多次提交Review
-### Android Lint、QAPlugins（Findbugs、Checkstyle、PMD）
-### 日志 Timer
-### MONKEY
-1. monkey tools 测试
-adb shell monkey -p com.bla.yourpackage -v 1000
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
-
-
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
-
-heisha:
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
-
-[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
-[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
-
-
-停止 monkey
-adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
-
-基础参数 | 事件参数 | 调试参数
-|------:|---------:|---------:|
--v |     -pct-touch| -hprof   |
--s |            ...|--ignore-security-exceptions|
--p |               |       ...|
---throttle|  |  |
-
-```java
-    public static final int FACTOR_TOUCH        = 0;//点击
-    public static final int FACTOR_MOTION       = 1;//滑动
-    public static final int FACTOR_TRACKBALL    = 2;//滚动
-    public static final int FACTOR_NAV          = 3;
-    public static final int FACTOR_MAJORNAV     = 4;//back home menu
-    public static final int FACTOR_SYSOPS       = 5;//物理按键
-    public static final int FACTOR_APPSWITCH    = 6;//startActivity
-    public static final int FACTOR_ANYTHING     = 7;
-```
-
-
-```
-monkey network
-adb forward tcp:1080 tcp:1080
-adb shell monkey --port 1080
-telnet 127.0.0.1 1080
-
-```
-
-
-2. 使用 adb 获取错误报告
-adb bugreport E:/bugs/
-3. anr文件
-adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
-
-4. 日志
-- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
-- EXCEPTION,NullPointerException
-- ERROR
-
-[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
-[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
-
-### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
-```
-services/core/java/com/android/server/am/AppErrors.java:
-
-StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
-//                    .detectDiskReads()
-//                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .penaltyDialog() //弹出违规提示对话框
-                    .penaltyLog() //在Logcat 中打印违规异常信息
-                    .penaltyFlashScreen() //API等级11
-                    .build());
-StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .detectLeakedClosableObjects() //API等级11
-        .penaltyLog()
-        .detectFileUriExposure()
-        .penaltyDeath()
-        .build());
-```
-### （异常 错误 安全）反编译
-[dex2jar](https://github.com/pxb1988/dex2jar)
-[jd-gui](https://github.com/java-decompiler/jd-gui)
-[Apktool](https://github.com/iBotPeaches/Apktool)
-[jad（不维护）](http://www.kpdus.com/jad.html)
-
-[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
-try{Looper.loop()}
-
-
-### 可维护性/通讯 - 架构之模块化（插件化及组件化）
-
-
-[详见《知识体系-平台-Android-cohesion.md》](./知识体系-平台-Android-cohesion.md)
-插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
-Activity校验，生命周期，Service优先级，资源访问，so插件化
-- Dynamic-loader-apk
-  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
-- Replugin
-
-组件化
-- 组件间解耦
-  1. MVVM-AAC 
-  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
-  2. MVP DI框架Dagger2解耦
-- 通信
-1. 对象持有
-2. 接口持有
-3. 路由 （ARouter）
-   Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
-
-
-### 版本特性
-[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
-
-#### （Android 11）
-[行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
-
-- [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
-
-#### Android 10 API level 29
-[面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
-- 折叠屏（resizeableActivity）
-- 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
- 
- 
-#### Android  9 API level 28
-[行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
-- 支持最新的全面屏，其中包含为摄像头和扬声器预留空间的屏幕缺口。 通过 DisplayCutout 
-- ImageDecoder 类，可提供现代化的图像解码方法。 使用该类取代 BitmapFactory 和 BitmapFactory.Options
-- AnimatedImageDrawable类来绘制和显示GIF和WebP动画图像
-- AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
-- webview多进程需要设置setDataDirectorySuffix
-
-
-#### Android  8 API level 26
-[Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
-
-- 后台执行限制
-- Notification Channels 创建一个用户可自定义的频道。
-- 画中画
-
-[Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
- 26 
-@FastNative注解
-
-- Safe Browsing API 的 WebView 实现
- ```xml
- <application>
-            ...
-            <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
-                       android:value="true" />
-</application>
- ```
-
- ```java
-superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
-            @Override
-            public void onReceiveValue(Boolean success) {
-                safeBrowsingIsInitialized = true;
-                if (!success) {
-                    Log.e("MY_APP_TAG", "Unable to initialize Safe Browsing!");
-                }
-            }
-        });
- ```
-#### Android  7 API Level 24
-[Android 7.0 行为变更](https://developer.android.google.cn/about/versions/nougat/android-7.0-changes?hl=zh-cn)
-- 低耗电
-- 夜间模式
-
-#### Android  6 API level 23
-[Android 6.0 变更](https://developer.android.google.cn/about/versions/marshmallow/android-6.0-changes?hl=zh-cn)
-
-- [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
-
-深层链接和 Android 应用链接
-#### Android  5 API level 21 
-[Android Lollipop](https://developer.android.google.cn/about/versions/lollipop?hl=zh-cn)
-- Material Design
-Art正式替代Dalvik VM
-#### Android  4 API level 14
-[Android KitKat 4.4(api level 19)](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
-VSYNC/Choreographer
-
 ## 流畅（每秒25帧，限时20毫秒内执行完）-界面开发系统
 1. Activity，View，Window
    activity在attach时，创建PhoneWindow；onCreate创建DecorView；onResume后创建ViewRootImpl关联WindowManager
@@ -1067,6 +869,206 @@ https://dart.dev/guides/language/language-tour
 
 
 
+
+
+## 稳定
+Crash 和 ANR
+
+android develop monkey
+AndroidJunitRunner
+
+
+### 代码Review：提高代码质量
+Commit 审阅 if，系统版本，模块管理
+Push   代码重用,多次提交Review
+
+### MONKEY
+1. monkey tools 测试
+adb shell monkey -p com.bla.yourpackage -v 1000
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+heisha:
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
+
+[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
+[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
+
+
+停止 monkey
+adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
+
+基础参数 | 事件参数 | 调试参数
+|------:|---------:|---------:|
+-v |     -pct-touch| -hprof   |
+-s |            ...|--ignore-security-exceptions|
+-p |               |       ...|
+--throttle|  |  |
+
+```java
+    public static final int FACTOR_TOUCH        = 0;//点击
+    public static final int FACTOR_MOTION       = 1;//滑动
+    public static final int FACTOR_TRACKBALL    = 2;//滚动
+    public static final int FACTOR_NAV          = 3;
+    public static final int FACTOR_MAJORNAV     = 4;//back home menu
+    public static final int FACTOR_SYSOPS       = 5;//物理按键
+    public static final int FACTOR_APPSWITCH    = 6;//startActivity
+    public static final int FACTOR_ANYTHING     = 7;
+```
+
+
+```
+monkey network
+adb forward tcp:1080 tcp:1080
+adb shell monkey --port 1080
+telnet 127.0.0.1 1080
+
+```
+
+
+2. 使用 adb 获取错误报告
+adb bugreport E:/bugs/
+3. anr文件
+adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
+
+4. 日志
+- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
+- EXCEPTION,NullPointerException
+- ERROR
+
+[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
+[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
+
+### Android Lint、QAPlugins（Findbugs、Checkstyle、PMD）
+### 日志 Timer
+
+### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
+```
+services/core/java/com/android/server/am/AppErrors.java:
+
+StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
+//                    .detectDiskReads()
+//                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyDialog() //弹出违规提示对话框
+                    .penaltyLog() //在Logcat 中打印违规异常信息
+                    .penaltyFlashScreen() //API等级11
+                    .build());
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .detectLeakedClosableObjects() //API等级11
+        .penaltyLog()
+        .detectFileUriExposure()
+        .penaltyDeath()
+        .build());
+```
+### （异常 错误 安全）反编译
+[dex2jar](https://github.com/pxb1988/dex2jar)
+[jd-gui](https://github.com/java-decompiler/jd-gui)
+[Apktool](https://github.com/iBotPeaches/Apktool)
+[jad（不维护）](http://www.kpdus.com/jad.html)
+
+[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
+try{Looper.loop()}
+
+
+### 可维护性/通讯 - 架构之模块化（插件化及组件化）
+
+
+[详见《知识体系-平台-Android-cohesion.md》](./知识体系-平台-Android-cohesion.md)
+插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
+Activity校验，生命周期，Service优先级，资源访问，so插件化
+- Dynamic-loader-apk
+  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
+- Replugin
+
+组件化
+- 组件间解耦
+  1. MVVM-AAC 
+  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
+  2. MVP DI框架Dagger2解耦
+- 通信
+1. 对象持有
+2. 接口持有
+3. 路由 （ARouter）
+   Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
+
+
+### 版本特性
+[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
+
+#### （Android 11）
+[行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
+
+- [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
+
+#### Android 10 API level 29
+[面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
+- 折叠屏（resizeableActivity）
+- 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
+ 
+ 
+#### Android  9 API level 28
+[行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
+- 支持最新的全面屏，其中包含为摄像头和扬声器预留空间的屏幕缺口。 通过 DisplayCutout 
+- ImageDecoder 类，可提供现代化的图像解码方法。 使用该类取代 BitmapFactory 和 BitmapFactory.Options
+- AnimatedImageDrawable类来绘制和显示GIF和WebP动画图像
+- AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
+- webview多进程需要设置setDataDirectorySuffix
+
+
+#### Android  8 API level 26
+[Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
+
+- 后台执行限制
+- Notification Channels 创建一个用户可自定义的频道。
+- 画中画
+
+[Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
+ 26 
+@FastNative注解
+
+- Safe Browsing API 的 WebView 实现
+ ```xml
+ <application>
+            ...
+            <meta-data android:name="android.webkit.WebView.EnableSafeBrowsing"
+                       android:value="true" />
+</application>
+ ```
+
+ ```java
+superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean success) {
+                safeBrowsingIsInitialized = true;
+                if (!success) {
+                    Log.e("MY_APP_TAG", "Unable to initialize Safe Browsing!");
+                }
+            }
+        });
+ ```
+#### Android  7 API Level 24
+[Android 7.0 行为变更](https://developer.android.google.cn/about/versions/nougat/android-7.0-changes?hl=zh-cn)
+- 低耗电
+- 夜间模式
+
+#### Android  6 API level 23
+[Android 6.0 变更](https://developer.android.google.cn/about/versions/marshmallow/android-6.0-changes?hl=zh-cn)
+
+- [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
+
+深层链接和 Android 应用链接
+#### Android  5 API level 21 
+[Android Lollipop](https://developer.android.google.cn/about/versions/lollipop?hl=zh-cn)
+- Material Design
+Art正式替代Dalvik VM
+#### Android  4 API level 14
+[Android KitKat 4.4(api level 19)](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
+VSYNC/Choreographer
 
 
 ## 续航

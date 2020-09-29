@@ -241,69 +241,7 @@ MAC算法（这里就是哈希算法）是SHA。
 [RSA 证明过程](https://www.di-mgt.com.au/rsa_theory.html)
 [RSA key生成过程 RSAKeyPairGenerator](openjdk/jdk/src/share/classes/sun/security/rsa/RSAKeyPairGenerator.java)介绍 n,p,q（p > q）,φ(n),e（RSAKeyGenParameterSpec.F4=65537）,d的胜场
 
-```
-public KeyPair generateKeyPair() {
-        // accommodate odd key sizes in case anybody wants to use them
-        int lp = (keySize + 1) >> 1;
-        int lq = keySize - lp;
-        if (random == null) {
-            random = JCAUtil.getSecureRandom();
-        }
-        BigInteger e = publicExponent;
-        while (true) {
-            // generate two random primes of size lp/lq
-            BigInteger p = BigInteger.probablePrime(lp, random);
-            BigInteger q, n;
-            do {
-                q = BigInteger.probablePrime(lq, random);
-                // convention is for p > q
-                if (p.compareTo(q) < 0) {
-                    BigInteger tmp = p;
-                    p = q;
-                    q = tmp;
-                }
-                // modulus n = p * q
-                n = p.multiply(q);
-                // even with correctly sized p and q, there is a chance that
-                // n will be one bit short. re-generate the smaller prime if so
-            } while (n.bitLength() < keySize);
-
-            // phi = (p - 1) * (q - 1) must be relative prime to e
-            // otherwise RSA just won't work ;-)
-            BigInteger p1 = p.subtract(BigInteger.ONE);
-            BigInteger q1 = q.subtract(BigInteger.ONE);
-            BigInteger phi = p1.multiply(q1);
-            // generate new p and q until they work. typically
-            // the first try will succeed when using F4
-            if (e.gcd(phi).equals(BigInteger.ONE) == false) {//不是互质，重新找p,q
-                continue;
-            }
-
-            // private exponent d is the inverse of e mod phi
-            BigInteger d = e.modInverse(phi);  //e*d 与phi欧拉函数互质
-
-            // 1st prime exponent pe = d mod (p - 1)
-            BigInteger pe = d.mod(p1);
-            // 2nd prime exponent qe = d mod (q - 1)
-            BigInteger qe = d.mod(q1);
-
-            // crt coefficient coeff is the inverse of q mod p
-            BigInteger coeff = q.modInverse(p);
-
-            try {
-                PublicKey publicKey = new RSAPublicKeyImpl(n, e);
-                PrivateKey privateKey =
-                        new RSAPrivateCrtKeyImpl(n, e, d, p, q, pe, qe, coeff);
-                return new KeyPair(publicKey, privateKey);
-            } catch (InvalidKeyException exc) {
-                // invalid key exception only thrown for keys < 512 bit,
-                // will not happen here
-                throw new RuntimeException(exc);
-            }
-        }
-    }
-
-```
+ 
 
 ```
 1. 客户端连上服务端
@@ -423,8 +361,8 @@ RTSP传输一般需要2-3个通道，命令和数据通道分离，HTTP和RTMP�
 |  5,6,7              |     session,         |  ftp , rlogin , rsh , rcp ,  |
 |                     |     presentation     | RIP, RDISC, SNMP, and others |RPC
 +---------------------------------------------------------------------------+
-|  4                  |     Transport        |     TCP, UDP                 |TCP还支持重传，错误校验，保证数据的可靠性,UDP不支持重传，有校验
-+---------------------------------------------------------------------------+
+|  4                  |     Transport        |     TCP, UDP                 |TCP还支持重传，错误校验，保证数据的可靠性
++---------------------------------------------------------------------------+UDP不支持重传，有校验
 |  3                  |     Network          |     IP, ARP, ICMP            |拥塞控制和路由选择
 +---------------------------------------------------------------------------+
 |  2                  |     Data link        |    PPP, IEEE 802.2           |
@@ -432,7 +370,7 @@ RTSP传输一般需要2-3个通道，命令和数据通道分离，HTTP和RTMP�
 
 ```
  
-TCP：面向连接、传输可靠(保证数据正确性,保证数据顺序)、用于传输大量数据(流模式)、速度慢，建立连接需要开销较多(时间，系统资源)，一般用于文件传输、邮件需要精确的操作。
+TCP：面向连接、用于传输大量数据(流模式)、传输可靠(保证数据正确性,保证数据顺序，错误重传)、速度慢，建立连接需要开销较多(时间，系统资源)，一般用于文件传输、邮件需要精确的操作。
 UDP：面向非连接、传输不可靠、用于传输少量数据(数据包模式)、速度快，一般用于即时通信、在线视频需要低延迟的操作。
 ```
 

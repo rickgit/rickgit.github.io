@@ -1,32 +1,789 @@
 
-## Cache
+## JVM HotSpot
+[类](https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-5.html)
+[类加载器（日文）](http://fits.hatenablog.com/entry/2016/05/06/200824)
+[OpenJDK备忘录（日文）](http://hsmemo.github.io/index.html)
+[jclasslib 查看类结构]()
+
+ 
+
+### JVM编译，加载，执行器执行，内存管理
+```
+JVM
+                                                                          +-------------------------------------------------+
+                                                                          |  Thread                                         |
++--------------------------------------------------------------------+    | +--------------+ +-------------+                |
+| Structure of JVM          | Run-Time Data Areas                    |    | | Native Method| |  Program    |                |
+|                           |                                     +-----> | | Stacks       | |  Couter     |                |
+|                           |                                        |    | |              | |  Register   |                |
+|                           |                                        |    | +--------------+ +-------------+                |
++-----------+--------------------------------------------------------+    | +---------------------------------------------+ |
+|           | Initialization|                                        |    | | JVM Stacks      +-------------------------+ | |
+|           +------------------------------+-------------------------+    | |                 | Frame                   | | |
+|           |               | Resolution   |                         |    | |                 |   LVT                   | | |
+|Continuity |               +--------------+                         |    | |                 |   Operand Stack         | | |
+|Complete   | linking       | Preparation  |                         |    | |                 |   Frame Data            | | |
+|           |               +--------------+                         |    | |                 |   method  return addr   | | |
+|           |               | Verification |                         |    | |                 |   dynamic addr          | | |
+|lifetime of+--------------------------------------------------------+    | |                 +-------------------------+ | |
+|class      | loaders       |  ClassLoader | Application ClassLoader |    | +---------------------------------------------+ |
+|           |               |              | Extension ClassLoader   |    +-------------------------------------------------+
+|           |               |              | BootstrapClassLoader    |    | +-------------+     +-------------------------+ |
++-----------+------------------------------+-------------------------+    | | Heap        |     |Method Area              | |
+|     class File Format     |                                        |    | |             |     | +-----------------------+ |
++--------------------------------------------------------------------+    | |             |     | | Runtime Constant Pool | |
+|     JVM  Instruction Set  |                javap (java bytecode)   |    | +-------------+     | +-----------------------+ |
++--------------------------------------------------------------------+    |                     | | Constant Pool Table   | |
+|     Compiling             |                javac                   |    |                     +-------------------------+ |
++---------------------------+----------------------------------------+    +-------------------------------------------------+
+
+                                                                          executor
+
+                                                                          +----------+------+------------+       +---------------+
+                                                                          |          |      |collector   |       |               |
+                                                                          |          |      |            |       |               |
+                                                                          |interpret | jit  |memory alloc|       |    jni        |
+                                                                          |          |      |GC          |       |               |
+                                                                          +----------+------+------------+       +---------------+
+
+CMS（physical region）/G1（logic region）
+                    heap                      method zone
++---------------------+----------------+------------------------+
+|                     |                |                        |
+|      Eden           |                |                        |
+|                     |                |                        |
++-----------+---------+                |                        |
+|           |         |                |                        |
+|  s0       |   s1    |                |                        |
+|           |         |                |                        |
++-----------+---------+----------------+------------------------+
+
+       yuang/new           tunure/old           permanent
+
+
+-xx:+PrintGCDetials 打印堆空间信息
+```
+
+
+jni方法 通过 宏**DT_RETURN_MARK_DECL** 注册方法
+```cpp
+DT_RETURN_MARK_DECL(SomeFunc, int);
+JNI_ENTRY(int, SomeFunc, ...) int return_value = 0;
+DT_RETURN_MARK(SomeFunc, int, (const int&)return_value);
+foo(CHECK_0)
+return_value = 5;
+return return_value;
+JNI_END
+
+```
+
+### 编译
+ 常量传播(constant propagation) 常量折叠(constant folding)
+
+
+[《Compilers-Principles, Techniques, & Tools》, Second Edition  # 9.4 Constant Propagation ](https://www.slideshare.net/kitocheng/ss-42438227)
+
+静态编译：在编译时确定类型，绑定对象
+反射动态编译：运行时确定类型，绑定对象
+
+####  类的相关概念（数据封装，信息结构，复杂数据 - 面向对象）
+高级特性：强类型，静态语言，混合型语言（编译，解释）
+动态类型语言是指在运行期间才去做数据类型检查的语言，说的是数据类型，动态语言说的是运行是改变结构，说的是代码结构。
+强类型语言，一旦一个变量被指定了某个数据类型，如果不经过强制类型转换，那么它就永远是这个数据类型。
+静态语言的数据类型是在编译其间确定的或者说运行之前确定的，编写代码的时候要明确确定变量的数据类型。
+[oops](https://www.javatpoint.com/java-oops-concepts)
+```
+---------+---------------------------------------------------------------------------------+
+|        |  Design patterns    | SOLID and GRASP guidelines                                |
+|        |(cohesion & coupling)|  Gof                                                       |
+|        +---------------------------------------------------------------------------------+
+|        |  reference variable| this                                                       |
+|        +---------------------------------------------------------------------------------+
+|        | (memory management)| Variable Method  Block Nested class                        |
+|        |     static         |                                                            |
+|        +-----------------+--+------------------------------------------------------------+
+|        |  Encapsulation  |  package                                                      |
+|        |                 |  Access Modifiers                                             |
+|        |                 |   member, method, constructor or class                        |
+|        +---------------------------------------------------------------------------------+
+|        |  Abstraction    |  Abstract class                                               |
+|        |                 |  Interface                                                    |
+|        +---------------------------------------------------------------------------------+
+|        |                 |  +--------------------+  Overloading   Overriding             |
+|        |                 |  |final      variable |  Covariant Return Type ,    Super     |
+|        |                 |  |           method   |  instance initializer block           |
+|        |  Polymorphism   |  |           class    |  Runtime polymorphism, Dynamic Binding|
+|        |                 |  +--------------------+  instanceof operator                  |
+|        +---------------------------------------------------------------------------------+
+|        |  Inheritance    |  Method Overriding                                            |
+|        |  ( IS-A )       |  Code Reusability                                             |
+|        +---------------------------------------------------------------------------------+
+| OOPs   |                 |                              +----------------------------+   |
+|        |  Class          | Fields    Methods  Blocks    |             |default       |   |
+|        |                 |                              |Constructors |Parameterized |   |
+|        |                 | Nested class and interface   +----------------------------+   |
+|        +-----------------+---------------------------------------------------------------+
+|        |  Object  (data and functions)                                                   |
++--------+---------------------------------------------------------------------------------+
+| ooad   |                                                                                 |
++--------+---------------------------------------------------------------------------------+
+
+```
+
+
+《Effect java》
+- Object方法
+
+equals()，hashcode()，toString()
+##### [hashcode() 基础知识](https://www.cnblogs.com/mengfanrong/p/4034950.html)
+混合hash （MD5）
+ 
+JDK Hash算法
+1. Map.hash: Austin Appleby's MurmurHash3
+
+2. String.hashCode
+```
+public int hashCode() {
+    int h = hash;
+    if (h == 0 && value.length > 0) {
+        char val[] = value;
+
+        for (int i = 0; i < value.length; i++) {
+            h = 31 * h + val[i];
+        }
+        hash = h;
+    }
+    return h;
+}
+```
+
+3. Object.hashCode
+```
+ java -XX:+PrintFlagsFinal -version|grep hashCode
+
+static inline intptr_t get_next_hash(Thread * Self, oop obj) {
+}
+```
+
+Redis
+1. Thomas Wang's 32 bit Mix Function
+2. Austin Appleby's MurmurHash2
+3. DJB Hash
+
+
+
+面向对象的三大特性，五大原则，23个设计模式
+- 封装
+    1. 枚举类,内部类（静态，成员，局部，匿名）
+    2. 自动装箱和拆箱
+    3. 日期
+- 继承
+     1. 抽象类，接口
+- 多态 
+    1. 继承
+    2. 重写
+    3. 父类引用指向子类对象
+- 重载（面向方法特性）
+
+```
+
+匿名函数接口可以有多个抽象方法，不能有默认方法；lambda实现接口时对应的函数接口只能有一个抽象方法，但是可以有多个默认方法
+
+函数式接口指的是只定义了唯一的抽象方法的接口（除了隐含的Object对象的公共方法）， 因此最开始也就做SAM类型的接口（Single Abstract Method）
+
+```
+
+```java
+public enum NumEnum {
+ ONE;
+ }
+public final class NumEnum extends java.lang.Enum<NumEnum> {
+  public static final NumEnum ONE;
+  public static NumEnum[] values();
+  public static NumEnum valueOf(java.lang.String);
+  static {};
+} 
+
+```
+#### APT - 编译时增强，代码编译时处理注解
+Dagger2, ButterKnife, EventBus3
+
+##### 2.字节码增强
+- 加载时
+ASM
+cglib
+javassist
+
+####  泛型 - 编译时校验
+1. 泛型：Generics in Java is similar to templates in C++.
+特点：泛型编译时验证；运行时擦除
+优点：加强类型安全及减少類转换的次数，提高性能；避免创建类，复用代码
+集合容器和网络请求经常用到
+
+泛型是一种多态技术。而多态的核心目的是为了消除重复，隔离变化，提高系统的正交性。
+```
++----------------------------------------------------------------------------------------------------------+
+|                                                                                                          |
+| GenericArrayType            ParameterizedType          TypeVariable            WildcardType         Class|
+|   getGenericComponentType()   getActualTypeArguments()  getBounds()              getUpperBounds()        |
+|                               getRawType()              getGenericDeclaration()  getLowerBounds()        |
+|                               getOwnerType()            getName()                                        |
+|                                                         getAnnotatedBounds()                             |
++----------------------------------------------------------------------------------------------------------+
+|                                      Type  (reflect)                                                     |
++----------------------------------------------------------------------------------------------------------+
+
+```
+```
+javax annotation apt/serviceloader
++-------------------------------------------------------------------------+------------------+
+|         VariableElement           ExecutableElement:Parameterizable     |                  |
+|TypeElement:Parameterizable,QualifiedNameable    TypeParameterElement    |                  |
+|                    PackageElement:QualifiedNameable                     |                  |
++-------------------------------------------------------------------------+------------------+
+|                        Element                                          | AnnotationMirror |
++-------------------------------------------------------------------------+------------------+
+|                        AnnotatedConstruct                                                  |
++--------------------------------------------------------------------------------------------+
+
+```
+1. 泛型类（参数化类型ParameterizedType）和泛型接口及其子类
+   1. 子类是泛型，必须和父类泛型一致。
+   2. 子类不是泛型，父类泛型必须声明泛型的具体类型，默认是Object
+   3. 参数化类型获取泛型：ParameterizedType#getActualTypeArguments()
+2. 泛型方法：
+   调用时设置类型； 支持静态方法
+3. 参数化类型变量与通配符 ？（WildcardType）
+   extends 上限，约束具体类型必须是某个类及其子类，默认Object。supper 形参下限制
+   WildcardType.getUpperBounds()
+4. 泛型变量（TypeVariable）与类型擦除
+5. 泛型数组（GenericArrayType）
+   Array.newInstance(tClass, 2)
+   GenericArrayType#
+6. 泛型与反射
+#### 反射
+>计算机程序在运行时（runtime）可以访问、检测和修改它本身状态或行为的一种能力。[](https://zh.wikipedia.org/wiki/%E5%8F%8D%E5%B0%84_(%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6))
+
+反射机制的优点就是可以实现动态创建对象（动态代理ProxyGenerator#defineClass0(loader, proxyName, proxyClassFile:byte[], 0, proxyClassFile.length)）
+
+RTTI，即Run-Time Type Identification，运行时类型识别。RTTI能在运行时就能够自动识别每个编译时已知的类型。
+反射机制就是识别未知类型的对象。
+##### 注解 - 元数据访问
+**@interface**
+
+Java 8拓宽了注解的应用场景。现在，注解几乎可以使用在任何元素上：局部变量、接口类型、超类和接口实现类，甚至可以用在函数的异常定义上。
+
+##### 内省（Introspector）
+内省机制仅指程序在运行时对自身信息（称为元数据）的检测
+```java
+try {
+    BeanInfo beanInfo = Introspector.getBeanInfo(WebSocketTest.class);
+    String name = beanInfo.getPropertyDescriptors()[0].getName();
+    Method readMethod = beanInfo.getPropertyDescriptors()[0].getReadMethod();
+} catch (IntrospectionException e) {
+    e.printStackTrace();
+}
+```
+
+##### 动态代理 - 修改状态或行为
+```java
+public class Proxy implements java.io.Serializable {
+         /**
+     * the invocation handler for this proxy instance.
+     * @serial
+     */
+    protected InvocationHandler h;
+}
+
+sun.misc.ProxyGenerator#generateProxyClass(java.lang.String, java.lang.Class<?>[], int)//类信息转化为字节数组，在转化为代理Class对象。
+
+
+
+```
+
+```java
+    static interface Animal{
+
+    }
+    static class Dog implements Animal{
+        @Override
+        public String toString() {
+            return "dog tostring()";
+        }
+    }
+    public static void main(String[] args) {
+        Dog dog = new Dog();
+        Animal proxy = (Animal) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Animal.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxyMethodNameLabel, Method method, Object[] args) throws Throwable {
+                System.out.println("before");
+                Object invoke = method.invoke(dog, args);
+                System.out.println(invoke);
+                System.out.println("after");
+                return invoke;
+            }
+        });
+//        System.out.println(proxy.toString());
+        proxy.toString();
+        System.out.println();
+    }
+
+```
+
+```java
+@Retention(RetentionPolicy.RUNTIME)
+public @interface A {
+}
+
+编译后：
+
+public interface A extends java.lang.annotation.Annotation {
+}
+
+```
+
+
+
+### 类对象创建与内存分配
+####  对象创建的方法
+``
+1. new（RTTI）
+2. clone
+3. 反射（Class#newInstance，Constructor#newInstance)：将类型绑定到现有对象，或从现有对象中获取类型。
+4. 反序列化：流转换为对象
+
+
+
+```java
+运行时数据区
+
+        JavaStack  Heap
+            ^     ^
+            |     |  Method Zone
+            |     |     ^
+            |     |     |
+            +     +     +
+        Object o = new Object()    +-----------> ProgramCounter//放执行当前指令的地址
+
+
+
+      int    i = 0
+                 +
+                 |
+                 v
+                 JavaStack
+
+
+      Object.java
+          public final native void notify();
+                          +
+                          |
+                          |
+                          |
+                          +------------------> nativeStack
+
+```
+##### 序列化Serializable
+>将数据结构或对象状态转换成可取用格式（例如存成文件，存于缓冲，或经由网络中发送），以留待后续在相同或另一台计算机环境中，能恢复原先状态的过程。[](https://zh.wikipedia.org/wiki/%E5%BA%8F%E5%88%97%E5%8C%96#Java)
+
+
+字节码分析：序列化后，存储java信息，类信息，字段信息
+[透过byte数组简单分析Java序列化、Kryo、ProtoBuf序列化](https://www.cnblogs.com/softlin/archive/2015/07/17/4653168.html)
+
+#### 对象访问方式
+1. 句柄访问：维护一个句柄池，栈访问句柄池，再访问对象和类信息。这种方法栈维护堆引用稳定
+2. 直接指针（Hotspot）：直接访问对象，对象持有类信息
+[OOP-KLASS模型](知识体系-程序-java.md)
+
+### 类加载器与双亲委派模型(Parents Dlegation Mode)
+```
+                 C++
+ +-----------------------+
+ | Bootstrap ClassLoader |  <JAVA_HOME>\lib,-Xbootclasspath
+ +----------^------------+
+            |    java,parentclass=null
+ +----------+-----------+
+ | Extension ClassLoader|  <JAVA_HOME>\lib\ext,java.ext.dirs
+ +----------^-----------+
+            |
++-----------+-------------+
+| Application ClassLoader | ClassPath
++-----------^-------------+
+            |
++-----------+------------+
+|   Custom ClassLoader   |
++------------------------+
+
+
+```
+
+##### 加载，连接（校验，准备，解析），初始化
+1.加载：查找并加载Class文件。(五种主动加载)
+2.链接：验证、准备、以及解析。
+  验证：确保被导入类型的正确性。
+  准备：为类的静态字段分配字段，并用默认值初始化这些字段。（heap开辟空间）
+  解析：将类型的符号引用转化为直接引用。根据运行时常量池的符号引用来动态决定具体值得过程。（查找接口，父类，其他符号）
+3.初始化：将类变量初始化为正确初始值。
+```java
+dx --dex --output=Hello.dex Hello.class
+
+javap -c  Hello.class
+
+javap –verbose Hello.class 可以看到更加清楚的信息
+
+[在线查看java字节码](https://javap.yawk.at/)
+```
+[**Jasmin**](http://jasmin.sourceforge.net/guide.html) 是一种免费的开源的 JAVA 汇编器 ，它将使用**Java虚拟机指令集**以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
+[Dalvik寄存器指令](http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html)，有64k个寄存器，只用到前256个
+ smali - An assembler/disassembler for Android's dex format
+
+[ **初始化**](https://blog.csdn.net/sujz12345/article/details/52590095/)
+ ```
+<clinit>与 <init>对象和类字段初始化
+
+1. 父类静态变量/语句块 （代码顺序执行）
+3. 子类静态变量/语句块 
+5. 父类变量/语句块 
+7. 父类构造函数 
+8. 子类变量/语句块 
+10. 子类构造函数
+ ```
+
+
+
+
+##### JVM 内存区域
+OOP-KLASS模型
+
+[jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)
+- 数组 
+  
+Arrays.sort 双轴快排算法（包含归并排序算法，经典快速排序算法，插入排序算法混用，及**jdk 1.7**废弃掉的归并排序和插入排序混用）
+
+```java
+数组
+                        ObjectHeader64Coops
+          +-            +------------------------+
+          |             |     Mark Word          |   8Byte
+Header    |             +------------------------+
+          |             |     Klass Pointer      |   4Byte
+          ++            +------------------------+
+                        |     Array Length       |   4Byte
+                        +------------------------+
+                        |                        |   //基本数据类型或每个对象的引用
+                        +------------------------+
+                        |                        |   //基本数据类型或每个对象的引用
+                        +------------------------+
+
+字符串32位
+java.lang.String object internals:
+ OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
+      0     4          (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4   char[] String.value                              [我, 4]
+     12     4      int String.hash                               0
+     16     8          (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 8 bytes external = 8 bytes total
+```
+
+- [类的内存大小](https://segmentfault.com/a/1190000007183623)
+
+```java
+                        ObjectHeader64Coops
+          +-            +------------------------+
+          |             |     Mark Word          |   8Byte
+Header    |             +------------------------+
+          |             |     Klass Pointer      |   4Byte
+          ++            +------------------------+
+                        |                        |
+                        +------------------------+
+                        |                        |
+                        +------------------------+
+
+
+```
+
+[内存占用查看工具](https://segmentfault.com/a/1190000007183623)
+
+以下是 64bit电脑，打印的信息。markword 8bytes,
+```java
+edu.ptu.java.lib.RefType object internals:
+ OFFSET  SIZE   TYPE DESCRIPTION                               VALUE
+      0    12        (object header)                           N/A
+     12     4        (loss due to the next object alignment)
+Instance size: 16 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+16
+Footprint{Objects=1, References=0, Primitives=[]}
+```
+
+[ObjectHeader64Coops 内存结构](https://gist.github.com/arturmkrtchyan/43d6135e8a15798cc46c)
+```java
+ObjectHeader32
+|----------------------------------------------------------------------------------------|--------------------|
+|                                    Object Header (64 bits)                             |        State       |
+|-------------------------------------------------------|--------------------------------|--------------------|
+|                  Mark Word (32 bits)                  |      Klass Word (32 bits)      |                    |
+|-------------------------------------------------------|--------------------------------|--------------------|
+| identity_hashcode:25 | age:4 | biased_lock:1 | lock:2 |      OOP to metadata object    |       Normal       |
+|-------------------------------------------------------|--------------------------------|--------------------|
+|  thread:23 | epoch:2 | age:4 | biased_lock:1 | lock:2 |      OOP to metadata object    |       Biased       |
+|-------------------------------------------------------|--------------------------------|--------------------|
+|               ptr_to_lock_record:30          | lock:2 |      OOP to metadata object    | Lightweight Locked |
+|-------------------------------------------------------|--------------------------------|--------------------|
+|               ptr_to_heavyweight_monitor:30  | lock:2 |      OOP to metadata object    | Heavyweight Locked |
+|-------------------------------------------------------|--------------------------------|--------------------|
+|                                              | lock:2 |      OOP to metadata object    |    Marked for GC   |
+|-------------------------------------------------------|--------------------------------|--------------------|
+
+ 
+```
+- 字符串
+
+```java
+
+java.lang.String object internals:
+ OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
+      0    12          (object header)                           N/A
+     12     4   char[] String.value                              N/A
+     16     4      int String.hash                               N/A
+     20     4          (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+
+----------------------------------
+
+java.lang.String object internals:
+ OFFSET  SIZE     TYPE DESCRIPTION                               VALUE
+      0     4          (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)
+      4     4          (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)
+      8     4          (object header)                           c2 02 00 f8 (11000010 00000010 00000000 11111000) (-134217022)
+     12     4   char[] String.value                              [a]
+     16     4      int String.hash                               0
+     20     4          (loss due to the next object alignment)
+Instance size: 24 bytes
+Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
+
+```
+##### 内存模型
+[](知识体系-程序-java-throughput.md)
+### 执行器（JIT与hotspot）
+##### Class文件格式及指令
+[jvms Instruction Set ](https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-2.html#jvms-2.11)
+[jvms Instruction Set ](https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-6.html)
+``` bytecode instruction operator
++-----------------+---------------------------------------+
+|  misc           | athrow   monitorenter,monitorexit     |
++---------------------------------------------------------+
+|                 |-load_<n>  -store_<slot>               |lvt -> OperandStack; lvt <- OperandStack
+|  stack operator |-const_<num>  -push  -ldc              |constant ->OperandStack     
+|                 | -pop   dup                            |OperandStack     
++---------------------------------------------------------+
+|  type conversion|  i2b, i2c,f2i                         |
++----------------------------+----------------------------+
+|  object operator|    field |  getstatic  putstatic      |
+|                 |          |  getfield   putfield       |
+|                 +---------------------------------------+
+|                 |    invoke|invokevirtual invokestatic  |
+|  Creation       |    method|invokeinterface invokespecial|
+|    &            |          |invokedynamic               |
+| Manipulation    +---------------------------------------+
+|                 |    method|  ireturn  lreturn   freturn|
+|                 |    return|  dreturn   areturn         |
+|                 +---------------------------------------+
+|                 | object   |  new  newarray anewarray   |
+|                 |          |           multianewarray   |
+|                 |          |  -aload   -astore          |
+|                 |          |  arraylength               |
+|                 |          |  instanceof  checkcast     |
++----------------------------+----------------------------+
+|  decision       |          ifeq,iflt,ifnull,ifnonnull   |
+|                 |          tableswitch,lookupswitch     |
+|                 |          goto,goto_w,jsr,jsr_w,ret    |
++---------------------------------------------------------+
+|  alth           | -add -sub -mul -div -rem -neg         |
+|                 |  -shl,-shr，-ushl,-ushr  iinc         |
+|                 |  -or,-and , -xor                      |
+|                 |  -cmpg,-cmpl,-cmp                     |
++-----------------+---------------------------------------+
+-代表类型
++--------------------------------------------------------------+
+|opcode| byte| short| int| long| float| double|char| reference |
++--------------------------------------------------------------+
+|      | b   | s    | i  | l   | f    | d     |c   | a         |
++------+-----+------+----+-----+------+------------+-----------+
+
+```
+**Jasmin** 是一种免费的开源的 JAVA 汇编器 ，它将使用Java虚拟机指令集以人类容易阅读方式编写的类汇编语法文件编译成class文件，注意jasmin并不是Java语言的汇编器。
+ 
+#### 执行器与JNI
+> [知识体系-C&CPP程序.md](./知识体系-C&CPP程序.md)
+##### jni注册本地方法的两种方式
+1. 动态注册
+```
++-------------------------------------------------------------------------------------------+
+|                                      add();//invokevirtual #7   // Method add:()I         |
++-------------------------------------------------------------------------------------------+
+|                               public native int add();                                    |
++-------------------------------------------------------------------------------------------+
+| [jni]                          System                                                     |
+|                                    loadLibrary()                                          |
+|                                JNI_OnLoad()                                               |
+|                                                                                           |
+|                                JavaEnv                                                    |
+|                                    RegisterNatives()                                      |
++-------------------------------------------------------------------------------------------+
+```
+2. JNI签名
+**JNICALL**表示调用约定，相当于C++的stdcall，说明调用的是本地方法
+**JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数
+```c
+extern "C" JNIEXPORT jstring JNICALL
+Java_edu_ptu_java_myapplication_MainActivity_stringFromJNI(
+        JNIEnv* env,
+        jobject /* this */) 
+```
+####### 数据类型定义：
+[JNI Types and Data Structures](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/types.html#wp9502)
+- jdk/src/share/javavm/export/jni.h:
+
+```
++----------------------------------------------------------------------------+
+| Primitive Types                                                            |
+|                                                                            |
+|     Java Type    Native Type     Description                               | Type Signatures
+|                                                                            |
+|     boolean      jboolean        unsigned 8 bits      #define JNI_FALSE  0 |z
+|                                                       #define JNI_TRUE   1 |
+|     byte         jbyte           signed 8 bits                             |b
+|     char         jchar           unsigned 16 bits                          |c
+|     short        jshort          signed 16 bits                            |x
+|     int          jint            signed 32 bits                            |i
+|     long         jlong           signed 64 bits                            |j
+|     float        jfloat          32 bits                                   |f
+|     double       jdouble         64 bits                                   |d
+|     void         void            N/A                                       |
++----------------------------------------------------------------------------+//other
+|  Reference Types                                                           |
+|     jobject                                                                |L fully-qualified-class ; fully-qualified-class
+|         jclass                                                             |
+|         jstring                                                            |
+|         jarray                                                             |[ type type[]
+|              jobjectArray                                                  |
+|              jbooleanArray                                                 |
+|              jbyteArray                                                    |
+|              jshortArray                                                   |
+|              jcharArray                                                    |
+|              jintArray                                                     |
+|              jlongArray                                                    |
+|              jfloatArray                                                   |
+|              jdoubleArray                                                  |
+|         jthrowable                                                         |
++----------------------------------------------------------------------------+( arg-types ) ret-type method type
+
+
+```
+
+
+[jni methods](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html)
+```
+JavaVM *jvm;       /* denotes a Java VM */
+JNIEnv *env;       /* pointer to native method interface */ 当前线程有效
+(*env)->GetFieldID
++---------------------------------------------------------------------+-------------------------------------------------------------------------------------------+
+|  Weak Global   jweak NewWeakGlobalRef(JNIEnv *env, jobject obj);    |                                                                                           |
+|  References    void DeleteWeakGlobalRef(JNIEnv *env, jweak obj);    |   Java VM Interface   GetJavaVM                                                           |
+|                                                                     |   Reflection Support  FromReflectedMethod     FromReflectedField                          |
++---------------------------------------------------------------------+                                                                                           |
+|               jobject NewGlobalRef(JNIEn^ *en^, jobject obj);       |                       ToReflectedMethod       ToReflectedField                            |
+|               void DeleteGlobalRef(JNIEnv *env, jobject globalRef); |                                                                                           |
+|                                                                     |                                                                                           |
+|  Global\      void DeleteLocalRef(JNIEnv *en^, jobject localRef);   |  NIO Support         NewDirectByteBuffer    GetDirectBufferAddress                        |
+| Local         jint EnsureLocalCapacity(JNIEnv *env, jint capacity); |                      GetDirectBufferCapacity                                              |
+| References    jint PushLocalFrame(JNIEnv *env, jint capacity);      |                                                                                           |
+|               jobject PopLocalFrame(JNIEnv *env, jobject result);   |  Monitor             MonitorEnter           MonitorExit                                   |
+|               jobject NewLocalRef(JNIEnv *env, jobject ref);        |                                                                                           |
+|                                                                     |  Registering        RegisterNatives        UnregisterNatives                              |
++---------------------------------------------------------------------+  Native Methods                                                                           |
+| Exceptions     ExceptionClear         Throw         ThrowNew        |                                                                                           |
+|                FatalError             ExceptionOccurred             |                    GetArrayLength            Get<PrimitiveType>ArrayElements Routines     |
+|                ExceptionCheck         ExceptionDescribe             |  Array Operations  SetObjectArrayElement                                                  |
+|                                                                     |                    NewObjectArray            Release<PrimitiveType>ArrayElements Routines |
++---------------------------------------------------------------------+                    GetObjectArrayElement                                                  |
+| Accessing          GetFieldID                                       |                    GetPrimitiveArrayCritical      Get<PrimitiveType>ArrayRegion Routines  |
+| Fields of Objects  Get^type^Field Routines  Set^type^Field Routines |                    ReleasePrimitiveArrayCritical                                          |
++---------------------------------------------------------------------+                                                   Set<PrimitiveType>ArrayRegion Routines  |
+|  Object        GetObjectClass            AllocObject                |                    New<PrimitiveType>Array Routines                                       |
+|  Operations    GetObjectRefType          NewObject                  |                                                                                           |
+|                IsInstanceOf              NewObjectA                 |                     GetStaticMethodID                CallStatic<type>Method Routines      |
+|                IsSameObject              NewObjectV                 |  Calling                                                                                  |
++---------------------------------------------------------------------+  Static Methods     SetStatic<type>Field Routines    CallStatic<type>MethodA Routines     |
+|                                                                     |                                                                                           |
+|               GetMethodID      Call<type>Method Routines            |                                                      CallStatic<type>MethodV Routines     |
+|                               CallNonvirtual<type>Method Routines   |                                                                                           |
+| Calling                       CallNonvirtual<type>MethodA Routines  |  Accessing           GetStaticFieldID      GetStatic<type>Field Routines                  |
+| Instance                                                            |  Static Fields                                                                            |
+|  Methods                      CallNonvirtual<type>MethodV Routines  |                      NewStringUTF                                                         |
+|                               Call<type>MethodA Routines            |                      GetStringUTFLength         GetStringRegion                           |
+|                                         Call<type>MethodV Routines  |                      GetStringUTFChars                                                    |
+|                                                                     |   String             ReleaseStringUTFChars      GetStringUTFRegion                        |
+|               jclass DefineClass                                    |   Operations                                                                              |
+| Class         jclass FindClass(JNIEnv *env, const char *name);      |                      NewString                  GetStringCritical                         |
+| Operations    jclass GetSuperclass(JNIEnv *en^, jclass clazz);      |                      GetStringLength            ReleaseStringCritical                     |
+|               jboolean IsAssignableFrom                             |                      GetStringChars                                                       |
+| Version                                                             |                      ReleaseStringChars                                                   |
+| Information   jint GetVersion(JNIEn^ *en^);                         |                                                                                           |
++---------------------------------------------------------------------+-------------------------------------------------------------------------------------------+
+
+```
+
+
+
+
+
+## 内存管理
 
 - oop-klass模型
 - JMM模型
 - Unix 5种I/O模型
 
 ### heap manager
+分配内存：指针碰撞，空闲列表
 
-### GC
+### 垃圾回收（GC）
 [](https://www.jianshu.com/p/8592ea9a408c)
 在JIT编译时，在安全点(safe point)记录栈和寄存器中的引用和对应的位置。
 安全点时，才可以GC：方法调用、执行跳转、异常跳转等处。
-
-分配内存：指针碰撞，空闲列表
-#### GC Roots
-```
-GC Roots 的对象包括下面几种： 
-虚拟机栈（栈帧中的本地变量表）中引用的对象
-方法区中类静态属性引用的对象
-方法区中常量引用的对象
-本地方法栈中 JNI （即一般说的 Native 方法）引用的对象
-
-```
 #### 可达性分析
+  JVM可回收对象判定方法 : 对象回收判定(可达性分析算法&对象引用) 
 
-#### 引用数据类型回收（虚拟机，垃圾回收器，回收算法）
- [mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
-3. Java垃圾回收算法及垃圾收集器
+#### GC Roots
+[mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
+
+GC Roots 的对象包括下面几种： 
+1. 虚拟机栈（栈帧中的本地变量表）中引用的对象
+2. 方法区中类静态属性引用的对象
+3. 方法区中常量引用的对象
+4. 本地方法栈中 JNI （即一般说的 Native 方法）引用的对象
+ 
+
+#### 引用数据类型回收
+##### 垃圾收集器
+[Java版本歷史](https://zh.wikipedia.org/wiki/Java%E7%89%88%E6%9C%AC%E6%AD%B7%E5%8F%B2)
+2009年05月28日，Java SE 6 Update 14发布。G1（Garbage First）低暂停的垃圾回收器的支持。Java 9 成为默认的垃圾回收器
+2018年09月25日，发布JDK 11，添加ZGC（一个可扩展的低延迟垃圾收集器）
+2020年05月17日 ，移除CMS垃圾回收器
+
+    新生代
+        Serial，ParNew, Paralle Scavenge
+    老年代
+        Serial Old，Paralle Old，CMS(这三个都是老年代)
+    G1
+
+##### 垃圾回收算法
    标记-清除算法(mark-sweep), dalvikvm；标记可达对象，线性扫描堆，回收不可达对象
         x遍历两遍，效率不高；STW 体验不好；碎片化。
         x空闲列表分配内存
@@ -40,7 +797,7 @@ GC Roots 的对象包括下面几种：
         指针碰撞分配对象
    分代收集算法（Generational Collection）
         朝生夕死，复制算法，存活率较高，标记清除或标记整理
-4. JVM可回收对象判定方法 : 对象回收判定(可达性分析算法&对象引用) 
+
 >《Inside the Java Virtual Machine》 ,Wiley (1996)《Garbage Collection- Algorithms for Automatic Dynamic Memory Management》 
 JVM给了三种选择收集器：串行收集器、并行收集器、并发收集器
 
@@ -115,11 +872,7 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 
 
 #### Reference 
-
-##### 对象访问方式：
-1. 句柄访问：维护一个句柄池，栈访问句柄池，再访问对象和类信息。这种方法栈维护堆引用稳定
-2. 直接指针（Hotspot）：直接访问对象，对象持有类信息
-[OOP-KLASS模型](知识体系-程序-java.md)
+##### WeakHashMap
 
 ```
 +--------------------------------------------------------------------------------------------+
@@ -155,8 +908,7 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
     保存注解，反射信息
  弱引用，没有被引用，GC发现即回收
     Glide以及缓存；Activity内存管理；weakHashMap；值动画WeakReference
- 虚引用，观察加入引用队列
-    堆外内存管理
+ 虚引用    堆外内存管理，FinalizableReferenceQueue
  
 #### 永久代的垃圾收集
 永久代的垃圾收集主要回收两部分内容：废弃常量和无用的类
@@ -370,7 +1122,7 @@ src/java.base/linux/native/libnio/ch/EPoll.c:59:Java_sun_nio_ch_EPoll_create
 
 ### NIO中的直接缓存和非直接缓存
 
- cache 是高速缓存，用于 CPU 和内存之间的缓冲；
+cache 是高速缓存，用于 CPU 和内存之间的缓冲；
 buffer是 I/O 缓存，用于内存和硬盘的缓冲。
 cache 是加速 读，而 buffer 是缓冲 写
 
@@ -400,9 +1152,4 @@ cache 是加速 读，而 buffer 是缓冲 写
 ```
 selector 不好直接管理socket，使用channel做适配
 
-## 网络
-### 数据交换格式
-Gson
-工厂方法： com.google.gson.Gson#factories用来创建TypeAdapter
-适配器模式：com.google.gson.internal.bind.TypeAdapters适配类型解析
-装饰模式：com.google.gson.reflect.TypeToken装饰class
+ 
