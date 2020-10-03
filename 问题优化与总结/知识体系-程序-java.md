@@ -176,222 +176,13 @@ data type   |
                          +  Array
 
 ```
-### 数据 - 基本数据类型
-- Short
-Short.MIN_VALUE ~ Short.MAX_VALUE
-=-2^15~（2^15）-1
-=-32768~-32767（计数单位约3万）
-
-Android 资源65534问题
-
-- Integer
-Integer.MIN_VALUE ~ Integer.MAX_VALUE
-=-2^31~（2^31）-1
-=-2_147_483_648 ~ 2_147_483_647(计数单位约等于21亿)
-
-- Long
-Long.MIN_VALUE ~ Long.MAX_VALUE
-==-2^63~（2^63）-1
-=-9_223_372_036_854_775_808L~-9_223_372_036_854_775_807L
-（计数单位约等于922京）
-
-
-- Float （遵循IEEE-754格式标准）
-
-```
-第一步：[176.0625换成二进制数](https://blog.csdn.net/k346k346/article/details/50487127)，
-        整数部分采用"除2取余，逆序排列"法：
-        小数点前:176 / 2 = 88  
-        余数为 088 / 2=44 余数为 0                             
-        44 / 2 =22    余数为 0                       
-        22 / 2= 11    余数为 0                              
-        11 / 2 =5     余数为 1        
-        5 / 2=2       余数为 1                             
-        2/ 2  =1      余数为 0                                                                             
-        1/ 2=0        余数为 1    商为0，结束。                                                                       
-        小数点前整数转换为二进制:10110000    
-        ---------------------  
-        
-        小数部分采用 "乘2取整，顺序排列"法部分：
-        0.0625 * 2 = 0.125   整数为0                 
-        0.125 * 2 = 0.25     整数为0             
-        0.25* 2 = 0.50       整数为0             
-        0.5* 2 = 1.0         整数为1，小数部分为0,结束
-        小数点后整数转换为二进制:0001 
-
-        得到二进制位：10110000.0001
-
-第二步：在换算成内存格式（IEEE-754格式标准）  SEEEEEEE    EMMMMMMM    MMMMMMMM    MMMMMMMM
-      S 0正数，1负数
-      E 第一位（1：大于1的十进制，0：0~1之间的十进制），第2到8位（减法后的值： [占1位；小数点移位至到个位1.若右移0，否则1][占7位，小数点移位的二进制] −1）
-      M 小数点移位到个位1后，截取后面23二进制
-      即 0 10000110 0110000 00010000 00000000
-
-```
--Float.MAX_VALUE ~ Float.MAX_VALUE
-=[-3.40282346638528860e+38 , -1.40129846432481707e-45] ∪ [1.40129846432481707e-45 ~ 3.40282346638528860e+38]
-正负是对称的，看下正数部分
-Float.MIN_VALUE ~ Float.MAX_VALUE
-=2^(-126) ~~ 2(1-2^(-24)) * 2^(2^7-1)
-=2^(-126) ~~ 2(1-2^(-24)) * 2^(127)
-=1.1754943508223e-38 ~ 3.4e+38
-= （已知e-24位 涅槃寂静，暂时找不到可以衡量的计数单位） ~ 3.4*(10^38)(计数单位约等于34涧)
-
-- Double
-内存里的存储结构（IEEE-754格式标准）：SEEE EEEE EEEE MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM
-正数范围：
-2^(-1022-52) ~~ 2-2^-52)*(2^((2^10)-1))
-
-- Char
-  jdk 9采用压缩字符串，Iso-8891，使用一个字节，否则用 UTF-16 编码。
-
-- Boolean
-- Byte
-
-### 指令 - 运算符（算术，位运算，赋值，比较，逻辑）
-Byte通过加法实现加减，移位和加法实现乘除法
-
-- 原码，反码，补码
-  正数：原码，反码，补码一致
-  负数：反码符号位不变其他位按位取反，补码为反码加1（取反加一，两个过程符号位都不变）
-```
-或者换成时钟，0，1，2，3，4，5，-6，-1，-2，-3，-4，-5
-3bit有符号二进制
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|  -3       |    -2     |   -1    |  -4    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 原码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-
-负数反码，相当与在负数范围换下位置。 
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|   -4      |    -1     |   -2    |  -3    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
  
-负数补码，整个数变得有序
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|   -1      |    -2     |   -3    |  -4    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-
-
-```
-  原码：加负数，不是预期值（1-1= 00000001^1000001（原码）=10000010=-2）
-  反码：正数原码加负数的原码，计算的结果不是想要的值（1-1= 00000001（反）^11111110（反码）=11111111（反）=10000000（原））。
-  补码：正数加负数的反码，符号位不对，用补码可以正确（1-1= 00000001（补）^11111111(补码)=00000000=0）
-- [补码原理：同余](https://www.cnblogs.com/baiqiantao/p/7442907.html)
-  负数取模：A mod b= A-B*Math.floor（A/B）
-  
-  1. 反码，实际上是这个数对于一个膜的同余数；而这个膜并不是我们的二进制，而是所能表示的最大值
-  2. 反码的基础上+1，只是相当于增加了膜的值
-```
-byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
-    取补求值，相当于（a+b） mod 128，保证不会溢出
-```
-
-- 位运算 **& | ~ ^**
- 
-
-### 数据 - 大数操作
-只要你的计算机的内存足够大，可以有无限位的。
-
-常见构造大数方法：指数，阶乘，高德纳箭头，葛立恒数和Tree(3)
-3^3=3
-
-- BigInteger、BigDecimal
-[-2^(2147483647*32-1) ，2^(2147483647*32-1)-1]
-
-
 ## 面向过程（命令式编程）
 方法（函数）
 ## 数据 -   基于类的面向对象（命令式编程）
 
-
-
 ### 数据类结构 - 类实现面向对象与设计模式
-三特性， 基于内聚与藕合(cohesion & coupling)五大基本原则(SOLID )：单一职责原则（接口隔离原则），开放封闭原则，Liskov替换原则，依赖倒置原则，良性依赖原则
-23设计模式
-```
 
-                                                               association
-                                                               aggregation
-                             inheritance                       composition
-    encapsulation            polymorphism                      dependencies
-+----------------------+----------------------------------+---------------------------------------+
-|                      |                                  | Visitor                               |
-|                      |                                  |                                       |
-|                      |                                  | Template                              |
-|                      |                                  |                                       |
-|                      |                                  | Strategy                              |
-|                      |                                  |                                       |
-|                      |                                  |*Null Object                           |
-|                      | proxy pattern                    | State Pattern                         |
-|                      |                                  |                                       |
-|                      | Flyweight pattern                | Observer Pattern                      |
-|                      |  reduce num of objects created   |  one-to-many relationship             |
-| Prototype pattern    | Facade pattern                   | Memento Pattern                       |
-|  create duplicate obj|  hides complexities of the system|                                       |
-|                      | Decorator pattern                | Mediator Pattern                      |
-| Builder pattern      |   wrapper to existing class      |                                       |
-|  builds complex obj  |   add new functionality          | Iterator Pattern                      |
-|                      | Composite pattern                | Interpreter Pattern                   |
-| Singleton pattern    |                                  |  evaluate language grammar            |
-|                      |*Filter pattern                   |  or expression                        |
-| Abstract Factory     | Bridge Pattern                   | Command Pattern                       |
-|  creates factories   |  decouple abstraction            |  object as command                    |
-|                      |  from implementation             |                                       |
-| Factory pattern      | Adapter pattern                  | Chain of Responsibility               |
-|  hidin creation logic|  two incompatible interfaces     |  creates a chain of recei^er obj      |
-+-------------------------------------------------------------------------------------------------+
-| Creational Patterns  | Structural Patterns              | Behavioral Patterns                   |
-|   create objects     |  class and object composition    |  communication                        |
-|                      |  obtain new functionalities      |  between objects                      |
-+----------------------+----------------------------------+---------------------------------------+
-
-```
-
-  - 构建者模式
-  Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
-
-  - 单例模式
-  Application，LayoutInflater
-  - 工厂方法
-  BitmapFactory
-  - 享元模式
-    Message.obtainMessage
-  - 代理模式
-    静态代理：封装ImageLoader、Glide；动态代理：面向切面。AIDL
-  - 组合模式
-    View和ViewGroup的组合
-  - 外观模式
-    ContextImpl
-  - 桥接模式
-    Window和WindowManager之间的关系
-- 行为型
-  - 命令模式
-    EventBus，Handler.post后Handler.handleMessage
-  - 观察者模式
-    RxAndroid，BaseAdapter.registerDataSetObserver
-  - 策略模式
-    时间插值器，如LinearInterpolator
-  - 状态模式
-  - 责任链
-    对事件的分发处理，很多启动弹窗
-  - 备忘录模式
-    onSaveInstanceState和onRestoreInstanceState
-  - 解释器模式
-    PackageParser
-  - 中介者模式
-    Binder机制
  #### 性能（异常，断言，日志）
  《Efficiency Java》
 [**JMH** 即Java Microbenchmark Harness](http://openjdk.java.net/projects/code-tools/jmh/)
@@ -442,7 +233,7 @@ byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
 |Supplier<R>     |   x     |  R        |供给型函数式接口
 +----------------+---------+-----------+
 ```
-1. 高阶函数
+1. 高阶函数：可以当作形参，传入方法
 
 2. 文件读写
 #### **Lambda 表达式**
@@ -529,29 +320,6 @@ awt/swing
 
 
 ## 4 算法与数据结构
-《Intruduce arthrigsim》
-KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半数值计算，组合算法（枚举与回溯-图论-最优化与递归），造句算法
-- 线性表
-- 栈和队列
-- 树
-- 图
-- 散列查找
-- 排序
-- 海量数据
-- 堆
-  PriorityQueue
-- 线性同余随机算法
-- HashMap hash冲突链表的红黑树平衡算法
-- 二叉查找树
-  1. AVL平衡树
-    1.1 其根的左右子树高度之差的绝对值不能超过1
-
-  2. 红黑平衡树
-    2.1 每一个节点不是红色的就是黑色的
-    2.2. 根总是黑色的
-    2.3. 如果节点是红色的，则它的子节点必须是黑色的（反之不一定成立）
-    2.4. 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点。
-
 
 
 ## 数据传输 - 计算机网络
@@ -566,142 +334,10 @@ sudo tcpdump
 
 网络数据：报文格式
 - Socket
-### 编码
-Java 8 Base64
-使用64个字符（2^6）编码内容
-```
-Simple： A-Za-z0-9+/（.用来填充）
-
-URL： A-Za-z0-9+_（.用来填充）
-
-MIME： A-Za-z0-9+/（=用来填充）
-```
-
-```java
-
- +--+
-             4 encode char uint
-+--------------------------------------------------------+
-        Byte1               Byte2             Byte3
-+-----------------+  +----------------+ +----------------+
-```
+ 
 
 
 ### TCP/IP
- TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。TCP是全双工模式，这就意味着，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了，主机1告诉主机2，它的数据已经全部发送完毕了
-
-[TCP Header Format](https://tools.ietf.org/html/rfc793)
-```
-    0                   1                   2                   3
-    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |          Source Port          |       Destination Port        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                        Sequence Number                        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    Acknowledgment Number                      |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |  Data |           |U|A|P|R|S|F|                               |
-   | Offset| Reserved  |R|C|S|S|Y|I|            Window             |
-   |       |           |G|K|H|T|N|N|                               |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |           Checksum            |         Urgent Pointer        |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                    Options                    |    Padding    |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-   |                             data                              |
-   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
-                            TCP Header Format
-
-
-```
-TCP层的Flag
-```
-SYN表示建立连接，
-FIN表示关闭连接，
-ACK表示响应，
-PSH表示有 DATA数据传输，
-RST表示连接重置。
-URG(urgent紧急)
-
-```
-
-```
-+-------------+
-|  Http data  |        App layer        应 用 层
-+-------------+
-
-
-
-+--------------+
-|  TCP Header  |
-|              |
-|    Http Data |
-|              |       Transport layer  传 输 层
-+--------------+
-
-
-
-+---------------+
-| IP Header     |
-|               |
-|   TCP Header  |
-|               |      Network layer    网 络 层
-|     Http Data |
-|               |
-+---------------+
-
-+-------------------+
-| Eth Header        |
-|                   |
-|   IP Header       |  Data link layer  链 路 层
-|                   |
-|     TCP Header    |
-|                   |
-|       Http Data   |
-+-------------------+
-
-```
-TCP断开连接时，会有四次挥手过程。
-
-```ascii
-三次握手四次挥手
-    +-----------+                                    +-------------+                +------------+                               +--------------+
-    |           |                                    |             |                |            |                               |              |
-    |  Client   |                                    |   Ser^er    |                |   Client   |                               |    Ser^er    |
-    |           |                                    |             |                |            |                               |              |
-    +-----+-----+                                    +-------+-----+                +-----+------+                               +-------+------+
-Close     |                                                  |  Close                     |                                              |
-          |            SYN=1 Seq=X                           |                            |             FIN=1 ACK=Z   Seq=X              |
-          |   +------------------------------------------->  |                            |  +---------------------------------------->  |
-          |                                                  |                 FIN        |                                              |
-          |                                                  |                 WAIT-1     |             ACK=X+1 Seq=Z                    |
-          |                                                  |  Listen                    | <---------------------------------------+    |
-          |                                                  |                            |                                              |
-          |                                                  |                 FIN        |                                              | CLOSE_WAIT
-          |            SYN=1 ACK=X+1 Seq=Y                   |                 WAIT-2     |             FIN=1 ACK=X Seq=Y                |
-          |   <------------------------------------------+   |                            |                                              |
-          |                                                  |                            |  <--------------------------------------+    |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              | CLOSE_WAIT
-SYN_SENT  |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          |            ACK=Y+1 Seq=Z                         |                            |             ACK=Y Seq=X                      |
-          |    +------------------------------------------>  |  SYN_RCVN                  |  +-------------------------------------->    | LAST_ACK
-          |                                                  |                TIME WAIT   |                                              |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          |                                                  |                            |   2MSL                                       |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          |                                                  |                            |                                              |
-          +                                                  +                            +                                              +
-     ESTABLISHED                                          ESTABLISHED                  Closed                                         Closed
-
-```
 
 
 ### XMPP/MQTT
@@ -742,25 +378,25 @@ JDBC
 ### Sql
 基本操作：增删改查
 前缀索引
-```
+```sql
 create database <dbName>
 ```
 
-```
+```sql
 create table <tableName>(
   <column0> <columnType0>,
   <column1> <column1Type>
   )
 ```
 
-```
+```sql
 drop table <tableName>
 ```
-```
+```sql
 alert table <tableName> add <columnName> <columnType>
 ```
 
-```
+```sql
 insert into <tableName> (
   <colunm0>,
   <column1>)
@@ -770,13 +406,13 @@ insert into <tableName> (
   )
 
 ```
-```
+```sql
 delete from <tableName> where <columnName>=<columnNewValue>
 ```
-```
+```sql
 update <tableName> set <columnName>=<columnNewValue> where <column1Name>=<column1Value>
 ```
-```
+```sql
 SELECT column_name [, column_name ]
 FROM   table1 [, table2 ]
 WHERE  column_name OPERATOR
@@ -799,14 +435,14 @@ WHERE student.sno = tempSC.sno
 - 集合查询
   UNION、UNION ALL、INTERSECT、EXCEPT
 - 事务
-```
+```sql
 begin;
 <insert,delete,update,select>
 rollback;/commit;
 ```
 ### sqlite 数据类型
 
-```
+```sql
 [Architecture of SQLite](https://sqlite.org/arch.html)
 
 

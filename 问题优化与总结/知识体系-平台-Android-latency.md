@@ -2040,8 +2040,33 @@ IM：
 增加重传和排重机制
 回执
 ### 通讯协议
+[通讯协议称谓](https://en.wikipedia.org/wiki/Alice_and_Bob)
 字节流协议：TagVersionLengthValue
 #### TCP/UDP
+
+
+```js
++-------------+
+|  Http data  |        App layer        应 用 层
++-------------+
++--------------+
+|  TCP Header  |
+|    Http Data |
+|              |       Transport layer  传 输 层
++--------------+
++---------------+
+| IP Header     |
+|   TCP Header  |     Network layer    网 络 层
+|     Http Data |
++---------------+
++-------------------+
+| Eth Header        |
+|   IP Header       |  Data link layer  链 路 层
+|     TCP Header    |
+|       Http Data   |
++-------------------+
+```
+
 ```js
       0      7 8     15 16    23 24    31
       +--------+--------+--------+--------+
@@ -2057,7 +2082,7 @@ IM：
 
           User Datagram Header Format
 ```
-[](https://tools.ietf.org/html/rfc793#section-3.1)
+[TCP Header Format](https://tools.ietf.org/html/rfc793#section-3.1)
 ```js
     0                   1                   2                   3
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2081,6 +2106,16 @@ IM：
 
                             TCP Header Format
 ```
+TCP层的Flag
+```
+SYN表示建立连接，
+FIN表示关闭连接，
+ACK表示响应，
+PSH表示有 DATA数据传输，
+RST表示连接重置。
+URG(urgent紧急)
+
+```
 ##### 抓包
 // testSocket("104.31.70.56");//tcp http://www.plantuml.com/
 ```plantuml
@@ -2098,6 +2133,38 @@ Client -> Server++: [FIN,ACK]
 Server-> Client  : [FIN,ACK]
 Client -> Server --: [ACK]
 @enduml
+```
+
+TCP协议是一种面向连接的、可靠的、基于字节流的运输层通信协议。
+TCP是全双工模式，当主机1发出FIN报文段时，只是表示主机1已经没有数据要发送了
+    TCP断开连接时，会有四次挥手过程。
+```ascii
+三次握手四次挥手
+    +-----------+                    +-------------+                +------------+                      +--------------+
+    |           |                    |             |                |            |                      |              |
+    |  Client   |                    |   Ser^er    |                |   Client   |                      |    Ser^er    |
+    |           |                    |             |                |            |                      |              |
+    +-----+-----+                    +-------+-----+                +-----+------+                      +-------+------+
+Close     |                                  |  Close                     |                                     |
+          |      SYN=1 Seq=X                 |                            |        FIN=1 ACK=Z   Seq=X          |
+          |   +--------------------------->  |                            |  +------------------------------->  |
+          |                                  |                 FIN        |                                     |
+          |                                  |                 WAIT-1     |        ACK=X+1 Seq=Z                |
+          |                                  |  Listen                    | <------------------------------+    |
+          |                                  |                 FIN        |                                     | CLOSE_WAIT
+          |      SYN=1 ACK=X+1 Seq=Y         |                 WAIT-2     |        FIN=1 ACK=X Seq=Y            |
+          |   <--------------------------+   |                            |                                     |
+          |                                  |                            |  <-----------------------------+    |
+          |                                  |                            |                                     | CLOSE_WAIT
+SYN_SENT  |                                  |                            |                                     |
+          |      ACK=Y+1 Seq=Z               |                            |        ACK=Y Seq=X                  |
+          |    +-------------------------->  |  SYN_RCVN                  |  +----------------------------->    | LAST_ACK
+          |                                  |                TIME WAIT   |                                     |
+          |                                  |                            |                                     |
+          |                                  |                            |   2MSL                              |
+          +                                  +                            +                                     +
+     ESTABLISHED                          ESTABLISHED                  Closed                                Closed
+
 ```
 
 #### HTTP
@@ -2285,8 +2352,9 @@ NPN 的协商结果是在 Change Cipher Spec 之后加密发送给服务端；�
 [](https://imququ.com/post/enable-alpn-asap.html)
 ####  WebSocket
 TCP三次握手后，HTTP/1.1 升级协议 **Upgrade: websocket**
-[升级后，WebSocket frame 格式](https://tools.ietf.org/html/rfc6455#section-5.2)
+[HTTP1.1 握手（升级后），WebSocket frame 格式](https://tools.ietf.org/html/rfc6455#section-5.2)
 [](https://github.com/abbshr/abbshr.github.io/issues/22)
+[org.java-websocket:Java-WebSocket:1.3.0@jar 使用 SelectorProvider.provider().openSocketChannel()](org.java_websocket.WebSocketImpl) 
 ```js
       0                   1                   2                   3
       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -2310,7 +2378,7 @@ TCP三次握手后，HTTP/1.1 升级协议 **Upgrade: websocket**
  
 [在线测试及WireShark捕获](http://coolaf.com/tool/chattest)
 ```js
-客户端（请求升级 websocket）：
+客户端（请求升级/握手 websocket）：
 GET /ajaxchattest HTTP/1.1
 Host: 123.207.136.134:9010
 Connection: Upgrade

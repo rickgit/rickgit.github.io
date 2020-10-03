@@ -353,16 +353,16 @@ public interface A extends java.lang.annotation.Annotation {
 4. 反序列化：流转换为对象
 
 
-
+类创建（类加载，初始化），JMM，栈帧
 ```java
 运行时数据区
 
         JavaStack  Heap
             ^     ^
             |     |  Method Zone
-            |     |     ^
-            |     |     |
-            +     +     +
+            |     |     ^     
+            |     |     |     cinit/init
+            +     +     +     ^   
         Object o = new Object()    +-----------> ProgramCounter//放执行当前指令的地址
 
 
@@ -395,7 +395,7 @@ public interface A extends java.lang.annotation.Annotation {
 2. 直接指针（Hotspot）：直接访问对象，对象持有类信息
 [OOP-KLASS模型](知识体系-程序-java.md)
 
-### 类加载器与双亲委派模型(Parents Dlegation Mode)
+#### 类加载器与双亲委派模型(Parents Dlegation Mode)
 ```
                  C++
  +-----------------------+

@@ -6,19 +6,90 @@
 KISS
 YAGNI 
   (关注分离，面向维护者代码，避免过早优化）
-DRY1   
+DRY   
 
-[Boy-Scout Rule:何一个成员都有义务去改善代码](《Bad Code, Craftsmanship, Engineering, and Certification》)
+[Boy-Scout Rule（童子军规则）:何一个成员都有义务去改善代码](《Bad Code, Craftsmanship, Engineering, and Certification》)
 
 1. 模块内部与模块间
 低耦合（模块间）高内聚（模块内）
 CARP（模块间，属OOAD），LoD（模块间），IoC（模块间）
-SOLID（模块内，属OOAD） 命令-查询分离原则（模块内）
+SOLID（模块内，属OOAD），良性依赖原则（dagger）， 命令-查询分离原则（模块内）
 
 # 模式
 [](https://en.wikipedia.org/wiki/Software_design_pattern)
-GOF23
-其他：
+## GOF23
+```
+                                                               association
+                                                               aggregation
+                             inheritance                       composition
+    encapsulation            polymorphism                      dependencies
++----------------------+----------------------------------+---------------------------------------+
+|                      |                                  | Visitor                               |
+|                      |                                  |                                       |
+|                      |                                  | Template                              |
+|                      |                                  |                                       |
+|                      |                                  | Strategy                              |
+|                      |                                  |                                       |
+|                      |                                  |*Null Object                           |
+|                      | proxy pattern                    | State Pattern                         |
+|                      |                                  |                                       |
+|                      | Flyweight pattern                | Observer Pattern                      |
+|                      |  reduce num of objects created   |  one-to-many relationship             |
+| Prototype pattern    | Facade pattern                   | Memento Pattern                       |
+|  create duplicate obj|  hides complexities of the system|                                       |
+|                      | Decorator pattern                | Mediator Pattern                      |
+| Builder pattern      |   wrapper to existing class      |                                       |
+|  builds complex obj  |   add new functionality          | Iterator Pattern                      |
+|                      | Composite pattern                | Interpreter Pattern                   |
+| Singleton pattern    |                                  |  evaluate language grammar            |
+|                      |*Filter pattern                   |  or expression                        |
+| Abstract Factory     | Bridge Pattern                   | Command Pattern                       |
+|  creates factories   |  decouple abstraction            |  object as command                    |
+|                      |  from implementation             |                                       |
+| Factory pattern      | Adapter pattern                  | Chain of Responsibility               |
+|  hidin creation logic|  two incompatible interfaces     |  creates a chain of recei^er obj      |
++-------------------------------------------------------------------------------------------------+
+| Creational Patterns  | Structural Patterns              | Behavioral Patterns                   |
+|   create objects     |  class and object composition    |  communication                        |
+|                      |  obtain new functionalities      |  between objects                      |
++----------------------+----------------------------------+---------------------------------------+
+
+```
+
+  - 构建者模式
+  Notification，AlertDialog，StringBuilder 和StringBuffer，OKhttp构建Request，Glide
+
+  - 单例模式
+  Application，LayoutInflater
+  - 工厂方法
+  BitmapFactory
+  - 享元模式
+    Message.obtainMessage
+  - 代理模式
+    静态代理：封装ImageLoader、Glide；动态代理：面向切面。AIDL
+  - 组合模式
+    View和ViewGroup的组合
+  - 外观模式
+    ContextImpl
+  - 桥接模式
+    Window和WindowManager之间的关系
+- 行为型
+  - 命令模式
+    EventBus，Handler.post后Handler.handleMessage
+  - 观察者模式
+    RxAndroid，BaseAdapter.registerDataSetObserver
+  - 策略模式
+    时间插值器，如LinearInterpolator
+  - 状态模式
+  - 责任链
+    对事件的分发处理，很多启动弹窗
+  - 备忘录模式
+    onSaveInstanceState和onRestoreInstanceState
+  - 解释器模式
+    PackageParser
+  - 中介者模式
+    Binder机制
+## 其他：
 Creational 
         Converter转换器
         DI
@@ -32,8 +103,8 @@ Creational
         动态属性
         Step Builder //多个builder组成一个大的Builder
         Value Object //重写equals()、hashCode()
-        （性能）
-        对象池
+        ⭐（性能）
+       Object pool
         Lazy Loading
 
  Structural
@@ -61,17 +132,21 @@ Creational
         Leader Election
 
 
-        （性能）
-        缓存（some fast-access storage， re-used to avoid having to acquire them again）
-        Circuit Breaker
+       ⭐（性能）
         Data Locality
+        缓存（some fast-access storage， re-used to avoid having to acquire them again）
+
         Dirty Flag
         Double Buffer
+
+        Throttling 节流模式
         Retry
+        
         Sharding 分片模式
         Spatial Partition 空闲分区
-        Throttling 节流模式
         Trampoline
+        Circuit Breaker
+
  Concurrency 
         Active Object	（POSA2）
         Double-checked locking（POSA2）

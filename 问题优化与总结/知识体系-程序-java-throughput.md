@@ -239,7 +239,7 @@ SPI 占用CPU
 
 #### 同步问题（AQS 实现 **乐观锁**）解决共享对象的竞争现象
 CAS，SPIN，LockSupport
-
+##### ReentrantLock 
 **os::PlatformEvent::park()** 相对于 wait/notify 能精确唤醒线程
 饥饿现象（即某个线程长时间未竞争到锁）使用公平锁，ReentrantLock默认用非公平锁
   -非公平锁，非是按照申请锁的时间前后给等待线程分配锁的
