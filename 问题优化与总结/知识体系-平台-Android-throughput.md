@@ -1,12 +1,25 @@
 ## CPU有限，防止抢占，降低吞吐量，不考虑低延时。用于消息传递
-main
-ReferenceQueueDaemon，FinalizerDaemon，FinalizerWatchdogDaemon，HeapTaskDaemon
-Signal Dispatcher
+[](https://developer.android.google.cn/topic/performance/threads)
+每个线程至少需要占用 64k 内存
+## Android 多线程
+1. main
+2. GC时，为了减少应用程序的停顿，会启动四个GC相关的守护线程。
+     1. ReferenceQueueDaemon 
+     2. FinalizerDaemon 执行Finalizer方法
+     3. FinalizerWatchdogDaemon 
+        1. 监控FinalizerDaemon线程的执行。检测到执行成员函数finalize时超出一定的时间，那么就会退出VM
+     4. HeapTaskDaemon 堆整理线程
+        1. for Alloc ： 内存分配的时候
+        2. Explicit  ： 显示调用的时候
+        3. Background ： 在后台的时候
+3. Signal Dispatcher
 
-Binder 
+4. Binder 
      Binder_1 主线程，编号为1，并且主线程是不会退出的。
      Binder_xx 普通线程
      Binder 其他线程：其他线程是指并没有调用 spawnPooledThread 方法，而是直接调用 IPC.joinThreadPool()
+
+
 ## Looper 封装线程
 
 

@@ -988,87 +988,48 @@ Arrays.sort
 https://blog.csdn.net/bryansun/article/details/105182778?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase
 
 
-## 错误检测/数据校验
-简便、速度快，检测或校验数据传输/保存后出现的错误。
-没有抗数据篡改的能力
-
-[](https://en.wikipedia.org/wiki/Error_detection_and_correction)
-奇偶校验
-    变体有纵向冗余校验、垂直冗余检查，以及双或对角奇偶
-校验和
-循环冗余校验（CRC）
-加密散列函数
-错误纠正码
-
-整数加法校验和，One’s complement “checksum”，Fletcher Checksum
-
-Adler Checksum，ATN Checksum (AN/466)，模 2 除法
-#### 校验和
-[](https://www.youtube.com/watch?v=ga_1YP7HExw)
-发送方 Alice：
-1. 分段
-2. 段与段求和。溢出时，放在低位
-3. 求反，得到checksum
-
-接收方 Bob：
-1. 分段
-2. 段与段求和。溢出时，放在低位
-2. 最总与checksum求和。溢出时，放在低位
-3. 求反。得到0，数据的校验成功
-
-#### CRC 循环冗余校验
-[](http://www.ip33.com/crc.html)
-基于伽罗华域(Galois Field) GF(2)（即除以 2 的同余）
-
-需要设置：位宽（bits），多项式（poly）
-```c++
-ffmpeg/avutil crc.h
-参数模型
-typedef enum {
-    AV_CRC_8_ATM,
-    AV_CRC_16_ANSI,
-    AV_CRC_16_CCITT,
-    AV_CRC_32_IEEE,
-    AV_CRC_32_IEEE_LE,  /*< reversed bitorder version of AV_CRC_32_IEEE */
-    AV_CRC_16_ANSI_LE,  /*< reversed bitorder version of AV_CRC_16_ANSI */
-    AV_CRC_24_IEEE,
-    AV_CRC_8_EBU,
-    AV_CRC_MAX,         /*< Not part of public API! Do not use outside libavutil. */
-}AVCRCId;
-```
-[](http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html)
-[](http://www.xjtudll.cn/Exp/273/)
-查表法实际上利用的是XOR运算的交换律和结合律，即（A XOR B ）XOR C = A XOR （B XOR C） 
-    直接计算多项式N次，查表法只需要计算一次，减少计算次数。
-初始化：参数模型（忽略最高位）
-        根据参数模型的位数，填充 0 数据
-1. 直接计算（除法/异或）或索引表法，得到余数
-2. 余数与填充的位数亦或/替换，得到最总数据流
-
-校验：
-1. 直接计算（除法/异或）或索引表法，得到余数。余数 0 ，代表校验成功
-
 ## 密码学家6个重要的工具
 《图解密码技术》
+伪随机数生成器
 单向散列函数/消息摘要算法
     验证数据完整性的算法
 对称密码
 公钥密码
-数字签名
-    完整性、可认证性和不可否认性（接收方 Bob 持有公钥，不可否认）
-    公钥密码体制都可以单独作为一种数字签名方案使用，MD5withRSA
 消息认证码（MAC，Message Authentication Code）
      完整性、可认证性消息（持有共享密钥，可以验证Alice发送）、认证码无法防止否认（接收方 Bob 持有共享密钥，可能否认）
     单向散列函数实现：HMAC-MD5（MD5加salt）
     AES的CBC模式：AES-CMAC
-伪随机数生成器
-
+数字签名
+    完整性、可认证性和不可否认性（接收方 Bob 持有公钥，不可否认）
+    公钥密码体制都可以单独作为一种数字签名方案使用，MD5withRSA
 
 认证分为实体认证和消息认证：
     消息源认证只表示Bob收到消息的来源是可靠的
 消息认证码只能实现消息认证，数字签名则同时可以实现实体认证和消息认证。
 
 消息认证分为两部分，消息源认证（即消息的来源不是冒充的）和消息完整性（即消息未被恶意篡改）。
+
+
+1949年，香农发表《保密系统的通信理论》标志着现代密码学的真正开始（第一次质的飞跃）。
+1972年，美国IBM公司研制的对称密码体制加密算法DES
+1976年，Diffie和Hellman发表《密码学的新方向》，标志着公钥密码体制的诞生（第二次质的飞跃）。
+1977年，Rivest、Shamir和Adleman提出了RSA公钥密码体制
+1981年，IBM发布了IBM个人计算机
+1987年，RC4由李维斯特（Ronald Rivest）设计
+1999年，distributed.net与电子前哨基金会合作，在22小时15分钟内即公开破解了一个DES密钥。3DES即通过增加DES的密钥长度来避免类似的攻击。
+1992年，MD5 用以取代MD4算法
+1996年，HMAC结构的定义和分析
+2000年，Camellia由三菱和日本电信电话（NTT）共同发明
+2001年，AES（Rijndael加密法）发布于FIPS PUB 197。DES标准和3DES标准已逐渐被高级加密标准（AES）所取代
+2004年，证实MD5算法无法防止碰撞攻击，因此不适用于安全性认证
+2008年，Chacha20由伯恩斯坦发布流加密算法，作为OpenSSL中RC4的替代品
+2015年，SHA-3（Keccak）发布。RC4算法存在弱点，所发布的 RFC 7465 规定禁止在TLS中使用RC4加密算法。
+
+
+
+现代密码学的三大基础：1、大素数的引入；3、算法的不可逆性；2、基于计算机运算而非手算
+ 
+
 ## 单向散列函数/数字摘要
 数据完整性与安全
     单向性，散列值称为 摘要 或者 数字签名（加密的摘要）
@@ -1088,8 +1049,7 @@ new String[] {
 ```
 其他：RIPEMD
 ### ~~MD5~~
-1992年，用以取代MD4算法
-2004年，证实MD5算法无法防止碰撞攻击，因此不适用于安全性认证
+
 
 
 [JDK sun impl](jdk\src\share\classes\sun\security\provider\MD5.java)
@@ -1141,6 +1101,95 @@ SHA-384和SHA-512基本上是相同的，除了：
 RSA和DH，DSA安全性都是基于整数有限域离散对数来实现；
 1991年NIST提出将DSA用于其数字签名标准（DSS），并于1994年将其作为FIPS 186采用
 
+
+
+## 对称密钥
+[JDK 14 Des](src\java.security.jgss\share\classes\sun\security\krb5\internal\crypto\Des.java)
+[JDK 14 3Des](src\java.security.jgss\share\classes\sun\security\krb5\internal\crypto\Des3.java)
+
+### 分组加密
+[jdk 14 AES 加密方式](src\java.base\share\classes\com\sun\crypto\provider\AESCipher.java)
+|[分组密码加密方式](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Common_modes)|
+|--|
+    ECB（电子密码本，相同的明文块就会生成相同的密文块，不建议使用）
+    CBC（密码块链接，不能并行加密）
+    CFB（密文反馈，数据段）
+    OFB（输出反馈，不用填充，输出块作为下一个块加密的输入块）
+    CTR（计数器模式，不用填充）
+    
+    GCM （CTR 和 GMAC（GHASH） 的复杂组合）
+    PCBC
+|填充有六种|
+|--|
+    NoPadding  （填充0，丢失原数据末尾的 '\0'）
+    PKCS7Padding
+        填充n(n>0)个字节才对齐，则一直填充字节n
+        （java 不支持PKCS7Padding，只支持PKCS5Padding，需要用到bouncycastle）
+    PKCS5Padding（PKCS7Padding子集，限定了块大小，可以16bit）
+    ISO 10126（填随机数，后一个字节是填充的字节数）
+    ANSI X9.23（填0，后一个字节是填充的字节数）
+    ZerosPadding
+### ~~DES/3DES~~
+
+### ~~RC4~~
+[](https://zh.wikipedia.org/wiki/RC4)
+
+
+### AES
+[JDK 1.8 krb5 Aes128.java](jdk\src\share\classes\sun\security\krb5\internal\crypto\Aes128.java)
+
+ 
+AES-256 是伪随机函数
+
+可逆原理：
+a ⊕ b ⊕ a = b
+[可视化](http://www.formaestudio.com/rijndaelinspector/archivos/Rijndael_Animation_v4_eng-html5.html)
+
+初始化：
+
+      1. 初始化替换表<br>
+      2. 填充<br>
+      3. 密钥生成 Main Round 和 Final Round 的 10 个 Round key<br>
+
+加密：
+
+      1. Initial Round（密钥加密）
+      2. Main Round（9轮计算 替换/移位/混合，密钥加密）
+      3. Final Round（替换/移位，密钥加密）
+
+
+![解密流程](res/aes.png)
+1. Initial Round（密钥加密）
+2. Main Round（9轮计算 移位，密码表替换，混合，密钥加密）
+3. Final Round（移位，密码表替换，密钥加密）
+   
+AES-123 可靠性：
+    破解需要尝试2^127 ≈ 1.7*10^38个128bit的随机数作为密钥进行加解密运算，方能找到正确的密钥。
+
+
+对称加密算法需要指定算法名称、工作模式和填充模式
+```java
+//java 支持
+// various modes
+//     ECB,  CFB,  OFB,  CBC,PCBC
+// padding 
+//     PKCS5Padding， NoPadding，ISO10126Padding
+
+        byte[] seed = "seed".getBytes();//
+        byte[] byteContent = "content".getBytes("utf-8");//需要注意加密/解密的编码要一样
+
+        KeyGenerator kgen = KeyGenerator.getInstance("AES");//算法
+        kgen.init(128, new SecureRandom(seed));//密钥长度；  通过传入 SecureRandom的seed，经 SHA-1 伪随机器（不同平台而异），生成 128 bit密钥
+
+        //1. 必须要设置 算法/工作模式/填充模式
+        Cipher cipher = Cipher.getInstance("AES");//windows 默认 "AES/ECB/PKCS5Padding"
+        //2. 必须要设置对应长度的密钥
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec( kgen.generateKey().getEncoded(), "AES"));//传入 密钥字节，选择加密实现。init 从 provider挑选实现类，并初始化 spi
+        byte[] result = cipher.doFinal(byteContent);
+```
+### Camellia
+### ChaCha20
+ 
 
 ## 公钥密码/密钥协商机制
 [密钥协商机制 wiki](https://zh.wikipedia.org/wiki/%E5%82%B3%E8%BC%B8%E5%B1%A4%E5%AE%89%E5%85%A8%E6%80%A7%E5%8D%94%E5%AE%9A)
@@ -1260,6 +1309,9 @@ d泄露，就等于私钥泄露
 3. n=pq,只有将n分解才能算出p和q
 ##### 慢
 幂模运算
+
+
+
 ### 密钥交换 DH（离散对数问题）、ECDH/ECDSA（ “椭圆曲线离散对数问题”）
 [ECKeyPairGenerator](jdk\src\share\classes\sun\security\ec\ECKeyPairGenerator.java)
 不支持认证，为避免遭遇 MITM 攻击，须靠签名算法帮忙来进行身份认证，即如使用RSA，需要走RSA的CA流程
@@ -1350,104 +1402,100 @@ deactivate Server
 ### 依靠共享的密钥 PSK，SRP等
 TLS 1.0开始支持PSK-RSA，SRP。不需要部属 CA 证书
 
+## bit串 错误检测/数据校验
+简便、速度快，检测或校验数据传输/保存后出现的错误。
+没有抗数据篡改的能力
 
-## 对称密钥
-[JDK 14 Des](src\java.security.jgss\share\classes\sun\security\krb5\internal\crypto\Des.java)
-[JDK 14 3Des](src\java.security.jgss\share\classes\sun\security\krb5\internal\crypto\Des3.java)
-1949年香农发表《保密系统的通信理论》标志着现代密码学的真正开始（第一次质的飞跃）。
-1976年，Diffie和Hellman发表《密码学的新方向》，标志着公钥密码体制的诞生（第二次质的飞跃）。
-1978年，Rivest、Shamir和Adleman提出了RSA公钥密码体制
-现代密码学的三大基础：1、大素数的引入；3、算法的不可逆性；2、基于计算机运算而非手算
-加密-DES、3DES AES RC4 ChaCha20 Camellia
-### 分组加密
-[jdk 14 AES 加密方式](src\java.base\share\classes\com\sun\crypto\provider\AESCipher.java)
-|[分组密码加密方式](https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Common_modes)|
-|--|
-    ECB（电子密码本，相同的明文块就会生成相同的密文块，不建议使用）
-    CBC（密码块链接，不能并行加密）
-    CFB（密文反馈，数据段）
-    OFB（输出反馈，不用填充，输出块作为下一个块加密的输入块）
-    CTR（计数器模式，不用填充）
-    
-    GCM （CTR 和 GMAC（GHASH） 的复杂组合）
-    PCBC
-|填充有六种|
-|--|
-    NoPadding  （填充0，丢失原数据末尾的 '\0'）
-    PKCS7Padding
-        填充n(n>0)个字节才对齐，则一直填充字节n
-        （java 不支持PKCS7Padding，只支持PKCS5Padding，需要用到bouncycastle）
-    PKCS5Padding（PKCS7Padding子集，限定了块大小，可以16bit）
-    ISO 10126（填随机数，后一个字节是填充的字节数）
-    ANSI X9.23（填0，后一个字节是填充的字节数）
-    ZerosPadding
-### ~~DES/3DES~~
-1976年被美国联邦政府的国家标准局确定为联邦资料处理标准（FIPS）
-1999年1月，distributed.net与电子前哨基金会合作，在22小时15分钟内即公开破解了一个DES密钥。3DES即通过增加DES的密钥长度来避免类似的攻击
-DES标准和3DES标准已逐渐被高级加密标准（AES）所取代
-### ~~RC4~~
-[](https://zh.wikipedia.org/wiki/RC4)
-1987年，罗纳德·李维斯特（Ronald Rivest）在设计的，由于RC4算法存在弱点，2015年2月所发布的 RFC 7465 规定禁止在TLS中使用RC4加密算法。
+[](https://en.wikipedia.org/wiki/Error_detection_and_correction)
+奇偶校验
+    变体有纵向冗余校验、垂直冗余检查，以及双或对角奇偶
+校验和
+循环冗余校验（CRC）
+加密散列函数
+错误纠正码
 
-### AES
-2001年11月26日发布于FIPS PUB 197。采用Rijndael加密法
-[JDK 1.8 krb5 Aes128.java](jdk\src\share\classes\sun\security\krb5\internal\crypto\Aes128.java)
+整数加法校验和，One’s complement “checksum”，Fletcher Checksum
 
- 
-AES-256 是伪随机函数
+Adler Checksum，ATN Checksum (AN/466)，模 2 除法
+#### 校验和
+[](https://www.youtube.com/watch?v=ga_1YP7HExw)
+发送方 Alice：
+1. 分段
+2. 段与段求和。溢出时，放在低位
+3. 求反，得到checksum
 
-可逆原理：
-a ⊕ b ⊕ a = b
-[可视化](http://www.formaestudio.com/rijndaelinspector/archivos/Rijndael_Animation_v4_eng-html5.html)
+接收方 Bob：
+1. 分段
+2. 段与段求和。溢出时，放在低位
+2. 最总与checksum求和。溢出时，放在低位
+3. 求反。得到0，数据的校验成功
 
-初始化：
+#### CRC 循环冗余校验
+[](http://www.ip33.com/crc.html)
+基于伽罗华域(Galois Field) GF(2)（即除以 2 的同余）
 
-      1. 初始化替换表<br>
-      2. 填充<br>
-      3. 密钥生成 Main Round 和 Final Round 的 10 个 Round key<br>
-
-加密：
-
-      1. Initial Round（密钥加密）
-      2. Main Round（9轮计算 替换/移位/混合，密钥加密）
-      3. Final Round（替换/移位，密钥加密）
-
-
-![解密流程](res/aes.png)
-1. Initial Round（密钥加密）
-2. Main Round（9轮计算 移位，密码表替换，混合，密钥加密）
-3. Final Round（移位，密码表替换，密钥加密）
-   
-AES-123 可靠性：
-    破解需要尝试2^127 ≈ 1.7*10^38个128bit的随机数作为密钥进行加解密运算，方能找到正确的密钥。
-
-
-对称加密算法需要指定算法名称、工作模式和填充模式
-```java
-//java 支持
-// various modes
-//     ECB,  CFB,  OFB,  CBC,PCBC
-// padding 
-//     PKCS5Padding， NoPadding，ISO10126Padding
-
-        byte[] seed = "seed".getBytes();//
-        byte[] byteContent = "content".getBytes("utf-8");//需要注意加密/解密的编码要一样
-
-        KeyGenerator kgen = KeyGenerator.getInstance("AES");//算法
-        kgen.init(128, new SecureRandom(seed));//密钥长度；  通过传入 SecureRandom的seed，经 SHA-1 伪随机器（不同平台而异），生成 128 bit密钥
-
-        //1. 必须要设置 算法/工作模式/填充模式
-        Cipher cipher = Cipher.getInstance("AES");//windows 默认 "AES/ECB/PKCS5Padding"
-        //2. 必须要设置对应长度的密钥
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec( kgen.generateKey().getEncoded(), "AES"));//传入 密钥字节，选择加密实现。init 从 provider挑选实现类，并初始化 spi
-        byte[] result = cipher.doFinal(byteContent);
+需要设置：位宽（bits），多项式（poly）
+```c++
+ffmpeg/avutil crc.h
+参数模型
+typedef enum {
+    AV_CRC_8_ATM,
+    AV_CRC_16_ANSI,
+    AV_CRC_16_CCITT,
+    AV_CRC_32_IEEE,
+    AV_CRC_32_IEEE_LE,  /*< reversed bitorder version of AV_CRC_32_IEEE */
+    AV_CRC_16_ANSI_LE,  /*< reversed bitorder version of AV_CRC_16_ANSI */
+    AV_CRC_24_IEEE,
+    AV_CRC_8_EBU,
+    AV_CRC_MAX,         /*< Not part of public API! Do not use outside libavutil. */
+}AVCRCId;
 ```
-### Camellia
-2000年，由三菱和日本电信电话（NTT）共同发明
-### ChaCha20
-2008年由伯恩斯坦发布流加密算法，作为OpenSSL中RC4的替代品
+[](http://www.sunshine2k.de/articles/coding/crc/understanding_crc.html)
+[](http://www.xjtudll.cn/Exp/273/)
+查表法实际上利用的是XOR运算的交换律和结合律，即（A XOR B ）XOR C = A XOR （B XOR C） 
+    直接计算多项式N次，查表法只需要计算一次，减少计算次数。
+初始化：参数模型（忽略最高位）
+        根据参数模型的位数，填充 0 数据
+1. 直接计算（除法/异或）或索引表法，得到余数
+2. 余数与填充的位数亦或/替换，得到最总数据流
 
+校验：
+1. 直接计算（除法/异或）或索引表法，得到余数。余数 0 ，代表校验成功
 
+## bit串 比特压缩
 
+无损
+    熵类型   霍夫曼编码
+    字典类型 LZ77（滑动窗口压缩）/LZ78，LZW，DEFLATE（同时使用LZSS和霍夫曼编码）
+    行长编码（RLE 运用JPEG）
+有损
+    转换类型 离散余弦变换 
+    预测类型 运动补偿/估计/向量，心理声
+音频
+    奈奎斯特-香农采样定理
+图片
+    宏块像素，量化
+固定位长算法
+1928，哈里·奈奎斯《Certain topics in telegraph transmission theory》中就已隐含了采样定理
+1949，香农在《Communication in the presence of noise》中提出采样定理
+1952, Huffman coding, "A Method for the Construction of Minimum-Redundancy Codes"
+1967，模拟电视信号传输就采用了运行长度编码（RLE）方案
+1972，纳西尔·艾哈迈德首次提出的DCT是信号处理和数据压缩中广泛使用的转换技术。
+1977，LZ77
+1982，LZSS
+1987, MDCT
+1996，Deflate （ RFC 1951）
+
+### RLE
+Length（1byte）+重复数据（1byte）
+特殊：length等于0
+Length（等于0）+num（逐字编码数量，大于2）+重复数据（逐字编码）
+Length（等于0）+num（逐字编码数量，小于等于2，结束） 
+### LZ77
+滑动窗口
+    查询缓冲区
+    先行缓冲区
+编码：
+    offset（查询缓冲区与先行缓冲区重复时的偏移量）,length（重复字符长度）,char_after_length（重复后第一个不同字符）
 ## 数据学习 - 人工智能
 [见 知识体系-人工智能.md](知识体系-人工智能.md)

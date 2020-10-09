@@ -87,18 +87,110 @@ walle
 ### 打包自动化
 [gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
 ### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
+#### ProGuard
+     代码混淆 -printmapping ，-applymapping
+
 #### 资源打包 AAPT
      [aapt2 适配之资源 id 固定](https://fucknmb.com/2017/11/15/aapt2%E9%80%82%E9%85%8D%E4%B9%8B%E8%B5%84%E6%BA%90id%E5%9B%BA%E5%AE%9A/)
           aapt  -p public.xml
           aapt2 --stable-ids ,--emit-ids
-#### ProGuard
-     代码混淆 -printmapping ，-applymapping
 
 ## 缓存篇
 
 ### Bitmp
 简单工厂 Bitmap（无数据源）：wrapHardwareBuffer，createScaledBitmap/createBitmap 
         BitmapFactory（有数据源）：decodeFile（decodeResource/decodeResourceStream）/decodeStream，decodeByteArray，decodeFileDescriptor
+### 编译，加载
+
+#### 类加载机制，类加载器，双亲委派
+```
+                 C++
+ +-----------------------+
+ | Bootstrap ClassLoader |  Framework classs
+ +----------^------------+
+            |
+  +---------+----------+   
+  | BaseDexClassLoader |   <|-------------------+
+  +---------^----------+                        |
+            |  DexPathList                       |
+            |                                   |
+            |                                   |
++-----------+-------------+                     |
+| PathClassLoader         | apk class           |
++-----------^-------------+                     |
+            |  parent                           |
++-----------+------------+           extends    |
+| DexClassLoader         | +--------------------+
++------------------------+
+
+
+
+```
+#### 类加载问题
+[pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
+QQ空间补丁
+```
+1. 阻止相关类打上Class_ispreverified标志
+2. 动态更改BaseDexClassLoader间接引用的dexElements
+```
+[Redex](https://blog.csdn.net/tencent_bugly/article/details/53375240)
+
+### 虚拟机与执行器
+
+#### dalvik bytecode
+```
+dx --dex --output=Hello.dex Hello.class
+```
+
+#### NDK
+
+```md
+GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
+
+[编译linux内核所用的gcc版本？ - jiangtao9999的回答 - 知乎](https://www.zhihu.com/question/58955848/answer/305063368)
+```
+
+```md
+    1.预处理是解决一些宏定义的替换等工作，为编译做准备,对应的gcc操作为：gcc -E xx.c -o xx.i(xx为源文件名)。
+    2.编译是将源码编译为汇编语言的过程，对应的gcc操作为:gcc -S xx.i -o xx.s。由xx.i 产生xx.s文件。
+    3.汇编是将汇编代码的文件汇编为机器语言的过程，对应的gcc操作为：gcc -c xx.s -o xx.o
+    4.链接是将目标文件链接为一个整的可执行文件的过程，对应的gcc操作为 gcc xx.o -o xx(xx成为可执行,运行时候可以用 "./xx" 的方式运行)。
+
+    [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
+```
+
+[Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
+
+```
++------------------------------------------------------------+
+|                 build-binary.mk                            |
+|                                                            |
+|                 setup-toolchain.mk                         |
+|                 setup-abi.mk                               |
+|                                                            |
+|                  setup-app.mk                              |
+|                  build-all.mk                              |
+|                  init.mk                                   |
+|                  build-local.mk                            |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|   Module-description variables                             |
+|                                                            |
+|   NDK-provided variables    NDK-provided function macros   |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|              ndk-build                                     |
++------------------------------------------------------------+
+|                     NDK                                    |
++------------------------------------------------------------+
+|                 GNU Make                                   |
++------------------------------------------------------------+
+
+
+
+```
 
 ###  2 内存泄漏/内存抖动（Android Profiler- memory）
 GC Root :
@@ -209,7 +301,19 @@ ART：
  
 zygote space 类似Davik
 
- 
+##### android触发垃圾回收
+[android gc](https://proandroiddev.com/collecting-the-garbage-a-brief-history-of-gc-over-android-versions-f7f5583e433c)
+[dalvik:tracing garbage collector, using a Mark and Sweep approach](https://android.googlesource.com/platform/dalvik.git/+/android-4.3_r2/vm/alloc/MarkSweep.cpp)
+[art 粘性CMS和部分CMS](https://android.googlesource.com/platform/art/+/master/runtime/gc/)
+当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
+系统需要更多内存的时候触发。
+HPROF时触发。
+
+[回收机制](https://blog.csdn.net/f2006116/article/details/71775193)
+[android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
+
+[smalidea 无源码调试 apk](https://blog.csdn.net/hackooo/article/details/53114838)
+
 #### Handler/Dialog/Thread泄漏
 
 1. PopupWindow 
@@ -718,11 +822,327 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
 ####  MMKV for Android “零拷贝问题” -  sharepreference优化
 mmap（微信mars，美图logan，网易）
-### 多媒体
-[zxing, ffmpeg]()
-[ffmpeg](知识体系-平台-多媒体.md)
+ 
+## 进程内通讯
+### EventBus
+反射与注解
+### ARouter
+控制反转和面向切面
+### 应用内消息机制（异步）
+- Thread
+- Handler        子线程与主线程通讯
+- AsyncTask      界面回调，异步任务，一次性
+- HandlerThread  异步队列，子线程与子线程通讯
+- TimeTask       定时任务
+- IntentServices 无界面，异步任务
+- ThreadPool     并行任务
 
-## 网络
+```
+查看权限
+adb shell pm list permissions -d -g                 
+```
+
+[hind api](https://android.googlesource.com/platform/prebuilts/runtime/+/master/appcompat)
+
+**/art/tools/veridex/appcompat.sh --dex-file=test.apk**
+``` dot
+APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
+ 
+```
+
+```
+
+打包参数
+manifestPlaceholders = [ app_label_name:"xxxxxxx"]
+//${app_label_name}
+getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_DATA).metaData.getString("app_label_name")
+
+
+```
+#### HandlerThread
+装饰模式（封装Thread）
+  装饰Thread，增加mLooper，可以让工作Handler设置Looper
+## 进程间通讯
+###  IPC机制与方法 
+Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 共享内存，消息队列，信号量；BSD 跨单机的socket）
+管道：**ls |grep "hello"** ls进程输出，输入到grep进程
+
+消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
+Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
+```java
+实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
+，并发，一对多
+                         +-----------+---------+---------------------+
+                         | Bundle    | Messager|  Content Provider   |
+         +---------------------------+---------+--------------------------------------+-----------------+
+         |               |   AIDL    +-------------------------------+                |                 |
+         |               |           | byte, char, short, int, long, |                |                 |
+         |               |           | float, double, boolean        |                |                 |
+         |               |           | String, CharSequence          |                |                 |
+         |               |           | Parcelable                    |                |                 |
+         |               |           | List<>, Map<>                 |                |                 |
+         |               |           | aidl interface                |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | import Parcelable package     |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | in out inout                  |                |                 |
+         | SendFile      |           +-------------------------------+                |                 |
+         | MemoryFile    |           | oneway                        |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |-------------------------------------------|                |                 |
+         | ashmem        |   android.os.Binder                       |  pipe/fifo     |                 |
+         +-----------------------------------------------------------+  signal        |                 |
+         |               |                                           |  messagequeue  |  File           |
+         | Shared memory |   Binder                                  |  semaphore     | SharedPreference|
+         |               |                                           |  Socket        |                 |
+         +----------------------------------------------------------------------------------------------+
+copy     |      0        |                 1                         |       2                          |
+times    +---------------+-------------------------------------------+----------------+-----------------+
+
+应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
+{                                                                                {
+    "mAction": "android.intent.action.MAIN",                                         "mAction": "android.intent.action.MAIN",
+    "mCategories": [                                                                 "mCategories": [
+        "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
+    ],                                                                               ],
+    "mComponent": {                                                                  "mComponent": {
+        "mClass": "com.example.proj.activity.SplashActivity",                              "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"                                                     "mPackage": "com.example.proj"
+    },                                                                               },
+    "mContentUserHint": -2,                                                          "mContentUserHint": -2,
+    "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
+    "mPackage": "com.example.proj"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+}                                                                                        "mSourceBounds": {
+                                                                                         "bottom": 395,
+                                                                                         "left": 540,
+                                                                                         "right": 800,
+                                                                                         "top": 120
+                                                                                     }
+                                                                                 }
+
+ 
+
+直接打开及直接打开第二次
+{
+    "mAction": "android.intent.action.MAIN",
+    "mCategories": [
+        "android.intent.category.LAUNCHER"
+    ],
+    "mComponent": {
+        "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"
+    },
+    "mContentUserHint": -2,
+    "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+    "mSourceBounds": {
+        "bottom": 395,
+        "left": 540,
+        "right": 800,
+        "top": 120
+    }
+}
+ 
+
+
+public class Intent implements Parcelable, Cloneable {
+    private String mAction;
+    private Uri mData;
+    private String mType;
+    private String mPackage;
+    private ComponentName mComponent;
+    private int mFlags;
+    private ArraySet<String> mCategories;
+    private Bundle mExtras;
+    private Rect mSourceBounds;
+    private Intent mSelector;
+    private ClipData mClipData;
+    private int mContentUserHint = UserHandle.USER_CURRENT;
+    /** Token to track instant app launches. Local only; do not copy cross-process. */
+    private String mLaunchToken;
+}
+public final class Messenger implements Parcelable {
+    private final IMessenger mTarget;
+}
+
+import android.os.Message;
+/** @hide */
+oneway interface IMessenger {
+    void send(in Message msg);
+}
+```
+
+```bash
+root@x86:/ # ls /dev/socket/
+adbd
+cryptd
+dnsproxyd
+fwmarkd
+installd
+lmkd
+logd
+logdr
+logdw
+mdns
+netd
+property_service
+rild
+rild-debug
+sap_uim_socket1
+vold
+wpa_eth1
+zygote// zygote socket通信设备文件
+
+```
+
+### Binder机制/通讯协议
+
+**序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
+
+[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
+binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
+Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
+[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/)
+
+```java
+n：native
+p：proxy
+
+SystemServer，Binder机制
++----------------+------------+--------------------------------------+-------------------------+
+|                |            |  BinderProxy   ServiceManagerProxy   | +---------------------+ |
+|                |            |  ServiceManager                      | | IInterface          | |
+|                |  Client    +--------------------------------------+ | IBinder             | |
+|                |            | BpBinder/BpRefBase   BpInterface     | | IServiceManager     | |
+|                |  process   |                                      | |                     | |
+|                |            | BpServiceManager                     | +---------------------+ |
+|                |            |                                      | | Android_util_Binder | |
+|                |            | frameworks//IPCThreadState.cpp   77  | | android_os_Parcel   | |
+|                +---------------------------------------------------+ | AndroidRuntime.cpp  | |
+|                |            | Binder    ServiceManagerNative       | +---------------------+ |
+|                |            | BinderInternal                       | | IInterface          | |
+|  user space    |  Server    +--------------------------------------+ | IBinder             | |
+|                |            | BBinder/JavaBBinder/JavaBBinderHolder| | IserviceManager     | |
+|                |  process   | BnInterface                          | | ProcessState        | |
+|                |            |                                      | |                     | |   binder/binderproxy
+|                |            | BnServiceManager                     | | IPCThreadState      | | +-----------+
+|                |            | frameworks//IPCThreadState.cpp       | +---------------------+ |             |
+|                +------------+--------------------------------------+-------------------------+             |
+|                                                                         |     ^              |             |
+|                                                             getbinder0  v     |  findBinder  |  binder(0)  |
+|                +------------+----------------------------------------------------------------+ +------+    |
+|                |  Service   |  (handle id = 0)                                               |        v    v
+|                |  Manager   |  servicemanager/binder.c                                       |   +------------------+
+|                |  process   |  service_manager.c                                             |   |  open/mmap/ioctl |
++----------------+------------+----------------------------------------------------------------+   +------------------+
++----------------+------------+----------------------------------------------------------------+        |    |      
+|                |            |                                                                | <------+    |      
+|                |  Binder    |                                                                |             |      
+|  kernel space  |  Driver    |   drivers/staging/android/binder.c                             | <-----------+     
++----------------+------------+----------------------------------------------------------------+
+                                                                                  +       ^
+                                                                                  |       |
+                                                                                  v       +
+                                                                               +---------------+
+                                                                               |  kernel memory|
+                                                                               +---------------+
+
+----
+
+binder的服务实体
++------------+----------------------------------+------------------------------+
+|            |   System Service                |    anonymous binder           |
+|            |                                 |    (bindService)              |
++------------------------------------------------------------------------------+
+|  launch    | SystemServer                    |  bindService                  |
++------------------------------------------------------------------------------+
+| regist and |ServiceManager.addService        |  ActivityManagerService       |
+| manager    |                                 |                               |
+|            |SystemServiceManager.startService|                               |
+|------------+---------------------------------+-------------------------------+
+| communicate| SystemServer#getService         |  ServiceConnection            |
+|            |                                 |  (binder.asInterface)         |
+|------------+---------------------------------+-------------------------------+
+
+通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
+通过bindService开启服务，Service和调用者之间可以通讯。
+
+名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
+首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
+
+```
+AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
+
+- Bundle(实现了接口Parcelable)
+
+[Android O 后台startService限制简析](https://www.jianshu.com/p/f2db0f58d47f)
+```java
+不允许Application启动服务。kill应用会出现问题。
+startService(new Intent(this,BackService.class));
+    java.lang.RuntimeException: Unable to create application edu.ptu.gson.DApplication: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6227)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+     Caused by: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.DApplication.onCreate(DApplication.java:10)
+        at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1182)
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6222)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211) 
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778) 
+        at android.os.Handler.dispatchMessage(Handler.java:107) 
+        at android.os.Looper.loop(Looper.java:214) 
+        at android.app.ActivityThread.main(ActivityThread.java:7116) 
+        at java.lang.reflect.Method.invoke(Native Method) 
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492) 
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925) 
+
+服务所在的应有在后台60秒后，不允许启动服务
+    @Override
+    protected void onPause() {
+        super.onPause();
+        new Handler().postDelayed(() -> {
+            startService(new Intent(MainActivity.this,BackService.class));
+        },TimeUnit.SECONDS.toMillis(65));
+
+    }
+    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{f7b20eb u0a129 LAST bg:+1m4s234ms idle change:idle procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.MainActivity.lambda$onPause$1$MainActivity(MainActivity.java:48)
+        at edu.ptu.gson.-$$Lambda$MainActivity$wl8e-hH5EF00KzpSg6rkpcKD2N8.run(Unknown Source:2)
+        at android.os.Handler.handleCallback(Handler.java:883)
+        at android.os.Handler.dispatchMessage(Handler.java:100)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+需要设置startForeground()
+startForegroundService(new Intent(MainActivity.this,BackService.class));
+    android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{266d400 u0 edu.ptu.gson/.BackService}
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1864)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+/**
+ * 8.0以上需要增加channel
+ */
+```
+## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)
 ###  Rxjava，线程切换 ，异步执行耗时代码
 流式构建，订阅及观察事件传递
@@ -795,6 +1215,11 @@ ReactiveX provides a collection of operators with which you can filter, select, 
         flowable，observable，
         single，completable，maybe，
         mixed，parallel
+#### 线程问题
+RxJava 使用 SchedulerPoolFactory 是管理 ScheduledExecutorServices的创建及清除
+ System.setProperty("rx2.purge-period-seconds", "1");//默认一秒建议延长
+或
+ System.setProperty("rx2.purge-enabled", false);
 
 #### 源码
 RxJava2.0是非常好用的一个异步链式库,响应式编程，遵循观察者模式。
@@ -1985,17 +2410,39 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 
 
 ### 数据交换格式
-#### Serial（Twitter）
 
+#### Serial（Twitter）
 模板方法 ObjectSerializer 
-#### RPC - Protocol Buffer
-tlv 存储格式，可变长int
+
+#### Parcelable
+内部类抽象工厂，创建Parcelable对象或数组
+  Creator
+
+模板方法
+  android.os.Parcelable#writeToParcel
+
+解析式
+  Parcel，序列化与反序列化，字节流和对象
+
+1. 交换效率相对Serialization高，使用Jni TLV索引逻辑结构
+
+2. Parcel 数据不能存储在磁盘上或通过网络发送
+   
+[Binder 事务缓冲区的大小固定有限，目前为 1MB](https://developer.android.google.cn/guide/components/activities/parcelables-and-bundles)
+对于 savedInstanceState 的具体情况，应将数据量保持在较小的规模，50k
+#### Protocol Buffer
+索引逻辑结构。tlv 存储格式，可变长int
 
 构建器 ProtoModel.User#newBuilder()
 解析器 ProtoModel.User#parseFrom(byte[])
+
+
+Android Studio gradle插件 protobuf-gradle-plugin ，编译期间自动地执行 Protocol Buffers 编译器
+
+
 #### Flatbuffer
 [flatbuffer编码的内存的结构](https://blog.csdn.net/weixin_42869573/article/details/83820166)
-向量表访问buffer
+索引逻辑结构。向量表访问buffer
 
 类型：com.google.flatbuffers.Constants
 Table 定义（Table#__reset()）：

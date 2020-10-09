@@ -1,6 +1,7 @@
 ## 总览
 [](https://juejin.im/post/6844903974294781965#heading-61)
 
+      存储或交换应用时精简，使用上稳定，视觉上流畅美观，省电
 
 ## 界面
 ### 四大组件基础 - Context
@@ -25,7 +26,7 @@ ComponentActivity
 AppCompatActivity
              ActionBar
 
-
+应用包资源访问（loadapk,resource,pm），应用内存访问（cache,file,sp,db），四大组件通讯
 +--------------------------------------------------------------------------------------------+
 |   ContextImpl                                                                              |
 +-----------------------------------------------------+--------------------------------------+
@@ -45,6 +46,7 @@ AppCompatActivity
 |       IBinder mActivityToken                                                               |
 |       UserHandle mUser                                                                     |
 +--------------------------------------------------------------------------------------------+
+界面元素（actionbar，搜索，菜单，popup窗口，对话框），fragment管理，窗口与配置变动，生命周期
 +--------------------------------------------------------------------------------------------+
 |   Activity                                                                                 |
 +-----------------------------------------------------+--------------------------------------+
@@ -111,7 +113,7 @@ am_crash
 
 
 
-## 流畅（每秒25帧，限时20毫秒内执行完）-界面开发系统
+## 流畅/美观（每秒25帧，限时20毫秒内执行完）-界面开发系统
 1. Activity，View，Window
    activity在attach时，创建PhoneWindow；onCreate创建DecorView；onResume后创建ViewRootImpl关联WindowManager
 
@@ -372,12 +374,38 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     2. 线程优化 
 
  [动画大全](https://github.com/OCNYang/Android-Animation-Set)
+#### 图片适配（density）
+```java
+显示屏幕信息
+adb shell wm size
+wm size 1080x1920
+wm size reset
+
+wm density
+
+wm screen-capture
+
+adb shell dumpsys window displays |head -n 3
+
+导出view,layoutinspector
+/system/bin/dumpsys -T 60000 activity -v all
+ 
+``` 
 ### 图片闪动
 滑动停止才进行显示图片
+ 
+### 显示与窗口
+Activity、Dialog、PopWindow、Toast
 
+ popupwindow 与 Dialog
+- popupwindow 非阻塞浮层，需要onResume后，view 关联窗口管理才能显示
+- Dialog 阻塞式对话框，需要context还存活判断
 
+#### 图片适配（density）
 ### 编舞者 Choreographer
+双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
 #### 遍历刷新(测量，布局，绘制) traversal
+
 invalidate只会调onDraw方法且必须在UI线程中调用
       mPrivateFlags |= PFLAG_INVALIDATED;
 postInvalidate只会调onDraw方法，可以再UI线程中回调
@@ -385,6 +413,8 @@ postInvalidate只会调onDraw方法，可以再UI线程中回调
 requestLayout会调onMeasure、onLayout和onDraw(特定条件下)方法
       mPrivateFlags |= PFLAG_FORCE_LAYOUT;
       mPrivateFlags |= PFLAG_INVALIDATED;
+
+[Activity的显示之ViewRootImpl的预测量、窗口布局、最终测量、布局、绘制五大过程](http://segmentfault.com/a/1190000012018189)
 
 #####  刷新 （绘制，局部重绘）View#invalite
 VSynch 垂直同步
@@ -538,7 +568,107 @@ Choreographer 编舞者
 
 ```
 
-##### 布局
+##### 布局与控件
+LinearLayout（线性布局）、RelativeLayout（相对布局）、 FrameLayout（单帧布局）
+AbsoluteLayout（绝对布局）和TableLayout（表格布局）
+RecyclerView，ConstraintLayout（约束布局）
+###### ConstraintLayout 布局创建复杂的大型布局
+三个原则：
+1. 每个视图都必须至少有两个**约束条件**：一个水平约束条件，一个垂直约束条件。
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        或：
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" 
+
+2. 只能在共用同一平面（垂直或水平方向）的**约束手柄**（constraint handle 圆圈）与**定位点**（anchor point 控件或父控件）之间创建约束条件。
+
+      Bottom对Bottom或top
+      top对Bottom或top
+      start对start或end
+      end对start或end
+
+3. 每个**约束句柄**只能用于一个约束条件，但您可以在同一**定位点**上创建多个约束条件
+
+约束条件：
+1. RelativeLayout 约束
+   1. 父级定位 parent
+   2. 顺序定位（Start_toEnd ...）
+   3. 对齐方式（Start_toStartOf ...）
+   4. 基线对齐（基线属于BottomToBottom的特殊情况，基于文本对齐）
+2. Chains约束（线性布局，app:layout_constraintHorizontal_chainStyle="spread"）
+   1. spread ：默认，居中均匀分布，两侧有空隙
+   2. spread inside ：居中均匀分布，两侧无空隙
+   3. Weighted：约束方向0dp，并设置权重 layout_constraintHorizontal_weight，两侧无空隙
+   4. packed：居中紧凑布局
+3. Guidelines（作为**定位线**作用于全局，orientation="vertical" startToStart，endToEnd）
+4. Placeholder 配合TransitionManager，移动选中控件
+5. Helper（referenced_ids控件操作）
+   1. Barrier （v1.1 一对多控件的屏障约束，控件位于两个内容长度可变控件的end ，避免嵌套）
+      1. barrierDirection 屏障约束的方向 start,end,top,bottom
+      2. app:constraint_referenced_ids="btn1,btn3" 共用屏障的控件
+   2. Group v1.1 分组方便隐藏，referenced_ids 添加控件到分组
+   3. Layer v2.0 referenced_ids的控件添加背景（背景根据绘制顺序，layer代码需要放在控件前）或动画
+   4. VirtualLayout/Flow 三种flow_wrapMode模式，对referenced_ids内的控件快速横向/纵向布局
+      1. wrap none 线性链，即使控件不够
+      2. wrap chain 控件不够，换行显示，居中对齐
+      3. wrap aligined 控件不够，换行显示，并左对齐
+6. 边距，默认外边，距尺寸和约束比例（bias）
+7.  自动创建约束
+      1. Infer Constraints 会扫描布局，以便为所有视图确定最有效的约束集。
+      2. Autoconnect to parent 。自动为每个视图创建两个或多个约束条件
+
+```java
+public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
+
+    private final List<View> mDependencySortedChildren = new ArrayList<>();
+    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
+
+    private final List<View> mTempList1 = new ArrayList<>();
+    private final List<View> mTempDependenciesList = new ArrayList<>();
+    private final int[] mTempIntPair = new int[2];
+    private Paint mScrimPaint;
+
+    private boolean mDisallowInterceptReset;
+
+    private boolean mIsAttachedToWindow;
+
+    private int[] mKeylines;
+
+    private View mBehaviorTouchView;
+    private View mNestedScrollingTarget;
+
+    private OnPreDrawListener mOnPreDrawListener;
+    private boolean mNeedsPreDrawListener;
+
+    private WindowInsetsCompat mLastInsets;
+    private boolean mDrawStatusBarBackground;
+    private Drawable mStatusBarBackground;
+
+    OnHierarchyChangeListener mOnHierarchyChangeListener;
+    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
+
+    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
+            new NestedScrollingParentHelper(this);
+}
+```
+
+中介者模式：
+      ConstraintLayout 定位控件
+
+TransitionManager 观察addOnPreDrawListener
+
+###### ViewPager
+transformPage
+ViewPager2支持：
+基于RecyclerView，DiffUtils计算差值，动画更新Viewpager。
+垂直方向 setOrientation
+离屏加载 setOffscreenPageLimit 默认0（v1.0默认1）
+使用 viewpager2.FragmentStateAdapter 代替 RecyclerView.Adapter
+
 ###### RecyclerView 缓存
 1. 缓存ViewHolder
 2. 刷新控件 
@@ -591,6 +721,41 @@ ViewCompat.postInvalidateOnAnimation(Activity.this)
         ViewDragHelper#continueSettling
 观察者   ViewDragHelper#smoothSlideViewTo
 
+##### 
+ [事件](http://gityuan.com/2016/12/31/input-ipc/)
+ [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
+- InputReader线程：通过EventHub从/dev/input节点获取事件，转换成EventEntry事件加入到InputDispatcher的mInboundQueue。EventHub采用INotify + epoll机制
+
+- InputDispatcher线程：从mInboundQueue队列取出事件，转换成DispatchEntry事件加入到connection的outboundQueue队列。再然后开始处理分发事件，取出outbound队列，放入waitQueue.InputChannel.sendMessage通过socket方式将消息发送给远程进程；
+
+- UI线程：创建socket pair，分别位于”InputDispatcher”线程和focused窗口所在进程的UI主线程，可相互通信。 
+UI主线程：通过setFdEvents()， 监听socket客户端，收到消息后回调NativeInputEventReceiver();【见小节2.1】
+“InputDispatcher”线程： 通过IMS.registerInputChannel()，监听socket服务端，收到消息后回调handleReceiveCallback；【见小节3.1】
+```java
+
+ViewRootImpl的setView()过程:
+    创建socket pair，作为InputChannel: 
+        socket服务端保存到system_server中的WindowState的mInputChannel；
+        socket客户端通过binder传回到远程进程的UI主线程ViewRootImpl的mInputChannel；
+    IMS.registerInputChannel()注册InputChannel，监听socket服务端： 
+        Loop便是“InputDispatcher”线程的Looper;
+        回调方法handleReceiveCallback。
+
+```
+ANR 事件 resetANRTimeoutsLocked
+
+
+```C
+struct RawEvent {
+    nsecs_t when;
+    int32_t deviceId;
+    int32_t type;
+    int32_t code;
+    int32_t value;
+};
+
+
+``` 
 
 #### 动画
 https://dribbble.com/
@@ -655,7 +820,7 @@ https://dribbble.com/
       AnimatedVectorDrawable/<animated-vector>
 ##### 属性动画（PropertyValuesHolder） 
 1. ValueAnimator 只对属性进行过渡
-2. ObjectAnimator 因为属性有其归属的对象，可以通过反射设置对象的属性值 PropertyValuesHolder#setupSetter；不用设置监听修改过渡值
+2. ObjectAnimator 因为属性有其归属的对象，可以通过反射内省设置对象的属性值 PropertyValuesHolder#setupSetter；不用设置监听修改过渡值
 3. ViewPropertyAnimator 观察ValueAnimation回调事件AnimatorEventListener#onAnimationUpdate，更新invalidateViewProperty属性值
    
 属性动画可以通过 ValueAnimator#ofPropertyValuesHolder对多个属性同时过渡， ValueAnimator#getAnimatedValue(String) 进行取值；
@@ -711,12 +876,14 @@ https://dribbble.com/
 
 
 ```
+##### beginDelayedTransition
 ##### GIF
 Glide播放多个gif文件卡
 
 android-gif-drawable性能好
 
 android-1.6_r1\external\giflib 系统源码利用
+
 
 ### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
 
@@ -1009,8 +1176,9 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
 - 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
- 
- 
+- [分区存储](https://developer.android.google.cn/training/data-storage/use-cases)，使用 FileProvider
+
+
 #### Android  9 API level 28
 [行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
 - 支持最新的全面屏，其中包含为摄像头和扬声器预留空间的屏幕缺口。 通过 DisplayCutout 
@@ -1018,6 +1186,7 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 - AnimatedImageDrawable类来绘制和显示GIF和WebP动画图像
 - AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
 - webview多进程需要设置setDataDirectorySuffix
+-  Android 9（API 级别 28）引入了新的电池管理功能：应用待机存储分区。[](https://developer.android.google.cn/topic/performance/appstandby)
 
 
 #### Android  8 API level 26
@@ -1026,7 +1195,6 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 - 后台执行限制
 - Notification Channels 创建一个用户可自定义的频道。
 - 画中画
-
 [Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
  26 
 @FastNative注解

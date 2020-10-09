@@ -165,285 +165,7 @@ p 命名管道文件。
 其中Linux中I/O设备分为两类:字符设备和块设备。
 [创建7种类型文件](https://blog.csdn.net/furzoom/article/details/77888131)
 ```
-###  IPC机制与方法 
-Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 共享内存，消息队列，信号量；BSD 跨单机的socket）
-管道：**ls |grep "hello"** ls进程输出，输入到grep进程
 
-消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
-Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
-```java
-实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
-，并发，一对多
-                         +-----------+---------+---------------------+
-                         | Bundle    | Messager|  Content Provider   |
-         +---------------------------+---------+--------------------------------------+-----------------+
-         |               |   AIDL    +-------------------------------+                |                 |
-         |               |           | byte, char, short, int, long, |                |                 |
-         |               |           | float, double, boolean        |                |                 |
-         |               |           | String, CharSequence          |                |                 |
-         |               |           | Parcelable                    |                |                 |
-         |               |           | List<>, Map<>                 |                |                 |
-         |               |           | aidl interface                |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |           | import Parcelable package     |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |           | in out inout                  |                |                 |
-         | SendFile      |           +-------------------------------+                |                 |
-         | MemoryFile    |           | oneway                        |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |-------------------------------------------|                |                 |
-         | ashmem        |   android.os.Binder                       |  pipe/fifo     |                 |
-         +-----------------------------------------------------------+  signal        |                 |
-         |               |                                           |  messagequeue  |  File           |
-         | Shared memory |   Binder                                  |  semaphore     | SharedPreference|
-         |               |                                           |  Socket        |                 |
-         +----------------------------------------------------------------------------------------------+
-copy     |      0        |                 1                         |       2                          |
-times    +---------------+-------------------------------------------+----------------+-----------------+
-
-应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
-{                                                                                {
-    "mAction": "android.intent.action.MAIN",                                         "mAction": "android.intent.action.MAIN",
-    "mCategories": [                                                                 "mCategories": [
-        "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
-    ],                                                                               ],
-    "mComponent": {                                                                  "mComponent": {
-        "mClass": "com.example.proj.activity.SplashActivity",                              "mClass": "com.example.proj.activity.SplashActivity",
-        "mPackage": "com.example.proj"                                                     "mPackage": "com.example.proj"
-    },                                                                               },
-    "mContentUserHint": -2,                                                          "mContentUserHint": -2,
-    "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
-    "mPackage": "com.example.proj"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
-}                                                                                        "mSourceBounds": {
-                                                                                         "bottom": 395,
-                                                                                         "left": 540,
-                                                                                         "right": 800,
-                                                                                         "top": 120
-                                                                                     }
-                                                                                 }
-
- 
-
-直接打开及直接打开第二次
-{
-    "mAction": "android.intent.action.MAIN",
-    "mCategories": [
-        "android.intent.category.LAUNCHER"
-    ],
-    "mComponent": {
-        "mClass": "com.example.proj.activity.SplashActivity",
-        "mPackage": "com.example.proj"
-    },
-    "mContentUserHint": -2,
-    "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
-    "mSourceBounds": {
-        "bottom": 395,
-        "left": 540,
-        "right": 800,
-        "top": 120
-    }
-}
- 
-
-
-public class Intent implements Parcelable, Cloneable {
-    private String mAction;
-    private Uri mData;
-    private String mType;
-    private String mPackage;
-    private ComponentName mComponent;
-    private int mFlags;
-    private ArraySet<String> mCategories;
-    private Bundle mExtras;
-    private Rect mSourceBounds;
-    private Intent mSelector;
-    private ClipData mClipData;
-    private int mContentUserHint = UserHandle.USER_CURRENT;
-    /** Token to track instant app launches. Local only; do not copy cross-process. */
-    private String mLaunchToken;
-}
-public final class Messenger implements Parcelable {
-    private final IMessenger mTarget;
-}
-
-import android.os.Message;
-/** @hide */
-oneway interface IMessenger {
-    void send(in Message msg);
-}
-```
-
-```bash
-root@x86:/ # ls /dev/socket/
-adbd
-cryptd
-dnsproxyd
-fwmarkd
-installd
-lmkd
-logd
-logdr
-logdw
-mdns
-netd
-property_service
-rild
-rild-debug
-sap_uim_socket1
-vold
-wpa_eth1
-zygote// zygote socket通信设备文件
-
-```
-
-### Binder机制
-
-**序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
-
-[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
-binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
-Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
-[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/)
-
-```java
-n：native
-p：proxy
-
-SystemServer，Binder机制
-+----------------+------------+--------------------------------------+-------------------------+
-|                |            |  BinderProxy   ServiceManagerProxy   | +---------------------+ |
-|                |            |  ServiceManager                      | | IInterface          | |
-|                |  Client    +--------------------------------------+ | IBinder             | |
-|                |            | BpBinder/BpRefBase   BpInterface     | | IServiceManager     | |
-|                |  process   |                                      | |                     | |
-|                |            | BpServiceManager                     | +---------------------+ |
-|                |            |                                      | | Android_util_Binder | |
-|                |            | frameworks//IPCThreadState.cpp   77  | | android_os_Parcel   | |
-|                +---------------------------------------------------+ | AndroidRuntime.cpp  | |
-|                |            | Binder    ServiceManagerNative       | +---------------------+ |
-|                |            | BinderInternal                       | | IInterface          | |
-|  user space    |  Server    +--------------------------------------+ | IBinder             | |
-|                |            | BBinder/JavaBBinder/JavaBBinderHolder| | IserviceManager     | |
-|                |  process   | BnInterface                          | | ProcessState        | |
-|                |            |                                      | |                     | |   binder/binderproxy
-|                |            | BnServiceManager                     | | IPCThreadState      | | +-----------+
-|                |            | frameworks//IPCThreadState.cpp       | +---------------------+ |             |
-|                +------------+--------------------------------------+-------------------------+             |
-|                                                                         |     ^              |             |
-|                                                             getbinder0  v     |  findBinder  |  binder(0)  |
-|                +------------+----------------------------------------------------------------+ +------+    |
-|                |  Service   |  (handle id = 0)                                               |        v    v
-|                |  Manager   |  servicemanager/binder.c                                       |   +------------------+
-|                |  process   |  service_manager.c                                             |   |  open/mmap/ioctl |
-+----------------+------------+----------------------------------------------------------------+   +------------------+
-+----------------+------------+----------------------------------------------------------------+        |    |      
-|                |            |                                                                | <------+    |      
-|                |  Binder    |                                                                |             |      
-|  kernel space  |  Driver    |   drivers/staging/android/binder.c                             | <-----------+     
-+----------------+------------+----------------------------------------------------------------+
-                                                                                  +       ^
-                                                                                  |       |
-                                                                                  v       +
-                                                                               +---------------+
-                                                                               |  kernel memory|
-                                                                               +---------------+
-
-----
-
-binder的服务实体
-+------------+----------------------------------+------------------------------+
-|            |   System Service                |    anonymous binder           |
-|            |                                 |    (bindService)              |
-+------------------------------------------------------------------------------+
-|  launch    | SystemServer                    |  bindService                  |
-+------------------------------------------------------------------------------+
-| regist and |ServiceManager.addService        |  ActivityManagerService       |
-| manager    |                                 |                               |
-|            |SystemServiceManager.startService|                               |
-|------------+---------------------------------+-------------------------------+
-| communicate| SystemServer#getService         |  ServiceConnection            |
-|            |                                 |  (binder.asInterface)         |
-|------------+---------------------------------+-------------------------------+
-
-通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
-通过bindService开启服务，Service和调用者之间可以通讯。
-
-名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
-首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
-
-```
-AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
-
-- Bundle(实现了接口Parcelable)
-
-[Android O 后台startService限制简析](https://www.jianshu.com/p/f2db0f58d47f)
-```java
-不允许Application启动服务。kill应用会出现问题。
-startService(new Intent(this,BackService.class));
-    java.lang.RuntimeException: Unable to create application edu.ptu.gson.DApplication: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
-        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6227)
-        at android.app.ActivityThread.access$1100(ActivityThread.java:211)
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778)
-        at android.os.Handler.dispatchMessage(Handler.java:107)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-     Caused by: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
-        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
-        at android.app.ContextImpl.startService(ContextImpl.java:1571)
-        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
-        at edu.ptu.gson.DApplication.onCreate(DApplication.java:10)
-        at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1182)
-        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6222)
-        at android.app.ActivityThread.access$1100(ActivityThread.java:211) 
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778) 
-        at android.os.Handler.dispatchMessage(Handler.java:107) 
-        at android.os.Looper.loop(Looper.java:214) 
-        at android.app.ActivityThread.main(ActivityThread.java:7116) 
-        at java.lang.reflect.Method.invoke(Native Method) 
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492) 
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925) 
-
-服务所在的应有在后台60秒后，不允许启动服务
-    @Override
-    protected void onPause() {
-        super.onPause();
-        new Handler().postDelayed(() -> {
-            startService(new Intent(MainActivity.this,BackService.class));
-        },TimeUnit.SECONDS.toMillis(65));
-
-    }
-    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{f7b20eb u0a129 LAST bg:+1m4s234ms idle change:idle procs:1 seq(0,0,0)}
-        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
-        at android.app.ContextImpl.startService(ContextImpl.java:1571)
-        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
-        at edu.ptu.gson.MainActivity.lambda$onPause$1$MainActivity(MainActivity.java:48)
-        at edu.ptu.gson.-$$Lambda$MainActivity$wl8e-hH5EF00KzpSg6rkpcKD2N8.run(Unknown Source:2)
-        at android.os.Handler.handleCallback(Handler.java:883)
-        at android.os.Handler.dispatchMessage(Handler.java:100)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-
-需要设置startForeground()
-startForegroundService(new Intent(MainActivity.this,BackService.class));
-    android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{266d400 u0 edu.ptu.gson/.BackService}
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1864)
-        at android.os.Handler.dispatchMessage(Handler.java:107)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-
-/**
- * 8.0以上需要增加channel
- */
-```
  
 ### Bluetooth驱动
 ```
@@ -476,7 +198,6 @@ startForegroundService(new Intent(MainActivity.this,BackService.class));
 init进程会孵化出ueventd、logd、healthd、installd、adbd、lmkd等用户守护进程
 init进程还启动servicemanager(binder服务管家)、bootanim(开机动画)等重要服务
 init进程孵化出Zygote进程，Zygote进程是Android系统的第一个Java进程(即虚拟机进程)，Zygote是所有Java进程的父进程
---------------------- 
 [作者：硬刚平底锅  ](https://blog.csdn.net/qq_30993595/article/details/82714409)
 
 
@@ -486,23 +207,7 @@ c++的智能指针有很多实现方式，有auto_ptr ,  unique_ptr , shared_ptr
 
 在Android中，RefBase结合sp（strong pointer）和wp（weak pointer），实现了一套通过引用计数的方法来控制对象生命周期的机制。
 
-### Dispaly 系统与图片适配（density）
-```java
-显示屏幕信息
-adb shell wm size
-wm size 1080x1920
-wm size reset
-
-wm density
-
-wm screen-capture
-
-adb shell dumpsys window displays |head -n 3
-
-导出view,layoutinspector
-/system/bin/dumpsys -T 60000 activity -v all
- 
-```
+### Dispaly 系统
 
 ```java
                            OpenGL/ES        Rasterization
@@ -661,9 +366,7 @@ skia 图形引擎
 
 ```
 
-### 屏幕刷新
-[](https://www.jianshu.com/p/0a54aa33ba7d)
-双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
+
 #### 数据渲染 SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
 
 SystemServer的RenderThread线程
@@ -956,68 +659,7 @@ public class View implements Drawable.Callback, KeyEvent.Callback,
 2. Camera 3D动画
 3. AR沉浸式效果（ARCore）
 
-##### 绘制事件 - ViewRootImpl#traversal
-[Activity的显示之ViewRootImpl的预测量、窗口布局、最终测量、布局、绘制五大过程](http://segmentfault.com/a/1190000012018189)
-
-### 窗口，见WMS
-
-
-### dalvik bytecode
-```
-dx --dex --output=Hello.dex Hello.class
-```
-
-### 类加载机制，类加载器，双亲委派
-```
-                 C++
- +-----------------------+
- | Bootstrap ClassLoader |  Framework classs
- +----------^------------+
-            |
-  +---------+----------+   
-  | BaseDexClassLoader |   <|-------------------+
-  +---------^----------+                        |
-            |  DexPathList                       |
-            |                                   |
-            |                                   |
-+-----------+-------------+                     |
-| PathClassLoader         | apk class           |
-+-----------^-------------+                     |
-            |  parent                           |
-+-----------+------------+           extends    |
-| DexClassLoader         | +--------------------+
-+------------------------+
-
-
-
-```
-
-
-
-
-
-
-#### android触发垃圾回收
-[android gc](https://proandroiddev.com/collecting-the-garbage-a-brief-history-of-gc-over-android-versions-f7f5583e433c)
-[dalvik:tracing garbage collector, using a Mark and Sweep approach](https://android.googlesource.com/platform/dalvik.git/+/android-4.3_r2/vm/alloc/MarkSweep.cpp)
-[art 粘性CMS和部分CMS](https://android.googlesource.com/platform/art/+/master/runtime/gc/)
-当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
-系统需要更多内存的时候触发。
-HPROF时触发。
-
-[回收机制](https://blog.csdn.net/f2006116/article/details/71775193)
-[android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
-
-[smalidea 无源码调试 apk](https://blog.csdn.net/hackooo/article/details/53114838)
-### 类加载问题
-[pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
-QQ空间补丁
-```
-1. 阻止相关类打上Class_ispreverified标志
-2. 动态更改BaseDexClassLoader间接引用的dexElements
-```
-[Redex](https://blog.csdn.net/tencent_bugly/article/details/53375240)
-
+ 
 ### 关键类与对象
 
 
@@ -1094,44 +736,10 @@ Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对�
 
 ```
 ### SystemServer - 窗口事件 InputManagerService
- [事件](http://gityuan.com/2016/12/31/input-ipc/)
- [事件子系统](https://blog.csdn.net/jscese/article/details/42099381)
-- InputReader线程：通过EventHub从/dev/input节点获取事件，转换成EventEntry事件加入到InputDispatcher的mInboundQueue。EventHub采用INotify + epoll机制
-
-- InputDispatcher线程：从mInboundQueue队列取出事件，转换成DispatchEntry事件加入到connection的outboundQueue队列。再然后开始处理分发事件，取出outbound队列，放入waitQueue.InputChannel.sendMessage通过socket方式将消息发送给远程进程；
-
-- UI线程：创建socket pair，分别位于”InputDispatcher”线程和focused窗口所在进程的UI主线程，可相互通信。 
-UI主线程：通过setFdEvents()， 监听socket客户端，收到消息后回调NativeInputEventReceiver();【见小节2.1】
-“InputDispatcher”线程： 通过IMS.registerInputChannel()，监听socket服务端，收到消息后回调handleReceiveCallback；【见小节3.1】
-```java
-
-ViewRootImpl的setView()过程:
-    创建socket pair，作为InputChannel: 
-        socket服务端保存到system_server中的WindowState的mInputChannel；
-        socket客户端通过binder传回到远程进程的UI主线程ViewRootImpl的mInputChannel；
-    IMS.registerInputChannel()注册InputChannel，监听socket服务端： 
-        Loop便是“InputDispatcher”线程的Looper;
-        回调方法handleReceiveCallback。
-
-```
 
 
 
 
-ANR 事件 resetANRTimeoutsLocked
-
-
-```C
-struct RawEvent {
-    nsecs_t when;
-    int32_t deviceId;
-    int32_t type;
-    int32_t code;
-    int32_t value;
-};
-
-
-``` 
 
 ```java
 public class ActivityStackSupervisor extends ConfigurationContainer implements DisplayListener,
@@ -1142,11 +750,6 @@ public class ActivityStackSupervisor extends ConfigurationContainer implements D
 
 ```
 ### SystemServer - 窗口视图（ 测量，布局及绘制,事件，动画，适配）wms
-Activity、Dialog、PopWindow、Toast
-
- popupwindow 与 Dialog
-- popupwindow 非阻塞浮层
-- Dialog 阻塞式对话框
 
 #### 其他组件 View ，controls,layouts
 
@@ -1191,43 +794,7 @@ Toolbar
 +-------------+------------+------------+------------------------------+-------------------------+
 
 ```
-#### 布局- CoordinatorLayout
-
-```java
-public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
-
-    private final List<View> mDependencySortedChildren = new ArrayList<>();
-    private final DirectedAcyclicGraph<View> mChildDag = new DirectedAcyclicGraph<>();
-
-    private final List<View> mTempList1 = new ArrayList<>();
-    private final List<View> mTempDependenciesList = new ArrayList<>();
-    private final int[] mTempIntPair = new int[2];
-    private Paint mScrimPaint;
-
-    private boolean mDisallowInterceptReset;
-
-    private boolean mIsAttachedToWindow;
-
-    private int[] mKeylines;
-
-    private View mBehaviorTouchView;
-    private View mNestedScrollingTarget;
-
-    private OnPreDrawListener mOnPreDrawListener;
-    private boolean mNeedsPreDrawListener;
-
-    private WindowInsetsCompat mLastInsets;
-    private boolean mDrawStatusBarBackground;
-    private Drawable mStatusBarBackground;
-
-    OnHierarchyChangeListener mOnHierarchyChangeListener;
-    private android.support.v4.view.OnApplyWindowInsetsListener mApplyWindowInsetsListener;
-
-    private final NestedScrollingParentHelper mNestedScrollingParentHelper =
-            new NestedScrollingParentHelper(this);
-}
-```
-
+ 
 ### SystemServer -窗口通知 NMS( NotificationManagerService) 
 **通知**是一个可以在应用程序正常的用户界面之外显示给用户的消息。
 
@@ -1314,8 +881,8 @@ PipUI画中画界面
 |   +--------------------------------------+ |
 +--------------------------------------------+
 
-
 ```
+
 APK文件中有一个文件resource.arsc。这个文件存放的是APK中资源的ID和资源类型，属性，文件名的读经关系表和所有的字符串，装载APK，就是解析该文件生成ResRTable对象
 
 
@@ -1354,152 +921,7 @@ public class LocationManagerService extends ILocationManager.Stub {
 }
 ```
 
-
-
-
 ### SystemServer - mediaserver
-多媒体信息，包括文字，图像，图形，音频，视频
-
-主要解释视频
-
-```
-                                                                    +-------------------------+ +-----------------------------------------------+
-                                                                    | Camera                  | | CameraManager                                 |
-                                                                    |   setPreviewDisplay()   | |   CameraDevice                                |
-                                                                    |   takePicture()         | |     CameraDevice.StateCallback                |
-                                                                    |   startPreview()        | |     CameraCaptureSession                      |
-                                                                    |                         | |          CameraCaptureSession.StateCallback   |
-                                                                    |                         | |          setRepeatingRequest()//setPreviewDis |
-                                                                    |   Camera.PreviewCallback| |          capture() //                         |
-                                                                    |                         | |     CaptureRequest                            |
-+--------------------------------------+--------------------------+ |                         | |          Builder.addTarget()                  |
-|  AudioTrack/AudioRecorder            | MediaPlayer/MediaRecorder| |                         | |          CameraCaptureSession.CaptureCallback |
-|  AudioSystem                         | VideoView                | |   CameraInfo            | |   CameraCharacteristics                       |
-+-----------------------------------------------------------------+ +-------------------------+ +-----------------------------------------------+
-+-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
-| mediaserver                                                     | | mediaserver                                                               |
-|  +--------------------+                 +---------------------- | |                                                                           |
-|  |                    |                 |  MediaPlayerService | | |                                                                           |
-|  | AudioManager       | -------------+  |  AudioTrack         | | |                                                           +---------------+
-|  | AudioPolicyService | |            |  |  AudioRecorder      | | |                                                           |               |
-|  |                    | |AudioFlinger|  |                     | | |                                                           |  CameraService|
-|  +--------------------+ +------------+  +---------------------+ | |                                                           +---------------+
-+-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
-|      HAL                             |                                                                                        |  HAL          |
-+--------------------------------------+                                                                                        +---------------+
-+-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
-|                 tinyalsa audio driver                           | |                          v4l2 camera driver                               |
-+-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
-```
-#### 音频驱动
-- OSS
-- ALSA（替代OSS）
-- TinyAlsa,ALSA的缩减版本 
-录音 
-```
-1. 调用录音应用 MediaStore.Audio.Media.RECORD_SOUND_ACTION
-2. AudioRecorder 录制的是PCM格式的音频文件，需要用AudioTrack来播放，AudioTrack更接近底层。 
-3. MediaRecorder 录制的音频文件是经过压缩后的，需要设置编码器。并且录制的音频文件可以用系统自带的Music播放器播放。 
-
-```
-播放 声音
-```
-soundPool 音效，播放比较短的音频片段，比如游戏声音、按键声、铃声片段等等，它可以同时播放多个音频
-mediaplayer 背景音乐，播放多种格式的声音文件
-AudioTrack 背景音乐，更接近底层。只能播放已经解码的PCM流，播放不需要解码的wav
-```
-AudioFlinger进行混音
-
-
-#### Camera 驱动 
-V4L2驱动程序就要为这些硬件设备提供音视频的合成以及编解码的功能接口
-
-```
-Camera2 CaptureRequest
-TEMPLATE_RECORD 创建适合录像的请求。
-TEMPLATE_PREVIEW 创建一个适合于相机预览窗口的请求。
-TEMPLATE_STILL_CAPTURE 创建适用于静态图像捕获的请求
-TEMPLATE_VIDEO_SNAPSHOT 在录制视频时创建适合静态图像捕获的请求。
-```
- 
-1. 拍照： Camera+BitmapFactory或Camera2+ImageReader
-2. [预览，保存图片](https://blog.csdn.net/foolish0421/article/details/77732140)
-扫描二维码-zxing
-3. 录视频：MediaRecorder+Camera
-
-
-
-#### 播放视频及视频渲染
-
-```
-State Diagram                                            +----+                                                          +-------+
-                                           reset()+----> |Idle|                                          release() +---->+ end   |
-                                                         +-+--+                                                          +-------+
-                        prepareAsync()     setDataSource() |  OnErrorListener.onError()  +-------------+
-                                                           |    +------------------------>  error      |
-          +-----------+                               +----v------+                      +-------------+
-          | preparing <-------------------------------+Initialized|
-          +---^---+---+                               +----+------+
-              |   |                                        |
-              |   | onPreparedListener.onPrepared()        |  prepare()
-              |   |                               +--------v-------+
-              |   +---------------------------->  |     prepared   <-----+
-              |   +--------------------------->   |                |     |
-              |   |             +--------------+  +--------+-------+     | seekTo()
-              |   |             |                          |    +--------+
-              |   |             |                          |
-prepareAsync()|   |prepare()    |                          | start()
-              |   |             <--------------------------v-----------------------+
-              |   |             |     +---->|            started                   <---+
-              |   |             |     |    ++--------------+--^------------^--+---++   |  Looping==true&&playback completes
-              |   |             |     |     |              |  |            |  |   |    |
-              |   |             |     +-----+       pause()|  |start()     |  |  -+----+
-              |   |             |    seekTo()/start()      |  |            |  |
-              |   |             |                          |  |            |  |
-        +-----+---+-+           |                     +----v--+--+         |  | Looping==false&&OnCompletionListener.OnCompletion()
-  +-->  |  stoped   |           <---------------------+  paused  <-----+   |  +-----------------+
-  |     +-----+---^-+           |                     +---------++     |   +----------------+   |
-  |           |   |             |              seekTo()/Pause() |      |                    |   |
-  +-----------+   |             |                               +------+                    |   |
-stop()            |      stop() |                +--------------------+              start()|   |
-                  |             |                |                    +---------------------+   |
-                  +-------------v----------------+ PlayBackCompleted  <-------------------------+
-                                                 |                    <----+
-                                                 +--------------+-----+    |
-                                                                |          | seekTo()
-                                                                +----------+
-
-```
-
-
-```
-+------------------------------------------------------+
-|        MediaPlayer.java                              |
-+------------------------------------------------------+
-|        android_media_player.cpp  (libmedia_jni.so)   |
-+------------------------------------------------------+
-|        MediaPlayer.cpp           (libmedia.so)       |
-+------------------------------------------------------+
-|        HTTP / RTSP / HTTPLive                        |
-+------------------------------------------------------+
-|                          +---------------------------+
-|        Stagefright       |       NuPlayer            |
-+--------------------------+---------------------------+
-
-```
-获取多媒体信息 使用系统应用
-拍照/录像 /录音 （见前文） 
-录屏 MediaProjection + MediaRecorder + 组合，或 MediaProjection + MediaCodec + MediaMuxer
-
-显示图片 ImageView
-播放音视频 MediaRecorder
-
-- MediaPlayer + SurfaceView
-- VideoView
-- FFmpeg
-
-#### 图片Bitmap
-[bitmap管理](https://developer.android.com/topic/performance/graphics/manage-memory.html)
 
 
 ## 应用层
@@ -1525,37 +947,7 @@ ps -t | grep -E "NAME| <zygote ps id> "
 
 ```
 
-### 应用内消息机制（异步）
-- Thread
-- Handler        子线程与主线程通讯
-- AsyncTask      界面回调，异步任务，一次性
-- HandlerThread  异步队列，子线程与子线程通讯
-- TimeTask       定时任务
-- IntentServices 无界面，异步任务
-- ThreadPool     并行任务
 
-```
-查看权限
-adb shell pm list permissions -d -g                 
-```
-
-[hind api](https://android.googlesource.com/platform/prebuilts/runtime/+/master/appcompat)
-
-**/art/tools/veridex/appcompat.sh --dex-file=test.apk**
-``` dot
-APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
- 
-```
-
-```
-
-打包参数
-manifestPlaceholders = [ app_label_name:"xxxxxxx"]
-//${app_label_name}
-getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_DATA).metaData.getString("app_label_name")
-
-
-```
 
 ### 四大组件-Activity
 ```
@@ -1924,70 +1316,10 @@ String btMAC = mBluetoothAdapter.getAddress();
 1.  环境初始化与销毁
 2.  房间初始化与销毁，声音控制
 3.  推流和拉流 
-### 3.3 开源框架
-#### OkHttp2
-
-#### Retrofit
-
+### 3.3 开源框架 
+ 
 #### RPC
-
-#### EventBus
-反射与注解 
-#### ARouter
-控制反转和面向切面
-
-
-
-## NDK
-
-```md
-GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
-
-[编译linux内核所用的gcc版本？ - jiangtao9999的回答 - 知乎](https://www.zhihu.com/question/58955848/answer/305063368)
-```
-
-```md
-    1.预处理是解决一些宏定义的替换等工作，为编译做准备,对应的gcc操作为：gcc -E xx.c -o xx.i(xx为源文件名)。
-    2.编译是将源码编译为汇编语言的过程，对应的gcc操作为:gcc -S xx.i -o xx.s。由xx.i 产生xx.s文件。
-    3.汇编是将汇编代码的文件汇编为机器语言的过程，对应的gcc操作为：gcc -c xx.s -o xx.o
-    4.链接是将目标文件链接为一个整的可执行文件的过程，对应的gcc操作为 gcc xx.o -o xx(xx成为可执行,运行时候可以用 "./xx" 的方式运行)。
-
-    [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
-```
-
-[Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
-
-```
-+------------------------------------------------------------+
-|                 build-binary.mk                            |
-|                                                            |
-|                 setup-toolchain.mk                         |
-|                 setup-abi.mk                               |
-|                                                            |
-|                  setup-app.mk                              |
-|                  build-all.mk                              |
-|                  init.mk                                   |
-|                  build-local.mk                            |
-|                                                            |
-+------------------------------------------------------------+
-|                                                            |
-|   Module-description variables                             |
-|                                                            |
-|   NDK-provided variables    NDK-provided function macros   |
-|                                                            |
-+------------------------------------------------------------+
-|                                                            |
-|              ndk-build                                     |
-+------------------------------------------------------------+
-|                     NDK                                    |
-+------------------------------------------------------------+
-|                 GNU Make                                   |
-+------------------------------------------------------------+
-
-
-
-```
-
+ 
 
 
 ## 源码

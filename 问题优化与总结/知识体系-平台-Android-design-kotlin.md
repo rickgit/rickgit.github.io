@@ -846,6 +846,6 @@ TimeoutCoroutine:AbstractCoroutine
 
 
 
-## 
+## viewModelScope
 [Retrofit+Coroutines+viewModelScope] 代替 [Retrofit+Rxjava+AutoDispose]
 https://juejin.im/post/5cb473e66fb9a068af37a6ce

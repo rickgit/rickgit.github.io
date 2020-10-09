@@ -344,7 +344,7 @@ public interface A extends java.lang.annotation.Annotation {
 
 
 
-### 类对象创建与内存分配
+### 对象分配（创建与内存分配）
 ####  对象创建的方法
 ``
 1. new（RTTI）
@@ -389,6 +389,15 @@ public interface A extends java.lang.annotation.Annotation {
 
 字节码分析：序列化后，存储java信息，类信息，字段信息
 [透过byte数组简单分析Java序列化、Kryo、ProtoBuf序列化](https://www.cnblogs.com/softlin/archive/2015/07/17/4653168.html)
+
+ObjectInputStream，ObjectOputStream
+
+1. 可以存储磁盘
+
+2. 反射，效率低
+3. 产生中间对象，占用内存，可能触发GC
+
+
 
 #### 对象访问方式
 1. 句柄访问：维护一个句柄池，栈访问句柄池，再访问对象和类信息。这种方法栈维护堆引用稳定
@@ -640,7 +649,69 @@ Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
 2. JNI签名
 **JNICALL**表示调用约定，相当于C++的stdcall，说明调用的是本地方法
 **JNIEXPORT**表示函数的链接方式，当程序执行的时候从本地库文件中找函数
-```c
+```java
+import java.lang.String;
+public class A{ 
+   public native void m1();
+   public native void m2(String s);
+   public native String m3(String s);
+   public native String m3(String s,String s1);
+   public native String m3(String s,String[] s1);
+   public native String[] m4(String s,String[] s1);
+}
+
+>javah -jni A
+```
+```c++
+/*
+ * Class:     A
+ * Method:    m1
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_A_m1
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     A
+ * Method:    m2
+ * Signature: (Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_A_m2
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     A
+ * Method:    m3
+ * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_A_m3__Ljava_lang_String_2
+  (JNIEnv *, jobject, jstring);
+
+/*
+ * Class:     A
+ * Method:    m3
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_A_m3__Ljava_lang_String_2Ljava_lang_String_2
+  (JNIEnv *, jobject, jstring, jstring);
+
+/*
+ * Class:     A
+ * Method:    m3
+ * Signature: (Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_A_m3__Ljava_lang_String_2_3Ljava_lang_String_2
+  (JNIEnv *, jobject, jstring, jobjectArray);
+
+/*
+ * Class:     A
+ * Method:    m4
+ * Signature: (Ljava/lang/String;[Ljava/lang/String;)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_A_m4
+  (JNIEnv *, jobject, jstring, jobjectArray);
+
+
 extern "C" JNIEXPORT jstring JNICALL
 Java_edu_ptu_java_myapplication_MainActivity_stringFromJNI(
         JNIEnv* env,
