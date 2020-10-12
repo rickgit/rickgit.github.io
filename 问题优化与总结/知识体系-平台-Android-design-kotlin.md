@@ -1,5 +1,42 @@
-## 
+## 介绍 
+kotlin 封装Java，减少开发成本，提高开发效率
+1. 封装字段在构造方法传入 var,val定义字段。
+2. 类默认时final ，除非使用openclass,abstractclass,interface
+3. 默认static 类，除非声明 innerclass 
+4. 拓展枚举类 sealclass，可以子类声明
+5. 合成复用原则，委托和拓展增加类的功能。
+6. 拓展类型，支持高阶函数，函数作为参数
+7. 拓展容器sequence，支持复杂流式操作。
+8. 拓展线程切换，协程。异步线程的数据流flow，挂起队列Channel
+### coroute
 
+#### flow
+Builders.kt 拓展Flow的构建方法
+```js
+<>().asFlow()
+flow(){}
+flowOf(){}
+channelFlow(){}
+callbackFlow(){}
+```
+Collect.kt 拓展Flow的触发方法
+```js
+collect()，collectLatest()
+launchIn()
+collectIndexed()
+collectLatest() 节流
+```
+拓展方法实现构建者模式  
+    kotlinx-coroutines-core-1.3.7.jar!\kotlinx\coroutines\flow\FlowKt.class 
+
+#### Channel
+可挂起队列
+
+管道 ReceiveChannel，扇出ReceiveChannel 扇入SendChannel
+## 图片加载 Coil
+足够快速，它在内存、图片存储、图片的采样、Bitmap重用、暂停\取消下载等细节方面都有很大的优化(相比于上面讲的三大框架)
+
+##
 ```
 +----------------------------------------------------------------------------------------------------+
 |                                                                                                    |

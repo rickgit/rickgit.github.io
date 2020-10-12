@@ -1,7 +1,4 @@
 ##
-
-
-
 - 双检锁(synchronized) + volatile
 - 静态内部类
     classloader 机制来保证初始化 instance 时只有一个线程。

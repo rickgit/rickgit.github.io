@@ -661,6 +661,10 @@ public class CoordinatorLayout extends ViewGroup implements NestedScrollingParen
 
 TransitionManager 观察addOnPreDrawListener
 
+
+
+装饰者模式:
+      setProgress
 ###### ViewPager
 transformPage
 ViewPager2支持：
@@ -1143,27 +1147,7 @@ try{Looper.loop()}
 
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
-
-
-[详见《知识体系-平台-Android-cohesion.md》](./知识体系-平台-Android-cohesion.md)
-插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
-Activity校验，生命周期，Service优先级，资源访问，so插件化
-- Dynamic-loader-apk
-  [非开放sdk api](https://blog.csdn.net/yun_simon/article/details/81985331)
-- Replugin
-
-组件化
-- 组件间解耦
-  1. MVVM-AAC 
-  Android Jetpack(Foundation Architecture Behavior UI  ) ViewModel LiveData
-  2. MVP DI框架Dagger2解耦
-- 通信
-1. 对象持有
-2. 接口持有
-3. 路由 （ARouter）
-   Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
-
-
+[](知识体系-平台-Android-desigin.md)
 ### 版本特性
 [Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
 
@@ -1175,8 +1159,9 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
-- 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
-- [分区存储](https://developer.android.google.cn/training/data-storage/use-cases)，使用 FileProvider
+- ⭐用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
+
+[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
 
 
 #### Android  9 API level 28

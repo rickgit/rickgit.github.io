@@ -353,18 +353,6 @@ skia 图形引擎
 [freetype 字体渲染](https://learnopengl-cn.readthedocs.io/zh/latest/06%20In%20Practice/02%20Text%20Rendering/)
 [OpenGL 基本数据类型](https://segmentfault.com/a/1190000017246734)
 [OpenGL ES 和 OpenGL ES 库的区别](https://woshijpf.github.io/android/2017/09/05/Android系统图形栈OpenGLES和EGL库的加载过程.html)
-```java
-+----------------+-----------------------------+-----------+
-|                | own   Surface|   EGL/Render |  hard acc |
-+----------------------------------------------------------+
-| SurfaceView    |    √         |     x        |           |
-+----------------------------------------------------------+
-| GLSurfaceView  |    √         |     √        |           |
-+----------------------------------------------------------+
-| TextureView    |    x         |              |     √     |
-+----------------+--------------+--------------+-----------+
-
-```
 
 
 #### 数据渲染 SurfaceFlinger - [Graphic图形系统](http://gityuan.com/2017/02/05/graphic_arch/)
