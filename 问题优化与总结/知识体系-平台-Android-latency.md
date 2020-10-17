@@ -161,7 +161,7 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 [Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
 
-```
+```java
 +------------------------------------------------------------+
 |                 build-binary.mk                            |
 |                                                            |
@@ -826,6 +826,7 @@ mmap（微信mars，美图logan，网易）
 ## 进程内通讯
 ### EventBus
 反射与注解
+观察者模式
 ### ARouter
 控制反转和面向切面
 ### 应用内消息机制（异步）
@@ -833,7 +834,7 @@ mmap（微信mars，美图logan，网易）
 - Handler        子线程与主线程通讯
 - AsyncTask      界面回调，异步任务，一次性
 - HandlerThread  异步队列，子线程与子线程通讯
-- TimeTask       定时任务
+- Timer/TimerTask  定时任务
 - IntentServices 无界面，异步任务
 - ThreadPool     并行任务
 
@@ -864,8 +865,33 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
   装饰Thread，增加mLooper，可以让工作Handler设置Looper
 ## 进程间通讯
 ###  IPC机制与方法 
-Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 共享内存，消息队列，信号量；BSD 跨单机的socket）
+1. 1940 年，计算机存储中就使用了"文件"。
+2. 1961 年，由Buroughs MCP和麻省理工学院兼容时间共享系统引入的"文件系统"的概念
+3. 1973年，管道被实现，Ken Thompson将管道添加到了UNIX操作系统。使用的记号(垂直线)
+    传统管道属于匿名管道，是计算机进程间的一种单工先进先出通信机制。
+    × 生存期不超过创建管道的进程的生存期
+    × 不支持异步读、写操作
+    x 只能在具有亲缘关系的进程间使用
+4. 命名管道	被视为文件的管道。进程与使用匿名管道时那样使用标准输入和输出，而是从命名管道写入和读取，就像它是常规文件一样。
+   允许无亲缘关系进程间的通信
+5. 信号起源于20世纪70年代的贝尔实验室Unix。
+   通常不用于传输数据，而是用于远程命令合作伙伴进程。
+6. 1963年，Dijkstra提出了n个进程互斥算法（Dekker算法的泛化）信号量机制
+7. POSIX 还提供用于将文件映射到内存的 API;可以共享映射，允许将文件的内容用作共享内存。mmap
+   最快的 IPC 方式
+8. 消息队列类似于套接字的数据流，但通常保留消息边界。
+    克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
+9. 1983年8月4.2BSD，包含socket
+
+Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 信号量， 共享内存，消息队列；BSD 跨单机的socket）
 管道：**ls |grep "hello"** ls进程输出，输入到grep进程
+
+```
+pipe：
+process1 | process2 | process3
+ls -l | grep key | less
+
+```
 
 消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
 Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
@@ -1435,15 +1461,16 @@ val searchResult = service.getSearchResult()
 ### Okhttp（Square）
 可加快内容加载速度并节省带宽。
 缓存
+ 
 
 转化器  
 简单工厂 RealCall.kt#newRealCall():RealCall
          Transmitter#newExchange():Exchange
          ExchangeFinder:find():ExchangeCodec
          ExchangeFinder#findHealthyConnection():RealConnection
-工厂方法 
+工厂方法 ⭐
         Call.Factory#newCall(): Call //构造请求回调
-构建器 
+构建器 ⭐
         OkHttpClient.Builder
         Request.Builder      //构建请求，method，url，headers，body
 
@@ -2388,6 +2415,18 @@ retrofit 核心：动态代理访问注解方法，返回Call适配器
 
 
 ```
+#### 拦截器
+Application Interceptor 适用于在请求前统一添加一些公共参数
+NetwrokInterceptor 在这一层拦截器中可以获取到最终发送请求的 request ，也可以获取到真正发生网络请求回来的 response 响应，从而修改对应的请求或者响应数据
+
+1. customInterceptor
+2. RetryAndFollowInterceptor（错误重试,自动重定向 ）
+3. BridgeInterceptor（转化为网络请求）
+4. CacheInterceptor（缓存管理）
+5. ConnectInterceptor （连接复用）
+6. NetworkInterceptor
+7. CallServerInterceptor（支持Http/2,gzip压缩响应体）
+
 #### OKIO
  装饰者模式、享元模式、模板模式
 
@@ -2875,11 +2914,7 @@ Sec-WebSocket-Accept: ps47fOR7Y0K9tgpbHog3Zw6H7/4=
 /* Message types */
 #define CONNECT 0x10
 #define CONNACK 0x20
-#define PUBLISH 0x30
-#define PUBACK 0x40
-#define PUBREC 0x50
-#define PUBREL 0x60
-#define PUBCOMP 0x70
+
 #define SUBSCRIBE 0x80
 #define SUBACK 0x90
 #define UNSUBSCRIBE 0xA0
@@ -2887,6 +2922,12 @@ Sec-WebSocket-Accept: ps47fOR7Y0K9tgpbHog3Zw6H7/4=
 #define PINGREQ 0xC0
 #define PINGRESP 0xD0
 #define DISCONNECT 0xE0
+
+#define PUBLISH 0x30
+#define PUBACK 0x40
+#define PUBREC 0x50
+#define PUBREL 0x60
+#define PUBCOMP 0x70
 ```
 #### 消息体
 ```c
@@ -2967,7 +3008,8 @@ openfire
 asmack
 #### XMPP通信原语有3种：message、presence和iq。
 
-
+#### 缺点
+xml传输，二进制需要转化Base64
 ## Sqlite
 ### h2 /JOOQ/SnakeYAML 
 ### xutils

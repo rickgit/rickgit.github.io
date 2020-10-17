@@ -887,8 +887,10 @@ Glide播放多个gif文件卡
 android-gif-drawable性能好
 
 android-1.6_r1\external\giflib 系统源码利用
-
-
+##### Scroller
+装饰者 
+      mStartTime
+      mMode
 ### 可拓展性/异步/多线程（Scalability：the number of tasks a system can execute at the same time.）
 
 ```shell

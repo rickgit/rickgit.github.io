@@ -458,7 +458,17 @@ Charset#availableCharsets():SortedMap
 
 ```
 
+#### SparseArray
+dirty flag模式
 
+remove时候，设置为true
+插入，索引，查找，size
+
+int不用计算hash效率高
+#### ArrayMap
+cache模式
+缓存长度为8，16数组
+缓存arrayamp
 
 
 ## 比特串/字节数组结构（二进制编码）
@@ -521,10 +531,7 @@ Float.MIN_VALUE ~ Float.MAX_VALUE
 #### 时间戳封装 - 日期Date/Canadar
 装饰 long时间戳
 懒加载 
-#### 字节压缩
-##### 可变长度编码（VLC）
 
-##### CABAC压缩
 ####  字符串结构及字符编码
 
 数据与二进制
@@ -1497,5 +1504,10 @@ Length（等于0）+num（逐字编码数量，小于等于2，结束）
     先行缓冲区
 编码：
     offset（查询缓冲区与先行缓冲区重复时的偏移量）,length（重复字符长度）,char_after_length（重复后第一个不同字符）
+
+#### 字节压缩
+##### 可变长度编码（VLC）
+
+##### CABAC压缩
 ## 数据学习 - 人工智能
 [见 知识体系-人工智能.md](知识体系-人工智能.md)

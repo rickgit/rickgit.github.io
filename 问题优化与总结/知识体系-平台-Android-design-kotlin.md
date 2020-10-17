@@ -8,7 +8,65 @@ kotlin 封装Java，减少开发成本，提高开发效率
 6. 拓展类型，支持高阶函数，函数作为参数
 7. 拓展容器sequence，支持复杂流式操作。
 8. 拓展线程切换，协程。异步线程的数据流flow，挂起队列Channel
-### coroute
+
+### 封装
+
+### 合成复用原则 
+#### 拓展和委托
+
+#### 作用域扩展函数
+```
++---------+----------------+-------------------+-----------------+
+|         | object as param|  object as return |  extension fun  |
++----------------------------------------------------------------+
+|  also   |  √             |  √                |  √              |
++----------------------------------------------------------------+
+|  apply  |  x             |  √                |  √              |
++----------------------------------------------------------------+
+|  let    |  √             |  x                |  √              |
++----------------------------------------------------------------+
+|  run    |  x             |  x                |  √              |
++----------------------------------------------------------------+
+|  with   |  x             |  x                |  x              |
++---------+----------------+-------------------+-----------------+
++----------------------------------------------------------------+
+|  use    |                |                   |                 |
++---------+----------------+-------------------+-----------------+
+
+
+```
+
+```java
+@kotlin.internal.InlineOnly public inline fun TODO(): kotlin.Nothing { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun TODO(reason: kotlin.String): kotlin.Nothing { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun repeat(times: kotlin.Int, action: (kotlin.Int) -> kotlin.Unit): kotlin.Unit { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <R> run(block: () -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> with(receiver: T, block: T.() -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.also(block: (T) -> kotlin.Unit): T { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T> T.apply(block: T.() -> kotlin.Unit): T { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> T.let(block: (T) -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly public inline fun <T, R> T.run(block: T.() -> R): R { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeIf(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
+
+@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeUnless(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
+
+```
+#### 伴生对象
+
+### 类型增强
+#### sequence
+#### 高阶函数
+#### null判断
+### 线程增强 - coroute
 
 #### flow
 Builders.kt 拓展Flow的构建方法
@@ -204,52 +262,7 @@ ints.filter { it > 0 }.forEach {
 }
 print(sum)
 ```
-### 作用域扩展函数
-```
-+---------+----------------+-------------------+-----------------+
-|         | object as param|  object as return |  extension fun  |
-+----------------------------------------------------------------+
-|  also   |  √             |  √                |  √              |
-+----------------------------------------------------------------+
-|  apply  |  x             |  √                |  √              |
-+----------------------------------------------------------------+
-|  let    |  √             |  x                |  √              |
-+----------------------------------------------------------------+
-|  run    |  x             |  x                |  √              |
-+----------------------------------------------------------------+
-|  with   |  x             |  x                |  x              |
-+---------+----------------+-------------------+-----------------+
-+----------------------------------------------------------------+
-|  use    |                |                   |                 |
-+---------+----------------+-------------------+-----------------+
 
-
-```
-
-```java
-@kotlin.internal.InlineOnly public inline fun TODO(): kotlin.Nothing { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun TODO(reason: kotlin.String): kotlin.Nothing { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun repeat(times: kotlin.Int, action: (kotlin.Int) -> kotlin.Unit): kotlin.Unit { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <R> run(block: () -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> with(receiver: T, block: T.() -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.also(block: (T) -> kotlin.Unit): T { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T> T.apply(block: T.() -> kotlin.Unit): T { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> T.let(block: (T) -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> T.run(block: T.() -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeIf(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeUnless(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
-
-```
 ## 编程泛型 - 面向对象-类
 Kotlin 中所有类都继承该 Any 类。
 

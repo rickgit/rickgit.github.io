@@ -84,8 +84,9 @@ Message类型  :
 异步消息与同步消息，屏蔽消息（ message.target ==null为屏障消息)）
 空闲任务
 
-6.0 eventfile+epoll阻塞唤醒
+6.0  epoll+eventfd 阻塞唤醒
 <6.0 epoll+pipe
+schedule_timeout 函数，使进程进入休眠，让出CPU
 ```
 
 
