@@ -811,10 +811,13 @@ JNIEnv *env;       /* pointer to native method interface */ 当前线程有效
 
 ```
 
+##### 引用
+局部引用、全局引用、弱全局引用
 
+[](https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html)
+弱全局引用是一种特殊的全局引用。
 
-
-
+[](https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/design.html)
 ## 内存管理
 
 - oop-klass模型
@@ -829,7 +832,7 @@ JNIEnv *env;       /* pointer to native method interface */ 当前线程有效
 在JIT编译时，在安全点(safe point)记录栈和寄存器中的引用和对应的位置。
 安全点时，才可以GC：方法调用、执行跳转、异常跳转等处。
 #### 可达性分析
-  JVM可回收对象判定方法 : 对象回收判定(可达性分析算法&对象引用) 
+  JVM可回收对象判定方法 : 标记根节点+对象回收判定(可达性分析算法&对象引用) 
 
 #### GC Roots
 [mat gc root](https://www.cnblogs.com/set-cookie/p/11069748.html)
@@ -1223,4 +1226,6 @@ cache 是加速 读，而 buffer 是缓冲 写
 ```
 selector 不好直接管理socket，使用channel做适配
 
- 
+### 文件格式
+
+#### EBK，TXT，PDF ，EPUB，MOBI，UMD

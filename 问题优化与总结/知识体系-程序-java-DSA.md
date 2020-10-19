@@ -952,6 +952,31 @@ ffmpeg
 [](src\jdk.crypto.mscapi\windows\classes\sun\security\mscapi\PRNG.java)
 
 linux：/dev/urandom
+##### UUID
+简单工厂
+    randomUUID()
+单例（内部类）
+```java
+java.util.UUID.Holder#numberGenerator
+```
+
+装饰
+```java
+    /*
+     * The most significant 64 bits of this UUID.
+     *
+     * @serial
+     */
+    private final long mostSigBits;
+
+    /*
+     * The least significant 64 bits of this UUID.
+     *
+     * @serial
+     */
+    private final long leastSigBits;
+
+```
 ### 排序
 3个维度：时间复杂度（最好，平均，最坏），空间复杂度，稳定性
 [](问题优化与总结\知识体系-理论-DSA.md)
