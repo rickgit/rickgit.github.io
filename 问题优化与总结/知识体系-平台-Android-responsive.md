@@ -374,6 +374,8 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     2. 线程优化 
 
  [动画大全](https://github.com/OCNYang/Android-Animation-Set)
+#### 屏幕适配
+
 #### 图片适配（density）
 ```java
 显示屏幕信息
