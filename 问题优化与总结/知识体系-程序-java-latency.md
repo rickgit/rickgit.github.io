@@ -1229,5 +1229,13 @@ selector 不好直接管理socket，使用channel做适配
 ### 文件格式
 #### Properties, JSON, ProBuff , FlatBuff
 #### EBK，TXT，PDF ，EPUB，MOBI，UMD
-epub
-mobi（mobi7变种kf6/7后缀名mobi或azw；mobi8变种kf8拓展名azw3，支持更丰富排版）
+Djuv 1996年起开发的一种图像压缩技术
+CHM  1998年微软推出的基于HTML文件特性的帮助文件系统
+mobi 2000年3月的法国公司，该公司创建了电子书文件格式（mobi7变种kf6/7后缀名mobi或azw；mobi8变种kf8拓展名azw3，支持更丰富排版）
+LIT  2000年，微软创建和发布的.lit文件类型。
+fb2  2004发布的基于XML的开放的电子书格式，无DRM
+ODT  2006年，，基于XML的文件格式，Libreoffice和Openoffice等开元办公自动化软件的默认格式
+EPub 2007年9月成为国际数位出版论坛(IDPF)的正式标准
+lrf  在2010年停产之前,索尼关联的电子书阅读器文件
+
+源电子书格式可以是AZW，CBZ，CBR，CBC，CHM，DJVU，DOCX，EPUB，FB2，HTML，LIT，LRF，MOBI，ODT，PDF，PRC，PDB，PML，RTF，SNB，TCR或TXT等
