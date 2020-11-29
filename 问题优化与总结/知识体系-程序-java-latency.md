@@ -1227,5 +1227,7 @@ cache 是加速 读，而 buffer 是缓冲 写
 selector 不好直接管理socket，使用channel做适配
 
 ### 文件格式
-
+#### Properties, JSON, ProBuff , FlatBuff
 #### EBK，TXT，PDF ，EPUB，MOBI，UMD
+epub
+mobi（mobi7变种kf6/7后缀名mobi或azw；mobi8变种kf8拓展名azw3，支持更丰富排版）
