@@ -401,6 +401,7 @@ Activity、Dialog、PopWindow、Toast
 
  popupwindow 与 Dialog
 - popupwindow 非阻塞浮层，需要onResume后，view 关联窗口管理才能显示
+      update()更新界面位置。触摸底部的控件容易导致popupwindow消失
 - Dialog 阻塞式对话框，需要context还存活判断
 
 #### 图片适配（density）

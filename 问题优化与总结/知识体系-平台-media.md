@@ -1582,6 +1582,9 @@ Live Stream Publishing
 Remoting
 Protocols: RTMP, RTMPT, RTMPS, and RTMPE
 ```
+## Calibre
+ EPUB, MOBI, PDF, AZW3, and DOCX, but also PDB, RTF, SNB, LIT, and others.
+ djvu,chm
 ## Zxing
 zxing
 ## Android
@@ -1732,7 +1735,14 @@ Paint画笔
     breakText拆分行，返回行字数
     getTextSize 高度
 和TextView同等大小是，字体太细，需要增加抗锯齿 
-
+#### 图标组成
+[](https://www.highcharts.com.cn/docs/basic-compose)
+```java
+Paint.Style style2 = mPaint.getStyle();
+mPaint.setStyle(Paint.Style.STROKE);
+canvas.drawRect(mCoordX,l,t,r,b, mPaint);
+mPaint.setStyle(style2);
+```
 ### 分离合成轨道
 
 MediaExtractor的作用是把音频和视频的数据进行分离。

@@ -999,43 +999,7 @@ ps -t | grep -E "NAME| <zygote ps id> "
 ```
 #### AMS 栈管理（任务栈），启动模式，亲和度
 Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
-```bash
-adb shell dumpsys -T 60000 activity -v all
 
-
-adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
-adb shell dumpsys activity activities----------查看Activity组件信息
-adb shell dumpsys activity services-----------查看Service组件信息
-adb shell dumpsys activity providers----------产看ContentProvider组件信息
-adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
-adb shell dumpsys activity intents--------------查看Intent信息
-adb shell dumpsys activity processes---------查看进程信息
-
-
-adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
-adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
-
-adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
-
-
-adb shell  dumpsys window windows |grep "Window #"
-
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-adb shell am kill <packagename>
-
-If you want to kill the Sticky Service,the following command NOT WORKING:
-
-adb shell am force-stop <PACKAGE>
-adb shell kill <PID>
-The following command is WORKING:
-
-adb shell pm disable <PACKAGE>
-If you want to restart the app,you must run command below first:
-
-adb shell pm enable <PACKAGE>
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-```
 ```java
 //ActivityStarter的启动模式代码阅读
 import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
@@ -1737,26 +1701,12 @@ tools（apkbuilder,ddms，draw9path,eclipse,hierarchyviewer,ninepatch,screenshot
 >两个控件联合，位于Relative居中，Relative宽度是WrapContent会出问题,部分视图不可见
 +-----------------------+
 |                       |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
 |   +-----+  +------+   |
 |   |     |  |      |   |
 |   | V1  |  | V2   |   |
 |   |     | .|      |   |
 |   |     |  |      |   |
 |   +-----+  +------+   |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
-|                       |
 |                       |
 +-----------------------+
 
