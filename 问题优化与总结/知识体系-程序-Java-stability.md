@@ -1,3 +1,5 @@
+稳定前提下，高效生产
+
 ## 自动化
 ### 文件版本控制管理
 [](https://git-scm.com/download/gui/windows)
