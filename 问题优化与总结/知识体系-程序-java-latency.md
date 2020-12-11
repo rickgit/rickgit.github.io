@@ -1229,15 +1229,27 @@ selector 不好直接管理socket，使用channel做适配
 ### 文件格式
 #### Properties, JSON, ProBuff , FlatBuff
 #### EBK，TXT，PDF ，EPUB，MOBI，UMD
-PDF  1992年， 发布版本 1.0
-Djuv 1996年起由AT&T实验室开发的一种图像压缩技术
-PlamDoc 1996 
-CHM  1998年微软推出的基于HTML文件特性的帮助文件系统。http://www.jedrea.com/chmlib/{filename}
-mobi 2000年3月的法国公司，该公司创建了电子书文件格式（mobi7变种kf6/7后缀名mobi或azw；mobi8变种kf8拓展名azw3，支持更丰富排版）
-LIT  2000年，微软创建和发布的.lit文件类型。
-lrf  2004年，Sony Librie支持的文件格式。在2010年停产之前,索尼关联的电子书阅读器文件
-fb2  2004年，发布的FictionBook扩展名，基于XML的开放的电子书格式，无DRM， 
-ODT  2006年，基于XML的文件格式（OpenDocument Text），Libreoffice和Openoffice等开元办公自动化软件的默认格式
-EPub 2007年9月成为国际数位出版论坛(IDPF)的正式标准
-docx 2006年，office 2007使用docx（microsoft office open Xml），文件本质上是一个XML文件的zip包。doc则是二进制zip包，二进制存储一旦破坏很难修复
+
+PML       [Palm Markup Language ](https://wiki.mobileread.com/wiki/EReader#History)
+Textile   [Textile Markup Language](https://textile-lang.com/)
+PDB Standard Palm extension, Fictionwise 使用
+开放电子书格式(epub/oeb,mobi,lit,imp)
+
+TCR     20世纪90年代开发的老Psion公司系列3掌上型装置
+rtf     1992年, 1.0规范
+PDF     1992年， 发布版本 1.0
+Djuv    1996年起由AT&T实验室开发的一种图像压缩技术
+PlamDoc 1996, 扩展名.pdb，.prc。mobi格式是这种格式的超集，也可以读取这种格式
+CHM     1998年微软推出的基于HTML文件特性的帮助文件系统。http://www.jedrea.com/chmlib/{filename}
+EPub    1999年，David Ornstein 发布 HTML-based早期的epub格式oeb规范 ，基于HTML格式。2007年9月成为国际数位出版论坛([IDPF](http://idpf.org/epub/dir/))的正式标准
+mobi    2000年，Mobipocket Reader发布基于OEB标准的HTML文件（PRC 格式），支持不同屏幕。2005，Amazon 终结PRC文件。MOBI基于XHTML支持DRM版权.
+        （mobi7变种kf6/7后缀名mobi或azw；2011 年 mobi8变种kf8拓展名azw3，支持更丰富排版.AZW4用于教科书的新版本（类似于PDF）;AZW8是KFX的扩展,KFX是ios版本）
+LIT     2000年，微软创建和发布的.lit文件类型电子书格式。
+Textile 2002年,[Textile Markup Language](https://textile-lang.com/)
+CBZ/CBR 2003年, CDisplay支持的格式
+lrf     2004年，Sony Librie支持的文件格式。在2010年停产之前,索尼关联的电子书阅读器文件
+fb2     2004年，FictionBook发布的扩展名，基于XML的开放的电子书格式，无DRM， 
+ODT     2006年，基于XML的文件格式（OpenDocument Text），Libreoffice和Openoffice等开元办公自动化软件的默认格式
+docx    2006年，office 2007使用docx（microsoft office open Xml），文件本质上是一个XML文件的zip包。doc则是二进制zip包，二进制存储一旦破坏很难修复
+snb     2011年,三星snote 应用保存格式
 源电子书格式可以是AZW，CBZ，CBR，CBC，CHM，DJVU，DOCX，EPUB，FB2，HTML，LIT，LRF，MOBI，ODT，PDF，PRC，PDB，PML，RTF，SNB，TCR或TXT等

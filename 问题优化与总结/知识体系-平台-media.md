@@ -1652,7 +1652,7 @@ Options
 8. 分屏滤镜
 #### View,Canvas,Paint
 View 白板：
-            绘制 颜色，点，线，弧，圆，路径，文本，位图；
+            绘制 颜色，点（弧，圆，路径），线，面（文本，位图）；
             saveLayer 创建新的画纸，savetocount时，绘制到画板
      画笔：
          1. 
@@ -1735,6 +1735,20 @@ Paint画笔
     breakText拆分行，返回行字数
     getTextSize 高度
 和TextView同等大小是，字体太细，需要增加抗锯齿 
+
+
+##### 段首空格, 防止Word在TextView中被破坏,&nbsp;
+textView 使用Unicode "\00A0"
+html/resource 使用 &#160;
+
+
+&#160;，&nbsp;， &#xA0;，no-break space （普通的英文半角空格但不换行）
+&#32;，普通的英文半角空格
+&#8197;，四分之一em空格 （四分之一中文宽度）
+&#8194;，&ensp;，en空格 （半个中文宽度）
+&#8195;，&emsp;，em空格 （一个中文宽度）
+&#12288;，中文全角空格 （一个中文宽度）
+
 #### 图标组成
 [](https://www.highcharts.com.cn/docs/basic-compose)
 ```java

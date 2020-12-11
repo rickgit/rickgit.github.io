@@ -404,6 +404,11 @@ Activity、Dialog、PopWindow、Toast
       update()更新界面位置。触摸底部的控件容易导致popupwindow消失
 - Dialog 阻塞式对话框，需要context还存活判断
 
+
+```bash
+adb shell dumpsys window w | findstr mCurrent
+```
+
 #### 图片适配（density）
 ### 编舞者 Choreographer
 双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
@@ -1262,3 +1267,6 @@ GPS
 
 JobScheduler
 
+## BlockCanary 检测界面卡顿
+UETool 
+GT 工具
