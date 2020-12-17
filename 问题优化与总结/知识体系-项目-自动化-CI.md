@@ -270,7 +270,17 @@ Could not find com.android.tools.build:aapt2 AndroidStudio
 
 
 [JetBrains intellij android](https://github.com/JetBrains/android.git)
-[android gradl dsl com.android.tools](https://beijing.source.codeaurora.org/quic/la/platform/prebuilts/gradle-plugin)
+[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
+```plantuml
+@startuml
+ProGuardPlugin -> ProGuardTransform :android.registerTransform() 
+note left :gradle-plugin
+
+ProGuardTransform -> ProGuardTask :project.tasks.create  
+ProGuardTask ->ProGuard :proguard()
+ProGuard ->ProGuard :shrink optimize obfuscate preverify
+@enduml
+```
 [android gradle-plugin relsease notes](https://developer.android.google.cn/studio/releases/gradle-plugin)
 #### Android gradle
 
