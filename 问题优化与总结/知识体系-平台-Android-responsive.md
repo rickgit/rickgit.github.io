@@ -1270,3 +1270,11 @@ JobScheduler
 ## BlockCanary 检测界面卡顿
 UETool 
 GT 工具
+
+
+## E-Paper
+[Kindlepdfviewer/koreader](https://github.com/koreader/koreader)
+
+https://libraries.io/github/koreader/koreader
+https://www.unisystem-displays.com/en/news/interactive-epaper.html
+http://www.xjishu.com/zhuanli/55/201510450954.html
