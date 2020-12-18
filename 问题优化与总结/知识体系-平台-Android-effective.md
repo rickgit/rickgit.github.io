@@ -1,4 +1,8 @@
 
+高效的稳健开发
+1. 设计模式
+2. 
+
 ## 包内精简 - APK打包 （编译，打包，优化，签名，安装）
   [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 
