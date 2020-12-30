@@ -1587,6 +1587,24 @@ Protocols: RTMP, RTMPT, RTMPS, and RTMPE
  djvu,chm
 ## Zxing
 zxing
+支持 QRCodeReader，PDF417Reader，OneDReader，ByQuadrantReader，MaxiCodeReader，DataMatrixReader，AztecReader，MultiFormatReader
+```
+@startuml
+DecodeHandler -> MultiFormatReader: decode
+MultiFormatReader->QRCodeReader:decodeWithState(BinaryBitmap)
+QRCodeReader->BinaryBitmap:decode(BinaryBitmap)
+BinaryBitmap->BitMatrix:getBlackMatrix()
+BitMatrix->QRCodeReader:BitMatrix
+QRCodeReader->Decoder
+Decoder->BitMatrixParser
+BitMatrixParser->BitMatrixParser:readVersion()
+BitMatrixParser->BitMatrixParser:readFormatInformation()
+BitMatrixParser->BitMatrixParser:readCodewords()
+BitMatrixParser->Decoder:Version,ErrorCorrectionLevel,codewordsDataBlock
+Decoder->DecodedBitStreamParser
+Decoder->QRCodeReader:decode(BitMatrix):DecoderResult
+@enduml
+```
 ## Android
 [](https://www.cnblogs.com/renhui/p/7452572.html)
 数据源：文件，网络协议，硬件设备
