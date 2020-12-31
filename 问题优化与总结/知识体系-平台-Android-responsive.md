@@ -374,8 +374,7 @@ Flame chart:横轴不再表示时间轴，相反，它表示每个方法执行�
     2. 线程优化 
 
  [动画大全](https://github.com/OCNYang/Android-Animation-Set)
-#### 屏幕适配
-[](./屏幕分辨率适配/屏幕分辨率适配.md)
+
 #### 图片适配（density）
 ```java
 显示屏幕信息
@@ -1088,6 +1087,12 @@ ANR Input dispatching timed out (Waiting because the touched window has not fini
 
 中等分辨率（mdpi）1px 等于 1in/160 = 0.0157in =0.0157cm 
 超高分辨率（xhdpi）1px 等于 1in/320 = 0.007in =0.008cm 
+
+ 
+```
+ResTable::getResource 参数rid，density获取图片
+ResTable_config::isBetterThan 查找适合的方法
+```
 
 ### 像素相关单位
 
