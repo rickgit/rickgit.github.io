@@ -257,8 +257,25 @@ git commit -am "Remove a submodule."
 .gitmodules 删除子模块
 
 ```
+#### 仓库太大
+ 
+
+```
+RPC failed; curl 18 transfer closed with outstanding read data remaining
+为项目太久，tag资源文件太大
+
+git config --global http.postBuffer 524288000 　　　　# 2GB
+git config --global http.postBuffer 2097152000　　      # 2GB
+git config --global http.postBuffer 3194304000 　　    # 3GB
+
+git config --global http.lowSpeedLimit 0
+git config --global http.lowSpeedTime 999999
 
 
+git clone /github_com/large-repository --depth 1
+cd large-repository
+git fetch --unshallow
+```
 ### [Git内部原理/源码](https://zhuanlan.zhihu.com/p/71577255)
 ```
  +--------------------------------------------+--------------+---------------------+---------------------+
@@ -664,6 +681,8 @@ fi
 #git clone -b app_flutter http://git/test.git
 
 ```
+
+
 ##  Repo
 Repo是谷歌用Python脚本写的调用git的一个脚本，可以实现管理多个git库。
 
