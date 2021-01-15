@@ -29,7 +29,7 @@
 ## Apache Ant
 使用技术：Java内省
 gnu make->git->ant->maven->groovy->gradle->Android gradle sdl
-gnu make->Autotools（配置文件复杂） ->Cmake（配置文件只需要写上源文件及生成类型，同一个目标的配置可能会零散分布在各个地方）->gyp（模块化、结构化）->gn（GN比GYP速度快20倍）
+gnu make（make包含很多默认）->Autotools（配置文件复杂） ->Cmake（配置文件只需要写上源文件及生成类型，同一个目标的配置可能会零散分布在各个地方）->gyp（python 项目，模块化、结构化）->gn（c++项目，GN比GYP速度快20倍）
 ```
 [organisation]-[module]-[revision]-[type].[ext]
 +------------+------------------------------------------------------+
