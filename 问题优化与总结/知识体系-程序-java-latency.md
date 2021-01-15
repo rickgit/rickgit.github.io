@@ -1225,7 +1225,22 @@ cache 是加速 读，而 buffer 是缓冲 写
 
 ```
 selector 不好直接管理socket，使用channel做适配
+### 文件的创建
+```java
+文件名不能包含下列任何字符：
+\/:*?"<>|
 
+    1.文件名在操作系统中不允许出现  / \ " : | * ? < > 故将其以空替代
+      　　Pattern pattern = Pattern.compile("[\\s\\\\/:\\*\\?\\\"<>\\|]");
+      　　Matcher matcher = pattern.matcher(fileName);
+
+      　　fileName= matcher.replaceAll(""); // 将匹配到的非法字符以空替换
+
+　　2.在创建文件前，对文件名进行合法性校验
+
+      　　fileName.matches("[^\\s\\\\/:\\*\\?\\\"<>\\|](\\x20|[^\\s\\\\/:\\*\\?\\\"<>\\|])*[^\\s\\\\/:\\*\\?\\\"<>\\|\\.]$");   
+
+```  
 ### 文件格式
 #### Properties, JSON, ProBuff , FlatBuff
 #### EBK，TXT，PDF ，EPUB，MOBI，UMD

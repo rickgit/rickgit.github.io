@@ -29,7 +29,7 @@
 ## Apache Ant
 使用技术：Java内省
 gnu make->git->ant->maven->groovy->gradle->Android gradle sdl
-gnu make->Cmake
+gnu make->Autotools（配置文件复杂） ->Cmake（配置文件只需要写上源文件及生成类型，同一个目标的配置可能会零散分布在各个地方）->gyp（模块化、结构化）->gn（GN比GYP速度快20倍）
 ```
 [organisation]-[module]-[revision]-[type].[ext]
 +------------+------------------------------------------------------+
@@ -264,6 +264,12 @@ implement不传递依赖库
 #### 问题
 ```
 Could not find com.android.tools.build:aapt2 AndroidStudio
+
+
+
+Android: A problem occurred configuring project ':app'. > java.lang.NullPointerException (no error message) 
+org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
+
 
 ```
 [Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
