@@ -1268,3 +1268,8 @@ ODT     2006年，基于XML的文件格式（OpenDocument Text），Libreoffice�
 docx    2006年，office 2007使用docx（microsoft office open Xml），文件本质上是一个XML文件的zip包。doc则是二进制zip包，二进制存储一旦破坏很难修复
 snb     2011年,三星snote 应用保存格式
 源电子书格式可以是AZW，CBZ，CBR，CBC，CHM，DJVU，DOCX，EPUB，FB2，HTML，LIT，LRF，MOBI，ODT，PDF，PRC，PDB，PML，RTF，SNB，TCR或TXT等
+
+#### PDF
+
+https://github.com/PDFium/PDFium.git
+https://github.com/mshockwave/PdfiumAndroid PDFium Android版本
