@@ -220,6 +220,55 @@ remote            +              tag
 
 
 ```
+
+### 仓库仓用命令
+```shell
+1.工作区
+git status //（红色文件）管理本地修改状态
+git clean -f//删除的是未跟踪的文件，-d 文件夹 ；-x .gitignore文件也可以删除；
+git add //添加到index/暂存区
+git checkout -- <file> //撤销跟踪文件修改，到工作区
+
+2.暂存区
+git status // （绿色文件）查看暂存区中差异信息
+git commit //添加到仓库
+git ls-files //管理文件
+
+3.仓库
+git init //初始化仓库
+git reset HEAD <file> //撤销仓库到暂存区；执行后 git diff 打印出来，没有区别
+git diff //工作区与ls-files差异信息
+git reset --soft //index 区； --hard 同步到工作区；--mix 记录撤销，撤销add
+git checkout //到本地工作区
+3.1 日志
+git log
+git log --grep=''
+git show
+git bisect
+
+3.2 分支
+git branch
+git merge
+git rebase
+git tag
+
+4.贮藏区
+git stash show //显示stash区的文件
+git stash save <message>//添加到stash贮藏区
+git stash pop //取出最近贮藏区修改
+
+git stash list //管理贮藏
+git stash drop stash@{message} //管理删除
+git stash apply stash@{message} //管理应用某个贮藏
+
+5. 远程仓库
+git clone //初始化仓库&checkout
+git push //添加记录到远程仓库
+git fetch //拉取记录到本地分支
+git pull //fetch &merge 拉取记录到本地仓库并工作区
+
+```
+
 ### 常见问题
 ```shell
 Please move or remove them before you can switch branches.

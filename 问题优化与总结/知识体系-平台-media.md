@@ -1588,7 +1588,7 @@ Protocols: RTMP, RTMPT, RTMPS, and RTMPE
 ## Zxing
 zxing
 支持 QRCodeReader，PDF417Reader，OneDReader，ByQuadrantReader，MaxiCodeReader，DataMatrixReader，AztecReader，MultiFormatReader
-```
+```plantuml
 @startuml
 DecodeHandler -> MultiFormatReader: decode
 MultiFormatReader->QRCodeReader:decodeWithState(BinaryBitmap)
@@ -1605,6 +1605,13 @@ Decoder->DecodedBitStreamParser
 Decoder->QRCodeReader:decode(BitMatrix):DecoderResult
 @enduml
 ```
+
+版本 1 （21×21）。内容："Ver1" 
+版本 2 （25×25）。内容："版本 2" 
+版本 3 （29×29）。内容："版本 3 QR 码"
+版本 4 （33×33）。内容："版本 4 QR 码，高达 50 个字符"
+
+Camera->Camera.PreviewCallback（rawdatas）->PlanarYUVLuminanceSource（从屏幕截图获取二维码的图片字节）->HybridBinarizer （获取矩阵的偏移量矩阵）->BitMatrixParser（解析codeblock字节。读取 FormatInformation，Version解析DataMask）->DataBlock->correctErrors
 ## Android
 [](https://www.cnblogs.com/renhui/p/7452572.html)
 数据源：文件，网络协议，硬件设备

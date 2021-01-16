@@ -170,6 +170,28 @@ set DEPOT_TOOLS_UPDATE=0 //不自动更新
 git -c core.deltaBaseCacheLimit=2g clone --no-checkout --progress https://chromium.googlesource.com/chromium/src.git /home/anshu/workspace/chrome/_gclient_src_khRm5A
 ```
 ## webview实现
+### android webview 2.2
+
+https://www.cnblogs.com/lfsblack/p/5342631.html
+```
+webview -> webviewcore -> BrowserFrame 
+-> external/WebKit/android/jni/WebCoreFrameBridge.cpp 
+-> external/WebKit/webcore/loader/FrameLoader::load
+-> external/WebKit/webcore/../MainResourceLoader
+-> external/WebKit/webcore/../MainResourceLoader
+-> ResourceHandle::create //网络及回调
+-> ../jni/ResourceLoaderAndroid::start
+-> external/WebKit/webcore/../DocumentLoader::receivedData
+-> FrameLoader::write //写入解析
+
+
+```
+
+```java 
+结构 webview->page->frame->document/loader
+WebView::initWithFrame
+
+```
 ### crosswalk
  [crosswalk](https://github.com/crosswalk-project/crosswalk.git)
 

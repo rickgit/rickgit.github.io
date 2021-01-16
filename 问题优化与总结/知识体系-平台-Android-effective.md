@@ -268,14 +268,14 @@ try{Looper.loop()}
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
-
+分区存储
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
-- ⭐用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；阻止设备跟踪 （OAID替换）
-
-[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
-
+- 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；
+⭐ AndroidX代替v4,v7
+⭐[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
+⭐ 设备ID就不能获取，去掉了READ_PHONE_STATE权限，阻止设备跟踪 （OAID替换）
 
 #### Android  9 API level 28
 [行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
@@ -285,13 +285,14 @@ try{Looper.loop()}
 - AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
 - webview多进程需要设置setDataDirectorySuffix
 -  Android 9（API 级别 28）引入了新的电池管理功能：应用待机存储分区。[](https://developer.android.google.cn/topic/performance/appstandby)
-
+⭐非可调用 sdk 接口限制
+⭐ Http 明文请求
 
 #### Android  8 API level 26
 [Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
 
-- 后台执行限制
-- Notification Channels 创建一个用户可自定义的频道。
+- ⭐后台执行限制，
+- ⭐ Notification Channels 创建一个用户可自定义的频道。
 - 画中画
 [Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
  26 
@@ -321,17 +322,24 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 [Android 7.0 行为变更](https://developer.android.google.cn/about/versions/nougat/android-7.0-changes?hl=zh-cn)
 - 低耗电
 - 夜间模式
-
+V2签名
+Android 7.x中,PopupWindow高度为match_parent时,会出现兼容性问题,需要处理兼容性
+⭐FileProvider访问文件
 #### Android  6 API level 23
 [Android 6.0 变更](https://developer.android.google.cn/about/versions/marshmallow/android-6.0-changes?hl=zh-cn)
 
 - [Android 临时访问权限](https://www.jianshu.com/p/f15f956763c1)
-
+⭐动态权限管理，IMEI可能获取不到
 深层链接和 Android 应用链接
 #### Android  5 API level 21 
 [Android Lollipop](https://developer.android.google.cn/about/versions/lollipop?hl=zh-cn)
 - Material Design
 Art正式替代Dalvik VM
+⭐Material Design风格，AppTheme，ToolBar 代替Actionbar 
 #### Android  4 API level 14
 [Android KitKat 4.4(api level 19)](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
 VSYNC/Choreographer
+⭐Holo风格，Fragment，FragmentActivity，v7兼容低版本
+
+#### Android 3
+⭐ActionBar Theme.Holo AppCompatActivity
