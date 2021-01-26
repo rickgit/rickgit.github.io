@@ -986,7 +986,7 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
  
 #### 永久代的垃圾收集
 永久代的垃圾收集主要回收两部分内容：废弃常量和无用的类
-
+## ⭐ 删除是最糟糕的体验
 ## io（同步、异步、阻塞、非阻塞）
 
 MMU/MMAP
@@ -1273,3 +1273,20 @@ snb     2011年,三星snote 应用保存格式
 
 https://github.com/PDFium/PDFium.git
 https://github.com/mshockwave/PdfiumAndroid PDFium Android版本
+
+[pdf格式](https://www.cnblogs.com/alita/p/12070677.html)
+[TABLE G.2 Objects in simple text string example](https://www.adobe.com/devnet/pdf/pdf_reference_archive.html)
+
+https://resources.infosecinstitute.com/topic/pdf-file-format-basic-structure/
+
+#### DjVuLibre
+http://djvu.sourceforge.net/
+https://github.com/barak/djvulibre
+
+#### office
+https://github.com/07101994/LibreOffice-Core-android
+https://docs.libreoffice.org/android.html
+https://cgit.freedesktop.org/libreoffice/core/
+
+#### comic
+rar,7z,zip,tar

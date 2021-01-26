@@ -414,6 +414,17 @@ adb shell dumpsys window w | findstr mCurrent
 ```
 
 #### 图片适配（density）
+#### 对话框
+修改对话框宽度
+```
+super.show();
+Window window = mDialogCommon.getWindow();
+if (window != null){
+      window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+      WindowManager.LayoutParams attributes = window.getAttributes();
+      attributes.y = -120;
+}
+```
 ### 编舞者 Choreographer
 双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
 #### 遍历刷新(测量，布局，绘制) traversal
@@ -677,6 +688,12 @@ TransitionManager 观察addOnPreDrawListener
 
 装饰者模式:
       setProgress
+```xml
+ConstraintLayout 1.1.3
+      - Framelayout
+            - ImageView
+这种布局 ImageView onMeasure 获取的是ConstraintLayout的宽高；
+```
 ###### ViewPager
 transformPage
 ViewPager2支持：
