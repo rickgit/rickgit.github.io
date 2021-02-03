@@ -868,8 +868,6 @@ join
 
 #### ThreadPoolExecutor 线程池
 
- 
-
 ```
 
 源码
@@ -899,8 +897,6 @@ join
       |   completedTasks:long                     |   ArrayBlockingQueue |                         |
       |                                           |                      |                         |
       +-------------------------------------------+----------------------+-------------------------+
-
-
 
 
                          //ThreadPoolExecutor/ScheduledThreadPoolExecutor

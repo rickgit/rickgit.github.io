@@ -174,6 +174,10 @@ adb shell 命令源码地址（find -iname 'cmds'）：
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 ### uiautomator
+dump
+events
+runtest
+
 
 https://android.googlesource.com/platform/frameworks/uiautomator
 
@@ -279,14 +283,13 @@ try{Looper.loop()}
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
-⭐ 分区存储
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
 - 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；
-⭐ AndroidX代替v4,v7
 ⭐[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
 ⭐ 设备ID就不能获取，去掉了READ_PHONE_STATE权限，阻止设备跟踪 （OAID替换）
+⭐ AndroidX代替v4,v7
 
 #### Android  9 API level 28
 [行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
@@ -302,8 +305,7 @@ try{Looper.loop()}
 #### Android  8 API level 26
 [Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
 
-- ⭐后台执行限制，
-- ⭐ Notification Channels 创建一个用户可自定义的频道。
+- ⭐后台执行Service限制，Notification Channels 创建一个用户可自定义的频道。
 - 画中画
 [Android 8.0（API 级别 26）及更高版本中，位图像素数据存储在原生堆中](https://developer.android.google.cn/topic/performance/graphics/manage-memory.html#save-a-bitmap-for-later-use)
  26 
@@ -349,8 +351,8 @@ Art正式替代Dalvik VM
 ⭐Material Design风格，AppTheme，ToolBar 代替Actionbar 
 #### Android  4 API level 14
 [Android KitKat 4.4(api level 19)](https://developer.android.google.cn/about/versions/kitkat?hl=zh-cn)
-VSYNC/Choreographer
-⭐Holo风格，Fragment，FragmentActivity，v7兼容低版本
+⭐ VSYNC/Choreographer
+⭐ Holo风格，Fragment，FragmentActivity，v7兼容低版本
 
 #### Android 3
 ⭐ActionBar Theme.Holo AppCompatActivity
