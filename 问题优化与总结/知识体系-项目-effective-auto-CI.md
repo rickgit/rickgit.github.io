@@ -278,7 +278,7 @@ org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
 [JetBrains intellij android](https://github.com/JetBrains/android.git)
 [android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
 
-[android gradle-plugin relsease notes](https://developer.android.google.cn/studio/releases/gradle-plugin)
+[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
 #### Android gradle
 
 ```gradle

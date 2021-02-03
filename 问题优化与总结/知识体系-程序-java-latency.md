@@ -1266,7 +1266,9 @@ lrf     2004年，Sony Librie支持的文件格式。在2010年停产之前,索�
 fb2     2004年，FictionBook发布的扩展名，基于XML的开放的电子书格式，无DRM， 
 ODT     2006年，基于XML的文件格式（OpenDocument Text），Libreoffice和Openoffice等开元办公自动化软件的默认格式
 docx    2006年，office 2007使用docx（microsoft office open Xml），文件本质上是一个XML文件的zip包。doc则是二进制zip包，二进制存储一旦破坏很难修复
+caj     2007年，杂志阅读格式
 snb     2011年,三星snote 应用保存格式
+
 源电子书格式可以是AZW，CBZ，CBR，CBC，CHM，DJVU，DOCX，EPUB，FB2，HTML，LIT，LRF，MOBI，ODT，PDF，PRC，PDB，PML，RTF，SNB，TCR或TXT等
 
 #### PDF

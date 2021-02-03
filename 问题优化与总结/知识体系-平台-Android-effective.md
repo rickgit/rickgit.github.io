@@ -158,13 +158,24 @@ Android AspectJ 常用埋点
 ## 稳定
 Crash 和 ANR
 
-android develop monkey
-AndroidJunitRunner
+ AndroidJunitRunner
+
+adb 命令源码地址：
+/system/core/adb/
+adb shell 命令源码地址（find -iname 'cmds'）：
+/development/cmds/monkey
+/frameworks/av/cmds
+/frameworks/base/cmds/(am bugreport dumpsys ime imput pm )
+/frameworks/native/cmds/(bugreport)
+/frameworks/testing/uiautomator/cmds
 
 
 ### 代码Review：提高代码质量
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
+### uiautomator
+
+https://android.googlesource.com/platform/frameworks/uiautomator
 
 ### MONKEY
 1. monkey tools 测试
@@ -268,7 +279,7 @@ try{Looper.loop()}
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
-分区存储
+⭐ 分区存储
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
@@ -285,7 +296,7 @@ try{Looper.loop()}
 - AMS：后台服务JobScheduler；后台进程不允许startService前台服务（IllegalStateException）；FLAG_ACTIVITY_NEW_TASK，才允许在非Activity场景启动Activity；
 - webview多进程需要设置setDataDirectorySuffix
 -  Android 9（API 级别 28）引入了新的电池管理功能：应用待机存储分区。[](https://developer.android.google.cn/topic/performance/appstandby)
-⭐非可调用 sdk 接口限制
+⭐ 非可调用 sdk 接口限制
 ⭐ Http 明文请求
 
 #### Android  8 API level 26

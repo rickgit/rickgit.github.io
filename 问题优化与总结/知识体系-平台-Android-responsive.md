@@ -400,8 +400,12 @@ adb shell dumpsys window displays |head -n 3
 ### 图片闪动
 滑动停止才进行显示图片
  
-### 显示与窗口
-Activity、Dialog、PopWindow、Toast
+### 显示（Surface）与窗口（WindowManageGloabal，PhoneWindow）
+
+WindowManageGloabal 关联 RootViewImpl 和 contentView
+PhoneWindow 维持 contentView
+
+Activity、Dialog、PopWindow、Toast、输入法
 
  popupwindow 与 Dialog
 - popupwindow 非阻塞浮层，需要onResume后，view 关联窗口管理才能显示
@@ -411,10 +415,18 @@ Activity、Dialog、PopWindow、Toast
 
 ```bash
 adb shell dumpsys window w | findstr mCurrent
+
+
 ```
 
+```java
+窗口泄露
+android.view.WindowManagerGlobal#closeAllExceptView
+```
+
+
 #### 图片适配（density）
-#### 对话框
+#### 对话框和PopupWindow
 修改对话框宽度
 ```
 super.show();
@@ -425,6 +437,7 @@ if (window != null){
       attributes.y = -120;
 }
 ```
+
 ### 编舞者 Choreographer
 双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
 #### 遍历刷新(测量，布局，绘制) traversal
@@ -1076,6 +1089,10 @@ ANR Input dispatching timed out (Waiting because the touched window has not fini
 
 
 ## 屏幕适配
+
+adb shell uiautomator dump /sdcard/ui.xml
+
+
 ### 屏幕参数
 > 屏幕尺寸：手机对角线的物理大小，单位为英寸（inch），1英寸=2.54cm，Android手机常见的尺寸有5寸、5.5寸、6寸等等
 
