@@ -933,13 +933,14 @@ zygote// zygote socket通信设备文件
 ```
 
 ### Binder机制/通讯协议
+OpenBinder以及合入到Linux Kernel主线 3.19版本
 
 **序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
 
 [Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
 binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
-[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/)
+[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/) 
 
 ```java
 n：native
