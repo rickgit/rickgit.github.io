@@ -95,7 +95,7 @@ JNI_END
 ```
 ---------+---------------------------------------------------------------------------------+
 |        |  Design patterns    | SOLID and GRASP guidelines                                |
-|        |(cohesion & coupling)|  Gof                                                       |
+|        |(cohesion & coupling)|  Gof                                                      |
 |        +---------------------------------------------------------------------------------+
 |        |  reference variable| this                                                       |
 |        +---------------------------------------------------------------------------------+
@@ -1275,6 +1275,8 @@ snb     2011年,三星snote 应用保存格式
 
 https://github.com/PDFium/PDFium.git
 https://github.com/mshockwave/PdfiumAndroid PDFium Android版本
+
+https://github.com/KnIfER/LibPDFium
 
 [pdf格式](https://www.cnblogs.com/alita/p/12070677.html)
 [TABLE G.2 Objects in simple text string example](https://www.adobe.com/devnet/pdf/pdf_reference_archive.html)

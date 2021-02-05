@@ -162,6 +162,7 @@ Crash 和 ANR
 
 adb 命令源码地址：
 /system/core/adb/
+/system/core/toolbox（getprop）
 adb shell 命令源码地址（find -iname 'cmds'）：
 /development/cmds/monkey
 /frameworks/av/cmds
@@ -276,10 +277,31 @@ try{Looper.loop()}
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
 [](知识体系-平台-Android-desigin.md)
-### 版本特性
-[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
 
-#### （Android 11）
+### studio
+```java
+问题：The emulator process for AVD Pixel_2_API_29 was killed 
+修改：C:\Users\anshu\.android\avd\Pixel_2_API_30.avd\config.ini
+hw.gpu.enabled = no hw.gpu.mode = off
+
+
+问题：你的主机中的软件中止了一个已建立的连接
+解决：gradle 6.5 不支持热点
+
+问题： gradle 下载慢
+解决：http://services.gradle.org/distributions/
+    放在user/.gradle/wrapper/dist/
+
+安装插件导致卡顿 tools > customproperties
+C:\Users\anshu\AppData\Roaming\Google\AndroidStudio4.1\plugins
+```
+
+#### Gradle 5.3  支持kotlin
+### 版本特性
+[Android 版本与API level](https://developer.android.google.cn/studio/releases/platforms?hl=zh-cn)
+
+[Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
+#### Android 11 API level 30
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)

@@ -103,6 +103,26 @@ GCC 就是把内核的源代码输出成二进制代码而已。生成的二进�
 
 
 ```
+ 
+###
+⭐ ndk-build出问题，需要用 命令行 gradlew assemble，提示的信息更全
+```
+Android NDK: APP_STL gnustl_static is no longer supported. Please switch to either c++_static or c++_shared.
+
+1. APP_STL  := gnustl_static 改为 APP_STL := c++_static；
+
+2.删除NDK_TOOLCHAIN or NDK_TOOLCHAIN_VERSION；
+
+
+
+
+found local symbol '__bss_start' 
+查看：readelf -s *.so |grep "__bss_start"  
+解决：Android.mk :：     APP_LDFLAGS := -fuse-ld=gold
+
+
+```
+
 
 ###  2 内存泄漏/内存抖动（Android Profiler- memory）
 GC Root :

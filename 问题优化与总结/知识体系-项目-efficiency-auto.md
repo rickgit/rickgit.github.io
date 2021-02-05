@@ -1,8 +1,5 @@
 ## 自动化
 
-
-### GNU
-http://mirrors.ustc.edu.cn/gnu/
 ### 
 
 [](https://juejin.im/post/5df10c116fb9a0165936e0b7)
