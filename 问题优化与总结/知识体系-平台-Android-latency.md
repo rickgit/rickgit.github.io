@@ -121,6 +121,16 @@ found local symbol '__bss_start'
 解决：Android.mk :：     APP_LDFLAGS := -fuse-ld=gold
 
 
+
+not found file "...h"
+查看：$(warning "the value of LOCAL_C_INCLUDES is$(LOCAL_C_INCLUDES)") 查看路径是否正确。
+解决：在wls 下面，$(win)返回的仍然是1，导致路径都替换成window的“c：/。。/”，注释掉代码。
+
+
+Operation not permitted
+虽然是警告，但是可能导致文件不能拷贝。
+使用sudo ndk-build
+
 ```
 
 
