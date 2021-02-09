@@ -345,6 +345,13 @@ adb shell pm list package
 ```bash
 adb shell dumpsys -T 60000 activity -v all
 
+ 
+## studio
+```java
+问题：The emulator process for AVD Pixel_2_API_29 was killed 
+修改：C:\Users\anshu\.android\avd\Pixel_2_API_30.avd\config.ini
+hw.gpu.enabled = no hw.gpu.mode = off
+ 
 
 adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
 adb shell dumpsys activity activities----------查看Activity组件信息
@@ -360,11 +367,21 @@ adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activ
 
 adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 
+安装插件导致卡顿 tools > customproperties
+C:\Users\anshu\AppData\Roaming\Google\AndroidStudio4.1\plugins
+
+
+wsl 安装sdk
+下载commandlinetools-linux，根据所需版本，执行命令
+sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3.6.4111459" "ndk;22.0.7026061"  "ndk-bundle"
+
+
+
+
 
 adb shell  dumpsys window windows |grep "Window #"
 
 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 adb shell am kill <packagename>
 
 If you want to kill the Sticky Service,the following command NOT WORKING:
@@ -377,7 +394,6 @@ adb shell pm disable <PACKAGE>
 If you want to restart the app,you must run command below first:
 
 adb shell pm enable <PACKAGE>
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ```
 ## 可拓展
 
