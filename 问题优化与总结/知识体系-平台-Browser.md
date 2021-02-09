@@ -221,3 +221,31 @@ architecture
 ## 稳定
 ### 版本
 https://src.chromium.org/viewvc/chrome/releases/1.0.154.53 第一版
+
+
+## 加载快
++--------------------------------------------------------------------------+
+|                            AdblockPlus:App                               |
+|                                js:JSThread                               |
+|                                subscriptions:List<Subscription>          |
+|                                                                          |
+|                           JSThread:Thread                                |
+|                               jsEngine:JSEngine                          |
+|                                                                          |
+|                           JSEngine                                       |
+|                                nativeInitialize()                        |
+|                               nativeExecute()                            |
+|                               methods:ObjMethod[]                        |
+|                                                                          |
+|                                                                          |
+|                                      [v8] v8::Handle< v8::String>        |
+|                                                                          |
+|                                           v8::Handle< v8::Script>        |
+|                                                  Run()                   |
++--------------------------------------------------------------------------+
+|   [js]                                                                   |
+|         start.js                                                         |
+|    XMLHttpRequest.jsm  FilterNotifier.jsm  FilterClasses.jsm             |
+|   SubscriptionClasses.jsm   FilterStorage.jsm   FilterListener.jsm       |
+|    Matcher.jsm          Synchronizer.jsm                                 |
++--------------------------------------------------------------------------+

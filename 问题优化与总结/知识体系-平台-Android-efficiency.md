@@ -1,158 +1,7 @@
 
-高效的稳健开发
+# 高效的稳健开发
 1. 设计模式
-2. 
-
-## 包内精简 - APK打包 （编译，打包，优化，签名，安装）
-  [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
-
-gradle,Transform的应用
-批量打包
-```打包流程
-G: gradle build tools
-B: android build tools
-J: JDK tools
-
-
-+--------------------------------------------------------------------------------------+
-| /META-INF                                                                            |
-| /assets                                                                              |
-| /res                                                                                 |
-| /libs                                                                                |
-| class.dex                                                                            |
-| resources.arsc                                                                       |
-| AndroidManifest.xml                                                                  |
-+--------------------------------------------------------------------------------------+
-|G                                                                                     |
-|    multiple agent tool                                                               |
-+--------------------------------------------------------------------------------------+
-|B                                                                                     |
-|   zipalign                                                                           |
-+--------------------------------------------------------------------------------------+
-|J                                                                                     |
-|   javasigner  V1, V2(N), V3(P)                                                       |
-+--------------------------------------------------------------------------------------+
-|G                                                                                     |
-|   ApkBuilder (so,FontCreator)                                                        |
-+--------------------+                          +--------------------------------------+
-|B                   |                          |B                                     |
-|  linker            |                          |    dex                               |
-+--------------------------------------------------------------------------------------+
-|B                   |B                         |G             +-----------------------+
-|  bcc compat        |   AAPT                   |    proguard  |          Preveirfy    |
-|                    |  (Lint,TinyPNG,tintcolor)|              |          Obfuscate    |
-|                    |  (WebP,svg)              |              |          Optimize     |
-|                    |                          |              |          Shrink       |
-|                    |                          |              +-----------------------+
-+--------------------+                          +--------------------------------------+
-|B                   |                          |        J                             |
-|  llvm-rs-cc        |                          +-------+    javac                     |
-|                    |                          | R.java|                              |
-|                    +--------------------------+--------------------------------------+
-|                    |G                                 |B                             |
-|                    | menifest/assets/resource merger  |    aidl                      |
-+--------------------+-----------------------------------------------------------------+
-
-                                                                                              
-
-```
-
-walle
-```
-+---------------------------------------------------------------------------------------------+
-|                                        walle-cli                                            |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                         jcommander                                                          |
-|                                                               Batch2Command                 |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                                                                                             |
-|                      ChannelReader                ChannelWriter                             |
-|                                                                                             |
-|                                                                                             |
-|                      PayloadReader                                                          |
-|                                                                                             |
-+---------------------------------------------------------------------------------------------+
-|                      ApkUtil                                                                |
-|                         findApkSigningBlock()                                               |
-+---------------------------------------------------------------------------------------------+
-
-```
-
-### 打包自动化
-[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
-### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
-#### ProGuard
-     代码混淆 -printmapping ，-applymapping
-[ProGuard android ](https://github.com/Guardsquare/proguard.git)
-```plantuml
-@startuml
-ProGuardPlugin -> ProGuardTransform :android.registerTransform() 
-note left :gradle-plugin
-
-ProGuardTransform -> ProGuardTask :project.tasks.create  
-ProGuardTask ->ProGuard :proguard()
-ProGuard ->ProGuard :shrink optimize obfuscate(Javassist) preverify
-@enduml
-```
-[ProGuard java](https://github.com/Guardsquare/proguard-core.git)
-
-#### 资源打包 AAPT
-     [aapt2 适配之资源 id 固定](https://fucknmb.com/2017/11/15/aapt2%E9%80%82%E9%85%8D%E4%B9%8B%E8%B5%84%E6%BA%90id%E5%9B%BA%E5%AE%9A/)
-          aapt  -p public.xml
-          aapt2 --stable-ids ,--emit-ids
-
-## 命令
-adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
-
-adb shell pm dump com.tencent.weread.eink | findstr “versionName”
-
-
-adb shell pm list package
-
-
-```bash
-adb shell dumpsys -T 60000 activity -v all
-
-
-adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
-adb shell dumpsys activity activities----------查看Activity组件信息
-adb shell dumpsys activity services-----------查看Service组件信息
-adb shell dumpsys activity providers----------产看ContentProvider组件信息
-adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
-adb shell dumpsys activity intents--------------查看Intent信息
-adb shell dumpsys activity processes---------查看进程信息
-
-
-adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
-adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
-
-adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
-
-
-adb shell  dumpsys window windows |grep "Window #"
-
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-adb shell am kill <packagename>
-
-If you want to kill the Sticky Service,the following command NOT WORKING:
-
-adb shell am force-stop <PACKAGE>
-adb shell kill <PID>
-The following command is WORKING:
-
-adb shell pm disable <PACKAGE>
-If you want to restart the app,you must run command below first:
-
-adb shell pm enable <PACKAGE>
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-```
-
-
-## 事件日志
-Android AspectJ 常用埋点
+稳定（单元测试）自动化（代码管理，编译打包），可分析（日志调试）可拓展（设计原则与模式）
 
 
 ## 稳定
@@ -160,123 +9,13 @@ Crash 和 ANR
 
  AndroidJunitRunner
 
-adb 命令源码地址：
-/system/core/adb/
-/system/core/toolbox（getprop）
-adb shell 命令源码地址（find -iname 'cmds'）：
-/development/cmds/monkey
-/frameworks/av/cmds
-/frameworks/base/cmds/(am bugreport dumpsys ime imput pm )
-/frameworks/native/cmds/(bugreport)
-/frameworks/testing/uiautomator/cmds
-
 
 ### 代码Review：提高代码质量
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
-### uiautomator
-dump
-events
-runtest
 
-
-https://android.googlesource.com/platform/frameworks/uiautomator
-
-### MONKEY
-1. monkey tools 测试
-adb shell monkey -p com.bla.yourpackage -v 1000
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
-
-
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
-
-heisha:
-adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
-
-[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
-[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
-
-
-停止 monkey
-adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
-
-基础参数 | 事件参数 | 调试参数
-|------:|---------:|---------:|
--v |     -pct-touch| -hprof   |
--s |            ...|--ignore-security-exceptions|
--p |               |       ...|
---throttle|  |  |
-
-```java
-    public static final int FACTOR_TOUCH        = 0;//点击
-    public static final int FACTOR_MOTION       = 1;//滑动
-    public static final int FACTOR_TRACKBALL    = 2;//滚动
-    public static final int FACTOR_NAV          = 3;
-    public static final int FACTOR_MAJORNAV     = 4;//back home menu
-    public static final int FACTOR_SYSOPS       = 5;//物理按键
-    public static final int FACTOR_APPSWITCH    = 6;//startActivity
-    public static final int FACTOR_ANYTHING     = 7;
-```
-
-
-```
-monkey network
-adb forward tcp:1080 tcp:1080
-adb shell monkey --port 1080
-telnet 127.0.0.1 1080
-
-```
-
-
-2. 使用 adb 获取错误报告
-adb bugreport E:/bugs/
-3. anr文件
-adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
-
-4. 日志
-- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
-- EXCEPTION,NullPointerException
-- ERROR
-
-[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
-[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
 
 ### Android Lint、QAPlugins（Findbugs、Checkstyle、PMD）
-### 日志 Timer
-
-### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
-```
-services/core/java/com/android/server/am/AppErrors.java:
-
-StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
-//                    .detectDiskReads()
-//                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .penaltyDialog() //弹出违规提示对话框
-                    .penaltyLog() //在Logcat 中打印违规异常信息
-                    .penaltyFlashScreen() //API等级11
-                    .build());
-StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-        .detectLeakedSqlLiteObjects()
-        .detectLeakedClosableObjects() //API等级11
-        .penaltyLog()
-        .detectFileUriExposure()
-        .penaltyDeath()
-        .build());
-```
-### （异常 错误 安全）反编译
-[dex2jar](https://github.com/pxb1988/dex2jar)
-[jd-gui](https://github.com/java-decompiler/jd-gui)
-[Apktool](https://github.com/iBotPeaches/Apktool)
-[jad（不维护）](http://www.kpdus.com/jad.html)
-
-[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
-try{Looper.loop()}
-
-
-### 可维护性/通讯 - 架构之模块化（插件化及组件化）
-[](知识体系-平台-Android-desigin.md)
 
 ### studio
 ```java
@@ -378,3 +117,270 @@ Art正式替代Dalvik VM
 
 #### Android 3
 ⭐ActionBar Theme.Holo AppCompatActivity
+
+## 自动化（代码，编译，依赖，）
+
+### 包内精简 - APK打包 （编译，打包，优化，签名，安装）
+  [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
+
+gradle,Transform的应用
+批量打包
+```打包流程
+G: gradle build tools
+B: android build tools
+J: JDK tools
+
+
++--------------------------------------------------------------------------------------+
+| /META-INF                                                                            |
+| /assets                                                                              |
+| /res                                                                                 |
+| /libs                                                                                |
+| class.dex                                                                            |
+| resources.arsc                                                                       |
+| AndroidManifest.xml                                                                  |
++--------------------------------------------------------------------------------------+
+|G                                                                                     |
+|    multiple agent tool                                                               |
++--------------------------------------------------------------------------------------+
+|B                                                                                     |
+|   zipalign                                                                           |
++--------------------------------------------------------------------------------------+
+|J                                                                                     |
+|   javasigner  V1, V2(N), V3(P)                                                       |
++--------------------------------------------------------------------------------------+
+|G                                                                                     |
+|   ApkBuilder (so,FontCreator)                                                        |
++--------------------+                          +--------------------------------------+
+|B                   |                          |B                                     |
+|  linker            |                          |    dex                               |
++--------------------------------------------------------------------------------------+
+|B                   |B                         |G             +-----------------------+
+|  bcc compat        |   AAPT                   |    proguard  |          Preveirfy    |
+|                    |  (Lint,TinyPNG,tintcolor)|              |          Obfuscate    |
+|                    |  (WebP,svg)              |              |          Optimize     |
+|                    |                          |              |          Shrink       |
+|                    |                          |              +-----------------------+
++--------------------+                          +--------------------------------------+
+|B                   |                          |        J                             |
+|  llvm-rs-cc        |                          +-------+    javac                     |
+|                    |                          | R.java|                              |
+|                    +--------------------------+--------------------------------------+
+|                    |G                                 |B                             |
+|                    | menifest/assets/resource merger  |    aidl                      |
++--------------------+-----------------------------------------------------------------+
+
+                                                                                              
+
+```
+
+walle
+```
++---------------------------------------------------------------------------------------------+
+|                                        walle-cli                                            |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                         jcommander                                                          |
+|                                                               Batch2Command                 |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                                                                                             |
+|                      ChannelReader                ChannelWriter                             |
+|                                                                                             |
+|                                                                                             |
+|                      PayloadReader                                                          |
+|                                                                                             |
++---------------------------------------------------------------------------------------------+
+|                      ApkUtil                                                                |
+|                         findApkSigningBlock()                                               |
++---------------------------------------------------------------------------------------------+
+
+```
+
+
+### 打包自动化
+[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
+### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
+#### ProGuard
+     代码混淆 -printmapping ，-applymapping
+[ProGuard android ](https://github.com/Guardsquare/proguard.git)
+```plantuml
+@startuml
+ProGuardPlugin -> ProGuardTransform :android.registerTransform() 
+note left :gradle-plugin
+
+ProGuardTransform -> ProGuardTask :project.tasks.create  
+ProGuardTask ->ProGuard :proguard()
+ProGuard ->ProGuard :shrink optimize obfuscate(Javassist) preverify
+@enduml
+```
+[ProGuard java](https://github.com/Guardsquare/proguard-core.git)
+
+#### 资源打包 AAPT
+     [aapt2 适配之资源 id 固定](https://fucknmb.com/2017/11/15/aapt2%E9%80%82%E9%85%8D%E4%B9%8B%E8%B5%84%E6%BA%90id%E5%9B%BA%E5%AE%9A/)
+          aapt  -p public.xml
+          aapt2 --stable-ids ,--emit-ids
+## 可分析
+### 日志 Timer 
+### 日志埋点/布点 AspectJ
+Android AspectJ 常用埋点
+### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
+```
+services/core/java/com/android/server/am/AppErrors.java:
+
+StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectCustomSlowCalls() //API等级11，使用StrictMode.noteSlowCode
+//                    .detectDiskReads()
+//                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .penaltyDialog() //弹出违规提示对话框
+                    .penaltyLog() //在Logcat 中打印违规异常信息
+                    .penaltyFlashScreen() //API等级11
+                    .build());
+StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+        .detectLeakedSqlLiteObjects()
+        .detectLeakedClosableObjects() //API等级11
+        .penaltyLog()
+        .detectFileUriExposure()
+        .penaltyDeath()
+        .build());
+```
+### （异常 错误 安全）反编译
+[dex2jar](https://github.com/pxb1988/dex2jar)
+[jd-gui](https://github.com/java-decompiler/jd-gui)
+[Apktool](https://github.com/iBotPeaches/Apktool)
+[jad（不维护）](http://www.kpdus.com/jad.html)
+
+[ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
+try{Looper.loop()}
+
+
+### 手机交互命令
+adb 命令源码地址：
+/system/core/adb/
+/system/core/toolbox（getprop）
+adb shell 命令源码地址（find -iname 'cmds'）：
+/development/cmds/monkey
+/frameworks/av/cmds
+/frameworks/base/cmds/(am pm bugreport dumpsys ime imput  )
+/frameworks/native/cmds/(bugreport)
+/frameworks/testing/uiautomator/cmds
+
+#### adb
+
+#### MONKEY
+1. monkey tools 测试
+adb shell monkey -p com.bla.yourpackage -v 1000
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 1574490540 --hprof --throttle 200 -v -v -v 90000000 -pct-touch 60% --pct-motion 20% --pct-anyevent 20% --pct-nav 0% --pct-majornav 0% --ignore-security-exceptions --kill-process-after-error --monitor-native-crashes >logs/20191123/142900/monkey.txt
+
+heisha:
+adb -s 127.0.0.1:7555 shell monkey -p com.example.proj -s 9455 --throttle 300 -v -v -v 300000 --pct-appswitch  0 --ignore-security-exceptions --ignore-crashes --ignore-timeouts  --monitor-native-crashes
+
+[--pkg-whitelist-file, /sdcard/systemwhitelist.txt, --ignore-crashes, --ignore-timeouts, --ignore-security-exceptions, --ignore-native-crashes, --monitor-native-crashes, --throttle, 500, -v, -v, -v, -s, 800, 570000]
+[-p, com.example.proj, -s, 9455, --throttle, 300, --ignore-security-exceptions, --pct-appswitch, 0, --ignore-crashes, --ignore-timeouts, --ignore-native-crashes, -v, -v, -v, 300000]
+
+
+停止 monkey
+adb shell ps | awk '/com\.android\.commands\.monkey/ { system("adb shell kill " $2) }'
+
+基础参数 | 事件参数 | 调试参数
+|------:|---------:|---------:|
+-v |     -pct-touch| -hprof   |
+-s |            ...|--ignore-security-exceptions|
+-p |               |       ...|
+--throttle|  |  |
+
+```java
+    public static final int FACTOR_TOUCH        = 0;//点击
+    public static final int FACTOR_MOTION       = 1;//滑动
+    public static final int FACTOR_TRACKBALL    = 2;//滚动
+    public static final int FACTOR_NAV          = 3;
+    public static final int FACTOR_MAJORNAV     = 4;//back home menu
+    public static final int FACTOR_SYSOPS       = 5;//物理按键
+    public static final int FACTOR_APPSWITCH    = 6;//startActivity
+    public static final int FACTOR_ANYTHING     = 7;
+```
+
+
+```
+monkey network
+adb forward tcp:1080 tcp:1080
+adb shell monkey --port 1080
+telnet 127.0.0.1 1080
+
+```
+
+
+2. 使用 adb 获取错误报告
+adb bugreport E:/bugs/
+3. anr文件
+adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
+
+4. 日志
+- ANR **(// NOT RESPONDING: )**,CRASH **(// CRASH: )**
+- EXCEPTION,NullPointerException
+- ERROR
+
+[ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
+[ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
+#### uiautomator
+dump
+events
+runtest
+
+https://android.googlesource.com/platform/frameworks/uiautomator
+
+#### am
+adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
+#### pm
+adb shell pm dump com.tencent.weread.eink | findstr “versionName”
+
+
+adb shell pm list package
+#### dumpsys
+
+```bash
+adb shell dumpsys -T 60000 activity -v all
+
+
+adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
+adb shell dumpsys activity activities----------查看Activity组件信息
+adb shell dumpsys activity services-----------查看Service组件信息
+adb shell dumpsys activity providers----------产看ContentProvider组件信息
+adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
+adb shell dumpsys activity intents--------------查看Intent信息
+adb shell dumpsys activity processes---------查看进程信息
+
+
+adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
+adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+
+adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+
+
+adb shell  dumpsys window windows |grep "Window #"
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+adb shell am kill <packagename>
+
+If you want to kill the Sticky Service,the following command NOT WORKING:
+
+adb shell am force-stop <PACKAGE>
+adb shell kill <PID>
+The following command is WORKING:
+
+adb shell pm disable <PACKAGE>
+If you want to restart the app,you must run command below first:
+
+adb shell pm enable <PACKAGE>
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+```
+## 可拓展
+
+### 可维护性/通讯 - 架构之模块化（插件化及组件化）
+[](知识体系-平台-Android-desigin.md)
+
