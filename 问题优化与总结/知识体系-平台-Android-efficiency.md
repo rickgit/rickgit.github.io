@@ -11,13 +11,13 @@ Crash 和 ANR
 
 
 ### 代码Review：提高代码质量
-Commit 审阅 if，系统版本，模块管理
-Push   代码重用,多次提交Review
 
 
 ### Android Lint、QAPlugins（Findbugs、Checkstyle、PMD）
 
 ### studio
+[JetBrains intellij android](https://github.com/JetBrains/android.git)
+
 ```java
 问题：The emulator process for AVD Pixel_2_API_29 was killed 
 修改：C:\Users\anshu\.android\avd\Pixel_2_API_30.avd\config.ini
@@ -33,6 +33,12 @@ hw.gpu.enabled = no hw.gpu.mode = off
 
 安装插件导致卡顿 tools > customproperties
 C:\Users\anshu\AppData\Roaming\Google\AndroidStudio4.1\plugins
+
+
+wsl 安装sdk
+下载commandlinetools-linux，根据所需版本，执行命令
+sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3.6.4111459" "ndk;22.0.7026061"  "ndk-bundle"
+
 ```
 
 #### Gradle 5.3  支持kotlin
@@ -119,10 +125,12 @@ Art正式替代Dalvik VM
 ⭐ActionBar Theme.Holo AppCompatActivity
 
 ## 自动化（代码，编译，依赖，）
+[](知识体系-存储-VCS.md)
+Commit 审阅 if，系统版本，模块管理
+Push   代码重用,多次提交Review
 
 ### 包内精简 - APK打包 （编译，打包，优化，签名，安装）
-  [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
-
+[包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 gradle,Transform的应用
 批量打包
 ```打包流程
@@ -147,7 +155,7 @@ J: JDK tools
 |   zipalign                                                                           |
 +--------------------------------------------------------------------------------------+
 |J                                                                                     |
-|   javasigner  V1, V2(N), V3(P)                                                       |
+|   javasigner  V1, V2(N), V3(P)   /   bouncycastle                                    |
 +--------------------------------------------------------------------------------------+
 |G                                                                                     |
 |   ApkBuilder (so,FontCreator)                                                        |
@@ -170,10 +178,61 @@ J: JDK tools
 |                    | menifest/assets/resource merger  |    aidl                      |
 +--------------------+-----------------------------------------------------------------+
 
-                                                                                              
+```
+
+
+### 编译 gradle sdl
+[gradle sdl ，master分支](https://source.codeaurora.cn/quic/la/platform/tools/base/tree/build-system/gradle?h=aosp-new/master)
+
+[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](./知识体系-项目-efficiency-auto-CI.md:)
+#### Android-DSL
+
+```
++---------------------------------------------+
+|                                             |
+|  gradle 2.x           gradle >=3.0          |
+|                                             |
++---------------------------------------------+
+|  provided           compileOnly             |
+|  apk                runtimeOnly             |
+|  compile            api/implementation      |
++---------------------------------------------+
+
+```
+api传递依赖库
+implement不传递依赖库
+
+[Android Plugin DSL Reference](http://google.github.io/android-gradle-dsl/current/index.html)
+[Android Plugin new future](https://developer.android.com/studio/releases/gradle-plugin)
+
+bouncycastle 签名
+#### 问题
+```
+Could not find com.android.tools.build:aapt2 AndroidStudio
+
+
+
+Android: A problem occurred configuring project ':app'. > java.lang.NullPointerException (no error message) 
+org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
+
+
+```
+[Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
+
+
+[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
+
+[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
+#### Android gradle
+
+```gradle
+
+    gradle -q dependencies your-app-project:dependencies
+
 
 ```
 
+### 打包自动化
 walle
 ```
 +---------------------------------------------------------------------------------------------+
@@ -197,10 +256,6 @@ walle
 
 ```
 
-
-### 打包自动化
-[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](..\问题优化与总结\知识体系-DSL-gradle.md)
-### [gradle sdl ](https://source.codeaurora.cn/quic/la/platform/tools/base)
 #### ProGuard
      代码混淆 -printmapping ，-applymapping
 [ProGuard android ](https://github.com/Guardsquare/proguard.git)
@@ -256,16 +311,19 @@ try{Looper.loop()}
 
 
 ### 手机交互命令
+```sh
+grep更适合单纯的查找或匹配文本，sed更适合编辑匹配到的文本，awk更适合格式化文本，对文本进行较复杂格式处理
+
 adb 命令源码地址：
 /system/core/adb/
-/system/core/toolbox（getprop）
+/system/core/toolbox（getprop，cat GNU项目）
 adb shell 命令源码地址（find -iname 'cmds'）：
 /development/cmds/monkey
-/frameworks/av/cmds
+    /frameworks/av/cmds（）
 /frameworks/base/cmds/(am pm bugreport dumpsys ime imput  )
-/frameworks/native/cmds/(bugreport)
-/frameworks/testing/uiautomator/cmds
-
+    /frameworks/native/cmds/(bugreport)
+    /frameworks/testing/uiautomator/cmds
+```
 #### adb
 
 #### MONKEY
@@ -330,23 +388,35 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 dump
 events
 runtest
-
-https://android.googlesource.com/platform/frameworks/uiautomator
-
-#### am
+#### am  pm 
+```
 adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
-#### pm
+
 adb shell pm dump com.tencent.weread.eink | findstr “versionName”
 
 
 adb shell pm list package
+
+adb shell am kill <packagename>
+
+If you want to kill the Sticky Service,the following command NOT WORKING:
+
+adb shell am force-stop <PACKAGE>
+adb shell kill <PID>
+The following command is WORKING:
+
+adb shell pm disable <PACKAGE>
+If you want to restart the app,you must run command below first:
+
+adb shell pm enable <PACKAGE>
+
+```
 #### dumpsys
 
 ```bash
 adb shell dumpsys -T 60000 activity -v all
-
+```
  
-## studio
 ```java
 问题：The emulator process for AVD Pixel_2_API_29 was killed 
 修改：C:\Users\anshu\.android\avd\Pixel_2_API_30.avd\config.ini
@@ -367,33 +437,11 @@ adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activ
 
 adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
 
-安装插件导致卡顿 tools > customproperties
-C:\Users\anshu\AppData\Roaming\Google\AndroidStudio4.1\plugins
-
-
-wsl 安装sdk
-下载commandlinetools-linux，根据所需版本，执行命令
-sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3.6.4111459" "ndk;22.0.7026061"  "ndk-bundle"
-
-
-
-
 
 adb shell  dumpsys window windows |grep "Window #"
 
 
-adb shell am kill <packagename>
 
-If you want to kill the Sticky Service,the following command NOT WORKING:
-
-adb shell am force-stop <PACKAGE>
-adb shell kill <PID>
-The following command is WORKING:
-
-adb shell pm disable <PACKAGE>
-If you want to restart the app,you must run command below first:
-
-adb shell pm enable <PACKAGE>
 ```
 ## 可拓展
 

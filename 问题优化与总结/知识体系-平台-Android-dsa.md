@@ -23,7 +23,7 @@ gc  标记为DELETED，key,Value替换为有值的数据。
 
 
 ## ArrayMap 
-相比HashMap链表存储，使用了两个小的容量的数组
+索引存储，相比HashMap链表存储，使用了两个小的容量的数组
 ```java
 public final class ArrayMap<K, V> implements Map<K, V> {
     final boolean mIdentityHashCode;// 1byte，default false

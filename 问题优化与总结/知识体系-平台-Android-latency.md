@@ -5,6 +5,7 @@
 LeakCanary、Glide、Retrofit、OkHttp、RxJava、GreenDAO
 [Studio Profiler](https://github.com/JetBrains/android/tree/master/profilers/src/com/android/tools/profilers/memory)
 
+和内核模块类似：内存管理，文件存储，进程调度，进程间调度，网络接口
 
 
 ## 缓存篇
@@ -824,6 +825,7 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
 8. 消息队列类似于套接字的数据流，但通常保留消息边界。
     克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
 9. 1983年8月4.2BSD，包含socket
+10. 2005年，Linux 3.19版本集成 OpenBinder
 
 Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 信号量， 共享内存，消息队列；BSD 跨单机的socket）
 管道：**ls |grep "hello"** ls进程输出，输入到grep进程

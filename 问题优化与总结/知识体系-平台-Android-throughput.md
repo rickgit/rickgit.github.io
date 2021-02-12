@@ -1,3 +1,5 @@
+# 高并发提高吞吐量
+
 ## CPU有限，防止抢占，降低吞吐量，不考虑低延时。用于消息传递
 [](https://developer.android.google.cn/topic/performance/threads)
 每个线程至少需要占用 64k 内存
