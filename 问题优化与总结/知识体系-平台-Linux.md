@@ -146,3 +146,139 @@ watch -n1 -d cat /proc/interrupts
 
 
 http://blog.chinaunix.net/uid-27177626-id-3438994.html
+
+## 驱动
+### openbinder 
+#### 系统调用 （用户态转化内核态）
+binder.c/binder_miscdev 方法注册
+```c
+static struct miscdevice binder_miscdev = {
+    .minor = MISC_DYNAMIC_MINOR,
+    .name = "binder",
+    .fops = &binder_fops
+};
+static const struct file_operations binder_fops = {
+    .owner = THIS_MODULE,
+    .poll = binder_poll,
+    .unlocked_ioctl = binder_ioctl,
+    .compat_ioctl = binder_ioctl,
+    .mmap = binder_mmap,
+    .open = binder_open,
+    .flush = binder_flush,
+    .release = binder_release,
+};
+```
+#### 传输存储格式
+```C++
+struct binder_write_read {//不一定传输这个数据，也有可能传输servicemanager的BC_FREE_BUFFER数据结构；BC_ACQUIRE 直接传递local binder对象
+	signed long	write_size;	/* bytes to write */
+	signed long	write_consumed;	/* bytes consumed by driver */
+	unsigned long	write_buffer;
+	signed long	read_size;	/* bytes to read */
+	signed long	read_consumed;	/* bytes consumed by driver */
+	unsigned long	read_buffer;
+};
+```
+#### 传输协议
+```c++
+binder.h
+enum binder_driver_return_protocol {// binder driver return client/server
+	BR_ERROR = _IOR('r', 0, int), 
+	BR_OK = _IO('r', 1), 
+	BR_TRANSACTION = _IOR('r', 2, struct binder_transaction_data),
+	BR_REPLY = _IOR('r', 3, struct binder_transaction_data),
+	BR_ACQUIRE_RESULT = _IOR('r', 4, int),
+	BR_DEAD_REPLY = _IO('r', 5),
+	BR_TRANSACTION_COMPLETE = _IO('r', 6),
+	BR_INCREFS = _IOR('r', 7, struct binder_ptr_cookie),
+	BR_ACQUIRE = _IOR('r', 8, struct binder_ptr_cookie),
+	BR_RELEASE = _IOR('r', 9, struct binder_ptr_cookie),
+	BR_DECREFS = _IOR('r', 10, struct binder_ptr_cookie),
+	BR_ATTEMPT_ACQUIRE = _IOR('r', 11, struct binder_pri_ptr_cookie),
+	BR_NOOP = _IO('r', 12),
+	BR_SPAWN_LOOPER = _IO('r', 13),
+	BR_FINISHED = _IO('r', 14),
+	BR_DEAD_BINDER = _IOR('r', 15, void *),
+	BR_CLEAR_DEATH_NOTIFICATION_DONE = _IOR('r', 16, void *),
+	BR_FAILED_REPLY = _IO('r', 17),
+};
+
+enum binder_driver_command_protocol {//client/server to binder driver
+	BC_TRANSACTION = _IOW('c', 0, struct binder_transaction_data),
+	BC_REPLY = _IOW('c', 1, struct binder_transaction_data),
+	BC_ACQUIRE_RESULT = _IOW('c', 2, int),
+	BC_FREE_BUFFER = _IOW('c', 3, int),
+	BC_INCREFS = _IOW('c', 4, int),
+	BC_ACQUIRE = _IOW('c', 5, int),
+	BC_RELEASE = _IOW('c', 6, int),
+	BC_DECREFS = _IOW('c', 7, int),
+	BC_INCREFS_DONE = _IOW('c', 8, struct binder_ptr_cookie),
+	BC_ACQUIRE_DONE = _IOW('c', 9, struct binder_ptr_cookie),
+	BC_ATTEMPT_ACQUIRE = _IOW('c', 10, struct binder_pri_desc),
+	BC_REGISTER_LOOPER = _IO('c', 11),
+	BC_ENTER_LOOPER = _IO('c', 12),
+	BC_EXIT_LOOPER = _IO('c', 13),
+	BC_REQUEST_DEATH_NOTIFICATION = _IOW('c', 14, struct binder_ptr_cookie),
+	BC_CLEAR_DEATH_NOTIFICATION = _IOW('c', 15, struct binder_ptr_cookie),
+	BC_DEAD_BINDER_DONE = _IOW('c', 16, void *),
+};
+
+
+struct binder_transaction_data {// command_protocol 是 TRANSACTION 时的数据；注意servicemanager是定义为binder_txn，多了offs；用户数据放在最后data.ptr.buffer
+	union {
+		size_t	handle;	/* target descriptor of command transaction */
+		void	*ptr;	/* target descriptor of return transaction */
+	} target;
+	void		*cookie;	/* target object cookie */
+	unsigned int	code;		/* transaction command */
+	unsigned int	flags;
+	pid_t		sender_pid;
+	uid_t		sender_euid;
+	size_t		data_size;	/* number of bytes of data */
+	size_t		offsets_size;	/* number of bytes of offsets */
+	union {
+		struct {
+			const void __user	*buffer;/* transaction data */
+			const void __user	*offsets;/* offsets from buffer to flat_binder_object structs */
+		} ptr;
+		uint8_t	buf[8];
+	} data;
+};
+// command_protocol 是 BC_TRANSACTION 时的数据
+
+
+struct flat_binder_object {// binder_transaction_data 数据的data.ptr.offsets数据结构
+	unsigned long		type;/* 8 bytes for large_flat_header. */
+	unsigned long		flags;
+	union {	/* 8 bytes of data. */
+		void __user	*binder;	/* local object */
+		signed long	handle;		/* remote object */
+	};
+	void __user		*cookie;/* extra data associated with local object */
+};
+
+```
+#### 内核态切换到进程所在的用户态
+```
+Linux kernel 的 wake_up_interruptible()
+```
+
+### initcall机制
+linux对驱动程序提供静态编译进内核和动态加载两种方式
+
+### 静态注册
+module_init
+
+mem.c/chr_dev_init()
+
+## 高效 GNU
+
+### grep  sed awk
+grep：适合单纯的查找或匹配文本；
+sed：适合对匹配到的文本进行编辑；
+awk：适合对文本进行较复杂的格式化处理；
+
+
+### find
+
+### locate whereis which type 

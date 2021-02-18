@@ -440,8 +440,6 @@ adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activi
 
 adb shell  dumpsys window windows |grep "Window #"
 
-
-
 ```
 ## 可拓展
 

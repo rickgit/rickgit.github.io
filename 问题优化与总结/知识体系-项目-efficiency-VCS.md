@@ -234,19 +234,19 @@ git status // （绿色文件）查看暂存区中差异信息
 git commit //添加到仓库
 git ls-files //管理文件
 
-3.仓库
+3.仓库记录
 git init //初始化仓库
 git reset HEAD <file> //撤销仓库到暂存区；执行后 git diff 打印出来，没有区别
 git diff //工作区与ls-files差异信息
 git reset --soft //index 区； --hard 同步到工作区；--mix 记录撤销，撤销add
 git checkout //到本地工作区
-3.1 日志
+3.1 记录搜索
 git log
 git log --grep=''
 git show
 git bisect
 
-3.2 分支
+3.2 记录管理
 git branch
 git merge
 git rebase
@@ -261,7 +261,7 @@ git stash list //管理贮藏
 git stash drop stash@{message} //管理删除
 git stash apply stash@{message} //管理应用某个贮藏
 
-5. 远程仓库
+5. 协同
 git clone //初始化仓库&checkout
 git push //添加记录到远程仓库
 git fetch //拉取记录到本地分支
@@ -275,6 +275,9 @@ Please move or remove them before you can switch branches.
 # git clean  -d  -fx ""
 git reset --hard HASH
 git reset --soft HASH
+
+
+# git checkout -f -b <branch>    
 ```
 [常见GUI](https://git-scm.com/downloads/guis)
 git-cola Gitg

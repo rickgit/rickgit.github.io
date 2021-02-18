@@ -25,7 +25,6 @@
 ## Looper 封装线程
 
 
-
 简单工厂  Looper.prepare()
 单例      sThreadLocal每个线程一个单例
 
@@ -86,10 +85,9 @@ Message类型  :
 异步消息与同步消息，屏蔽消息（ message.target ==null为屏障消息)）
 空闲任务
 
-6.0  epoll+eventfd 阻塞唤醒
-<6.0 epoll+pipe
-schedule_timeout 函数，使进程进入休眠，让出CPU
+
 ```
+### Handler
 
 
 ```java
@@ -120,6 +118,12 @@ schedule_timeout 函数，使进程进入休眠，让出CPU
  
 
 ```
+
+### 阻塞唤醒
+epoll是linux2.6内核的一个新的系统调用
+6.0  kernel/fs/eventpoll.c + kernel/fs/eventfd.c 阻塞唤醒
+<6.0 kernel/fs/eventpoll.c + kernel/fs/pipe.c
+schedule_timeout 函数，使进程进入休眠，让出CPU
 [select/poll/epoll对比分析](http://gityuan.com/2015/12/06/linux_epoll/)
  [源码解读poll/select内核机制](http://gityuan.com/2019/01/05/linux-poll-select/)
 
@@ -134,7 +138,10 @@ cat /proc/sys/fs/file-max
 2. epoll不同于select和poll轮询的方式，而是通过每个fd定义的回调函数来实现的
 
  
+进程不会卡住原因：
 
+1. 当没有消息的时候会epoll.wait，等待句柄写的时候再唤醒
+2. 屏幕刷新16ms一个消息，句柄写操作，唤醒上文的wait操作
 
 
 ## AsyncTask 封装handle

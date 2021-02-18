@@ -242,51 +242,6 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 
 [官方文档](https://docs.gradle.org/current/userguide/dependency_types.html)
 
-#### Android-DSL
-```
-+---------------------------------------------+
-|                                             |
-|  gradle 2.x           gradle >=3.0          |
-|                                             |
-+---------------------------------------------+
-|  provided           compileOnly             |
-|  apk                runtimeOnly             |
-|  compile            api/implementation      |
-+---------------------------------------------+
-
-```
-api传递依赖库
-implement不传递依赖库
-
-[Android Plugin DSL Reference](http://google.github.io/android-gradle-dsl/current/index.html)
-[Android Plugin new future](https://developer.android.com/studio/releases/gradle-plugin)
-
-#### 问题
-```
-Could not find com.android.tools.build:aapt2 AndroidStudio
-
-
-
-Android: A problem occurred configuring project ':app'. > java.lang.NullPointerException (no error message) 
-org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
-
-
-```
-[Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
-
-
-[JetBrains intellij android](https://github.com/JetBrains/android.git)
-[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
-
-[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
-#### Android gradle
-
-```gradle
-
-    gradle -q dependencies your-app-project:dependencies
-
-
-```
 
 
 ### 源碼

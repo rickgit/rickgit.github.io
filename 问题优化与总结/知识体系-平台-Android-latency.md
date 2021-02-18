@@ -717,7 +717,7 @@ Chain of Responsibility:Interceptor
 
 
 ## 数据存储
-SharedPreferences,文件存储,SQLite数据库方式,内容提供器（Content provider）,网络
+文件存储,SharedPreferences,SQLite数据库方式,内容提供器（Content provider）,网络
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
 ### 配置参数存储
@@ -754,9 +754,7 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
                 +-----------------------------+          writtenToDiskLatch //commit() wait return       |
                 |Xml                          |                                                          |
                 |  newPullParser():KXmlParser |                                                          |
-                |                             |                                                          |
                 +-----------------------------+                                                          |
-                |                             |                                                          |
                 | KXmlParser: XmlPullParser   |                                                          |
                 ------------------------------+----------------------------------------------------------+
 
@@ -765,7 +763,15 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
 ####  MMKV for Android “零拷贝问题” -  sharepreference优化
 mmap（微信mars，美图logan，网易）
- 
+## Sqlite
+### h2 /JOOQ/SnakeYAML 
+### xutils
+[xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
+
+### 缓存GreenDAO /Jetpack-Room
+
+### Mqtt服务器
+
 ## 进程内通讯
 ### EventBus
 反射与注解
@@ -812,21 +818,23 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
 2. 1961 年，由Buroughs MCP和麻省理工学院兼容时间共享系统引入的"文件系统"的概念
 3. 1973年，管道被实现，Ken Thompson将管道添加到了UNIX操作系统。使用的记号(垂直线)
     传统管道属于匿名管道，是计算机进程间的一种单工先进先出通信机制。
-    × 生存期不超过创建管道的进程的生存期
-    × 不支持异步读、写操作
-    x 只能在具有亲缘关系的进程间使用
+    ❌ 只能在具有亲缘关系的进程间使用
+    ❌ 生存期不超过创建管道的进程的生存期
+    ❌ 不支持异步读、写操作
 4. 命名管道	被视为文件的管道。进程与使用匿名管道时那样使用标准输入和输出，而是从命名管道写入和读取，就像它是常规文件一样。
-   允许无亲缘关系进程间的通信
+   ⭐允许无亲缘关系进程间的通信
 5. 信号起源于20世纪70年代的贝尔实验室Unix。
    通常不用于传输数据，而是用于远程命令合作伙伴进程。
 6. 1963年，Dijkstra提出了n个进程互斥算法（Dekker算法的泛化）信号量机制
 7. POSIX 还提供用于将文件映射到内存的 API;可以共享映射，允许将文件的内容用作共享内存。mmap
    最快的 IPC 方式
 8. 消息队列类似于套接字的数据流，但通常保留消息边界。
-    克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
+    ⭐克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
 9. 1983年8月4.2BSD，包含socket
+    ⭐不同主机，C/S架构
 10. 2005年，Linux 3.19版本集成 OpenBinder
-
+    ⭐安全性
+趋势：导向，传输数据量，C/S一对多架构，速度，安全性
 Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 信号量， 共享内存，消息队列；BSD 跨单机的socket）
 管道：**ls |grep "hello"** ls进程输出，输入到grep进程
 
@@ -842,16 +850,16 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
 ```java
 实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
 ，并发，一对多
-                         +-----------+---------+---------------------+
-                         | Bundle    | Messager|  Content Provider   |
-         +---------------------------+---------+--------------------------------------+-----------------+
+                         +--------------+---------+------------------+
+                         |Intent/Bundle | Messager|  Content Provider|
+         +------------------------------+---------+-----------------------------------+-----------------+
          |               |   AIDL    +-------------------------------+                |                 |
          |               |           | byte, char, short, int, long, |                |                 |
          |               |           | float, double, boolean        |                |                 |
          |               |           | String, CharSequence          |                |                 |
          |               |           | Parcelable                    |                |                 |
          |               |           | List<>, Map<>                 |                |                 |
-         |               |           | aidl interface                |                |                 |
+         |               |           | interface                     |                |                 |
          |               |           +-------------------------------+                |                 |
          |               |           | import Parcelable package     |                |                 |
          |               |           +-------------------------------+                |                 |
@@ -860,7 +868,7 @@ Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空�
          | MemoryFile    |           | oneway                        |                |                 |
          |               |           +-------------------------------+                |                 |
          |               |-------------------------------------------|                |                 |
-         | ashmem        |   android.os.Binder                       |  pipe/fifo     |                 |
+         | ashmem        |   read/write  Parcel                      |  pipe/fifo     |                 |
          +-----------------------------------------------------------+  signal        |                 |
          |               |                                           |  messagequeue  |  File           |
          | Shared memory |   Binder                                  |  semaphore     | SharedPreference|
@@ -969,38 +977,55 @@ OpenBinder以及合入到Linux Kernel主线 3.19版本
 
 **序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
 
-[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
-binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager,Binder驱动
 Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
 [Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/) 
+[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
+
+#### Linux Binder driver
+Binder定向制导
+Binder binder_proc结构体的四棵红黑树  ，threads，nodes，refs_by_desc，refs_by_node
+[](https://maoao530.github.io/2016/12/21/android-binder-01/)
+
+[](./知识体系-平台-Linux.md)
+#### IPCThreadState （client/server libs）
+系统调用 ioctl的 BINDER_WRITE_READ，BINDER_THREAD_EXIT
+存储结构 Parcel
+#### ServiceManager
+系统调用 open 打开驱动
+
+系统调用 ioctl的 BINDER_WRITE_READ，BINDER_SET_CONTEXT_MGR
+
+##### SystemServer
+binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager（系统服务路由）,Binder驱动
 
 ```java
 n：native
 p：proxy
 
-SystemServer，Binder机制
 +----------------+------------+--------------------------------------+-------------------------+
-|                |            |  BinderProxy   ServiceManagerProxy   | +---------------------+ |
-|                |            |  ServiceManager                      | | IInterface          | |
-|                |  Client    +--------------------------------------+ | IBinder             | |
-|                |            | BpBinder/BpRefBase   BpInterface     | | IServiceManager     | |
-|                |  process   |                                      | |                     | |
-|                |            | BpServiceManager                     | +---------------------+ |
-|                |            |                                      | | Android_util_Binder | |
-|                |            | frameworks//IPCThreadState.cpp   77  | | android_os_Parcel   | |
-|                +---------------------------------------------------+ | AndroidRuntime.cpp  | |
-|                |            | Binder    ServiceManagerNative       | +---------------------+ |
-|                |            | BinderInternal                       | | IInterface          | |
-|  user space    |  Server    +--------------------------------------+ | IBinder             | |
-|                |            | BBinder/JavaBBinder/JavaBBinderHolder| | IserviceManager     | |
-|                |  process   | BnInterface                          | | ProcessState        | |
-|                |            |                                      | |                     | |   binder/binderproxy
-|                |            | BnServiceManager                     | | IPCThreadState      | | +-----------+
-|                |            | frameworks//IPCThreadState.cpp       | +---------------------+ |             |
-|                +------------+--------------------------------------+-------------------------+             |
-|                                                                         |     ^              |             |
-|                                                             getbinder0  v     |  findBinder  |  binder(0)  |
-|                +------------+----------------------------------------------------------------+ +------+    |
++----------------+------------+          java  layer  / JNI          |          Native         |frameworks/base/libs/utils
++----------------+------------+--------------------------------------+-------------------------+
+|                |            | Binder                BinderProxy    | +---------------------+ |              
+|                |            +--------------------------------------| |  AndroidRuntime.cpp | |       
+|                |  Client    |Android_util_Binder                   | |                     | |BpInterface/BnInterface
+|                |            |    JavaBBinderHolder    (BpBinder)   + |                     | |      
+|                |  process   |    JavaBBinder                       | |  IBinder IInterface | |   
+|                |            |android_os_Parcel                     | +                     | |BBinder/
+|                +---------------------------------------------------+ |  BpBinder           | |
+|                |            | Binder                               | |  ProcessState       | |   binder/binderproxy
+|                |            | BinderInternal                       | |  IPCThreadState     | | +-----------+
+|                |  Server    +--------------------------------------+ +                     + |             |
+|                |  process   |                                      | |                     | |             |
+|  user space    +---------------------------------------------------+ |---------------------+ |             |
+|                |            | ServiceManager                       | |                     | |             |
+|                | system     |          ServiceManagerNative        | |IserviceManager      | |             |   
+|                | service    |          ServiceManagerProxy         | |    BpServiceManager | |  binder(0)  |
+|                |            |                                      | |    BnServiceManager | | +------+    |    
+|                |            |                                      | +---------------------+ |        |    | 
+|                +------------+--------------------------------------+-------------------------+        |    |
+|                                                                         |     ^              |        |    |
+|                                                             getbinder0  v     |  findBinder  |        |    |
+|                +------------+----------------------------------------------------------------+        |    |
 |                |  Service   |  (handle id = 0)                                               |        v    v
 |                |  Manager   |  servicemanager/binder.c                                       |   +------------------+
 |                |  process   |  service_manager.c                                             |   |  open/mmap/ioctl |
@@ -1016,15 +1041,144 @@ SystemServer，Binder机制
                                                                                +---------------+
                                                                                |  kernel memory|
                                                                                +---------------+
+java层->JNI层->libs/IPCThreadState ==> driver （binder_proc）==>servicemanager/server
 
-----
+binder_write_read
+  read_buffer(servicemanager/binder_txn 或server)
 
-binder的服务实体
+
+
+```
+
+##### AMS 栈管理（任务栈），启动模式，亲和度
+Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
+
+```java
+//ActivityStarter的启动模式代码阅读
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
+```
+
+ 
+ [ActivityStack](https://blog.csdn.net/guoqifa29/article/details/54863237)
+
+android N开始有5种窗口类型（窗口类型及ActivityType决定ActivityStack） ：
+全屏 FullScreenStack
+DockedStack（分屏Activity） configChanges:screenLayout   onMultiWindowModeChanged
+PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
+freeformstack(自由模式  Activity) ：FreeForm Stack
+homeStack（launcher和recents Activity）和其他
+```java
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_RECENTS;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_STANDARD;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_UNDEFINED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN_OR_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_PINNED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
+```
+
+
+ 桌面Launcher、任务栏Recents属于id=HOME_STACK的栈中。多窗口不仅仅是控制Activity放入不同ActivityStack中，同时还要改变Activity的生命周期，即Focus Activity是resume状态，其他可见Activity是Pause状态，并不会进入Stop状态
+
+```
+ActivityDisplay#0（一般只有一显示器） 
++--------------------------------------------------------------------------------------+
+| ActivityStack#0                                                                      |//不用类型（mHomeStack，mFocusedStack）
+|    +---------------------+                                                           |//区分ActivityStack
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |//亲和度（taskAffinity）区分TaskRecord
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+| ActivityStack#1                                                                      |
+|    +---------------------+                                                           |
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
+
+
+
+
+```
+
+
+[四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
+[Activity启动模式](gityuan.com/2017/06/11/activity_record/)
+
+```
++------------+-----------------------+------------------------------+
+|            |                       |newIntent()|taskAffinity      |
+|            +------------------------------------------------------+
+|            |        standard       |           |                  |
+|            +------------------------------------------------------+
+|            |        singleTop      |   √       |                  |
+| launch mode+------------------------------------------------------+
+|            |        singleTask     |   √       |choice  TaskRecord|
+|            +------------------------------------------------------+
+|            |        singleInstance |   √       |                  |
++-------------------------------------------------------------------+
+|  Flags     | FLAG_ACTIVITY_NEW_TASK|           |choice TaskRecord |
++-------------------------------------------------------------------+
+|            |   allowTaskReparenting|           |change to affinity task|
++------------+------------------------------------------------------+
+FLAG_ACTIVITY_NEW_TASK
+在google的官方文档中介绍，它与launchMode="singleTask"具有相同的行为。实际上，并不是完全相同！
+很少单独使用FLAG_ACTIVITY_NEW_TASK，通常与FLAG_ACTIVITY_CLEAR_TASK或FLAG_ACTIVITY_CLEAR_TOP联合使用。因为单独使用该属性会导致奇怪的现象，通常达不到我们想要的效果！尽管如何，后面还是会通过"FLAG_ACTIVITY_NEW_TASK示例一"和"FLAG_ACTIVITY_NEW_TASK示例二"会向你展示单独使用它的效果。
+
+FLAG_ACTIVITY_SINGLE_TOP
+在google的官方文档中介绍，它与launchMode="singleTop"具有相同的行为。实际上，的确如此！单独的使用FLAG_ACTIVITY_SINGLE_TOP，就能达到和launchMode="singleTop"一样的效果。
+
+FLAG_ACTIVITY_CLEAR_TOP
+顾名思义，FLAG_ACTIVITY_CLEAR_TOP的作用清除"包含Activity的task"中位于该Activity实例之上的其他Activity实例。FLAG_ACTIVITY_CLEAR_TOP和FLAG_ACTIVITY_NEW_TASK两者同时使用，就能达到和launchMode="singleTask"一样的效果！
+
+FLAG_ACTIVITY_CLEAR_TASK
+FLAG_ACTIVITY_CLEAR_TASK的作用包含Activity的task。使用FLAG_ACTIVITY_CLEAR_TASK时，通常会包含FLAG_ACTIVITY_NEW_TASK。这样做的目的是启动Activity时，清除之前已经存在的Activity实例所在的task；这自然也就清除了之前存在的Activity实例！
+```
+
+android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
+android:alwaysRetainTaskState触发时机在系统清理后台Task，且Activity实例为根Activity时。 
+android:finishOnTaskLaunch Task重新启动时(比如桌面上点击某一个应用图标)，会销销毁此Task中的该Activity实例。
+android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
+
+
+单任务无法内存回收。多任务，内存回收
+```
+单栈的进程，Activity跟进程声明周期一致
+多栈的，只有不可见栈的Activity可能被销毁（Java内存超过3/4,不可见）
+该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
+至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
+```
+#### 四大组件之Service
+```
 +------------+----------------------------------+------------------------------+
 |            |   System Service                |    anonymous binder           |
-|            |                                 |    (bindService)              |
+|            | (AMS, PMS, WMS)                 | (depend on ServiceConn#binder)|   
 +------------------------------------------------------------------------------+
-|  launch    | SystemServer                    |  bindService                  |
+|  launch    | SystemServer                    |   bindService                 |
 +------------------------------------------------------------------------------+
 | regist and |ServiceManager.addService        |  ActivityManagerService       |
 | manager    |                                 |                               |
@@ -1035,12 +1189,13 @@ binder的服务实体
 |------------+---------------------------------+-------------------------------+
 
 通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
-通过bindService开启服务，Service和调用者之间可以通讯。
+通过bindService开启服务， ServiceConnection#asbinder()与AMS关联通讯，Service#onBind()与client关联通讯。
 
-名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
+实名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
 首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
 
 ```
+
 AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
 
 - Bundle(实现了接口Parcelable)
@@ -1113,6 +1268,187 @@ startForegroundService(new Intent(MainActivity.this,BackService.class));
  * 8.0以上需要增加channel
  */
 ```
+
+
+#### 四大组件-Activity
+1. 协议
+client binder: 
+  IApplicationThread(ActivityThread.ApplicationThread)
+server binder:
+  ams(IActivityManager)
+  IApplicationToken(ActivityRecord)
+```
++---------------------------------------------------------------+
+|   AMS                                                         |
+|     +-------------------------------------------------------+ |
+|     |ProcessRecord                                          | |
+|     |                                                       | |
+|     |    ActivityRecord                                     | |
+|     |                                                       | |
+|     |    ServiceRecord   ConnectionRecord                   | |
+|     |                                                       | |
+|     |    BroadcastRecord  ReceiverList                      | |
+|     |                                                       | |
+|     |    ContentProviderRecord    ContentProviderConnection | |
+|     |                                                       | |
+|     +-------------------------------------------------------+ |
++---------------------------------------------------------------+
+
+```
+##### 生命周期
+```
+                                  +--------+
+                                  | Start  |
+                                  +----+---+
+                                       v                                                   +-----------------+
+                                  +----+---+                            Activity States    |onAttach         |
+      +------------------------>  |onCreate|                                               |oncreate         |
+      |                           +---+----+                                               |oncreateView     +<---+
+      | back to                       v  created +------------------------------------>    |onActivityCreated|    |
+      | foreground                +---+----+        +-----------+                          |                 |    |
+      |                           |onStart |  <-----+ onRestart +--+                       +-----------------+    |
+      | recreate                  |        |        +-----------+  |                                              |
++-----+---------+                 +----+---+                       |                       +---------+            |
+| Process killed|                      v started                   |   +-------------->    |onStart  |            |
++-----+---------+       +-------+ +----+---+   (singleTop/Task)    |                       +---------+            |
+      |                 v         |onResume|  <-----+activity      |                                              |
+      |             +---+------+  +--------+        |froreground   |                       +---------+            |
+      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |<-----+     |
+      |   activity  +---+------+                    |              |                       +---------+      |     |
+      |   foreground    |         +--------+        |              |                              Fragm is  |     |
+      |                 +-------> |onPause |        |    activity  |                        retaininstance  | onBack
+      | <-----------------------+ |        | +----->+    foreground|                          onactivityRecreate  |
+      |   other app               +---+----+                       |                       +---------+      |     |
+      |   need memory                 v  paused                    |     +------------>    |onPause  |------|     |
+      |                                  no longe visiable         |                       +---------+            |
+      |                           +--------+                       |                                              |
+      +-------------------------+ |onStop  | +---------------------+                                              |
+                                  +---+----+                                               +---------+            |
+                                      v  stoped                       +--------------->    |onStop   |            |
+                                  +---+----+                                               +---------+            |
+  *configChanges                  |onDestroy                                                                      |
+                                  |        +                                               +-v-----v------+       |
+                                  +---+----+                                               |onDestroyView +-------+
+                                      v  destroyed  +--------------------------------->    |onDestroy     |
+                                  +---+----+                                               |onDetach      |
+                                  |shutdown|                                               +--------------+
+                                  +--------+
+
+
+```
+
+
+
+
+#### 四大组件之广播
+1. 协议
+client binder: 
+  IIntentReceiver(LoadedApk.ReceiverDispatcher.InnerReceiver)
+  IApplicationThread(ActivityThread.ApplicationThread)
+server binder:
+  ams(IActivityManager)
+
+2. 通讯
+   
+```
+
+                                                      +---------------------------------------+
++---------------------+-----------+-----------+       | SystemServer                          |
+|                     | runtime   | location  |       |                                       |
+|                     |           |           |       |   PMS                                 |
++---------------------------------------------+       |     mReceivers:ActivityIntentResolver |
+|                     |           |           |       |                                       |
+|   mReceivers        |  install  |  WMS      |       |     mReceiverResolver                 |
+|                     |           |           |       |                                       |
++---------------------------------------------+       |   AMS                                 |
+|   mReisterdReceivers|  run app  |  AMS      |       |     mReisterdReceivers:IIntentReceiver|
+|                     |           |           |       |                                       |
++---------------------+-----------+-----------+       +---------------------------------------+
+
+```
+3. LocalBroadCastManager
+   使用Handler处理penddingBroadCast
+
+#### 四大组件之contentProvider
+安装时候，会在AMS注册providers
+1. 协议
+client binder: 
+  IApplicationThread(ActivityThread.ApplicationThread)
+  IContentProvider(ContentProvider.Transport holder:ContentProviderRecord)
+server binder:
+  ams(IActivityManager)
+1. registerContentObserver协议
+client binder: 
+  IContentObserver
+server binder:
+  IContentService(ContentService holder:ApplicationContentResolver)
+
+3. ContentService扮演者ContentObserver的注册中心
+
+ContentProvider——内容提供者， 在android中的作用是对外共享数据，也就是说你可以通过ContentProvider把应用中的数据共享给其他应用访问，其他应用可以通过ContentProvider 对你应用中的数据进行添删改查。
+
+ContentResolver——内容解析者， 其作用是按照一定规则访问内容提供者的数据（其实就是调用内容提供者自定义的接口来操作它的数据）。
+ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的数据库的变化，继而做一些相应的处理，它类似于数据库技术中的触发器(Trigger)，当ContentObserver所观察的Uri发生变化时，便会触发它。 
+
+```java
+    private static final class ApplicationContentResolver extends ContentResolver {
+        private final ActivityThread mMainThread;
+    }
+ 
+
+    public class ContentProviderHolder implements Parcelable {
+            public final ProviderInfo info;
+        public IContentProvider provider;
+        public IBinder connection;// IContentProvider 通过这个对象传输数据,由ContentProvider#mTransport赋值
+        public boolean noReleaseNeeded;
+    }
+
+                                          +-------------------------------------------------------------+
+                                          |  SystemServer                                               |
+                                          |             +-------------------------------------+         |
+                   +---------------------------+        |   ContentService                    |   +----------------------+
+                   |                      |    |        |      ObserverNode                   |   |     |                |
+                   v                      |    +-------------+   IContentObserver      +----------+     |                v
+                                          |             |                                     |         |
++--------------------------------------+  |             +-------------------------------------+         |  +---------------------------------+
+|  App                                 |  |                                                             |  |  App2                           |
+|                     ActivityManager. |  |     +-------------------------------------------------------+  |                                 |
+|    mProviderMap       getService()   |  |     | AMS                 +->  mProviderMap                ||  |    +---->  mProviderMap         |
+|                                      |  |     +                     |         +                      ||  |    |                            |
+|      +  ^            +-------------------> getContentProvider()  +--+         v                      ||  |    |             +              |
+|      |  |                            |  |     +                                                      ||  |    |             |              |
+|      |  |                            |  |     |                         +-----------------------------+  |    |             v              |
+|      |  |                            |  |     |                         |        IApplicationThread  |   |    |                            |
+|      |  |                            |  |     +                         |                            +--------+   scheduleInstallProvider()|
+|      |  +---------------------------------+ ContentProviderHolder  <--+-+ContentPro^iderRecord.wait()||  |                                 |
+|      |                               |  |     +                       ^ +-----------------------------|  |                                 |
+|      |                               |  |     |               +-------+                              ||  |                                 |
+|      |                               |  |     |               |   +------------------------------+   ||  |          ActivityManager.       |
+|      |                               |  |     |               |   |     publishContentProviders()|  <--------------+  getService()         |
+|      |                               |  |     |               +---+ContentPro^iderRecord.notify()|   ||  |                                 |
+|      |                               |  |     |                   +------------------------------+   ||  | +-------------------------------+
+|      |                               |  |     +-------------------------------------------------------+  | |  ContentProvider             ||
+|      |                               |  |                                                             |  | |    Transport:IContentProvider||
+|      |                               |  |                                                             |  | +-------------------------------|
++--------------------------------------+  +-------------------------------------------------------------+  +---------------------------------+
+       |                                                                                                                  ^
+       +------------------------------------------------------------------------------------------------------------------+
+
+
+   URI = scheme:[//authority]path[?query][#fragment]
+
+   normal
+低风险权限，只要申请了就可以使用，安装时不需要用户确认。 
+dangerous
+高风险权限，安装时需要用户确认授权才可使用。 
+signature
+只有当申请权限应用与声明此权限应用的数字签名相同时才能将权限授给它。 
+signatureOrSystem
+签名相同或者申请权限的应用为系统应用才能将权限授给它 
+```
+
+
+
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)
 ###  Rxjava，线程切换 ，异步执行耗时代码
@@ -2955,11 +3291,3 @@ asmack
 
 #### 缺点
 xml传输，二进制需要转化Base64
-## Sqlite
-### h2 /JOOQ/SnakeYAML 
-### xutils
-[xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
-
-### 缓存GreenDAO /Jetpack-Room
-
-### Mqtt服务器
