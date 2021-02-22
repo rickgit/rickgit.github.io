@@ -717,7 +717,7 @@ Chain of Responsibility:Interceptor
 
 
 ## 数据存储
-文件存储,SharedPreferences,SQLite数据库方式,内容提供器（Content provider）,网络
+文件存储,SharedPreferences/MMKV,SQLite数据库方式,内容提供器（Content provider）,网络
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 
 ### 配置参数存储
