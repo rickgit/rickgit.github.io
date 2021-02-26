@@ -210,11 +210,38 @@ bouncycastle 签名
 ```
 Could not find com.android.tools.build:aapt2 AndroidStudio
 
-
-
 Android: A problem occurred configuring project ':app'. > java.lang.NullPointerException (no error message) 
 org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
 
+
+https://stackoverflow.com/questions/44185165/what-are-the-differences-between-gradle-assemble-and-gradle-build-tasks
+使用framework 无法打包情况：
+使用studio -> build -> build Apk(s)
+或使用命令 gradlew.bat build --dry-run :app:assembleR605Debug ,跳过 lint 和 test
+
+
+请注意，.iml文件名和路径根据Android Studio版本的不同而不同。
+在Android Studio 4.0下：Project / app / app.iml（其中“ app”是您的项目名称）
+Android Studio 4.0：Project / .idea / modules / app / app.iml（其中“ app”是您的项目名称）
+Android Studio 4.1或更高版本：Project / .idea / modules / app / CustomFramework.app.iml（其中“ app”是项目名称，CustomFramework是根项目名称）
+
+preBuild {
+    doLast {
+        def imlFile = file("..\\.idea\\modules\\"+project.name+"\\"+project.rootProject.name+"."+project.name+ ".iml")
+        println 'Change ' + project.name + '.iml order'
+        try {
+            def parsedXml = (new XmlParser()).parse(imlFile)
+            def jdkNode = parsedXml.component[1].orderEntry.find { it.'@type' == 'jdk' }
+            parsedXml.component[1].remove(jdkNode)
+            def sdkString = "Android API " + android.compileSdkVersion.substring("android-".length()) + " Platform"
+            println 'what' + sdkString
+            new Node(parsedXml.component[1], 'orderEntry', ['type': 'jdk', 'jdkName': sdkString, 'jdkType': 'Android SDK'])
+            groovy.xml.XmlUtil.serialize(parsedXml, new FileOutputStream(imlFile))
+        } catch (FileNotFoundException e) {
+            println "no iml found"
+        }
+    }
+}
 
 ```
 [Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
@@ -324,8 +351,9 @@ adb shell 命令源码地址（find -iname 'cmds'）：
     /frameworks/native/cmds/(bugreport)
     /frameworks/testing/uiautomator/cmds
 ```
-#### adb
-
+#### system/core
+adb shell "getprop ro.build.version.release"
+adb shell "getprop ro.build.version.sdk"
 #### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000

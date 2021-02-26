@@ -262,7 +262,13 @@ struct flat_binder_object {// binder_transaction_data 数据的data.ptr.offsets�
 ```
 Linux kernel 的 wake_up_interruptible()
 ```
-
+### 显卡驱动
+2.2以下，vga直接对显卡上的寄存器操作；2.2以上加入fb
+```C++
+drivers/video/fbmem.c#fb_fops //提供系统调用
+```
+https://tldp.org/HOWTO/html_single/Framebuffer-HOWTO/#AEN131
+https://www.cnblogs.com/linfeng-learning/p/9478048.html
 ### initcall机制
 linux对驱动程序提供静态编译进内核和动态加载两种方式
 
@@ -270,6 +276,8 @@ linux对驱动程序提供静态编译进内核和动态加载两种方式
 module_init
 
 mem.c/chr_dev_init()
+
+
 
 ## 高效 GNU
 

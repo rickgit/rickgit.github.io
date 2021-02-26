@@ -1172,6 +1172,22 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
 至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
 ```
+##### 静默安装
+```java
+小于Android 5      通过IPackageInstallObserver进行跨进程通信
+                    1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
+                    2.2 base/core/java/android/app/ContextImpl.java:1638:    static final class ApplicationPackageManager extends PackageManager {
+                    4.4 base/core/core/java/android/app/ApplicationPackageManager.java:61:final class ApplicationPackageManager extends PackageManager {
+Android 5（api21） 调用PackageManager#installPackage(Uri.class,android.app.PackageInstallObserver.int.class,String.class)；
+                      通过PackageInstallObserver的binder（IPackageInstallObserver2）进行进程间通信
+                     base/core/java/android/app/ApplicationPackageManager.java:78:final class ApplicationPackageManager extends PackageManager {
+Android 7.0（api24）（和5.0 通用的方法可行） 调用PackageManager#installPacakageAsUser
+                  base/core/java/android/app/ApplicationPackageManager.java:98:public class ApplicationPackageManager extends PackageManager
+Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，PackageInstaller.Session写入pms,广播接收通知
+                  base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
+
+```
+
 #### 四大组件之Service
 ```
 +------------+----------------------------------+------------------------------+
