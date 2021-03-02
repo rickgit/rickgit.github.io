@@ -298,10 +298,20 @@ ProGuard ->ProGuard :shrink optimize obfuscate(Javassist) preverify
 ```
 [ProGuard java](https://github.com/Guardsquare/proguard-core.git)
 
+
+```
+aar 给主模块使用的代码混淆文件
+
+        consumerProguardFiles 'consumer-rules.pro'
+
+```
 #### 资源打包 AAPT
      [aapt2 适配之资源 id 固定](https://fucknmb.com/2017/11/15/aapt2%E9%80%82%E9%85%8D%E4%B9%8B%E8%B5%84%E6%BA%90id%E5%9B%BA%E5%AE%9A/)
           aapt  -p public.xml
           aapt2 --stable-ids ,--emit-ids
+
+
+
 ## 可分析
 ### 日志 Timer 
 ### 日志埋点/布点 AspectJ

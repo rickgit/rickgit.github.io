@@ -1172,6 +1172,8 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
 至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
 ```
+##### WIFI
+"am start -a android.net.wifi.PICK_WIFI_NETWORK"
 ##### 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
