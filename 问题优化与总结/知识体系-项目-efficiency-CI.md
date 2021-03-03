@@ -541,7 +541,7 @@ android gradle plugin
 
 #git tag | grep -P 'gradle'
 ```
-[/platform/tools/base](https://beijing.source.codeaurora.org/quic/la/platform/tools/base/)
+[android sdl /platform/tools/base](https://source.codeaurora.cn/quic/la/platform/tools/base/)
 ```
   002_initial_base             940b0f9046fe7ca212f8f1c24b373dd7b0dc0af7 Copy code from sdk.git to base.git
                               +--------------------------------------------------------------------------------------------------------+
@@ -586,7 +586,79 @@ android gradle plugin
 
 
 ```
+ 
 
+[gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](./知识体系-项目-efficiency-CI.md:)
+#### Android-DSL
+
+```
++---------------------------------------------+
+|                                             |
+|  gradle 2.x           gradle >=3.0          |
+|                                             |
++---------------------------------------------+
+|  provided           compileOnly             |
+|  apk                runtimeOnly             |
+|  compile            api/implementation      |
++---------------------------------------------+
+
+```
+api传递依赖库
+implement不传递依赖库
+
+[Android Plugin DSL Reference](http://google.github.io/android-gradle-dsl/current/index.html)
+[Android Plugin new future](https://developer.android.com/studio/releases/gradle-plugin)
+
+bouncycastle 签名
+#### 问题
+```
+Could not find com.android.tools.build:aapt2 AndroidStudio
+
+Android: A problem occurred configuring project ':app'. > java.lang.NullPointerException (no error message) 
+org.gradle.java.home=/Library/Java/JavaVirtualMachines/{your jdk}/Contents/Home
+
+
+https://stackoverflow.com/questions/44185165/what-are-the-differences-between-gradle-assemble-and-gradle-build-tasks
+使用framework 无法打包情况：
+使用studio -> build -> build Apk(s)
+或使用命令 gradlew.bat build --dry-run :app:assembleR605Debug ,跳过 lint 和 test
+
+
+请注意，.iml文件名和路径根据Android Studio版本的不同而不同。
+在Android Studio 4.0下：Project / app / app.iml（其中“ app”是您的项目名称）
+Android Studio 4.0：Project / .idea / modules / app / app.iml（其中“ app”是您的项目名称）
+Android Studio 4.1或更高版本：Project / .idea / modules / app / CustomFramework.app.iml（其中“ app”是项目名称，CustomFramework是根项目名称）
+
+preBuild {
+    doLast {
+        def imlFile = file("..\\.idea\\modules\\"+project.name+"\\"+project.rootProject.name+"."+project.name+ ".iml")
+        println 'Change ' + project.name + '.iml order'
+        try {
+            def parsedXml = (new XmlParser()).parse(imlFile)
+            def jdkNode = parsedXml.component[1].orderEntry.find { it.'@type' == 'jdk' }
+            parsedXml.component[1].remove(jdkNode)
+            def sdkString = "Android API " + android.compileSdkVersion.substring("android-".length()) + " Platform"
+            println 'what' + sdkString
+            new Node(parsedXml.component[1], 'orderEntry', ['type': 'jdk', 'jdkName': sdkString, 'jdkType': 'Android SDK'])
+            groovy.xml.XmlUtil.serialize(parsedXml, new FileOutputStream(imlFile))
+        } catch (FileNotFoundException e) {
+            println "no iml found"
+        }
+    }
+}
+
+```
+[Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
+
+
+[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
+
+[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
+#### Android gradle
+
+```gradle
+    gradle -q dependencies your-app-project:dependencies
+```
 ### kotlin-gradle-plugin
 
 

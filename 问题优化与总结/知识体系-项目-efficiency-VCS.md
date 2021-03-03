@@ -170,7 +170,6 @@ git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d"
 
 git branch initial_revision <commit id>
  //显示分支
-git branch -v  --abbrev=40 //打印详情，hash值长度40
 
 git checkout initial_revision  
 git ls-files --stage //显示stage文件
@@ -181,19 +180,11 @@ git show-ref
  git tag -n --sort=taggerdate
  git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 
-
-
  git checkout -b <new branch name> <tag_name>
 
 ```
 
 [git stash 贮藏](https://www.cnblogs.com/zndxall/archive/2018/09/04/9586088.html)
-[git stage 暂存]()
-git list-file --stage //查看stage的文件
-[git reset 回滚]()
-[git revert 撤销]()
-某次操作，此次操作之前和之后的commit和history都会保留，并且把这次撤销
-[git rebase ]()
 
 ***Model***
 ```
@@ -221,51 +212,75 @@ remote            +              tag
 
 ```
 
-### 仓库仓用命令
+### ⭐ 仓库仓用命令
 ```shell
 1.工作区
 git status //（红色文件）管理本地修改状态
-git clean -f//删除的是未跟踪的文件，-d 文件夹 ；-x .gitignore文件也可以删除；
 git add //添加到index/暂存区
-git checkout -- <file> //撤销跟踪文件修改，到工作区
+git clean -f//删除的是未跟踪的文件，-d 文件夹 ；-x .gitignore文件也可以删除；
+git restore <file>... //丢弃修改
+git mv //重命名
+
+//工作区差异
+git diff //对比工作区和stage文件的差异
+git ls-files --u //冲突文件
 
 2.暂存区
 git status // （绿色文件）查看暂存区中差异信息
+git checkout -- <file> //恢复索引区修改到工作区
 git commit //添加到仓库
-git ls-files //管理文件
 
-3.仓库记录
-git init //初始化仓库
-git reset HEAD <file> //撤销仓库到暂存区；执行后 git diff 打印出来，没有区别
-git diff //工作区与ls-files差异信息
-git reset --soft //index 区； --hard 同步到工作区；--mix 记录撤销，撤销add
-git checkout //到本地工作区
-3.1 记录搜索
+//工作区差异
+git diff --cached //对比stage和branch之间的差异
+git ls-files --stage //object文件
+git cat-file //object对象
+3 记录管理
 git log
-git log --grep=''
 git show
+
+3.1 记录的文件恢复
+git reset -- <file>                     //恢复仓库修改到索引区，索引区unstage到工作区
+git restore --staged <file>             //恢复仓库修改到索引区
+git restore <file>                      //恢复索引区修改改到工作区
+git restore --staged --worktree <file> //恢复仓库修改到工作区
+git checkout -- HEAD <file> //恢复仓库修改到工作区
+
+3.2 记录的恢复
+git reverse      // 未提交需要提交，错误记录提交撤销修改，新创建记录提交
+git reset --soft // 未提交不删除不修改，提交记录重置的放到index 区，提交记录删除 
+git reset --mix  // 未提交不删除并移到工作区，提交记录重置的放到工作区，提交记录删除 
+git reset --hard // 未提交删除，要撤销的记录文件删除，提交记录删除 
+git checkout     // 未提交需要提交，不删除已经commit 记录
+git checkout  -f // 未提交删除，不删除已经commit 记录
+git switch (2.23)// 未提交删除，不删除已经commit 记录，不能切换commit id
+
+3.3 记录搜索
+git log --grep='' --author="anshu.wang"
+git log -- <filepath>    //某个文件的修改
 git bisect
 
-3.2 记录管理
-git branch
-git merge
-git rebase
-git tag
-
 4.贮藏区
+git stash list //管理贮藏
 git stash show //显示stash区的文件
+
 git stash save <message>//添加到stash贮藏区
 git stash pop //取出最近贮藏区修改
-
-git stash list //管理贮藏
+git stash apply stash@{message} //取出最近贮藏区修改，并删除记录
 git stash drop stash@{message} //管理删除
-git stash apply stash@{message} //管理应用某个贮藏
 
 5. 协同
+git init //初始化仓库
 git clone //初始化仓库&checkout
+git remote -v
 git push //添加记录到远程仓库
 git fetch //拉取记录到本地分支
 git pull //fetch &merge 拉取记录到本地仓库并工作区
+
+5.1 记录分支管理
+git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
+git merge
+git rebase
+git tag
 
 ```
 
