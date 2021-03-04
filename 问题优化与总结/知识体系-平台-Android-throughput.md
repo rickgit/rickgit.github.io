@@ -515,3 +515,20 @@ FlowableSubscribeOn
 ### 背压
  
 MISSING（配合onBackPressure，达到后面四种效果）、BUFFER（接收性能比Observable低）、ERROR、DROP、LATEST
+
+### 搜索业务
+ 
+```java
+        mSubscribe = Observable.unsafeCreate((Observable.OnSubscribe<String>) subscriber -> mSearch = subscriber)
+                .debounce(400, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .filter(key -> key.toString().trim().length() > 0)
+                .switchMap((Func1<String, Observable<List<Result>>>) key -> searchObservable(key))//避免每次搜索都要重新设置监听
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(results -> {
+                    mSearchListener.onSearchComplete();
+                }, throwable -> throwable.printStackTrace());
+
+       mSearch.onNext(key);         
+```

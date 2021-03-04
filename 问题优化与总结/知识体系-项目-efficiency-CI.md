@@ -570,7 +570,7 @@ android gradle plugin
                               +--------------------------------------------------------------------------------------------------------+
 
   003_gradle_plugin            5ca08b98c7a58e51c5f38ee25d16ffcd55349e15 Update internal gradle plugin.
-  004_build                    e494641b510d866001a0bc10a8b00990ebc02021 Merge "move build into tools/base"
+  004_build_system             e494641b510d866001a0bc10a8b00990ebc02021 Merge "move build into tools/base"
 * 090_android_gradle_0.9.0     b8c5a93aaf8e5e189249d4651b69da8ed3523f4c Merge "Fix RS tests." into gradle_0.9
   100_Gradle_2.1               4d871a7914395be94cd611928b5b8cd3361dca4e Made Gradle plug-in 0.14.0 and Gradle 2.1 the minimum supported versions.
   200_Gradle_2.2               ffb22733515ed2dcffdacc59fdefd946e7f4d300 Allowed Gradle 2.2+ versions to be used with the gradle plugin
