@@ -403,6 +403,10 @@ adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activi
 adb shell  dumpsys window windows |grep "Window #"
 
 ```
+
+### 手机交互工具
+https://github.com/eleme/UETool
+
 ## 可拓展
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）

@@ -65,6 +65,24 @@ os
 
 《Operating Systems：Design and Implention（Minix）【操作系统设计与实现】》文件系统
 《unix操作系统设计》第三章高速缓存
+
+### 安装
+1. 开机慢
+sudo gedit /etc/default/grub 
+修改 GRUB_CMDLINE_LINUX_DEFAULT="quiet splash" 
+为 GRUB_CMDLINE_LINUX_DEFAULT=""
+为了 查看开关机后台服务
+
+sudo gedit /etc/systemd/system.conf
+修改为
+DefaultTimeoutStartSec=3s
+DefaultTimeoutStopSec=3s
+重新加载
+systemctl daemon-reload
+
+2. 识别固态硬盘
+dell bios选项里面，SATA 修改为 AHCI模式
+[磁盘工具](https://cloud.tencent.com/developer/article/1389853)
 ## 设备
 字符设备（/dev下，无缓存），块设备（/dev下，无缓存），网络设备（ifconfig -a查看，register_netdev注册）
 [何为文件系统，何为根文件系统？ - Xi Yang的回答 - 知乎](https://www.zhihu.com/question/284540952/answer/446736946)

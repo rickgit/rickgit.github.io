@@ -1175,6 +1175,37 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 ```
 ##### WIFI
 "am start -a android.net.wifi.PICK_WIFI_NETWORK"
+
+```
+com.zhangyue.settings.wifi.WifiEnabler#onSwitchClicked
+  this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
+    mWifiManager.getWifiApState();
+ 
+    java.lang.IllegalStateException: java.io.IOException: Failed to parse network stats
+        at com.android.server.NetworkManagementService.getNetworkStatsUidDetail(NetworkManagementService.java:1877)
+        at com.android.server.net.NetworkStatsService.getNetworkStatsUidDetail(NetworkStatsService.java:1619)
+        at com.android.server.net.NetworkStatsService.recordSnapshotLocked(NetworkStatsService.java:1204)
+        at com.android.server.net.NetworkStatsService.performPollLocked(NetworkStatsService.java:1294)
+        at com.android.server.net.NetworkStatsService.updateIfacesLocked(NetworkStatsService.java:1108)
+        at com.android.server.net.NetworkStatsService.updateIfaces(NetworkStatsService.java:1084)
+        at com.android.server.net.NetworkStatsService.forceUpdateIfaces(NetworkStatsService.java:862)
+        at com.android.server.ConnectivityService.notifyIfacesChangedForNetworkStats(ConnectivityService.java:5793)
+        at com.android.server.ConnectivityService.disconnectAndDestroyNetwork(ConnectivityService.java:2499)
+        at com.android.server.ConnectivityService.updateNetworkInfo(ConnectivityService.java:5651)
+        at com.android.server.ConnectivityService.access$1500(ConnectivityService.java:198)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.maybeHandleNetworkAgentMessage(ConnectivityService.java:2203)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.handleMessage(ConnectivityService.java:2342)
+        at android.os.Handler.dispatchMessage(Handler.java:106)
+        at android.os.Looper.loop(Looper.java:193)
+        at android.os.HandlerThread.run(HandlerThread.java:65)
+
+
+ @hide，不对外开放，但通过revoke机制调用到。
+    getWifiApState
+    setWifiApEnabled
+    getWifiApConfiguration
+    isWifiApEnabled
+```
 ##### 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
@@ -1190,6 +1221,10 @@ Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，Packa
                   base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
 
 ```
+
+##### 蓝牙连接
+
+
 
 #### 四大组件之Service
 ```
@@ -1465,8 +1500,40 @@ signature
 signatureOrSystem
 签名相同或者申请权限的应用为系统应用才能将权限授给它 
 ```
+##### 发送广播出现权限问题
+```java
+java.lang.SecurityException: Permission Denial: not allowed to send broadcast android.intent.action.TIME_SET from pid=4404, uid=10033
 
+1. 查找位置：
+grep -irn 'Permission\ Denial:\ not\ allowed\ to\ send\ broadcast'
 
+>base/services/core/java/com/android/server/am/ActivityManagerService.java:17701: 
+
+2. 定位代码
+isProtectedBroadcast = AppGlobals.getPackageManager().isProtectedBroadcast(action);
+
+3. PMS 查找代码
+
+    @Override
+    public boolean isProtectedBroadcast(String actionName) {
+        synchronized (mPackages) {
+            if (mProtectedBroadcasts.contains(actionName)) {
+                return true;
+            } else if (actionName != null) {
+                // TODO: remove these terrible hacks
+                if (actionName.startsWith("android.net.netmon.lingerExpired")
+                        || actionName.startsWith("com.android.server.sip.SipWakeupTimer")
+                        || actionName.startsWith("com.android.internal.telephony.data-reconnect")
+                        || actionName.startsWith("android.net.netmon.launchCaptivePortalApp")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+grep -irn --include="*.xml" 'protected-broadcast android:name="android.intent.action.TIME_SET'
+base/core/res/AndroidManifest.xml:32:    <protected-broadcast android:name="android.intent.action.TIME_SET" />
+```
 
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)
