@@ -846,6 +846,9 @@ git config --system core.longpaths true
 
 
 ##  chromium 版本管理depot_tools(gclient)
+
+
+
 [获取depot_tools](https://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools)
 
 ```depot_tools         
@@ -905,3 +908,10 @@ git config --system core.longpaths true
           
 
 ```
+
+### fetch 是获取源码
+
+### gclient 提供 git 多个仓库（.DEPS）的批量操作。
+
+gclient config git://source.codeaurora.cn/quic/lc 生成 **.gclient** 文件
+gclient sync  执行 **.DEPS** 依赖

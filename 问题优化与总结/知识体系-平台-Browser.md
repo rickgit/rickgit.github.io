@@ -51,7 +51,13 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
 sed -i s#"https://beijing.source.codeaurora.org/quic/lc/chromium/src.git"#"https://beijing.source.codeaurora.org/quic/lc/chromium/src"#g  `grep "https://beijing.source.codeaurora.org/quic/lc/chromium/src.git" -rl ./`
 
-sed -i s#"https://chromium.googlesource.com/chromium/src.git"#"https://beijing.source.codeaurora.org/quic/lc/chromium/src"#g  `grep "https://chromium.googlesource.com/chromium/src.git" -rl ./`
+sed -i s#"https://chromium.googlesource.com/chromium/src.git"#"https://source.codeaurora.cn/quic/lc/chromium/src/"#g  `grep "https://chromium.googlesource.com/chromium/src.git" -rl ./`
+sed -i s#"https://chromium.googlesource.com/v8/v8.git"#"http://source.codeaurora.cn/quic/lc/v8/v8"#g  `grep "https://chromium.googlesource.com/v8/v8.git" -rl ./`
+sed -i s#"https://chromium.googlesource.com/chromium/tools/depot_tools.git"#"http://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools"#g  `grep "https://chromium.googlesource.com/chromium/tools/depot_tools.git" -rl ./`
+sed -i s#"https://chromium.googlesource.com/chromium/reference_builds/chrome_win.git"#"http://source.codeaurora.cn/quic/lc/chromium/reference_builds/chrome_win"#g  `grep "https://chromium.googlesource.com/chromium/reference_builds/chrome_win.git" -rl ./`
+ 
+sed -i s#"https://chromium.googlesource.com/"#"git://source.codeaurora.cn/quic/lc/"#g  `grep "https://chromium.googlesource.com/" -rl ./`
+
 
 sed -i s#"https://chromium.googlesource.com/chromium/src.git"#"https://beijing.source.codeaurora.org/quic/lc/chromium/src"#g  `grep "https://chromium.googlesource.com/chromium/src.git" -rl ./`
 
@@ -160,6 +166,39 @@ x 3. gclient sync --nohooks --no-history  -r 7d100c0e9df1d093c61d7e2c16daf1327d7
 
 [Chromium版本介绍](http://www.chromium.org/developers/calendar)
 [Chromium稳定版本](https://omahaproxy.appspot.com/)
+
+
+```
+1. depot_tools
+git clone git://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools
+
+2. 下载chromium（可以预先下载完 git clone -b 42.0.2311.90 --depth 1 git://source.codeaurora.cn/quic/lc/chromium/src chromium/src）
+D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\fetch.py  --nohooks --no-history android
+
+3. 下载依赖
+创建依赖文件：
+cd chromium & D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\gclient.py config git://source.codeaurora.cn/quic/lc
+scheme必须是git，否则dept_tools/gclient_scm.py#GetScmName方法的git判断，http走 svn
+
+下载依赖：
+D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\gclient.py sync  --nohooks --no-history --force
+
+其中 src/third_party/WebKit src/third_party/skia 下载比较慢，
+
+3.安装依赖项
+build/install-build-deps.sh
+build/install-build-deps-android.sh
+
+4.DEPS文件定义的所有git仓库拉取到指定的目录或者运行指定脚本
+set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+gclient runhooks  
+
+
+5.编译
+gn gen out/Default //生成ninja项目文件
+ninja -C out/Default //编译源码
+
+```
 
 ### tarball
 [tarball](http://www.voidcn.com/article/p-bbehtnem-qq.html)
