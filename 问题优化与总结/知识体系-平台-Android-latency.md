@@ -717,10 +717,18 @@ Chain of Responsibility:Interceptor
 ```
 
 
-## 数据存储
+## 数据存储/Context
+
+
 文件存储,SharedPreferences/MMKV,SQLite数据库方式,内容提供器（Content provider）,网络
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
+### Context
 
+```java
+W/Resources: Drawable com.android.systemui:drawable/ic_lockscreen_ime has unresolved theme attributes! 
+ContextCompat.getDrawable() 获取vector
+
+```
 ### 配置参数存储
 #### SharedPreference
 ```
@@ -1177,7 +1185,6 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 "am start -a android.net.wifi.PICK_WIFI_NETWORK"
 
 ```
-com.zhangyue.settings.wifi.WifiEnabler#onSwitchClicked
   this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
     mWifiManager.getWifiApState();
  
@@ -1206,6 +1213,8 @@ com.zhangyue.settings.wifi.WifiEnabler#onSwitchClicked
     getWifiApConfiguration
     isWifiApEnabled
 ```
+
+SSI 更新改为 30s
 ##### 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
@@ -1223,8 +1232,10 @@ Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，Packa
 ```
 
 ##### 蓝牙连接
-
-
+控制蓝牙图标显示
+com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
+##### AudioManager
+frameworks/base/services/core/java/com/android/server/audio/AudioService.java
 
 #### 四大组件之Service
 ```
@@ -1494,11 +1505,158 @@ ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的
    normal
 低风险权限，只要申请了就可以使用，安装时不需要用户确认。 
 dangerous
-高风险权限，安装时需要用户确认授权才可使用。 
+高风险权限，安装时需要用户确认授权才可使用。  
 signature
 只有当申请权限应用与声明此权限应用的数字签名相同时才能将权限授给它。 
 signatureOrSystem
 签名相同或者申请权限的应用为系统应用才能将权限授给它 
+```
+
+### Configuration
+![蓝牙连接手持按键](configuration.png)
+
+```java 
+android 7 Configuration.java
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("{");
+        sb.append(fontScale);
+        sb.append(" ");
+        if (mcc != 0) {
+            sb.append(mcc);
+            sb.append("mcc");
+        } else {
+            sb.append("?mcc");
+        }
+        if (mnc != 0) {
+            sb.append(mnc);
+            sb.append("mnc");
+        } else {
+            sb.append("?mnc");
+        }
+        fixUpLocaleList();
+        if (!mLocaleList.isEmpty()) {
+            sb.append(" ");
+            sb.append(mLocaleList);
+        } else {
+            sb.append(" ?localeList");
+        }
+        int layoutDir = (screenLayout&SCREENLAYOUT_LAYOUTDIR_MASK);
+        switch (layoutDir) {
+            case SCREENLAYOUT_LAYOUTDIR_UNDEFINED: sb.append(" ?layoutDir"); break;
+            case SCREENLAYOUT_LAYOUTDIR_LTR: sb.append(" ldltr"); break;
+            case SCREENLAYOUT_LAYOUTDIR_RTL: sb.append(" ldrtl"); break;
+            default: sb.append(" layoutDir=");
+                sb.append(layoutDir >> SCREENLAYOUT_LAYOUTDIR_SHIFT); break;
+        }
+        if (smallestScreenWidthDp != SMALLEST_SCREEN_WIDTH_DP_UNDEFINED) {
+            sb.append(" sw"); sb.append(smallestScreenWidthDp); sb.append("dp");
+        } else {
+            sb.append(" ?swdp");
+        }
+        if (screenWidthDp != SCREEN_WIDTH_DP_UNDEFINED) {
+            sb.append(" w"); sb.append(screenWidthDp); sb.append("dp");
+        } else {
+            sb.append(" ?wdp");
+        }
+        if (screenHeightDp != SCREEN_HEIGHT_DP_UNDEFINED) {
+            sb.append(" h"); sb.append(screenHeightDp); sb.append("dp");
+        } else {
+            sb.append(" ?hdp");
+        }
+        if (densityDpi != DENSITY_DPI_UNDEFINED) {
+            sb.append(" "); sb.append(densityDpi); sb.append("dpi");
+        } else {
+            sb.append(" ?density");
+        }
+        switch ((screenLayout&SCREENLAYOUT_SIZE_MASK)) {
+            case SCREENLAYOUT_SIZE_UNDEFINED: sb.append(" ?lsize"); break;
+            case SCREENLAYOUT_SIZE_SMALL: sb.append(" smll"); break;
+            case SCREENLAYOUT_SIZE_NORMAL: sb.append(" nrml"); break;
+            case SCREENLAYOUT_SIZE_LARGE: sb.append(" lrg"); break;
+            case SCREENLAYOUT_SIZE_XLARGE: sb.append(" xlrg"); break;
+            default: sb.append(" layoutSize=");
+                    sb.append(screenLayout&SCREENLAYOUT_SIZE_MASK); break;
+        }
+        switch ((screenLayout&SCREENLAYOUT_LONG_MASK)) {
+            case SCREENLAYOUT_LONG_UNDEFINED: sb.append(" ?long"); break;
+            case SCREENLAYOUT_LONG_NO: /* not-long is not interesting to print */ break;
+            case SCREENLAYOUT_LONG_YES: sb.append(" long"); break;
+            default: sb.append(" layoutLong=");
+                    sb.append(screenLayout&SCREENLAYOUT_LONG_MASK); break;
+        }
+        switch (orientation) {
+            case ORIENTATION_UNDEFINED: sb.append(" ?orien"); break;
+            case ORIENTATION_LANDSCAPE: sb.append(" land"); break;
+            case ORIENTATION_PORTRAIT: sb.append(" port"); break;
+            default: sb.append(" orien="); sb.append(orientation); break;
+        }
+        switch ((uiMode&UI_MODE_TYPE_MASK)) {
+            case UI_MODE_TYPE_UNDEFINED: sb.append(" ?uimode"); break;
+            case UI_MODE_TYPE_NORMAL: /* normal is not interesting to print */ break;
+            case UI_MODE_TYPE_DESK: sb.append(" desk"); break;
+            case UI_MODE_TYPE_CAR: sb.append(" car"); break;
+            case UI_MODE_TYPE_TELEVISION: sb.append(" television"); break;
+            case UI_MODE_TYPE_APPLIANCE: sb.append(" appliance"); break;
+            case UI_MODE_TYPE_WATCH: sb.append(" watch"); break;
+            default: sb.append(" uimode="); sb.append(uiMode&UI_MODE_TYPE_MASK); break;
+        }
+        switch ((uiMode&UI_MODE_NIGHT_MASK)) {
+            case UI_MODE_NIGHT_UNDEFINED: sb.append(" ?night"); break;
+            case UI_MODE_NIGHT_NO: /* not-night is not interesting to print */ break;
+            case UI_MODE_NIGHT_YES: sb.append(" night"); break;
+            default: sb.append(" night="); sb.append(uiMode&UI_MODE_NIGHT_MASK); break;
+        }
+        switch (touchscreen) {
+            case TOUCHSCREEN_UNDEFINED: sb.append(" ?touch"); break;
+            case TOUCHSCREEN_NOTOUCH: sb.append(" -touch"); break;
+            case TOUCHSCREEN_STYLUS: sb.append(" stylus"); break;
+            case TOUCHSCREEN_FINGER: sb.append(" finger"); break;
+            default: sb.append(" touch="); sb.append(touchscreen); break;
+        }
+        switch (keyboard) {
+            case KEYBOARD_UNDEFINED: sb.append(" ?keyb"); break;
+            case KEYBOARD_NOKEYS: sb.append(" -keyb"); break;
+            case KEYBOARD_QWERTY: sb.append(" qwerty"); break;
+            case KEYBOARD_12KEY: sb.append(" 12key"); break;
+            default: sb.append(" keys="); sb.append(keyboard); break;
+        }
+        switch (keyboardHidden) {
+            case KEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case KEYBOARDHIDDEN_NO: sb.append("/v"); break;
+            case KEYBOARDHIDDEN_YES: sb.append("/h"); break;
+            case KEYBOARDHIDDEN_SOFT: sb.append("/s"); break;
+            default: sb.append("/"); sb.append(keyboardHidden); break;
+        }
+        switch (hardKeyboardHidden) {
+            case HARDKEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case HARDKEYBOARDHIDDEN_NO: sb.append("/v"); break;
+            case HARDKEYBOARDHIDDEN_YES: sb.append("/h"); break;
+            default: sb.append("/"); sb.append(hardKeyboardHidden); break;
+        }
+        switch (navigation) {
+            case NAVIGATION_UNDEFINED: sb.append(" ?nav"); break;
+            case NAVIGATION_NONAV: sb.append(" -nav"); break;
+            case NAVIGATION_DPAD: sb.append(" dpad"); break;
+            case NAVIGATION_TRACKBALL: sb.append(" tball"); break;
+            case NAVIGATION_WHEEL: sb.append(" wheel"); break;
+            default: sb.append(" nav="); sb.append(navigation); break;
+        }
+        switch (navigationHidden) {
+            case NAVIGATIONHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case NAVIGATIONHIDDEN_NO: sb.append("/v"); break;
+            case NAVIGATIONHIDDEN_YES: sb.append("/h"); break;
+            default: sb.append("/"); sb.append(navigationHidden); break;
+        }
+        if (seq != 0) {
+            sb.append(" s.");
+            sb.append(seq);
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
 ```
 ##### 发送广播出现权限问题
 ```java
@@ -1534,6 +1692,13 @@ isProtectedBroadcast = AppGlobals.getPackageManager().isProtectedBroadcast(actio
 grep -irn --include="*.xml" 'protected-broadcast android:name="android.intent.action.TIME_SET'
 base/core/res/AndroidManifest.xml:32:    <protected-broadcast android:name="android.intent.action.TIME_SET" />
 ```
+### SystemUI
+QuickStatusBarHeader
+  quick_status_bar_expanded_header.xml
+  QuickStatusBarHeader（system_icons.xml）
+    BluetoothLayout
+    BatteryMeterLayout
+
 
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)

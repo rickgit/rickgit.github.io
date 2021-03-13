@@ -10,9 +10,9 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
 
 +-------------------------------------------------------------------------------+
-|  repo wtf weekly  git-gs zsh-goodies gn ninja                                                         |
-|  cpplint.py pylint presubmit_support.py                                                          |
-|  gclient gcl git-cl svn drover                                                         |
+|  repo wtf weekly  git-gs zsh-goodies gn ninja                                 |
+|  cpplint.py pylint presubmit_support.py                                        |
+|  gclient gcl git-cl svn drover                                                |
 |   depot_tools                                                                 |
 +-------------------------------------------------------------------------------+
 |                                                                               |
@@ -157,10 +157,11 @@ https://blog.csdn.net/u014743697/article/details/52890036
 ## 下载chromium
 [获取Chromium 源码的三种方式](https://blog.csdn.net/business122/article/details/80512218)
 ```
-x 1.下载zip包
-x 2. git clone -b 42.0.2311.90 --depth 1 https://chromium.googlesource.com/chromium/src.git
+√ 1. 查询稳定版本 https://github.com/zcbenz/chromium-source-tarball/releases  
+x 2. git clone -b 59.0.3071.117 --depth 1 git://source.codeaurora.cn/quic/lc/chromium/src.git（https://chromium.googlesource.com/chromium/src.git ）
 x 3. gclient sync --nohooks --no-history  -r 7d100c0e9df1d093c61d7e2c16daf1327d7cc163
-√ 4. 稳定版本 https://github.com/zcbenz/chromium-source-tarball/releases  
+x 4.下载zip包
+
 ```
 
 
@@ -168,17 +169,21 @@ x 3. gclient sync --nohooks --no-history  -r 7d100c0e9df1d093c61d7e2c16daf1327d7
 [Chromium稳定版本](https://omahaproxy.appspot.com/)
 
 
-```
+```shell
 1. depot_tools
 git clone git://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools
 
-2. 下载chromium（可以预先下载完 git clone -b 42.0.2311.90 --depth 1 git://source.codeaurora.cn/quic/lc/chromium/src chromium/src）
+
+2. 下载chromium（可以预先下载完 git clone -b 59.0.3071.117 --depth 1 git://source.codeaurora.cn/quic/lc/chromium/src chromium/src）
 D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\fetch.py  --nohooks --no-history android
 
 3. 下载依赖
 创建依赖文件：
+
 cd chromium & D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\gclient.py config git://source.codeaurora.cn/quic/lc
 scheme必须是git，否则dept_tools/gclient_scm.py#GetScmName方法的git判断，http走 svn
+可能需要修改地址：
+sed -i s#"https://chromium.googlesource.com/chromium/tools/depot_tools.git"#"git://source.codeaurora.cn/quic/lc/chromium/tools/depot_tools"#g  `grep "https://chromium.googlesource.com/chromium/tools/depot_tools.git" -rl ./`
 
 下载依赖：
 D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\gclient.py sync  --nohooks --no-history --force

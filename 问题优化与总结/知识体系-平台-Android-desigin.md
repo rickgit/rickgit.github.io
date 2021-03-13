@@ -4,7 +4,7 @@
 Rxjava 1.0 Rx....
 RxJava 2.0 io.reactivex....
 RxJava 3.0 io.reactivex.rxjava3...
-### 概念与设计模式
+ ### 概念与设计模式
 ReactiveX provides a collection of operators with which you can filter, select, transform, combine, and compose Observables.
 ```
 定时分发：注册倒计时
@@ -589,6 +589,9 @@ Provider装饰工厂类，管理生成的类
 
 
 ## 可维护性/通讯 - 架构之模块化（插件化及组件化）
+
+模块化 maven  复用，解耦，协同；代码，业务，团队
+组件化 gradle lib独立运行，提升了编译速度
 
 
 插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）

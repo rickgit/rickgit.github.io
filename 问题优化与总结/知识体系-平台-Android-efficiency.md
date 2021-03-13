@@ -68,7 +68,52 @@ sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3
 -  Android 9（API 级别 28）引入了新的电池管理功能：应用待机存储分区。[](https://developer.android.google.cn/topic/performance/appstandby)
 ⭐ 非可调用 sdk 接口限制
 ⭐ Http 明文请求
+```java
+        android:usesCleartextTraffic="true" 
+        tls支持：
+   public static OkHttpClient.Builder ignoreSSL (OkHttpClient.Builder builder) {
+        builder.sslSocketFactory(createSSLSocketFactory())
+            .hostnameVerifier((s, sslSession) -> true);
+        return builder;
+    }
 
+    private static SSLSocketFactory createSSLSocketFactory () {
+
+        SSLSocketFactory sSLSocketFactory = null;
+
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new TrustAllManager()}, new SecureRandom());
+            sSLSocketFactory = sc.getSocketFactory();
+        } catch (Exception e) {
+            LOGGER.info(e.getMessage(), e);
+        }
+
+        return sSLSocketFactory;
+    }
+
+    private static class TrustAllManager implements X509TrustManager {
+
+        @Override
+        public void checkClientTrusted (java.security.cert.X509Certificate[] x509Certificates,
+            String s) throws java.security.cert.CertificateException {
+
+        }
+
+        @Override
+        public void checkServerTrusted (java.security.cert.X509Certificate[] x509Certificates,
+            String s) throws java.security.cert.CertificateException {
+
+        }
+
+
+        @Override
+        public java.security.cert.X509Certificate[] getAcceptedIssuers () {
+            return new X509Certificate[0];
+        }
+    }
+
+```
 #### Android  8 API level 26
 [Android 8.0 变更](https://developer.android.google.cn/about/versions/oreo/android-8.0-changes?hl=zh-cn#back-all)
 
