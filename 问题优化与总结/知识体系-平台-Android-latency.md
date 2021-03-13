@@ -1182,7 +1182,7 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
 ```
 ##### WIFI
-"am start -a android.net.wifi.PICK_WIFI_NETWORK"
+adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK
 
 ```
   this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
@@ -1212,9 +1212,23 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
     setWifiApEnabled
     getWifiApConfiguration
     isWifiApEnabled
+
+
+  
 ```
 
 SSI 更新改为 30s
+
+```java
+WIFI 连接文案 frameworks\base\packages\SettingsLib\src\com\android\settingslib\wifi\AccessPoint.java
+base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
+
+```
+
+```设置热点
+WifiManager.getConfiguredNetworks()
+```
+
 ##### 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
@@ -1234,6 +1248,10 @@ Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，Packa
 ##### 蓝牙连接
 控制蓝牙图标显示
 com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
+
+adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+
+
 ##### AudioManager
 frameworks/base/services/core/java/com/android/server/audio/AudioService.java
 
