@@ -189,6 +189,7 @@ sed -i s#"https://chromium.googlesource.com/chromium/tools/depot_tools.git"#"git
 D:\Program\Python27\python.exe D:\workspace\ws-codeaurora\depot_tools\gclient.py sync  --nohooks --no-history --force
 
 其中 src/third_party/WebKit src/third_party/skia 下载比较慢，
+build_tools依赖需要修改 .gclient_entries 仓库地址。
 
 3.安装依赖项
 build/install-build-deps.sh
