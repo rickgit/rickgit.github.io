@@ -281,7 +281,7 @@ git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
 git merge
 git rebase
 git tag
-
+git push origin --delete develop_AA //删除远程分支
 ```
 
 ### 常见问题

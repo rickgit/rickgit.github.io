@@ -437,7 +437,11 @@ if (window != null){
       attributes.y = -120;
 }
 ```
+##### 状态栏遮住对话框
 
+```
+         <item name="android:windowSoftInputMode">adjustResize</item>
+```
 ### 编舞者 Choreographer
 双缓冲机制、Choreographer的作用（vsync）、同步消息屏障
 #### 遍历刷新(测量，布局，绘制) traversal
