@@ -26,10 +26,14 @@
 * 008_pom             4b799deefa16558f8af0eaab299e8c0b09c9e2aa Create minimal POM
 
 ```
-## Apache Ant
-使用技术：Java内省
+## Apache Ant （Java内省实现xml对象化）
 gnu make->git->ant->maven->groovy->gradle->Android gradle sdl
 gnu make（make包含很多默认）->Autotools（配置文件复杂） ->Cmake（配置文件只需要写上源文件及生成类型，同一个目标的配置可能会零散分布在各个地方）->gyp（python 项目，模块化、结构化）->gn（c++项目，GN比GYP速度快20倍）
+
+### 配置文件
+build.xml
+
+### 源码
 ```
 [organisation]-[module]-[revision]-[type].[ext]
 +------------+------------------------------------------------------+
@@ -81,7 +85,73 @@ gnu make（make包含很多默认）->Autotools（配置文件复杂） ->Cmake�
 
 
 ```
-## Apache Maven
+## Apache Maven 项目管理（Plexus容器）
+
+### 配置文件
+pom.xml
+1. 生命周期
+Maven 有三套独立的 Lifecycle:default、clean 和 site，每个 Lifecycle 包含多个 Phase。
+2. 插件拓展
+3. 依赖机制。坐标五元组，即：（groupId，artifactId，version，type，classifier）
+
+
+
+### 仓库
+``` java
+  mavenCentral(); //最早
+  jcenter() //Android Studio 0.8 版本起的默认 ；
+  google()  //https://maven.google.com	
+
+  //其他仓库
+  maven{ url 'https://maven.aliyun.com/repository/public'}
+  maven { url 'https://maven.aliyun.com/repositories/jcenter' }
+  maven { url 'https://maven.aliyun.com/repositories/google' }
+  maven { url 'https://maven.aliyun.com/repository/central' }
+  maven { url "https://jitpack.io" }
+
+  //本地仓库
+  mavenLocal()   //{USER_HOME}/.m2/repository	                              
+  maven {
+      url 'file:///e:/repo/'                   
+  } 
+
+
+
+```
+#### 仓库配置
+[本地仓库配置](https://www.cnblogs.com/Bugtags2015/p/5168763.html)
+
+```java
+
+  apply plugin: 'maven'
+
+  uploadArchives {
+      repositories.mavenDeployer {
+          repository(url: LOCAL_REPO_URL)
+          pom.groupId = PROJ_GROUP
+          pom.artifactId = PROJ_ARTIFACTID
+          pom.version = PROJ_VERSION     
+      }   
+  }
+
+
+task uploadLocalMaven(type: Upload) {
+    group 'upload'
+}
+```
+
+### 
+
+[](https://juejin.im/post/5df10c116fb9a0165936e0b7)
+//个人账号
+https://bintray.com/signup/oss
+//企业账号
+https://bintray.com/
+
+https://bintray.com/profile/edit key :44097c6d8dc66a328312ced58d25c46cdc346af2
+
+### 源码
+
 
 ``` 
   001_initial_maven-mboot             f646e34f614ca93b7ca3319834582422b5f07a8b Initial revision
@@ -174,8 +244,15 @@ Maven is - at its heart - a plugin execution framework;
 +--------------------------------------------------------------+  
 
  
-## Gradle 
+## Gradle 编译（ task闭包和task依赖构成生命周期）
 
+### 配置文件
+1. build.gradle
+
+2. 插件配置文件
+resources\META-INF\gradle-plugins\xxx.properties
+
+### 源码
 [](https://juejin.im/post/5cf3e4dfe51d454d56535790)
 
 Gradle provides a Domain Specific Language (DSL), for describing builds. 

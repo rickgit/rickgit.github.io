@@ -276,6 +276,8 @@ git push //添加记录到远程仓库
 git fetch //拉取记录到本地分支
 git pull //fetch &merge 拉取记录到本地仓库并工作区
 
+5.1 配置
+git config
 5.1 记录分支管理
 git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
 git merge
