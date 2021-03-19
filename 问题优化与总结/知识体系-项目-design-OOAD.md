@@ -12,8 +12,8 @@ DRY
 
 2. 模块内部与模块间
 低耦合（模块间）高内聚（模块内）
-CARP（模块间，属OOAD），LoD（模块间），IoC（模块间）
-SOLID（模块内，属OOAD），良性依赖原则（dagger）， 命令-查询分离原则（ 模块内）
+CARP（模块间，属OOAD），IoC（模块间），LoD（模块间）
+SOLID（模块内，属OOAD），良性依赖原则（dagger/rxjava 《拥抱变化：敏捷设计从理论到实践》）， 命令-查询分离原则（ 模块内）
 
 # 模式
 [](https://en.wikipedia.org/wiki/Software_design_pattern)

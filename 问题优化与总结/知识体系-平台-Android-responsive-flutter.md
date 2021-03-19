@@ -2,6 +2,31 @@
 [性能对比，包大小，启动速度，CUP/内存占用，刷新率；原生优于flutter](https://juejin.im/post/6844903666433032199)
 
 [教程](https://github.com/ahyangnb/flutter_interview)
+### Flutter UI框架
+
+```
++-------------+-----------------+----------------------+
+|             |   Material      |    Cupertino         |
+|             +-----------------+----------------------+
+|   Framework |             Wedgets                    |
+|             +----------------------------------------+
+|    (Dart)   |                                        |
+|             |             Rendering                  |
+|             +----------------------------------------+
+|             |  Animation   Painting   Gestures       |
+|             +----------------------------------------+
+|             |             Foundation                 |
++-------------+----------------------------------------+
++-------------+----------------------------------------+
+| Engine(C++) |    Skia     Dart    Text               |
++-------------+----------------------------------------+
+
+
+```
+
+Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(Physics-based animation) 
+
+physics，scheduler,sematics,services
 ### 包大小与编译
 
 Android debug模式（Flutter使用Kernel Snapshot 模式编译）
