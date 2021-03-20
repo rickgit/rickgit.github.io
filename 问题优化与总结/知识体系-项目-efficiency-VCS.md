@@ -94,6 +94,9 @@ project
 
 
 ## 分布式的VCS (DVCS) -Git
+ 
+[](https://git-scm.com/download/gui/windows)
+
 
 Git与SVN区别:
 1. Git是分布式的，操作几乎不需要联网，SVN是CS模式；
@@ -754,6 +757,12 @@ fi
 
 ##  Repo
 Repo是谷歌用Python脚本写的调用git的一个脚本，可以实现管理多个git库。
++--------------------------------------------------+
+|                                                  |
+|     repo         Manifest     AOSP project       |
+|                                                  |
+|                     repo                         |
++--------------------------------------------------+
 
 Gerrit,一种免费、开放源代码的代码审查软件,使用网页界面。
 ### 合并两个不同仓库
