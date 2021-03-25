@@ -1452,6 +1452,8 @@ server binder:
 3. LocalBroadCastManager
    使用Handler处理penddingBroadCast
 
+4. 7.0 版本上静态注册android.net.conn.CONNECTIVITY_CHANGE
+
 #### 四大组件之contentProvider
 安装时候，会在AMS注册providers
 1. 协议

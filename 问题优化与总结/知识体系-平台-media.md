@@ -1942,6 +1942,16 @@ stop()            |      stop() |                +--------------------+         
 [ExoPlayer](https://github.com/google/ExoPlayer) 支持 Android 的 MediaPlayer API 当前不支持的功能
 
 ## OpenGL
+1998年8月 GLUT v3.7的废弃
+2005年    Freeglut 
+2002年    GLFW v2版本。用于创建窗口，上下文和表面，接收输入和事件。替代freeGLUT，GLUT 
+2002年    GLEW是使用OPENGL2.0之后的一个工具函数。openGL的实现是显卡生产商，glew用来找openGL的函数
+glad是glew的升级版
+
+
+https://blog.csdn.net/shimazhuge/article/details/24963633
+docs.gl
+https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=6
 ### type
 ```
 +-----------------------------------------------------------------------------------+
