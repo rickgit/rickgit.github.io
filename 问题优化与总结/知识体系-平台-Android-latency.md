@@ -728,6 +728,11 @@ ContentProvider->保存和获取数据，并使其对所有应用程序可见
 W/Resources: Drawable com.android.systemui:drawable/ic_lockscreen_ime has unresolved theme attributes! 
 ContextCompat.getDrawable() 获取vector
 
+名称获取id
+getResources().getIdentifier(val, "drawable", getPackageName());
+
+获取图片名称
+mContext.getResources().getResourceEntryName(resourceId)
 ```
 ### 配置参数存储
 #### SharedPreference
@@ -1182,7 +1187,9 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
 ```
 ##### WIFI
-adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK
+adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
 
 ```
   this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
@@ -1716,6 +1723,27 @@ QuickStatusBarHeader
   QuickStatusBarHeader（system_icons.xml）
     BluetoothLayout
     BatteryMeterLayout
+```
+
+com.android.systemui.statusbar.CommandQueue#mHandler 接收消息
+com.android.systemui.statusbar.phone.PhoneStatusBarPolicy#mIntentReceiver 
+
+
+statusbar 隐藏原生图标
+com.android.systemui.statusbar.phone.StatusBarIconController.IconManager
+com.android.systemui.statusbar.StatusBarIconView
+
+```
+SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
+- stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
+
+其他进程,状态栏系统图标（蓝牙，WiFi）
+- ![其他进程,状态栏图标](其他进程,状态栏图标.png)
+获取系统图标
+```java
+com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
+```
+
 
 
 ## 网络通讯

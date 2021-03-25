@@ -648,6 +648,12 @@ preBuild {
 }
 
 ```
+
+```
+清空本地缓存
+gradlew build --refresh-dependencies  
+
+```
 [Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
 
 
