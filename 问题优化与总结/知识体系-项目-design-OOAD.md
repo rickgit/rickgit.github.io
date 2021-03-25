@@ -12,8 +12,8 @@ DRY
 
 2. 模块内部与模块间
 低耦合（模块间）高内聚（模块内）
-CARP（模块间，属OOAD），LoD（模块间），IoC（模块间）
-SOLID（模块内，属OOAD），良性依赖原则（dagger）， 命令-查询分离原则（ 模块内）
+CARP（模块间，属OOAD），IoC（模块间），LoD（模块间）
+SOLID（模块内，属OOAD），良性依赖原则（dagger/rxjava 《拥抱变化：敏捷设计从理论到实践》）， 命令-查询分离原则（ 模块内）
 
 # 模式
 [](https://en.wikipedia.org/wiki/Software_design_pattern)
@@ -188,9 +188,14 @@ Creational
         Thread Local Storage
         AAA
  Integration 
+## 单例
+- 双检锁(synchronized) + volatile
+- 静态内部类
+    classloader 机制来保证初始化 instance 时只有一个线程。
+- 枚举
+  自动支持序列化机制。不能通过 reflection attack 来调用私有构造方法。
 
-
-# OOAD IDEF4：面向对象设计(Object-Oriented Design)
+## OOAD IDEF4：面向对象设计(Object-Oriented Design)
 
 《Pattern-oriented Software Architecture 》五套书
 《Software Architecture: Perspectives on an Emerging Discipline》

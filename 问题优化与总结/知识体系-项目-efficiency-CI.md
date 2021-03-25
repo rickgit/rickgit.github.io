@@ -1,5 +1,8 @@
 # 持续集成(Jenkins/TeamCity)
  Continuous integration (CI)
+ 
+ 软件打包和分发自动化
+
 ## Apache-commons-cli
 ```
 +---------------------------+--------------------+----------------------+
@@ -26,10 +29,14 @@
 * 008_pom             4b799deefa16558f8af0eaab299e8c0b09c9e2aa Create minimal POM
 
 ```
-## Apache Ant
-使用技术：Java内省
+## Apache Ant （Java内省实现xml对象化）
 gnu make->git->ant->maven->groovy->gradle->Android gradle sdl
 gnu make（make包含很多默认）->Autotools（配置文件复杂） ->Cmake（配置文件只需要写上源文件及生成类型，同一个目标的配置可能会零散分布在各个地方）->gyp（python 项目，模块化、结构化）->gn（c++项目，GN比GYP速度快20倍）
+
+### 配置文件
+build.xml
+
+### 源码
 ```
 [organisation]-[module]-[revision]-[type].[ext]
 +------------+------------------------------------------------------+
@@ -81,7 +88,73 @@ gnu make（make包含很多默认）->Autotools（配置文件复杂） ->Cmake�
 
 
 ```
-## Apache Maven
+## Apache Maven 项目管理（Plexus容器）
+
+### 配置文件
+pom.xml
+1. 生命周期
+Maven 有三套独立的 Lifecycle:default、clean 和 site，每个 Lifecycle 包含多个 Phase。
+2. 插件拓展
+3. 依赖机制。坐标五元组，即：（groupId，artifactId，version，type，classifier）
+
+
+
+### 仓库
+``` java
+  mavenCentral(); //最早
+  jcenter() //Android Studio 0.8 版本起的默认 ；
+  google()  //https://maven.google.com	
+
+  //其他仓库
+  maven{ url 'https://maven.aliyun.com/repository/public'}
+  maven { url 'https://maven.aliyun.com/repositories/jcenter' }
+  maven { url 'https://maven.aliyun.com/repositories/google' }
+  maven { url 'https://maven.aliyun.com/repository/central' }
+  maven { url "https://jitpack.io" }
+
+  //本地仓库
+  mavenLocal()   //{USER_HOME}/.m2/repository	                              
+  maven {
+      url 'file:///e:/repo/'                   
+  } 
+
+
+
+```
+#### 仓库配置
+[本地仓库配置](https://www.cnblogs.com/Bugtags2015/p/5168763.html)
+
+```java
+
+  apply plugin: 'maven'
+
+  uploadArchives {
+      repositories.mavenDeployer {
+          repository(url: LOCAL_REPO_URL)
+          pom.groupId = PROJ_GROUP
+          pom.artifactId = PROJ_ARTIFACTID
+          pom.version = PROJ_VERSION     
+      }   
+  }
+
+
+task uploadLocalMaven(type: Upload) {
+    group 'upload'
+}
+```
+
+### 
+
+[](https://juejin.im/post/5df10c116fb9a0165936e0b7)
+//个人账号
+https://bintray.com/signup/oss
+//企业账号
+https://bintray.com/
+
+https://bintray.com/profile/edit key :44097c6d8dc66a328312ced58d25c46cdc346af2
+
+### 源码
+
 
 ``` 
   001_initial_maven-mboot             f646e34f614ca93b7ca3319834582422b5f07a8b Initial revision
@@ -174,8 +247,40 @@ Maven is - at its heart - a plugin execution framework;
 +--------------------------------------------------------------+  
 
  
-## Gradle 
+## Gradle 编译（ task闭包和task依赖构成生命周期）
 
+### 配置文件
+1. build.gradle
+
+2. 插件配置文件
+resources\META-INF\gradle-plugins\xxx.properties
+### tasks 分为 build，help
+```java
+默认 tasks
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'ws-gradle'.
+components - Displays the components produced by root project 'ws-gradle'. [incubating]
+dependencies - Displays all dependencies declared in root project 'ws-gradle'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'ws-gradle'.
+dependentComponents - Displays the dependent components of components in root project 'ws-gradle'. [incubating]
+help - Displays a help message.
+model - Displays the configuration model of root project 'ws-gradle'. [incubating]
+projects - Displays the sub-projects of root project 'ws-gradle'.
+properties - Displays the properties of root project 'ws-gradle'.
+tasks - Displays the tasks runnable from root project 'ws-gradle'.
+
+
+```
+
+
+### 源码
 [](https://juejin.im/post/5cf3e4dfe51d454d56535790)
 
 Gradle provides a Domain Specific Language (DSL), for describing builds. 
@@ -530,8 +635,137 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 ```
 
 
-### android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
+## android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
 
+#### 插件
+1. 依赖 JavaBasePlugin（apply plugin: 'java-base'），关注 createAssembleTask()，
+2. "android" Extension 关联 **AppExtension** ，productFlavors,buildTypes,signiingConfigs
+
+#### tasks
+```java
+依赖java-base 的 task
+
+Build tasks
+-----------
+assemble - Assembles the outputs of this project.
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+clean - Deletes the build directory.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'ws-gradle'.
+components - Displays the components produced by root project 'ws-gradle'. [incubating]
+dependencies - Displays all dependencies declared in root project 'ws-gradle'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'ws-gradle'.
+dependentComponents - Displays the dependent components of components in root project 'ws-gradle'. [incubating]
+help - Displays a help message.
+model - Displays the configuration model of root project 'ws-gradle'. [incubating]
+projects - Displays the sub-projects of root project 'ws-gradle'.
+properties - Displays the properties of root project 'ws-gradle'.
+tasks - Displays the tasks runnable from root project 'ws-gradle'.
+
+Verification tasks
+------------------
+check - Runs all checks.
+
+Other tasks
+-----------
+prepareKotlinBuildScriptModel
+```
+```java
+Android tasks
+-------------
+androidDependencies - Displays the Android dependencies of the project.
+signingReport - Displays the signing info for the base and test modules
+sourceSets - Prints out all the source sets defined in this project.
+
+Build tasks
+-----------
+assemble - Assemble main outputs for all the variants.
+assembleAndroidTest - Assembles all the Test applications.
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+bundle - Assemble bundles for all the variants.
+classes - Assembles main classes.
+clean - Deletes the build directory.
+cleanBuildCache - Deletes the build cache directory.
+compileDebugAndroidTestSources
+compileDebugSources
+compileDebugUnitTestSources
+compileReleaseSources
+compileReleaseUnitTestSources
+extractDebugAnnotations - Extracts Android annotations for the debug variant into the archive file
+extractReleaseAnnotations - Extracts Android annotations for the release variant into the archive file
+jar - Assembles a jar archive containing the main classes.
+testClasses - Assembles test classes.
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build.
+wrapper - Generates Gradle wrapper files.
+
+Cleanup tasks
+-------------
+lintFix - Runs lint on all variants and applies any safe suggestions to the source code.
+
+Documentation tasks
+-------------------
+groovydoc - Generates Groovydoc API documentation for the main source code.
+javadoc - Generates Javadoc API documentation for the main source code.
+
+Help tasks
+----------
+buildEnvironment - Displays all buildscript dependencies declared in root project 'Test-java'.
+components - Displays the components produced by root project 'Test-java'. [incubating]
+dependencies - Displays all dependencies declared in root project 'Test-java'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'Test-java'.
+dependentComponents - Displays the dependent components of components in root project 'Test-java'. [incubating]
+help - Displays a help message.
+model - Displays the configuration model of root project 'Test-java'. [incubating]
+outgoingVariants - Displays the outgoing variants of root project 'Test-java'.
+projects - Displays the sub-projects of root project 'Test-java'.
+properties - Displays the properties of root project 'Test-java'.
+tasks - Displays the tasks runnable from root project 'Test-java' (some of the displayed tasks may belong to subprojects).
+
+Install tasks
+-------------
+installDebug - Installs the Debug build.
+installDebugAndroidTest - Installs the android (on device) tests for the Debug build.
+uninstallAll - Uninstall all applications.
+uninstallDebug - Uninstalls the Debug build.
+uninstallDebugAndroidTest - Uninstalls the android (on device) tests for the Debug build.
+uninstallRelease - Uninstalls the Release build.
+
+Upload tasks
+------------
+uploadArchives - Uploads all artifacts belonging to configuration ':GradlePlugin:archives'
+
+Verification tasks
+------------------
+check - Runs all checks.
+connectedAndroidTest - Installs and runs instrumentation tests for all flavors on connected devices.
+connectedCheck - Runs all device checks on currently connected devices.
+connectedDebugAndroidTest - Installs and runs the tests for debug on connected devices.
+deviceAndroidTest - Installs and runs instrumentation tests using all Device Providers.
+deviceCheck - Runs all device checks using Device Providers and Test Servers.
+lint - Runs lint on all variants.
+lintDebug - Runs lint on the Debug build.
+lintRelease - Runs lint on the Release build.
+lintVitalRelease - Runs lint on just the fatal issues in the release build.
+test - Run unit tests for all variants.
+testDebugUnitTest - Run unit tests for the debug build.
+testReleaseUnitTest - Run unit tests for the release build.
+
+```
+#### 源码
 查询Gradle 版本 
 ```bash
 Gradle

@@ -1,6 +1,5 @@
 ## TDD 测试驱动
 内省
-
 ## Junit
 ```
 +----------------------------------------------------------------+ 
@@ -58,12 +57,5 @@ it's pretty easy to instantiate objects in Java through standard reflection.
 
 
 ```
-## repo
-+--------------------------------------------------+
-|                                                  |
-|     repo         Manifest     AOSP project       |
-|                                                  |
-|                     repo                         |
-+--------------------------------------------------+
 
 
