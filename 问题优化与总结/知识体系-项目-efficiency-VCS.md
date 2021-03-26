@@ -169,7 +169,7 @@ git config --global --unset http.proxy
 git log --reverse
 git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
 
- git log --all --reverse --grep='搜索关键字'
+git log --all --reverse --grep='搜索关键字'
 
 git branch initial_revision <commit id>
  //显示分支

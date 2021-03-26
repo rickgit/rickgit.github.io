@@ -276,7 +276,6 @@ projects - Displays the sub-projects of root project 'ws-gradle'.
 properties - Displays the properties of root project 'ws-gradle'.
 tasks - Displays the tasks runnable from root project 'ws-gradle'.
 
-
 ```
 
 

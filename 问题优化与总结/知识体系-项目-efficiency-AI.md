@@ -255,6 +255,7 @@ k均值法
   104_v1.0.b4  64be3e2a89c72a8b23ad11b3719bd66725658c61 Undoing changes mistakenly made on tag 1.0b4
 
 ```
+封装数据类型 narray
 
 ## pandas
 [getting_started（install）](https://pandas.pydata.org/getting_started.html) 
@@ -281,7 +282,7 @@ k均值法
   100_v1.0.0  d3f08566a80239a18a813ebda9a2ebb0368b1dc5 RLS: 1.0.0rc0
 
 ```
-
+封装数据类型 Series
 
 ## Matplotlib
 
