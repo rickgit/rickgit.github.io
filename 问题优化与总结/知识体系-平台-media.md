@@ -2006,11 +2006,15 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 ES只支持三角形
 gles没有glDrawBuffer和glReadBuffer接口，没法直接操纵前后缓冲区。 
 
-OpenGL ES 1.1 固定渲染管线。持FBO，gl变量和指令加OES后缀。Android 1.6支持（核心是窗口库，gl还是显卡驱动实现）。
+            OpenGL ES 1.1 参考的是OpenGL 1.5。固定渲染管线。持FBO，gl变量和指令加OES后缀。
+              Android 1.6支持（核心是窗口库，gl还是显卡驱动实现），Pixelflinger是Android系统中为OpenGL ES引擎提供的一套软件渲染器（renderer）。
               通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。
-OpenGl ES 2.x 可编程渲染管线，由OpenGL 2.x裁剪，支持vertex,pixel shader。Android 2.2 底层渲染均由OpenGL负责
-OpenGL ES 3.0 Android 4.3 
-OpenGL ES 3.1 Android 5
+              着色器语言有着两套标准：CM和CL，其中CL只支持定点数，而CM既支持定点数又支持浮点数
+2007年3月   OpenGl ES 2.0 可编程渲染管线，移除了很多固定管线的渲染流程，固定管线里那些材质参数、灯光参数都被shader所替代。
+              由OpenGL 2.0裁剪，支持vertex,pixel shader。Android 2.2 底层渲染均由OpenGL负责
+2012年8月   OpenGL ES 3.0 Android 4.3 ，WebGL2.0就是基于OpenGLES3.0
+2014年3月   OpenGL ES 3.1 Android 5
+2018年3月   Vulkan 1.1 正式版本，取代OpenGL和ES。Android 7.0。预编译Shaders
 
 libagl：Android中通过软件方法实现的一套OpenGL动态库，只具有参考意义
 libhgl：为区别libagl，自定义的一种叫法。特指GPU厂商提供的硬件实现的OpenGL
