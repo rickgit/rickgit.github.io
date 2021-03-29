@@ -318,7 +318,11 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 [ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
 try{Looper.loop()}
 
-
+### sdk
+/cmdline-tools 下载安装器
+/tools/monitor.bat       DDMS/animator dump/systrace,Hierarchy ivew, pixel perfect
+（adb root）
+\platform-tools\systrace 卡顿
 ### 手机交互命令
 ```sh
 grep更适合单纯的查找或匹配文本，sed更适合编辑匹配到的文本，awk更适合格式化文本，对文本进行较复杂格式处理

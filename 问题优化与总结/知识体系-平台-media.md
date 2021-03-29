@@ -1942,16 +1942,127 @@ stop()            |      stop() |                +--------------------+         
 [ExoPlayer](https://github.com/google/ExoPlayer) 支持 Android 的 MediaPlayer API 当前不支持的功能
 
 ## OpenGL
-1998年8月 GLUT v3.7的废弃
-2005年    Freeglut 
-2002年    GLFW v2版本。用于创建窗口，上下文和表面，接收输入和事件。替代freeGLUT，GLUT 
-2002年    GLEW是使用OPENGL2.0之后的一个工具函数。openGL的实现是显卡生产商，glew用来找openGL的函数
-glad是glew的升级版
+### 介绍
+openGL定义的是协议，暴露给开发者使用，其实现是显卡生产商。
+[http://docs.gl/](http://docs.gl/)
+2003年    GL 1.5发布，支持Vertex Buffer Object (VBO)。glReadPixels读取颜色缓存耗时，会强制刷入渲染管线，然后读取颜色缓存
+2006年    GL 2.1发布，不在维护glBegin(), glEnd()来绘制图形。用着色器(shader/GLSL)直接操作GPU。
+          GLSL 1.2, Pixel Buffer Object (PBO),
+2008年    GL 3.0发布，GLSL 1.3, Frame Buffer Object (FBO)
+2009年    GL 3.2发布，废弃立即渲染模式，使用更高效的核心模式(Core-profile)，核心模式要求我们使用VAO
+2008年    GL 4.5发布，GLSL 4.5, Direct State Access (DSA)
 
+绘制（点线多边形 glBegin/gldrawelements）
+    glVertex、显示列表(glCallList)：❌glBegin()-glEnd()中的代码放到一个显示列表中（通常在初始化阶段完成），然后每遍渲染都调用这个显示列表
+    顶点数组(Vertex array)：❌，减少函数调用的次数（告别glVertex），提高绘制效率
+    VBO：VA（Vertex Array）的升级版，直接把顶点数据交到流水线的第一步
+    VAO：顶点信息放到GPU中，结合VBO使用
+    VA，VBO 绘制方法：
+    glDrawArrays传输或指定的数据是最终的真实数据,在绘制时效能更好
+    glDrawElements指定的是真实数据的调用索引,在内存/显存占用上更节省
+着色
+    glColor❌
+    着色器：顶点和一个片段着色器, uniform修改fragment着色器的颜色
+纹理/贴图及纹理映射（gltexture*）
+投影变换（透视/glFrustumf，正交glOrthof）
+
+坐标变换（glTranslate*()、glRotate*()和glScale*()，glViewPoint，辅助库glm）
+
+堆栈
+阴影（恒定，平滑）
+光照（glLight*() 、glLightModel*() ；高光/位置-方向-角度，环境光，散射光）
+材质（glMaterial*）
+
+混合特效（混合方式glBlendFunc,glHint,雾化glFog）
+帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
+曲线或曲面绘制（贝塞尔曲线）
+查询（glGetString）
+粒子系统
+异常处理 glCall
+
+```
+                     ▲  Y
+                     │
+                     │
+                     │
+                     │
+                     │
+─────────────────────┼─────────────────►
+                    x│                    X
+                  x  │
+                x    │
+              x      │
+            x        │
+          x          │
+      | x
+      . ——
+
+    Z
+```
+### OpenGL ES
+没有double类型
+删除了低效绘制图元的函数glBegin/glEnd/glVertex2f，只能用gldrawarray，gldrawelements绘图
+没有实时非压缩图片转化为贴图
+ES只支持三角形
+gles没有glDrawBuffer和glReadBuffer接口，没法直接操纵前后缓冲区。 
+
+OpenGL ES 1.1 固定渲染管线。持FBO，gl变量和指令加OES后缀。Android 1.6支持（核心是窗口库，gl还是显卡驱动实现）。
+              通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。
+OpenGl ES 2.x 可编程渲染管线，由OpenGL 2.x裁剪，支持vertex,pixel shader。Android 2.2 底层渲染均由OpenGL负责
+OpenGL ES 3.0 Android 4.3 
+OpenGL ES 3.1 Android 5
+
+libagl：Android中通过软件方法实现的一套OpenGL动态库，只具有参考意义
+libhgl：为区别libagl，自定义的一种叫法。特指GPU厂商提供的硬件实现的OpenGL
+
+OpenGL中的gl库是核心库，glu是实用库，glut是实用工具库，
+opengl 实用库 ： 43个函数，以glu开头，包括纹理映射、坐标变换、多边形分化
+opengl辅助库： 31个函数，以aux 开头
+### EGL
+EGL是OpenGL ES和底层的native window system之间的接口
+
+1998年    GLUT v3.7的废弃
+2005年    Freeglut bug较多
+2002年    GLFW v2版本。用于创建窗口，上下文和表面，接收输入和事件。替代freeGLUT，GLUT 
+2002年    GLEW 是使用 OPENGL2.0 之后的一个工具函数。能使用gl, glu, glext, wgl, glx的全部函数。glew用来找openGL的函数。glad是glew的升级版
+2009年    android egl 集成于 Android 1.6
 
 https://blog.csdn.net/shimazhuge/article/details/24963633
 docs.gl
 https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=6
+
+
+### Opengl 介绍
+OpenGl只是一个标准；实际的OpenGL库的开发者通常是显卡的生产商，Windows中的opengl32.dll，以及Unix /usr/lib/libGL.so，Android 实现是 platform_frameworks_native  agl;
+EGL代替的是原先wgl/glx 管理context，Android 使用 egl。
+GBM还是在Chromium的开源项目中，它和EGL功能类似，但是比EGL功能多一些。在XDC2014，Nvidia员工Andy Ritger提议增强EGL以取代GBM。
+
+DRM(Direct Rendering Manager)由两个部分组成：
+一是 Kernel 的子系统，这个子系统对硬件 GPU 操作进行了一层框架封装。
+二是提供了一个 libdrm 库，里面封装了一系列 API，用来进行图像显示。
+
+
+显示存储器简称显存，也称为帧缓存，顾名思义，其主要功能就是暂时储存显示芯片处理过或即将提取的渲染数据。帧缓冲可能是GPU专属内存，也可能是GPU和CPU共享内存，看硬件。手机一般是共享内存，PC独立显卡一般是专属内存，集成显卡是共享内存。
+系统内存只是暂时存放数据的地方，不能处理数据；要想显示数据，还得把数据传输到显卡内存里。显卡内存（常见的有2、16、32、64、128MB）要存储FRONT和BACK缓冲区，Z 缓冲区，其他的顶点缓存、索引缓存、纹理缓存、模板缓存 [显存与纹理内存详解](https://blog.csdn.net/mmqqyyqqyyq/article/details/84001790)
+
+Linux FrameBuffer 本质上只是提供了对图形设备的硬件抽象，在开发者看来，FrameBuffer 是一块显示缓存，往显示缓存中写入特定格式的数据就意味着向屏幕输出内容。
+帧(frame)是指整个屏幕范围。
+
+
+#### 显存与显示
+glReadPixels，它可以直接把显存中的数据拷贝到内存中，读取帧缓存数据，效率慢。帧实时读取时，画面就会出现卡顿，需要使用更快的读取方式，比如通过内存映射。如果使用了双缓冲区，则默认是从正在显示的缓冲（即前缓冲）中读取，而绘制工作是默认绘制到后缓冲区的。如果需要读取已经绘制好的像素，往往需要先交换前后缓冲。其他glDrawPixels/glCopyPixels
+#### 内存映射
+glGenBuffers 创建顶点缓存（位于显存），glReadPixels 就可以将帧缓存数据（位于显存）读取到顶点缓冲，glMapBuffer 顶点缓存映射到内存。
+PBO是OpenGL ES 3.0开始提供的一种方式，主要应用于从内存快速复制纹理到显存，或从显存复制像素数据到内存。由于现在Android的生态还有大部分只支持到OpenGL ES 2.0的硬件存在，所以通常需要跟glReadPixels配合使用。判断硬件api版本，如果是3.0就使用PBO，否则使用glReadPixels [Alimin利民](https://www.jianshu.com/p/3be97e897531)
+
+
+渲染操作是将场景送至backbuffer
+单缓冲区渲染，把渲染结果实际绘制到屏幕上，需要调用glFlush()或glFinsh()
+双缓冲区渲染,GL_FRONT缓冲区（位于显存）和GL_BACK缓冲区（位于显存）。glDrawBuffer(GL_BACK); glReadBuffer(GL_BACK); 
+立体渲染，左和右缓冲区以及辅助缓冲区。
+
+ 
+
 ### type
 ```
 +-----------------------------------------------------------------------------------+
@@ -1983,34 +2094,3 @@ https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GG
 
 ```
 
-### Opengl
-OpenGl只是一个标准；实际的OpenGL库的开发者通常是显卡的生产商，Windows中的opengl32.dll，以及Unix /usr/lib/libGL.so，Android 实现是 platform_frameworks_native  agl;
-EGL代替的是原先wgl/glx 管理context，Android 使用 egl。
-GBM还是在Chromium的开源项目中，它和EGL功能类似，但是比EGL功能多一些。在XDC2014，Nvidia员工Andy Ritger提议增强EGL以取代GBM。
-
-DRM(Direct Rendering Manager)由两个部分组成：
-一是 Kernel 的子系统，这个子系统对硬件 GPU 操作进行了一层框架封装。
-二是提供了一个 libdrm 库，里面封装了一系列 API，用来进行图像显示。
-
-
-显示存储器简称显存，也称为帧缓存，顾名思义，其主要功能就是暂时储存显示芯片处理过或即将提取的渲染数据。帧缓冲可能是GPU专属内存，也可能是GPU和CPU共享内存，看硬件。手机一般是共享内存，PC独立显卡一般是专属内存，集成显卡是共享内存。
-系统内存只是暂时存放数据的地方，不能处理数据；要想显示数据，还得把数据传输到显卡内存里。显卡内存（常见的有2、16、32、64、128MB）要存储FRONT和BACK缓冲区，Z 缓冲区，其他的顶点缓存、索引缓存、纹理缓存、模板缓存 [显存与纹理内存详解](https://blog.csdn.net/mmqqyyqqyyq/article/details/84001790)
-
-Linux FrameBuffer 本质上只是提供了对图形设备的硬件抽象，在开发者看来，FrameBuffer 是一块显示缓存，往显示缓存中写入特定格式的数据就意味着向屏幕输出内容。
-帧(frame)是指整个屏幕范围。
-
-
-### 显存与显示
-glReadPixels，它可以直接把显存中的数据拷贝到内存中，读取帧缓存数据，效率慢。帧实时读取时，画面就会出现卡顿，需要使用更快的读取方式，比如通过内存映射。如果使用了双缓冲区，则默认是从正在显示的缓冲（即前缓冲）中读取，而绘制工作是默认绘制到后缓冲区的。如果需要读取已经绘制好的像素，往往需要先交换前后缓冲。其他glDrawPixels/glCopyPixels
-### 内存映射
-glGenBuffers 创建顶点缓存（位于显存），glReadPixels 就可以将帧缓存数据（位于显存）读取到顶点缓冲，glMapBuffer 顶点缓存映射到内存。
-PBO是OpenGL ES 3.0开始提供的一种方式，主要应用于从内存快速复制纹理到显存，或从显存复制像素数据到内存。由于现在Android的生态还有大部分只支持到OpenGL ES 2.0的硬件存在，所以通常需要跟glReadPixels配合使用。判断硬件api版本，如果是3.0就使用PBO，否则使用glReadPixels [Alimin利民](https://www.jianshu.com/p/3be97e897531)
-
-
-渲染操作是将场景送至backbuffer
-单缓冲区渲染，把渲染结果实际绘制到屏幕上，需要调用glFlush()或glFinsh()
-双缓冲区渲染,GL_FRONT缓冲区（位于显存）和GL_BACK缓冲区（位于显存）。glDrawBuffer(GL_BACK); glReadBuffer(GL_BACK); 
-立体渲染，左和右缓冲区以及辅助缓冲区。
-
-gles是opengl的缩减版，gles没有glDrawBuffer和glReadBuffer接口，没法直接操纵前后缓冲区。 
-gles1.1开始支持FBO，gl变量和指令加OES后缀。 通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。

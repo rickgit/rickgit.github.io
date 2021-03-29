@@ -75,6 +75,7 @@
 +------------------------------------------------------------------------------+
 
 ```
+[](https://en.wikipedia.org/wiki/Android_version_history)
 ## Linux kernel
 android 驱动 主要分两种类型：Android 专用驱动 和 Android 使用的设备驱动（linux）
 
