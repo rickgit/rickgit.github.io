@@ -47,6 +47,7 @@ C语言产生的原因：汇编需要操作地址，C语言不用关注代码物
 [API](https://en.cppreference.com/w/)
 [教程](https://www.tutorialspoint.com/cplusplus/cpp_classes_objects.htm)
 ## 库文件实现
+dlopen打开，dlsym链接方法
 ### C库
 只要是符合ANSI（美国国家标准学会） C标准的C库都可以叫做标准C库。
 

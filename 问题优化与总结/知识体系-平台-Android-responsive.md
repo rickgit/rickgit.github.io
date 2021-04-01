@@ -751,6 +751,30 @@ ViewPager2支持：
 +---------------------------------------------------------------------------------+
 
 ```
+
+###### Progressbar
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--item background与progress 顺序不可颠倒 -->
+    <item android:id="@android:id/background" >
+        <shape android:shape="line">
+            <!--背景颜色和宽度-->
+            <stroke
+                android:width="4dp" android:color="#bbbbbb" /> \
+        </shape>
+    </item>
+    <item android:id="@android:id/progress" >
+        <clip>
+            <shape android:shape="line">
+                <stroke android:width="4dp" android:color="@color/Black"  />
+            </shape>
+        </clip>
+    </item>
+
+</layer-list>
+
+```
 #### 事件 
 ##### ViewDragHelper 滑动工具类和computeScroll()
 移动控件方法： 
