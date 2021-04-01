@@ -1964,14 +1964,20 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
     glColor❌
     着色器：顶点和一个片段着色器, uniform修改fragment着色器的颜色
 纹理/贴图及纹理映射（gltexture*）
-投影变换（透视/glFrustumf，正交glOrthof）
+投影变换/摄像机（透视/glFrustumf，正交glOrthof）[线性代数本质](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
+坐标变换（❌glTranslate*()、glRotate*()和glScale*()，glViewPoint，⭐辅助库glm）
 
-坐标变换（glTranslate*()、glRotate*()和glScale*()，glViewPoint，辅助库glm）
-
-堆栈
-阴影（恒定，平滑）
 光照（glLight*() 、glLightModel*() ；高光/位置-方向-角度，环境光，散射光）
-材质（glMaterial*）
+    环境光（光的混合）：ambientStrength * lightColor* objectColor;
+    冯氏光照模型：
+        ambient材质向量定义了在环境光照下这个物体反射得颜色（物体颜色）
+        diffuse材质向量定义了在漫反射光照下物体的颜色。（和环境光照一样）
+        specular材质向量设置的是镜面光照对物体的颜色影响
+        shininess影响镜面高光的散射/半径
+    材质（glMaterial*）
+
+阴影（恒定，平滑）
+模型与网络
 
 混合特效（混合方式glBlendFunc,glHint,雾化glFog）
 帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
@@ -1979,6 +1985,7 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 查询（glGetString）
 粒子系统
 异常处理 glCall
+堆栈
 
 ```
                      ▲  Y
@@ -2030,6 +2037,14 @@ EGL是OpenGL ES和底层的native window system之间的接口
 https://blog.csdn.net/shimazhuge/article/details/24963633
 docs.gl
 https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=6
+
+### GLSL
+
+存储标识符：const, attribute, uniform , varying ,centroid varying
+访问修饰符： in, const in, out , inout
+### GLM 向量和矩阵数据结构
+glm::mat4
+glm::vec4
 
 
 ### Opengl 介绍
