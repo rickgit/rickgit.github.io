@@ -1978,12 +1978,13 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 
 阴影（恒定，平滑）
 模型与网络
-
-混合特效（混合方式glBlendFunc,glHint,雾化glFog）
-帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
 曲线或曲面绘制（贝塞尔曲线）
-查询（glGetString）
+
 粒子系统
+混合特效（混合方式glBlendFunc,glHint,雾化glFog）
+
+帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
+查询（glGetString）
 异常处理 glCall
 堆栈
 
