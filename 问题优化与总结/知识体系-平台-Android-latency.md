@@ -1745,8 +1745,22 @@ SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
 ```java
 com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
 ```
-
-
+#### SystemUI启动的子服务
+```java
+private final Class<?>[] SERVICES = new Class[] {
+            com.android.systemui.tuner.TunerService.class, //定制状态栏服务
+            com.android.systemui.keyguard.KeyguardViewMediator.class,//锁屏模块
+            com.android.systemui.recents.Recents.class,//最近应用
+            com.android.systemui.volume.VolumeUI.class,//全局音量控制
+            com.android.systemui.statusbar.SystemBars.class,//系统状态栏
+            com.android.systemui.usb.StorageNotification.class,//Storage存储通知
+            com.android.systemui.power.PowerUI.class,//电量管理相关
+            com.android.systemui.media.RingtonePlayer.class,//铃声播放
+            com.android.systemui.keyboard.KeyboardUI.class,//键盘相关
+};
+```
+#### SystemBars 常见界面
+PhoneStatusBarView，PanelHolder，keyguardbouncer
 
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)

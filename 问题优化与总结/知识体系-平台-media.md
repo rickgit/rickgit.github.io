@@ -1964,7 +1964,9 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
     glColor❌
     着色器：顶点和一个片段着色器, uniform修改fragment着色器的颜色
 纹理/贴图及纹理映射（gltexture*）
+
 投影变换/摄像机（透视/glFrustumf，正交glOrthof）[线性代数本质](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
+    立方体，我们一共需要36个顶点(6个面 x 每个面有2个三角形组成 x 每个三角形有3个顶点)
 坐标变换（❌glTranslate*()、glRotate*()和glScale*()，glViewPoint，⭐辅助库glm）
 
 光照（glLight*() 、glLightModel*() ；高光/位置-方向-角度，环境光，散射光）
@@ -2014,10 +2016,10 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 ES只支持三角形
 gles没有glDrawBuffer和glReadBuffer接口，没法直接操纵前后缓冲区。 
 
-            OpenGL ES 1.1 参考的是OpenGL 1.5。固定渲染管线。持FBO，gl变量和指令加OES后缀。
-              Android 1.6支持（核心是窗口库，gl还是显卡驱动实现），Pixelflinger是Android系统中为OpenGL ES引擎提供的一套软件渲染器（renderer）。
-              通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。
-              着色器语言有着两套标准：CM和CL，其中CL只支持定点数，而CM既支持定点数又支持浮点数
+1997年1月    OpenGL ES 1.1 参考的是OpenGL 1.5。固定渲染管线。持FBO，gl变量和指令加OES后缀。
+                Android 1.6支持（核心是窗口库，gl还是显卡驱动实现），Pixelflinger是Android系统中为OpenGL ES引擎提供的一套软件渲染器（renderer）。
+                通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。
+                着色器语言有着两套标准：CM和CL，其中CL只支持定点数，而CM既支持定点数又支持浮点数
 2007年3月   OpenGl ES 2.0 可编程渲染管线，移除了很多固定管线的渲染流程，固定管线里那些材质参数、灯光参数都被shader所替代。
               由OpenGL 2.0裁剪，支持vertex,pixel shader。Android 2.2 底层渲染均由OpenGL负责
 2012年8月   OpenGL ES 3.0 Android 4.3 ，WebGL2.0就是基于OpenGLES3.0
