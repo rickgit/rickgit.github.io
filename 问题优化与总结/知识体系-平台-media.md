@@ -23,6 +23,45 @@ color text image audio video
 ### Agg
 ### skia
 
+Canvas是一个2D的概念，是在Skia中定义的
+Skia 2D和OpenGL/ES 3D
+
+[skia api](https://skia.org/user/api?cl=9919)
+```
+SkCanvas - the drawing context.
+SkPaint - color, stroke, font, effects
+SkRect - rectangles
+SkRegion - set operations with rectangles and paths
+SkPath - contours of lines and curves
++--------------------------------------------------------------------+
+|                                                                    |
+| SkCanvas                        SkImageFilter                      |
+| SkPaint                            SkAlphaThresholdFilter          |
+| SkPath                             SkBlurImageFilter               |
+| SkImage                            SkBitmapSource                  |
+| SkSurface                          SkColorFilterImageFilter        |
+| SkShader                           SkComposeImageFilter            |
+|    SkComposeShader                 SkDisplacementMapEffect         |
+|    SkPerlinNoiseShader             SkDownSampleImageFilter         |
+|    SkGradientShader                SkDropShadowImageFilter         |
+|    SkTransparentShader             SkLightingImageFilter           |
+| SkColorFilter                      SkMagnifierImageFilter          |
+|    SkColorMatrixFilter             SkMatrixConvolutionImageFilter  |
+|    SkLumaColorFilter               SkMergeImageFilter              |
+|    SkModeColorFilter               SkDilateImageFilter             |
+|    SkPathEffect                    SkErodeImageFilter              |
+|    SkPath2DPathEffect              SkOffsetImageFilter             |
+|    SkLine2DPathEffect              SkPictureImageFilter            |
+|    SkPath1DPathEffect              SkRectShaderImageFilter         |
+|    SkArcToPathEffect               SkTileImageFilter               |
+|    SkCornerPathEffect              SkXfermodeImageFilter           |
+|    SkDashPathEffect             SkMaskFilter                       |
+|    SkDiscretePathEffect            SkTableMaskFilter               |
+|    SkComposePathEffect          SkDrawLooper                       |
+|    SkSumPathEffect                 SkBlurDrawLooper                |
+|                                                                    |
++--------------------------------------------------------------------+
+```
 ## 音视频
 - audio
 

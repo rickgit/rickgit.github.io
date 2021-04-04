@@ -320,9 +320,18 @@ try{Looper.loop()}
 
 ### sdk
 /cmdline-tools 下载安装器
-/tools/monitor.bat       DDMS/animator dump/systrace,Hierarchy ivew, pixel perfect
+#### /tools/monitor.bat       DDMS/animator dump/systrace,Hierarchy ivew, pixel perfect
 （adb root）
-\platform-tools\systrace 卡顿
+手机需要开启开发者模式，才能开启 adb root
+
+systrace.py -b 8000 -t 5 -o systrace.html
+d:\Program\Python27\python.exe systrace.py sched freq idle am wm gfx view sync binder_driver irq workq input -b 8000 -t 5  -o systrace.html
+chromium打开：chrome://tracing/ load加载html文件
+#### uiautomator
+dump
+events
+runtest
+
 ### 手机交互命令
 ```sh
 grep更适合单纯的查找或匹配文本，sed更适合编辑匹配到的文本，awk更适合格式化文本，对文本进行较复杂格式处理
@@ -398,10 +407,7 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 
 [ChkBugReport日志报告](https://github.com/sonyxperiadev/ChkBugReport.git)
 [ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
-#### uiautomator
-dump
-events
-runtest
+
 #### am  pm 
 ```
 adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity

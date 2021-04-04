@@ -165,8 +165,9 @@ watch -n1 -d cat /proc/interrupts
 
 http://blog.chinaunix.net/uid-27177626-id-3438994.html
 
-## 驱动
-### openbinder 
+## 通讯驱动
+### openbinder 通讯驱动
+linux-kernel\drivers\staging\android\binder.c
 #### 系统调用 （用户态转化内核态）
 binder.c/binder_miscdev 方法注册
 ```c
@@ -280,13 +281,31 @@ struct flat_binder_object {// binder_transaction_data 数据的data.ptr.offsets�
 ```
 Linux kernel 的 wake_up_interruptible()
 ```
-### 显卡驱动
+
+### 蓝牙驱动
+### Wifi驱动
+## 显卡声卡摄像头驱动
+
+### FrameBuffer 显卡驱动
 2.2以下，vga直接对显卡上的寄存器操作；2.2以上加入fb
 ```C++
 drivers/video/fbmem.c#fb_fops //提供系统调用
 ```
 https://tldp.org/HOWTO/html_single/Framebuffer-HOWTO/#AEN131
 https://www.cnblogs.com/linfeng-learning/p/9478048.html
+
+### V4l2 摄像头驱动
+v4l2的代码：
+linux-kernel/drivers/media/v4l2-core/v4l2-device.c
+linux-3.0.35/drivers/media/video/mxc/capture/mxc_v4l2_capture.c
+### ALSA 声卡驱动
+ sound/core ALSA的核心驱动
+## 外设驱动
+### USB
+### Flash
+### KeyPad
+
+
 ### initcall机制
 linux对驱动程序提供静态编译进内核和动态加载两种方式
 

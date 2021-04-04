@@ -2,7 +2,7 @@
 kotlin 封装Java，减少开发成本，提高开发效率
 1. 封装字段在构造方法传入 var,val定义字段。
 2. 类默认时final ，除非使用openclass,abstractclass,interface
-3. 默认static 类，除非声明 innerclass 
+3. 类内定义类， 默认static 嵌套类，除非声明 innerclass 
 4. 拓展枚举类 sealclass，可以子类声明
 5. 合成复用原则，委托和拓展增加类的功能。
 6. 拓展类型，支持高阶函数，函数作为参数
