@@ -1190,7 +1190,9 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
 adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
 adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
-
+adb shell am start com.android.settings/com.android.settings.Settings
+adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
 ```
   this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
     mWifiManager.getWifiApState();
@@ -1235,8 +1237,14 @@ base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
 ```设置热点
 WifiManager.getConfiguredNetworks()
 ```
+提示文案：
+√已联网，√未联网，√连接被拒，√信号差，√不可达，满载，√其他保存记录
+刷新的情况
+  1. 创建
+  2. update(ScanResult result) 
+  3. update(WifiInfo info, DetailedState state)，接收到广播的情况
 
-##### 静默安装
+##### PMS 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
                     1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
