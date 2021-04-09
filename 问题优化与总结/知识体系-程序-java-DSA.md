@@ -16,7 +16,7 @@
     顺序存储结构
     链式存储结构（单链，双链，跳跃列表）
     散列存储结构：顺序存储+散列（HashMap）
-    索引存储结构：顺序存储+索引（Serizable，protoBuffer，flatBuffer）
+    索引存储结构：顺序存储+索引（tlv格式，Serizable，protoBuffer，flatBuffer）
 操作：
     增删改，索引，查找，销毁
 
@@ -1080,10 +1080,7 @@ new String[] {
         }
 ```
 其他：RIPEMD
-### ~~MD5~~
-
-
-
+### ~~MD5~~ 初始化4个字，128个字为1块，循环64次
 [JDK sun impl](jdk\src\share\classes\sun\security\provider\MD5.java)
 [FFmpeg impl](libavutil\md5.c)
 [freebsd MD5](https://svnweb.freebsd.org/base/stable/12/lib/libcrypt/crypt-md5.c?view=markup)
@@ -1094,7 +1091,7 @@ new String[] {
         loop 64
         右移轮换h0,h1,h2,h3
 4. h0 append h1 append h2 append h3
-### ~~SHA-1~~
+### ~~SHA-1~~ 初始化4个字，128个字为1块，循环80次
 2017年 谷歌在 2^64 复杂度（约 110 GPU年的计算量）内完成了第一次 SHA-1 碰撞
 [ffmpeg impl](libavutil\sha.c#av_sha_init)
 1. initial h0(32bit),h1,h2,h3,h4

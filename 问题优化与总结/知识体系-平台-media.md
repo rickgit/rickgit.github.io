@@ -23,6 +23,45 @@ color text image audio video
 ### Agg
 ### skia
 
+Canvas是一个2D的概念，是在Skia中定义的
+Skia 2D和OpenGL/ES 3D
+
+[skia api](https://skia.org/user/api?cl=9919)
+```
+SkCanvas - the drawing context.
+SkPaint - color, stroke, font, effects
+SkRect - rectangles
+SkRegion - set operations with rectangles and paths
+SkPath - contours of lines and curves
++--------------------------------------------------------------------+
+|                                                                    |
+| SkCanvas                        SkImageFilter                      |
+| SkPaint                            SkAlphaThresholdFilter          |
+| SkPath                             SkBlurImageFilter               |
+| SkImage                            SkBitmapSource                  |
+| SkSurface                          SkColorFilterImageFilter        |
+| SkShader                           SkComposeImageFilter            |
+|    SkComposeShader                 SkDisplacementMapEffect         |
+|    SkPerlinNoiseShader             SkDownSampleImageFilter         |
+|    SkGradientShader                SkDropShadowImageFilter         |
+|    SkTransparentShader             SkLightingImageFilter           |
+| SkColorFilter                      SkMagnifierImageFilter          |
+|    SkColorMatrixFilter             SkMatrixConvolutionImageFilter  |
+|    SkLumaColorFilter               SkMergeImageFilter              |
+|    SkModeColorFilter               SkDilateImageFilter             |
+|    SkPathEffect                    SkErodeImageFilter              |
+|    SkPath2DPathEffect              SkOffsetImageFilter             |
+|    SkLine2DPathEffect              SkPictureImageFilter            |
+|    SkPath1DPathEffect              SkRectShaderImageFilter         |
+|    SkArcToPathEffect               SkTileImageFilter               |
+|    SkCornerPathEffect              SkXfermodeImageFilter           |
+|    SkDashPathEffect             SkMaskFilter                       |
+|    SkDiscretePathEffect            SkTableMaskFilter               |
+|    SkComposePathEffect          SkDrawLooper                       |
+|    SkSumPathEffect                 SkBlurDrawLooper                |
+|                                                                    |
++--------------------------------------------------------------------+
+```
 ## 音视频
 - audio
 
@@ -1980,12 +2019,13 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 
 阴影（恒定，平滑）
 模型与网络
-
-混合特效（混合方式glBlendFunc,glHint,雾化glFog）
-帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
 曲线或曲面绘制（贝塞尔曲线）
-查询（glGetString）
+
 粒子系统
+混合特效（混合方式glBlendFunc,glHint,雾化glFog）
+
+帧缓存（glclear, glStencilMask深度缓存，模板缓存，颜色缓存；片元测试：深度测试，裁剪测试，Alpha测试，模板测试）
+查询（glGetString）
 异常处理 glCall
 堆栈
 

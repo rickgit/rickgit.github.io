@@ -1,1779 +1,8 @@
-## 精简
-[square](https://github.com/square?q=android&type=&language=)
-
-常见优化库
-LeakCanary、Glide、Retrofit、OkHttp、RxJava、GreenDAO
-[Studio Profiler](https://github.com/JetBrains/android/tree/master/profilers/src/com/android/tools/profilers/memory)
-
-和内核模块类似：内存管理，文件存储，进程调度，进程间调度，网络接口
-
-
-## 缓存篇
-
-### Bitmp
-简单工厂 Bitmap（无数据源）：wrapHardwareBuffer，createScaledBitmap/createBitmap 
-        BitmapFactory（有数据源）：decodeFile（decodeResource/decodeResourceStream）/decodeStream，decodeByteArray，decodeFileDescriptor
-### 编译，加载
-
-#### 类加载机制，类加载器，双亲委派
-```
-                 C++
- +-----------------------+
- | Bootstrap ClassLoader |  Framework classs
- +----------^------------+
-            |
-  +---------+----------+   
-  | BaseDexClassLoader |   <|-------------------+
-  +---------^----------+                        |
-            |  DexPathList                       |
-            |                                   |
-            |                                   |
-+-----------+-------------+                     |
-| PathClassLoader         | apk class           |
-+-----------^-------------+                     |
-            |  parent                           |
-+-----------+------------+           extends    |
-| DexClassLoader         | +--------------------+
-+------------------------+
-
-
-
-```
-#### 类加载问题
-[pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
-QQ空间补丁
-```
-1. 阻止相关类打上Class_ispreverified标志
-2. 动态更改BaseDexClassLoader间接引用的dexElements
-```
-[Redex](https://blog.csdn.net/tencent_bugly/article/details/53375240)
-
-### 虚拟机与执行器
-
-#### dalvik bytecode
-```
-dx --dex --output=Hello.dex Hello.class
-```
-
-#### NDK
-
-```md
-GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
-
-[编译linux内核所用的gcc版本？ - jiangtao9999的回答 - 知乎](https://www.zhihu.com/question/58955848/answer/305063368)
-```
-
-```md
-    1.预处理是解决一些宏定义的替换等工作，为编译做准备,对应的gcc操作为：gcc -E xx.c -o xx.i(xx为源文件名)。
-    2.编译是将源码编译为汇编语言的过程，对应的gcc操作为:gcc -S xx.i -o xx.s。由xx.i 产生xx.s文件。
-    3.汇编是将汇编代码的文件汇编为机器语言的过程，对应的gcc操作为：gcc -c xx.s -o xx.o
-    4.链接是将目标文件链接为一个整的可执行文件的过程，对应的gcc操作为 gcc xx.o -o xx(xx成为可执行,运行时候可以用 "./xx" 的方式运行)。
-
-    [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
-```
-
-[Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
-
-```java
-+------------------------------------------------------------+
-|                 build-binary.mk                            |
-|                                                            |
-|                 setup-toolchain.mk                         |
-|                 setup-abi.mk                               |
-|                                                            |
-|                  setup-app.mk                              |
-|                  build-all.mk                              |
-|                  init.mk                                   |
-|                  build-local.mk                            |
-|                                                            |
-+------------------------------------------------------------+
-|                                                            |
-|   Module-description variables                             |
-|                                                            |
-|   NDK-provided variables    NDK-provided function macros   |
-|                                                            |
-+------------------------------------------------------------+
-|                                                            |
-|              ndk-build                                     |
-+------------------------------------------------------------+
-|                     NDK                                    |
-+------------------------------------------------------------+
-|                 GNU Make                                   |
-+------------------------------------------------------------+
-
-
-
-```
- 
-###
-⭐ ndk-build出问题，需要用 命令行 gradlew assemble，提示的信息更全
-```
-Android NDK: APP_STL gnustl_static is no longer supported. Please switch to either c++_static or c++_shared.
-
-1. APP_STL  := gnustl_static 改为 APP_STL := c++_static；
-
-2.删除NDK_TOOLCHAIN or NDK_TOOLCHAIN_VERSION；
-
-
-
-
-found local symbol '__bss_start' 
-查看：readelf -s *.so |grep "__bss_start"  
-解决：Android.mk :：     APP_LDFLAGS := -fuse-ld=gold
-
-
-
-not found file "...h"
-查看：$(warning "the value of LOCAL_C_INCLUDES is$(LOCAL_C_INCLUDES)") 查看路径是否正确。
-解决：在wls 下面，$(win)返回的仍然是1，导致路径都替换成window的“c：/。。/”，注释掉代码。
-
-
-Operation not permitted
-虽然是警告，但是可能导致文件不能拷贝。
-使用sudo ndk-build
-
-```
-
-
-###  2 内存泄漏/内存抖动（Android Profiler- memory）
-GC Root :
-堆，方法区内存：static（对象，容器），final，
-栈：ActivityThread的activitys，Handler使用WeakReference持有activity引用
-本地方法栈：File，Cursor，WebView
-
-#### GC
-Reference
-Lrucache,Bitmap
-ArrayMap
-
-##### ART-dalvik 
-```
-              |java compiler(javac)
-    +-----------------------+
-    | java byte code(.class)|
-    +---------+-------------+
-              |   Dex compiler
-              v   (dx.bat)
-     +--------+--------------+
-     | Dalvik byte code(.dex)|
-     +---+-----------------+-+
-         | dex2oat         |dexopt
-+--------v---+       +-----+-------+
-|.oat(elf file)|     |    .odex    |
-+---+--------+       +----+--------+
-    |                     |   Register-based
-    |  +---------+        |   +---------------+
-    |  | ART     |        |   |   Dalvik VM   |
-    |  |      AOT|        |   |           JIT |
-    |  +---------+        |   +---------------+
-    |                     |
-    |moving collector     | MarkSweep collector
-    v                     v
-
-+--------+---------+
-|        | Active  |
-|        | Heap    |
-|DalvikVM|         |
-|  Heap  |         |
-|(Ashmem)|         |
-| mspace |         |
-|        +---------+
-|        | Zygote  |
-|        | Heap    |
-|        | (shared)|
-+----------------------+--------------------+----------------------+
-|        |             | Image Space                               |
-|        | Continuous  +---------------+---------------------------+
-|        |             | Zygote Space  | Zygote Space              |
-|  ART   | Space       |               +---------------------------+
-|        |             |               | Allocation Space          |
-|  Heap  |             |               |     ....                  |
-|        +-------------+---------------+---------------------------+
-|        |Discontinuous  Large Object                              |
-|        |    Space    | Space                                     |
-+--------+-------------+-------------------------------------------+
-
-
-                                           +
-                                           |new ArrayList
-                                           |
-                                           v
-      +--------+  +------+ +-------+  +-+-----+ +-------+ 
-      |  ART   |  | Image| | Zygote|  |       | | Large | 
-Heap  |        |  | Space| | Space |  | Alloc | | Object| 
-      |  L+    |  |      | |       |  | Space | | Space | 
-      +--------+  +------+ +-------+  +-------+ +-------+ 
-
-      +--------+           +-------+  +------+           
-      |DalvikVM|           | Zygote|  |Active|           
-      |  <L    |           | Heap  |  |Heap  |           
-      |        |           |       |  |      |           
-      +--------+           +-------+  +------+           
-
-
-```
-Art Java堆的主要组成包括Image Space、Zygote Space、Allocation Space和Large Object Space四个Space
-        （详细的话main space、image space、zygote space、non moving space、large object space）
-        Image Space用来存在一些预加载的类（boot.art ） 
-        Zygote Space和Allocation Space对应Dalvik虚拟机垃圾收集机制中的Zygote堆和Active堆的。
-        ( 创建进程时，已经使用了的那部分堆内存Zygote Space，还没有使用的堆内存划分为Allocation Space)
-        Large Object Space就是一些离散地址的集合
-
-###### GC分类
-日志：D/dalvikvm: <GC_Reason> <Amount_freed>, <Heap_stats>, <External_memory_stats>, <Pause_time>
-Dalvik 有两种基本的 GC 模式， GC_CONCURRENT 和 GC_FOR_ALLOC 。
-GC_CONCURRENT 对于每次收集将阻塞主线程大约 5ms 。GC_CONCURRENT 通常不会造成你的应用丢帧。
-              GC_MALLOC, 内存分配失败时触发
-              GC_CONCURRENT，当分配的对象大小超过384K时触发
-              GC_EXPLICIT，对垃圾收集的显式调用(System.gc)
-              GC_EXTERNAL_ALLOC，外部内存分配失败时触发
-              GC_HPROF_DUMP_HEAP：当你请求创建 HPROF 文件来分析堆内存时出现的GC。
-GC_FOR_ALLOC 是一种 stop-the-world 收集，可能会阻塞主线程达到 125ms 以上。
-              GC_FOR_ALLOC 几乎每次都会造成你的应用丢失多个帧，导致视觉卡顿，特别是在滑动的时候。
-
-I/art: <GC_Reason> <GC_Name> <Objects_freed>(<Size_freed>) AllocSpace Objects,<Large_objects_freed>(<Large_object_size_freed>) <Heap_stats> LOS objects, <Pause_time(s)>
-ART新增GC原因：
-              LOS_Space_Status
-
-###### GC回收
-Davik 仅有一种 Mark-Sweep。
-        Live Bitmap和Mark Bitmap分代标记上次GC存活和这次需标记被引用的对象。
-        mark阶段，其他线程可以并发执行（Concurrent GC）。CardTable记录非垃圾回收线程对对象的引用
-
-ART：
- 
-zygote space 类似Davik
-
-##### android触发垃圾回收
-[android gc](https://proandroiddev.com/collecting-the-garbage-a-brief-history-of-gc-over-android-versions-f7f5583e433c)
-[dalvik:tracing garbage collector, using a Mark and Sweep approach](https://android.googlesource.com/platform/dalvik.git/+/android-4.3_r2/vm/alloc/MarkSweep.cpp)
-[art 粘性CMS和部分CMS](https://android.googlesource.com/platform/art/+/master/runtime/gc/)
-当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
-系统需要更多内存的时候触发。
-HPROF时触发。
-
-[回收机制](https://blog.csdn.net/f2006116/article/details/71775193)
-[android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
-
-[smalidea 无源码调试 apk](https://blog.csdn.net/hackooo/article/details/53114838)
-
-#### Handler/Dialog/Thread泄漏
-
-1. PopupWindow 
-
-```java 
-android.view.WindowManager$BadTokenException: Unable to add window -- token null is not valid; is your activity running?
->  popwindow必须依附于某一个view
-
-1. onWindowFocusChanged()或使用view的post()显示界面
-2. if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){}
-
-```
-
-2.  AlertDialog不能使用application作为context 
-```
-android.view.WindowManager$BadTokenException: Unable to add window --token null is not for an application
- 
-```
-3. dialog.show()
-```java
-android.view.WindowManager$BadTokenException
-if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){
-   dialog.show();
-}
-```
-
-4. Dialog.dismiss()
-```java
- View not attached to window manager
-    if(mDialog != null) {
-        if(mDialog.isShowing()) {   
-            Context context = ((ContextWrapper)mDialog.getContext()).getBaseContext();  
-            if(context instanceof Activity) { 
-                if(!((Activity)context).isFinishing() && !((Activity)context).isDestroyed()) 
-                    mDialog.dismiss();
-            } else
-                mDialog.dismiss();
-        }
-        mDialog = null;
-    }
-```
-5. 没有及时关闭dialog
-```java
-  Activity xxxx has leaked， that was originally added here
-
-@Override
-public void onDestroy(){
-    super.onDestroy();
-    if ( mDialog!=null && mDialog.isShowing() ){
-        mDialog.cancel();
-    }
-}
-
-```
-#### 内存泄漏
- 
- 工具：profiler，eclipse mat
- [Activity 泄漏和重复创建的冗余Bitmap-ResourceCanary](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
-```
-LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有的Activity生命周期，并在Activity的onDestroy时，执行RefWatcher的watch方法，该方法的作用就是检测本页面内是否存在内存泄漏问题。
-
-所有未被回收的 Bitmap 的数据 buffer 取出来，然后先对比所有长度为 1 的 buffer，找出相同的，记录所属的 Bitmap 对象；再对比所有长度为 2 的、长度为 3 的 buffer ……直到把所有buffer都比对完，这样就记录下了所有冗余的 Bitmap 对象了，接着再套用 LeakCanary 获取引用链的逻辑把这些 Bitmap 对象到 GC Root 的最短强引用链找出来即可。
-```
- 内存泄漏优化 - 资源未释放
-        3.1 单例
-        3.2 非静态内部类
-        3.3 资源未关闭（webview没执行 destroy）
-        3.4 ListView 未缓存
-        3.5 集合类未销毁
-
-
-```sh
-
-adb shell am dumpheap $(ps | grep com.example.proj | awk '{print $2}') /mnt/sdcard/my_heap/dumpheap.hprof
-
-adb shell 'am dumpheap com.example.proj /mnt/sdcard/dumpheap.hprof'
-
-
->adb shell dumpsys meminfo edu.ptu.java.kotlinbase
-Applications Memory Usage (kB):
-Uptime: 53403267 Realtime: 53403267
-
-** MEMINFO in pid 32724 [edu.ptu.java.kotlinbase] **
-                   Pss  Private  Private  Swapped     Heap     Heap     Heap
-                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
-                ------   ------   ------   ------   ------   ------   ------
-  Native Heap        0        0        0        0    15616    14393     1222
-  Dalvik Heap     2908     2416        0        0    13722     9283     4439
- Dalvik Other      680      532        0        0
-        Stack      260      260        0        0
-       Ashmem        2        0        0        0
-    Other dev        4        0        4        0
-     .so mmap     3713      340      924        0
-    .apk mmap      972        0       88        0
-    .ttf mmap      164        0      132        0
-    .dex mmap     3259        4     2652        0
-    .oat mmap     2602        0      520        0
-    .art mmap     1016      680        4        0
-   Other mmap       39        8        0        0
-      Unknown     3795     3612        0        0
-        TOTAL    19414     7852     4324        0    29338    23676     5661
-
- App Summary
-                       Pss(KB)
-                        ------
-           Java Heap:     3100
-         Native Heap:        0
-                Code:     4660
-               Stack:      260
-            Graphics:        0
-       Private Other:     4156
-              System:     7238
-
-               TOTAL:    19414      TOTAL SWAP (KB):        0
-
- Objects
-               Views:       18         ViewRootImpl:        1
-         AppContexts:        3           Activities:        1
-              Assets:        2        AssetManagers:        2
-       Local Binders:        9        Proxy Binders:       13
-       Parcel memory:        3         Parcel count:       12
-    Death Recipients:        0      OpenSSL Sockets:        0
-
- SQL
-         MEMORY_USED:        0
-  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
-```
-
-#### LeakCanary&shark（Square）
- LRUCACHE
-```
-+------------------------------------------------------------------------------+
-|                                    LruCache                                  |
-|                                         cache:LinkedHashMap                  |
-|                                         initialMaxSize:long                  |
-|                                         maxSize:long                         |
-|                                         currentSize:long                     |
-|                                                                              |
-|                                         put()                                |
-|                                         getSize()           entryRemoved()   |
-|                                         onItemEvicted()                      |
-|                                         evict()                              |
-|                                                                              |
-|                                         get()                                |
-+------------------------------------------------------------------------------+
-
-
-```
-
-```
-* 001_initial f0cc04dfbf3cca92a669f0d250034d410eb05816 Initial import
-                +-----------------------------------------------------------------------------------------------------+------------------------------+
-                |                                                LeakCanary                                           |                              |
-                |                                                   install(app:Application)                          |                              |
-                +------------------------------------------------------------------------------------------------------------------------------------+
-                |                                 RefWatcher                                                          |                              |
-                |                                     queue:ReferenceQueue                                            |                              |
-                |                                     retainedKeys:Set<String>                                        |                              |
-                |                                                                                                     |                              |
-                |                                     watch()                                                         |                              |
-                |                                     removeWeaklyReachableReferences()                               |                              |
-                |                                     gone()                                                          |                              |
-                +------------------------------------------------------------------------------------------------------------------------------------+
-                | AndroidWatchExecutor    GcTrigger   AndroidHeapDumper    ServiceHeapDumpListener: HeapDump.Listener |                              |
-                |                            runGc()       dumpHeap()          analyze(h:HeapDump)                    |                              |
-                |                                                                                                     |                              |
-                | AndroidDebuggerControl              Debug                HeapAnalyzerService                        |                              |
-                |                                        dumpHprofData()     heapAnalyzer:HeapAnalyzer                |                              |
-                |                              dalvik_system_VMDebug.c       runAnalysis()                            | DisplayLeakActivity          |
-                |           Dalvik_dalvik_system_VMDebug_dumpHprofData()     listenerServiceClass                     |                              |
-                |                                                              :DisplayLeakService                    | AbstractAnalysisResultService|
-                |                                                                                                     |                              |
-                +------------------------------------------------------------------------------------------------------------------------------------+
-                |                                         HeapDump               HeapAnalyzer                         |                              |
-                |                                           heapDumpFile:File        checkForLeak():AnalysisResult    |                              |
-                |                                                                    findLeakTrace():AnalysisResult   |                              |
-                +------------------------------------------------------------------------------------------------------------------------------------+
-                |                                                              proj(:haha-1.1)                        |                              |
-                |                                                                                                     |                              |
-                +-----------------------------------------------------------------------------------------------------+------------------------------+
-
-                +----------------------------------------------------------------------------------------------------------------+ 
-                | [haha]                                    SnapshotFactory                                                      |
-                |                                                  openSnapshot():ISnapshot                                      | 
-                |                                           Snapshot                                                             |
-                |                                               createSnapshot():ISnapshot                                       | 
-                |                                           SnapshotImpl                                                         |
-                |                                               readFromFile():ISnapshot                                         |
-                |                                               parse():ISnapshot                                                | 
-                +----------------------------------------------------------------------------------------------------------------+
- 
-* 200_v2.0    49510378fa14e14e110985da4cab838facbf4864 Prepare 2.0 release
-使用[shark]代理[haha]作为dump parse
-
-                +-----------------------------------------------------------------------------------------------------+
-                |[leakcanary-object-watcher-android]                                                                  |
-                |                          sealed AppWatcherInstaller:ContentProvider()                               |
-                +-----------------------------------------------------------------------------------------------------+
-                |                                   InternalAppWatcher                                                |
-                |                                                                                                     |
-                |        ActivityDestroyWatcher                 FragmentDestroyWatcher                                |
-                |                                                                                                     |
-                +-----------------------------------------------------------------------------------------------------+
-                | [leakcanary-object-watcher]                                                                         |
-                |                                ObjectWatcher                                                        |
-                +-----------------------------------------------------------------------------------------------------+
-                |  [leakcanary-android-core]                                                                          |
-                |                            HeapDumpTrigger                                                          |
-                |                                 onObjectRetained()                                                  |
-                |                                 heapDumper: HeapDumper                                              |
-                |                                                                                                     |
-                |                            AndroidHeapDumper                                                        |
-                |                                  dumpHeap()                                                         |
-                |                                                                                                     |
-                |                             Debug                                                                   |
-                |                               dumpHprofData()                                                       |
-                +-----------------------------------------------------------------------------------------------------+
-                |   [shark]                                                                                           |
-                |             HeapAnalyzer                 FindLeakInput                                              |
-                |                 analyze()                      findLeaks()                                          |
-                |                                                buildLeakTraces()                                    |
-                +-----------------------------------------------------------------------------------------------------+
-                |        [shark-hprof]                      [shark-graph]                                             |
-                |             Hprof                             HprofHeapGraph                                        |
-                |               open(hprofFile: File)                                                                 |
-                +-----------------------------------------------------------------------------------------------------+
-
-```
-#### 对象的生命周期绑定
-Obsevable
-### 缓存
- 活动缓存 - WeakReference提高命中率；字节缓存，防止内存抖动；
-
-#### 磁盘缓存 - DiskLruCache
-1. 文档及配置文件
-2. 源码
-3. 单元测试
-4. 性能及容错
-5. 重用，封装，解耦，通讯
-6. 文档
-
-```
-初定修订版本数据结构
-+-----------------------+----------------------------+
-|    maxSize            |  lruEntries(LinkedHashMap) |
-+----------------------------------------------------+
-|                       |  edit()  remove() get()    |
-|                       +----------------------------+
-|    magic              |  DIRTY   REMOVE READ  CLEAN|
-|    version            | (Editor)      (Snapshot)   |
-|    appVersionString   +----------------------------+
-|    valueCountString   |    Entry                   |
-+-----------------------+----------------------------+
-|                   JOURNAL_FILE                     |
-+----------------------------------------------------+
-|                  DiskLruCache                      |
-+----------------------------------------------------+
-
-valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解决冲突 0,1,2,3
-
-```
-
-
-### Glide
-Glide是一个快速高效的Android图片加载库，注重于平滑的滚动。
-不同数据源加载Fetcher，解码decode，变换transform，平滑过渡transition
-三级缓存和ResourceManager及Target生命周期管理
-[中文文档](https://muyangmin.github.io/glide-docs-cn/)
-三级缓存 
-      ActiveResources 活动缓存，weakreference提高命中率
-      LruResourceCache 最近最少使用，剔除
-      InternalCacheDiskCacheFactory（装饰DiskLruCache） 磁盘缓存
-图片解码缓存
-      LruBitmapPool    缓存bitmap，复用                              //BitmapFactory.Options#inBitmap
-      LruArrayPool     复用字节/Integer数组，避免频繁GC，导致内存抖动 // BitmapFactory.Options#inTempStorage
-
-单例     
-         Glide#get() //volatile+双检锁
-简单工厂      
-        //资源简单工厂
-        Glide#with(android.content.Context):RequestManager
-        RequestManager#as():RequestBuilder::BaseRequestOptions
-        RequestBuilder#into():Target//ViewTaget 对View的生命周期管理，构建Request下载到Target
-        RequestBuilder#buildRequest():Request/SingleRequest#obtain():Request
-        DecodeJob#getNextGenerator():DataFetcherGenerator// 数据请求，磁盘缓存
-        ModelLoader#buildLoadData():LoadData             //加载图片数据
-        BitmapResource#obtain():BitmapResource
-
-工厂方法 
-        /request/transition/TransitionFactory#build
-        RequestManagerFactory#build():RequestManager
-
-
-构建器   
-         GlideBuilder#build()
-原型    
-        BaseRequestOptions#clone
-
-转化器
-       ResourceTranscoder#transcode():T
-       Transformation#transform():Resource<T>
-桥接
-        RequestManagerRetriever#get(android.app.Activity):RequestManager//获取RequestManager 给RequestManagerRetriever实现
-
-外观模式 
-        Glide，GlideContext ，
-        Engine类：
-        Registry：
-                ModelLoaderRegistry       //判断是否可以加载数据，并构建 ModelLoader#buildLoadData():LoadData
-                EncoderRegistry          //流编码，写入文件等
-                ResourceEncoderRegistry   //流编码，写入文件等
-                ResourceDecoderRegistry   //数据源转化为Resource<T>
-                DataRewinderRegistry      //流或buffer可以重置状态
-                TranscoderRegistry         
-                ImageHeaderParserRegistry //解析文件类型 ImageHeaderParser#getType():ImageType
-享元  
-        SingleRequest#POOL//复用Request
-
-静态代理 
-      Glide代理Engine
-装饰   
-      EngineJob 封装 DecodeJob
-      LoadData 装饰 DataFetcher
-      BitmapResource 装饰 Bitmap ，增加 BitmapPool 回收功能
-      DataRewinder#rewindAndGet() //根据不同策略，增加流或buffer可以重置状态
-      EngineResource              //装饰Resource，增添acquired计数功能
-命令
-       Engine#load()              //先从缓存获取
-       DecodeJob#run()
-观察者 
-      /request/target/ViewTarget
-       RequestManagerFragment 观察生命周期，管理 RequestManager
-      DataFetcher.DataCallback#onDataReady                            //DataFetcherGenerator 观察 DataFetcher 返回图片数据数据
-      DataFetcherGenerator.FetcherReadyCallback#onDataFetcherReady() //DecodeJob观察DataFetcherGenerator返回原生图片数据
-      DecodeJob.DecodeCallback#onResourceDecoded                     //DecodeJob通过DecodeCallback，观察DecodePath，返回图片数据。并进行Transformation
-      EngineJob#onResourceReady                                      //EnginJob观察DecodeJob返回 DataSource
-      Engine#onEngineJobComplete()                                   //Engine观察EngineJob返回EngineResource数据
-      SingleRequest#onResourceReady()                                //Request观察Engine返回<Resource>
-      Target#onResourceReady()                                       //Target观察Request，返回<Resource>
-      OnAttachStateChangeListener#onViewAttachedToWindow()           //Target观察View添加到界面，启动Request或暂停Request
-      BaseTarget：观察Request生命周期状态                             //BaseTarget
-
-      RequestManager                                                 //RequestManager观察ApplicationLifecycle，ActivityFragmentLifecycle生命周期执行
-      ActivityFragmentLifecycle                                       //ActivityFragmentLifecycle观察RequestManagerFragment的onstart，onstop，onDestroy事件
-      TargetTracker                                                  //TargetTracker观察ActivityFragmentLifecycle，给Target发送事件
-      Target                                                         //Target通过TargetTracker#track，观察生命周期，并设置ViewHold，onResourceReady进行转场动画transition
-适配器 
-       ViewAdapter#transition
-
-模板。。。
-
-策略   LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
-       Encoder#encode()
-       DataFetcher#loadData()：AssetPathFetcher，HttpUrlFetcher，FileFetcher，HttpUrlFetcher
-       /load/model/ModelLoader 工厂方法
-       磁盘缓存策略：ResourceCacheGenerator，DataCacheGenerator，SourceGenerator
-      BitmapTransformation：
-              CenterCrop，CenterInside，CircleCrop，FitCenter，Rotate，RoundedCorners
-
-迭代 
-      DataCacheGenerator#hasNextModelLoader() //迭代ModelLoader，加载图片数据
-
-##### 源码
-RequestManager：请求管理（ RequestManager#requestTracker）， 生命周期管理 （观察Fragment生命周期）
-      Request 构建器
-Engine（命令模式load；）：
-    EngineJob：图片加载。
-    DecodeJob：图片处理
-
-```
-
-----------------+---------------------------------------------------------------------+--------------------------------------------+---------------------------------+--------------+-----------------------------------------+
-|               |            |assets  raw  drawable ContentProvider| Picking a        |     Glide.with(fragment).asDrawable()      |                                 |              |                                         |
-|               |ModelLoaders|SD   http/https                      | resource type    |                                            |                                 |              |                                         |
-|               +-----------------------------------------------------------------------------------------+------------------------+                                 |              |                                         |
-|    Component  |                                                  |                  |                   |   Placeholder          |                                 |              |                                         |
-|    Options    |   ResourceEncoders, Encoders                     |                  |  placeholders     |   Error                |                                 |              |                                         |
-|    load()     |   ResourceDecoders,                              |                  |                   |   Fallback             |                                 |              |                                         |
-+------------------------------------------------------------------+                  +--------------------------------------------+                                 |              |                                         |
-|  Application  |  Memory cache   LruResourceCache                 |  Request         | Transformations   |  circleCrop CenterCrop |                                 |              |                                         |
-|  Options      |                                                  |  options         +--------------------------------------------+                                 |              |                                         |
-|               |  Bitmap pool    LruBitmapPool                    |                  |  Caching          |                        |                                 |              |                                         |
-|               |  Disk Cache     DiskLruCacheWrapper              |  apply()         |  Strategies       |                        |                                 |              |                                         |
-|               +--------------------------------------------------+                  +--------------------------------------------+                                 |              |                                         |
-|               | Default         format(DecodeFormat.RGB_565)     |                  |  Component        |                        |  View fade in                   |              |                                         |
-|               | Request Options disallowHardwareBitmaps()        |                  |  specific         |                        |  Cross fade from the placeholder|  into()  size|  GlideExtension                         |
-|               | UncaughtThrowableStrategy                        +------------------+-------------------+------------------------+  No transition                  |              |               GlideOption               |
-|               | Log le^el                                        |  Thumbnail                                                    |                                 |              |               GlideType (GIFs, SVG etc) |
-|               +------------------------------------------------------------------------------------------------------------------+                                 |              |                                         |
-|               |  GlideModule                                     |  error                                                        |                                 |              |                                         |
-+---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-|                                                                  |                                                               |                                 |              |                                         |
-|                                                                  |                 Request                                       |    Transition                   |   Targets    |     Generated API                       |
-|             Configuration                                        |                 Builder                                       |                                 |              |                                         |
-+------------------------------------------------------------------+---------------------------------------------------------------+---------------------------------+--------------+-----------------------------------------+
-
-Singleton: Platform 
-Builder:OkHttpClient、Request、Response、MultipartBody、HttpUrl
-Strategy: CookieJar
-Observer:EventListener， WebSocketListener
-Chain of Responsibility:Interceptor
-
-  001_initial_code          1903a3ba2b980fd5c0556bfe869333a34411f5f5 initial commit of source from project
-  002_presenter_imageloader f9a436a1bfb5e4b6901506ea61dc490a9b2fe5ae Add presenter system for wrapping imageviews
-  003_pathLoader            1afd6153d474f6f54a9b42d0df263e48ffaf4154 Refactor ImageLoader -> PathLoader + ImageLoader
-  004_start_stop_diskcache  b362a3df8471b8d8716b5747690b492e8fb2a984 Add start/stop to disk cache
-* 005_flickr_sample         51c51e7fa4d247864f3debfff8aaff4078aaac7b Initial commit of flickr sample
-                            +-------------------------------------------------------------------+
-                            |  diskCache                                                        |
-                            |                                                                   |
-                            |  memoryCache  mainHandler                                         |
-                            |                                                                   |
-                            |  bitmapCache  executor    resizer                     pathLoader  |
-                            |                                                       imageLoader |
-                            |                                                                   |
-                            +----------------------------------------+--------------------------+
-                            |      ImageManager                      |            ImagePresenter|
-                            |                                        |                          |
-                            +----------------------------------------+--------------------------+
-
-
-  200_v2.0_a                64186e3971a8f9ec14a8da2bec752e8182a2057a Bump targetSdkVersion
-                            +----------------------------------------+--------------------------+
-                            |                                        |      pathLoader          |
-                            |  diskCache                             |      imageLoader         |
-                            |                                        |                          |
-                            |  memoryCache  mainHandler              +--------------------------+
-                            |                                        |      ImagePresenter      |
-                            |  bitmapCache  executor    resizer      |                          |
-                            |                                        +--------------------------+
-                            |                                        |       ModelLoader        |
-                            +----------------------------------------+                          |
-                            |      ImageManager                      |   volley.RequestQueue    |
-                            |                                        |                          |
-                            +----------------------------------------+--------------------------+
-                            |                         Glide                                     |
-                            +-------------------------------------------------------------------+
-
-
- 490_v4.9.0                3035749168c8a4187cf3a51d19a6aee3bc5958d1 Bump version to 4.9.0
-                          +------------------------------------+------------------------------+
-                          |                   resourceRecycler |   DiskCache                  |
-                          |                   diskCacheProvider|   MemoryCache                |
-                          |                   memoryCache      |   BitmapPool                 |
-                          |                          engine    |   arrayPool                  |
-                          +-------------------------------------------------------------------+
-                          |   ViewTarget       Request         |                              |
-                          |      :Target                       |                              |
-                          +------------------------------------+                              |
-                          |  RequestBuilder                    |                              |
-                          |                                    |                              |
-                          |GlideRequests                       |                              |
-                          | :RequestManager                    |                              |
-                          +------------------------------------+                              |
-                          |          Glide                                                    |
-                          +-------------------------------------------------------------------+
-
-```
-
-
-## 数据存储/Context
-
-
-文件存储,SharedPreferences/MMKV,SQLite数据库方式,内容提供器（Content provider）,网络
-ContentProvider->保存和获取数据，并使其对所有应用程序可见
-### Context
-
-```java
-W/Resources: Drawable com.android.systemui:drawable/ic_lockscreen_ime has unresolved theme attributes! 
-ContextCompat.getDrawable() 获取vector
-
-名称获取id
-getResources().getIdentifier(val, "drawable", getPackageName());
-
-获取图片名称
-mContext.getResources().getResourceEntryName(resourceId)
-```
-### 配置参数存储
-#### SharedPreference
-```
-                +----------------------------------------------------------------------------------------+
-                |  ContextImpl                                                                           |
-                |    mSharedPrefsPaths:ArrayMap<String, File>                                            |
-                |    getSharedPreferencesPath(String name): File                                         |
-                |                                                                                        |
-                |    sSharedPrefsCache                                                                   |
-                |         :ArrayMap<String, ArrayMap<File, SharedPreferencesImpl> >                      |
-                |    getSharedPreferences():SharedPreferencesImpl                                        |
-                |                                                                                        |
-                |    getSharedPreferencesCacheLocked()                                                   |
-                |         :ArrayMap<File, SharedPreferencesImpl>                                         |
-                |                                                                                        |
-                +----------------------------------------------------------------------------------------+
-                |   SharedPreferencesImpl             mMap:Map<String, Object>        enqueueDiskWrite() |
-                |           makeBackupFile():File     edit():EditorImpl               writeToFile()      |
-                |           loadFromDisk()                                                               |
-                |                             +----------------------------------------------------------+
-                |                             | EditorImpl:Editor                                        |
-                |                             |    mModified:Map<String, Object>   mEditorLock:Object    |
-                |                             |    apply()                         mModified             |
-                |                             |    commit()                         :Map<String, Object> | 
-                |                             |                                                          |
-                |                             | commitToMemory():MemoryCommitResult                      |
-                |                             | mListeners                                               |
-                |                             |   :WeakHashMap<OnSharedPreferenceChangeListener, Object> |
-                +----------------------------------------------------------------------------------------+
-                |XmlUtils                     |                                                          |
-                |  readMapXml()               |     MemoryCommitResult                                   |
-                +-----------------------------+          writtenToDiskLatch //commit() wait return       |
-                |Xml                          |                                                          |
-                |  newPullParser():KXmlParser |                                                          |
-                +-----------------------------+                                                          |
-                | KXmlParser: XmlPullParser   |                                                          |
-                ------------------------------+----------------------------------------------------------+
-
-
-```
-
-####  MMKV for Android “零拷贝问题” -  sharepreference优化
-mmap（微信mars，美图logan，网易）
-## Sqlite
-### h2 /JOOQ/SnakeYAML 
-### xutils
-[xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
-
-### 缓存GreenDAO /Jetpack-Room
-
-### Mqtt服务器
-
-## 进程内通讯
-### EventBus
-反射与注解
-观察者模式
-### ARouter
-控制反转和面向切面
-### 应用内消息机制（异步）
-- Thread
-- Handler        子线程与主线程通讯
-- AsyncTask      界面回调，异步任务，一次性
-- HandlerThread  异步队列，子线程与子线程通讯
-- Timer/TimerTask  定时任务
-- IntentServices 无界面，异步任务
-- ThreadPool     并行任务
-
-```
-查看权限
-adb shell pm list permissions -d -g                 
-```
-
-[hind api](https://android.googlesource.com/platform/prebuilts/runtime/+/master/appcompat)
-
-**/art/tools/veridex/appcompat.sh --dex-file=test.apk**
-``` dot
-APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
- 
-```
-
-```
-
-打包参数
-manifestPlaceholders = [ app_label_name:"xxxxxxx"]
-//${app_label_name}
-getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_DATA).metaData.getString("app_label_name")
-
-
-```
-#### HandlerThread
-装饰模式（封装Thread）
-  装饰Thread，增加mLooper，可以让工作Handler设置Looper
-## 进程间通讯
-###  IPC机制与方法 
-1. 1940 年，计算机存储中就使用了"文件"。
-2. 1961 年，由Buroughs MCP和麻省理工学院兼容时间共享系统引入的"文件系统"的概念
-3. 1973年，管道被实现，Ken Thompson将管道添加到了UNIX操作系统。使用的记号(垂直线)
-    传统管道属于匿名管道，是计算机进程间的一种单工先进先出通信机制。
-    ❌ 只能在具有亲缘关系的进程间使用
-    ❌ 生存期不超过创建管道的进程的生存期
-    ❌ 不支持异步读、写操作
-4. 命名管道	被视为文件的管道。进程与使用匿名管道时那样使用标准输入和输出，而是从命名管道写入和读取，就像它是常规文件一样。
-   ⭐允许无亲缘关系进程间的通信
-5. 信号起源于20世纪70年代的贝尔实验室Unix。
-   通常不用于传输数据，而是用于远程命令合作伙伴进程。
-6. 1963年，Dijkstra提出了n个进程互斥算法（Dekker算法的泛化）信号量机制
-7. POSIX 还提供用于将文件映射到内存的 API;可以共享映射，允许将文件的内容用作共享内存。mmap
-   最快的 IPC 方式
-8. 消息队列类似于套接字的数据流，但通常保留消息边界。
-    ⭐克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
-9. 1983年8月4.2BSD，包含socket
-    ⭐不同主机，C/S架构
-10. 2005年，Linux 3.19版本集成 OpenBinder
-    ⭐安全性
-趋势：导向，传输数据量，C/S一对多架构，速度，安全性
-Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 信号量， 共享内存，消息队列；BSD 跨单机的socket）
-管道：**ls |grep "hello"** ls进程输出，输入到grep进程
-
-```
-pipe：
-process1 | process2 | process3
-ls -l | grep key | less
-
-```
-
-消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
-Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
-```java
-实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
-，并发，一对多
-                         +--------------+---------+------------------+
-                         |Intent/Bundle | Messager|  Content Provider|
-         +------------------------------+---------+-----------------------------------+-----------------+
-         |               |   AIDL    +-------------------------------+                |                 |
-         |               |           | byte, char, short, int, long, |                |                 |
-         |               |           | float, double, boolean        |                |                 |
-         |               |           | String, CharSequence          |                |                 |
-         |               |           | Parcelable                    |                |                 |
-         |               |           | List<>, Map<>                 |                |                 |
-         |               |           | interface                     |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |           | import Parcelable package     |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |           | in out inout                  |                |                 |
-         | SendFile      |           +-------------------------------+                |                 |
-         | MemoryFile    |           | oneway                        |                |                 |
-         |               |           +-------------------------------+                |                 |
-         |               |-------------------------------------------|                |                 |
-         | ashmem        |   read/write  Parcel                      |  pipe/fifo     |                 |
-         +-----------------------------------------------------------+  signal        |                 |
-         |               |                                           |  messagequeue  |  File           |
-         | Shared memory |   Binder                                  |  semaphore     | SharedPreference|
-         |               |                                           |  Socket        |                 |
-         +----------------------------------------------------------------------------------------------+
-copy     |      0        |                 1                         |       2                          |
-times    +---------------+-------------------------------------------+----------------+-----------------+
-
-应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
-{                                                                                {
-    "mAction": "android.intent.action.MAIN",                                         "mAction": "android.intent.action.MAIN",
-    "mCategories": [                                                                 "mCategories": [
-        "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
-    ],                                                                               ],
-    "mComponent": {                                                                  "mComponent": {
-        "mClass": "com.example.proj.activity.SplashActivity",                              "mClass": "com.example.proj.activity.SplashActivity",
-        "mPackage": "com.example.proj"                                                     "mPackage": "com.example.proj"
-    },                                                                               },
-    "mContentUserHint": -2,                                                          "mContentUserHint": -2,
-    "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
-    "mPackage": "com.example.proj"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
-}                                                                                        "mSourceBounds": {
-                                                                                         "bottom": 395,
-                                                                                         "left": 540,
-                                                                                         "right": 800,
-                                                                                         "top": 120
-                                                                                     }
-                                                                                 }
-
- 
-
-直接打开及直接打开第二次
-{
-    "mAction": "android.intent.action.MAIN",
-    "mCategories": [
-        "android.intent.category.LAUNCHER"
-    ],
-    "mComponent": {
-        "mClass": "com.example.proj.activity.SplashActivity",
-        "mPackage": "com.example.proj"
-    },
-    "mContentUserHint": -2,
-    "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
-    "mSourceBounds": {
-        "bottom": 395,
-        "left": 540,
-        "right": 800,
-        "top": 120
-    }
-}
- 
-
-
-public class Intent implements Parcelable, Cloneable {
-    private String mAction;
-    private Uri mData;
-    private String mType;
-    private String mPackage;
-    private ComponentName mComponent;
-    private int mFlags;
-    private ArraySet<String> mCategories;
-    private Bundle mExtras;
-    private Rect mSourceBounds;
-    private Intent mSelector;
-    private ClipData mClipData;
-    private int mContentUserHint = UserHandle.USER_CURRENT;
-    /** Token to track instant app launches. Local only; do not copy cross-process. */
-    private String mLaunchToken;
-}
-public final class Messenger implements Parcelable {
-    private final IMessenger mTarget;
-}
-
-import android.os.Message;
-/** @hide */
-oneway interface IMessenger {
-    void send(in Message msg);
-}
-```
-
-```bash
-root@x86:/ # ls /dev/socket/
-adbd
-cryptd
-dnsproxyd
-fwmarkd
-installd
-lmkd
-logd
-logdr
-logdw
-mdns
-netd
-property_service
-rild
-rild-debug
-sap_uim_socket1
-vold
-wpa_eth1
-zygote// zygote socket通信设备文件
-
-```
-
-### Binder机制/通讯协议
-OpenBinder以及合入到Linux Kernel主线 3.19版本
-
-**序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
-
-Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
-[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/) 
-[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
-
-#### Linux Binder driver
-Binder定向制导
-Binder binder_proc结构体的四棵红黑树  ，threads，nodes，refs_by_desc，refs_by_node
-[](https://maoao530.github.io/2016/12/21/android-binder-01/)
-
-[](./知识体系-平台-Linux.md)
-#### IPCThreadState （client/server libs）
-系统调用 ioctl的 BINDER_WRITE_READ，BINDER_THREAD_EXIT
-存储结构 Parcel
-#### ServiceManager
-系统调用 open 打开驱动
-
-系统调用 ioctl的 BINDER_WRITE_READ，BINDER_SET_CONTEXT_MGR
-
-##### SystemServer
-binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager（系统服务路由）,Binder驱动
-
-```java
-n：native
-p：proxy
-
-+----------------+------------+--------------------------------------+-------------------------+
-+----------------+------------+          java  layer  / JNI          |          Native         |frameworks/base/libs/utils
-+----------------+------------+--------------------------------------+-------------------------+
-|                |            | Binder                BinderProxy    | +---------------------+ |              
-|                |            +--------------------------------------| |  AndroidRuntime.cpp | |       
-|                |  Client    |Android_util_Binder                   | |                     | |BpInterface/BnInterface
-|                |            |    JavaBBinderHolder    (BpBinder)   + |                     | |      
-|                |  process   |    JavaBBinder                       | |  IBinder IInterface | |   
-|                |            |android_os_Parcel                     | +                     | |BBinder/
-|                +---------------------------------------------------+ |  BpBinder           | |
-|                |            | Binder                               | |  ProcessState       | |   binder/binderproxy
-|                |            | BinderInternal                       | |  IPCThreadState     | | +-----------+
-|                |  Server    +--------------------------------------+ +                     + |             |
-|                |  process   |                                      | |                     | |             |
-|  user space    +---------------------------------------------------+ |---------------------+ |             |
-|                |            | ServiceManager                       | |                     | |             |
-|                | system     |          ServiceManagerNative        | |IserviceManager      | |             |   
-|                | service    |          ServiceManagerProxy         | |    BpServiceManager | |  binder(0)  |
-|                |            |                                      | |    BnServiceManager | | +------+    |    
-|                |            |                                      | +---------------------+ |        |    | 
-|                +------------+--------------------------------------+-------------------------+        |    |
-|                                                                         |     ^              |        |    |
-|                                                             getbinder0  v     |  findBinder  |        |    |
-|                +------------+----------------------------------------------------------------+        |    |
-|                |  Service   |  (handle id = 0)                                               |        v    v
-|                |  Manager   |  servicemanager/binder.c                                       |   +------------------+
-|                |  process   |  service_manager.c                                             |   |  open/mmap/ioctl |
-+----------------+------------+----------------------------------------------------------------+   +------------------+
-+----------------+------------+----------------------------------------------------------------+        |    |      
-|                |            |                                                                | <------+    |      
-|                |  Binder    |                                                                |             |      
-|  kernel space  |  Driver    |   drivers/staging/android/binder.c                             | <-----------+     
-+----------------+------------+----------------------------------------------------------------+
-                                                                                  +       ^
-                                                                                  |       |
-                                                                                  v       +
-                                                                               +---------------+
-                                                                               |  kernel memory|
-                                                                               +---------------+
-java层->JNI层->libs/IPCThreadState ==> driver （binder_proc）==>servicemanager/server
-
-binder_write_read
-  read_buffer(servicemanager/binder_txn 或server)
-
-
-
-```
-
-##### AMS 栈管理（任务栈），启动模式，亲和度
-Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
-
-```java
-//ActivityStarter的启动模式代码阅读
-import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
-import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
-import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
-```
-
- 
- [ActivityStack](https://blog.csdn.net/guoqifa29/article/details/54863237)
-
-android N开始有5种窗口类型（窗口类型及ActivityType决定ActivityStack） ：
-全屏 FullScreenStack
-DockedStack（分屏Activity） configChanges:screenLayout   onMultiWindowModeChanged
-PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
-freeformstack(自由模式  Activity) ：FreeForm Stack
-homeStack（launcher和recents Activity）和其他
-```java
-import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
-import static android.app.WindowConfiguration.ACTIVITY_TYPE_RECENTS;
-import static android.app.WindowConfiguration.ACTIVITY_TYPE_STANDARD;
-import static android.app.WindowConfiguration.ACTIVITY_TYPE_UNDEFINED;
-import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
-import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN;
-import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN_OR_SPLIT_SCREEN_SECONDARY;
-import static android.app.WindowConfiguration.WINDOWING_MODE_PINNED;
-import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
-import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_SECONDARY;
-import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
-```
-
-
- 桌面Launcher、任务栏Recents属于id=HOME_STACK的栈中。多窗口不仅仅是控制Activity放入不同ActivityStack中，同时还要改变Activity的生命周期，即Focus Activity是resume状态，其他可见Activity是Pause状态，并不会进入Stop状态
-
-```
-ActivityDisplay#0（一般只有一显示器） 
-+--------------------------------------------------------------------------------------+
-| ActivityStack#0                                                                      |//不用类型（mHomeStack，mFocusedStack）
-|    +---------------------+                                                           |//区分ActivityStack
-|    | +----------------+  |      +---------------------+                              |
-|    | |ActivityRecord  |  |      |                     |                              |
-|    | +----------------+  |      |                     |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    +---------------------+      +---------------------+                              |
-|    +---------------------+      +---------------------+                              |
-|    |  TaskRecord#0       |      | TaskRecord#1        |                              |//亲和度（taskAffinity）区分TaskRecord
-|    +---------------------+      +---------------------+                              |
-+--------------------------------------------------------------------------------------+
-+--------------------------------------------------------------------------------------+
-| ActivityStack#1                                                                      |
-|    +---------------------+                                                           |
-|    | +----------------+  |      +---------------------+                              |
-|    | |ActivityRecord  |  |      |                     |                              |
-|    | +----------------+  |      |                     |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
-|    | +----------------+  |      | +----------------+  |                              |
-|    +---------------------+      +---------------------+                              |
-|    +---------------------+      +---------------------+                              |
-|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
-|    +---------------------+      +---------------------+                              |
-+--------------------------------------------------------------------------------------+
-
-
-
-
-```
-
-
-[四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
-[Activity启动模式](gityuan.com/2017/06/11/activity_record/)
-
-```
-+------------+-----------------------+------------------------------+
-|            |                       |newIntent()|taskAffinity      |
-|            +------------------------------------------------------+
-|            |        standard       |           |                  |
-|            +------------------------------------------------------+
-|            |        singleTop      |   √       |                  |
-| launch mode+------------------------------------------------------+
-|            |        singleTask     |   √       |choice  TaskRecord|
-|            +------------------------------------------------------+
-|            |        singleInstance |   √       |                  |
-+-------------------------------------------------------------------+
-|  Flags     | FLAG_ACTIVITY_NEW_TASK|           |choice TaskRecord |
-+-------------------------------------------------------------------+
-|            |   allowTaskReparenting|           |change to affinity task|
-+------------+------------------------------------------------------+
-FLAG_ACTIVITY_NEW_TASK
-在google的官方文档中介绍，它与launchMode="singleTask"具有相同的行为。实际上，并不是完全相同！
-很少单独使用FLAG_ACTIVITY_NEW_TASK，通常与FLAG_ACTIVITY_CLEAR_TASK或FLAG_ACTIVITY_CLEAR_TOP联合使用。因为单独使用该属性会导致奇怪的现象，通常达不到我们想要的效果！尽管如何，后面还是会通过"FLAG_ACTIVITY_NEW_TASK示例一"和"FLAG_ACTIVITY_NEW_TASK示例二"会向你展示单独使用它的效果。
-
-FLAG_ACTIVITY_SINGLE_TOP
-在google的官方文档中介绍，它与launchMode="singleTop"具有相同的行为。实际上，的确如此！单独的使用FLAG_ACTIVITY_SINGLE_TOP，就能达到和launchMode="singleTop"一样的效果。
-
-FLAG_ACTIVITY_CLEAR_TOP
-顾名思义，FLAG_ACTIVITY_CLEAR_TOP的作用清除"包含Activity的task"中位于该Activity实例之上的其他Activity实例。FLAG_ACTIVITY_CLEAR_TOP和FLAG_ACTIVITY_NEW_TASK两者同时使用，就能达到和launchMode="singleTask"一样的效果！
-
-FLAG_ACTIVITY_CLEAR_TASK
-FLAG_ACTIVITY_CLEAR_TASK的作用包含Activity的task。使用FLAG_ACTIVITY_CLEAR_TASK时，通常会包含FLAG_ACTIVITY_NEW_TASK。这样做的目的是启动Activity时，清除之前已经存在的Activity实例所在的task；这自然也就清除了之前存在的Activity实例！
-```
-
-android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
-android:alwaysRetainTaskState触发时机在系统清理后台Task，且Activity实例为根Activity时。 
-android:finishOnTaskLaunch Task重新启动时(比如桌面上点击某一个应用图标)，会销销毁此Task中的该Activity实例。
-android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
-
-
-单任务无法内存回收。多任务，内存回收
-```
-单栈的进程，Activity跟进程声明周期一致
-多栈的，只有不可见栈的Activity可能被销毁（Java内存超过3/4,不可见）
-该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
-至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
-```
-##### WIFI
-adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
-adb shell am start com.android.settings/com.android.settings.Settings
-adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
-adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
-```
-  this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
-    mWifiManager.getWifiApState();
- 
-    java.lang.IllegalStateException: java.io.IOException: Failed to parse network stats
-        at com.android.server.NetworkManagementService.getNetworkStatsUidDetail(NetworkManagementService.java:1877)
-        at com.android.server.net.NetworkStatsService.getNetworkStatsUidDetail(NetworkStatsService.java:1619)
-        at com.android.server.net.NetworkStatsService.recordSnapshotLocked(NetworkStatsService.java:1204)
-        at com.android.server.net.NetworkStatsService.performPollLocked(NetworkStatsService.java:1294)
-        at com.android.server.net.NetworkStatsService.updateIfacesLocked(NetworkStatsService.java:1108)
-        at com.android.server.net.NetworkStatsService.updateIfaces(NetworkStatsService.java:1084)
-        at com.android.server.net.NetworkStatsService.forceUpdateIfaces(NetworkStatsService.java:862)
-        at com.android.server.ConnectivityService.notifyIfacesChangedForNetworkStats(ConnectivityService.java:5793)
-        at com.android.server.ConnectivityService.disconnectAndDestroyNetwork(ConnectivityService.java:2499)
-        at com.android.server.ConnectivityService.updateNetworkInfo(ConnectivityService.java:5651)
-        at com.android.server.ConnectivityService.access$1500(ConnectivityService.java:198)
-        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.maybeHandleNetworkAgentMessage(ConnectivityService.java:2203)
-        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.handleMessage(ConnectivityService.java:2342)
-        at android.os.Handler.dispatchMessage(Handler.java:106)
-        at android.os.Looper.loop(Looper.java:193)
-        at android.os.HandlerThread.run(HandlerThread.java:65)
-
-
- @hide，不对外开放，但通过revoke机制调用到。
-    getWifiApState
-    setWifiApEnabled
-    getWifiApConfiguration
-    isWifiApEnabled
-
-
-  
-```
-
-SSI 更新改为 30s
-
-```java
-WIFI 连接文案 frameworks\base\packages\SettingsLib\src\com\android\settingslib\wifi\AccessPoint.java
-base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
-
-```
-
-```设置热点
-WifiManager.getConfiguredNetworks()
-```
-提示文案：
-√已联网，√未联网，√连接被拒，√信号差，√不可达，满载，√其他保存记录
-刷新的情况
-  1. 创建
-  2. update(ScanResult result) 
-  3. update(WifiInfo info, DetailedState state)，接收到广播的情况
-
-##### PMS 静默安装
-```java
-小于Android 5      通过IPackageInstallObserver进行跨进程通信
-                    1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
-                    2.2 base/core/java/android/app/ContextImpl.java:1638:    static final class ApplicationPackageManager extends PackageManager {
-                    4.4 base/core/core/java/android/app/ApplicationPackageManager.java:61:final class ApplicationPackageManager extends PackageManager {
-Android 5（api21） 调用PackageManager#installPackage(Uri.class,android.app.PackageInstallObserver.int.class,String.class)；
-                      通过PackageInstallObserver的binder（IPackageInstallObserver2）进行进程间通信
-                     base/core/java/android/app/ApplicationPackageManager.java:78:final class ApplicationPackageManager extends PackageManager {
-Android 7.0（api24）（和5.0 通用的方法可行） 调用PackageManager#installPacakageAsUser
-                  base/core/java/android/app/ApplicationPackageManager.java:98:public class ApplicationPackageManager extends PackageManager
-Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，PackageInstaller.Session写入pms,广播接收通知
-                  base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
-
-```
-
-##### 蓝牙连接
-控制蓝牙图标显示
-com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
-
-adb shell am start -a android.settings.BLUETOOTH_SETTINGS
-
-
-##### AudioManager
-frameworks/base/services/core/java/com/android/server/audio/AudioService.java
-
-#### 四大组件之Service
-```
-+------------+----------------------------------+------------------------------+
-|            |   System Service                |    anonymous binder           |
-|            | (AMS, PMS, WMS)                 | (depend on ServiceConn#binder)|   
-+------------------------------------------------------------------------------+
-|  launch    | SystemServer                    |   bindService                 |
-+------------------------------------------------------------------------------+
-| regist and |ServiceManager.addService        |  ActivityManagerService       |
-| manager    |                                 |                               |
-|            |SystemServiceManager.startService|                               |
-|------------+---------------------------------+-------------------------------+
-| communicate| SystemServer#getService         |  ServiceConnection            |
-|            |                                 |  (binder.asInterface)         |
-|------------+---------------------------------+-------------------------------+
-
-通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
-通过bindService开启服务， ServiceConnection#asbinder()与AMS关联通讯，Service#onBind()与client关联通讯。
-
-实名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
-首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
-
-```
-
-AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
-
-- Bundle(实现了接口Parcelable)
-
-[Android O 后台startService限制简析](https://www.jianshu.com/p/f2db0f58d47f)
-```java
-不允许Application启动服务。kill应用会出现问题。
-startService(new Intent(this,BackService.class));
-    java.lang.RuntimeException: Unable to create application edu.ptu.gson.DApplication: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
-        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6227)
-        at android.app.ActivityThread.access$1100(ActivityThread.java:211)
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778)
-        at android.os.Handler.dispatchMessage(Handler.java:107)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-     Caused by: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
-        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
-        at android.app.ContextImpl.startService(ContextImpl.java:1571)
-        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
-        at edu.ptu.gson.DApplication.onCreate(DApplication.java:10)
-        at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1182)
-        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6222)
-        at android.app.ActivityThread.access$1100(ActivityThread.java:211) 
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778) 
-        at android.os.Handler.dispatchMessage(Handler.java:107) 
-        at android.os.Looper.loop(Looper.java:214) 
-        at android.app.ActivityThread.main(ActivityThread.java:7116) 
-        at java.lang.reflect.Method.invoke(Native Method) 
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492) 
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925) 
-
-服务所在的应有在后台60秒后，不允许启动服务
-    @Override
-    protected void onPause() {
-        super.onPause();
-        new Handler().postDelayed(() -> {
-            startService(new Intent(MainActivity.this,BackService.class));
-        },TimeUnit.SECONDS.toMillis(65));
-
-    }
-    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{f7b20eb u0a129 LAST bg:+1m4s234ms idle change:idle procs:1 seq(0,0,0)}
-        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
-        at android.app.ContextImpl.startService(ContextImpl.java:1571)
-        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
-        at edu.ptu.gson.MainActivity.lambda$onPause$1$MainActivity(MainActivity.java:48)
-        at edu.ptu.gson.-$$Lambda$MainActivity$wl8e-hH5EF00KzpSg6rkpcKD2N8.run(Unknown Source:2)
-        at android.os.Handler.handleCallback(Handler.java:883)
-        at android.os.Handler.dispatchMessage(Handler.java:100)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-
-需要设置startForeground()
-startForegroundService(new Intent(MainActivity.this,BackService.class));
-    android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{266d400 u0 edu.ptu.gson/.BackService}
-        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1864)
-        at android.os.Handler.dispatchMessage(Handler.java:107)
-        at android.os.Looper.loop(Looper.java:214)
-        at android.app.ActivityThread.main(ActivityThread.java:7116)
-        at java.lang.reflect.Method.invoke(Native Method)
-        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
-        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
-
-/**
- * 8.0以上需要增加channel
- */
-```
-
-
-#### 四大组件-Activity
-1. 协议
-client binder: 
-  IApplicationThread(ActivityThread.ApplicationThread)
-server binder:
-  ams(IActivityManager)
-  IApplicationToken(ActivityRecord)
-```
-+---------------------------------------------------------------+
-|   AMS                                                         |
-|     +-------------------------------------------------------+ |
-|     |ProcessRecord                                          | |
-|     |                                                       | |
-|     |    ActivityRecord                                     | |
-|     |                                                       | |
-|     |    ServiceRecord   ConnectionRecord                   | |
-|     |                                                       | |
-|     |    BroadcastRecord  ReceiverList                      | |
-|     |                                                       | |
-|     |    ContentProviderRecord    ContentProviderConnection | |
-|     |                                                       | |
-|     +-------------------------------------------------------+ |
-+---------------------------------------------------------------+
-
-```
-##### 生命周期
-```
-                                  +--------+
-                                  | Start  |
-                                  +----+---+
-                                       v                                                   +-----------------+
-                                  +----+---+                            Activity States    |onAttach         |
-      +------------------------>  |onCreate|                                               |oncreate         |
-      |                           +---+----+                                               |oncreateView     +<---+
-      | back to                       v  created +------------------------------------>    |onActivityCreated|    |
-      | foreground                +---+----+        +-----------+                          |                 |    |
-      |                           |onStart |  <-----+ onRestart +--+                       +-----------------+    |
-      | recreate                  |        |        +-----------+  |                                              |
-+-----+---------+                 +----+---+                       |                       +---------+            |
-| Process killed|                      v started                   |   +-------------->    |onStart  |            |
-+-----+---------+       +-------+ +----+---+   (singleTop/Task)    |                       +---------+            |
-      |                 v         |onResume|  <-----+activity      |                                              |
-      |             +---+------+  +--------+        |froreground   |                       +---------+            |
-      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |<-----+     |
-      |   activity  +---+------+                    |              |                       +---------+      |     |
-      |   foreground    |         +--------+        |              |                              Fragm is  |     |
-      |                 +-------> |onPause |        |    activity  |                        retaininstance  | onBack
-      | <-----------------------+ |        | +----->+    foreground|                          onactivityRecreate  |
-      |   other app               +---+----+                       |                       +---------+      |     |
-      |   need memory                 v  paused                    |     +------------>    |onPause  |------|     |
-      |                                  no longe visiable         |                       +---------+            |
-      |                           +--------+                       |                                              |
-      +-------------------------+ |onStop  | +---------------------+                                              |
-                                  +---+----+                                               +---------+            |
-                                      v  stoped                       +--------------->    |onStop   |            |
-                                  +---+----+                                               +---------+            |
-  *configChanges                  |onDestroy                                                                      |
-                                  |        +                                               +-v-----v------+       |
-                                  +---+----+                                               |onDestroyView +-------+
-                                      v  destroyed  +--------------------------------->    |onDestroy     |
-                                  +---+----+                                               |onDetach      |
-                                  |shutdown|                                               +--------------+
-                                  +--------+
-
-
-```
-
-
-
-
-#### 四大组件之广播
-1. 协议
-client binder: 
-  IIntentReceiver(LoadedApk.ReceiverDispatcher.InnerReceiver)
-  IApplicationThread(ActivityThread.ApplicationThread)
-server binder:
-  ams(IActivityManager)
-
-2. 通讯
-   
-```
-
-                                                      +---------------------------------------+
-+---------------------+-----------+-----------+       | SystemServer                          |
-|                     | runtime   | location  |       |                                       |
-|                     |           |           |       |   PMS                                 |
-+---------------------------------------------+       |     mReceivers:ActivityIntentResolver |
-|                     |           |           |       |                                       |
-|   mReceivers        |  install  |  WMS      |       |     mReceiverResolver                 |
-|                     |           |           |       |                                       |
-+---------------------------------------------+       |   AMS                                 |
-|   mReisterdReceivers|  run app  |  AMS      |       |     mReisterdReceivers:IIntentReceiver|
-|                     |           |           |       |                                       |
-+---------------------+-----------+-----------+       +---------------------------------------+
-
-```
-3. LocalBroadCastManager
-   使用Handler处理penddingBroadCast
-
-4. 7.0 版本上静态注册android.net.conn.CONNECTIVITY_CHANGE
-
-#### 四大组件之contentProvider
-安装时候，会在AMS注册providers
-1. 协议
-client binder: 
-  IApplicationThread(ActivityThread.ApplicationThread)
-  IContentProvider(ContentProvider.Transport holder:ContentProviderRecord)
-server binder:
-  ams(IActivityManager)
-1. registerContentObserver协议
-client binder: 
-  IContentObserver
-server binder:
-  IContentService(ContentService holder:ApplicationContentResolver)
-
-3. ContentService扮演者ContentObserver的注册中心
-
-ContentProvider——内容提供者， 在android中的作用是对外共享数据，也就是说你可以通过ContentProvider把应用中的数据共享给其他应用访问，其他应用可以通过ContentProvider 对你应用中的数据进行添删改查。
-
-ContentResolver——内容解析者， 其作用是按照一定规则访问内容提供者的数据（其实就是调用内容提供者自定义的接口来操作它的数据）。
-ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的数据库的变化，继而做一些相应的处理，它类似于数据库技术中的触发器(Trigger)，当ContentObserver所观察的Uri发生变化时，便会触发它。 
-
-```java
-    private static final class ApplicationContentResolver extends ContentResolver {
-        private final ActivityThread mMainThread;
-    }
- 
-
-    public class ContentProviderHolder implements Parcelable {
-            public final ProviderInfo info;
-        public IContentProvider provider;
-        public IBinder connection;// IContentProvider 通过这个对象传输数据,由ContentProvider#mTransport赋值
-        public boolean noReleaseNeeded;
-    }
-
-                                          +-------------------------------------------------------------+
-                                          |  SystemServer                                               |
-                                          |             +-------------------------------------+         |
-                   +---------------------------+        |   ContentService                    |   +----------------------+
-                   |                      |    |        |      ObserverNode                   |   |     |                |
-                   v                      |    +-------------+   IContentObserver      +----------+     |                v
-                                          |             |                                     |         |
-+--------------------------------------+  |             +-------------------------------------+         |  +---------------------------------+
-|  App                                 |  |                                                             |  |  App2                           |
-|                     ActivityManager. |  |     +-------------------------------------------------------+  |                                 |
-|    mProviderMap       getService()   |  |     | AMS                 +->  mProviderMap                ||  |    +---->  mProviderMap         |
-|                                      |  |     +                     |         +                      ||  |    |                            |
-|      +  ^            +-------------------> getContentProvider()  +--+         v                      ||  |    |             +              |
-|      |  |                            |  |     +                                                      ||  |    |             |              |
-|      |  |                            |  |     |                         +-----------------------------+  |    |             v              |
-|      |  |                            |  |     |                         |        IApplicationThread  |   |    |                            |
-|      |  |                            |  |     +                         |                            +--------+   scheduleInstallProvider()|
-|      |  +---------------------------------+ ContentProviderHolder  <--+-+ContentPro^iderRecord.wait()||  |                                 |
-|      |                               |  |     +                       ^ +-----------------------------|  |                                 |
-|      |                               |  |     |               +-------+                              ||  |                                 |
-|      |                               |  |     |               |   +------------------------------+   ||  |          ActivityManager.       |
-|      |                               |  |     |               |   |     publishContentProviders()|  <--------------+  getService()         |
-|      |                               |  |     |               +---+ContentPro^iderRecord.notify()|   ||  |                                 |
-|      |                               |  |     |                   +------------------------------+   ||  | +-------------------------------+
-|      |                               |  |     +-------------------------------------------------------+  | |  ContentProvider             ||
-|      |                               |  |                                                             |  | |    Transport:IContentProvider||
-|      |                               |  |                                                             |  | +-------------------------------|
-+--------------------------------------+  +-------------------------------------------------------------+  +---------------------------------+
-       |                                                                                                                  ^
-       +------------------------------------------------------------------------------------------------------------------+
-
-
-   URI = scheme:[//authority]path[?query][#fragment]
-
-   normal
-低风险权限，只要申请了就可以使用，安装时不需要用户确认。 
-dangerous
-高风险权限，安装时需要用户确认授权才可使用。  
-signature
-只有当申请权限应用与声明此权限应用的数字签名相同时才能将权限授给它。 
-signatureOrSystem
-签名相同或者申请权限的应用为系统应用才能将权限授给它 
-```
-
-### Configuration
-![蓝牙连接手持按键](configuration.png)
-
-```java 
-android 7 Configuration.java
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder(128);
-        sb.append("{");
-        sb.append(fontScale);
-        sb.append(" ");
-        if (mcc != 0) {
-            sb.append(mcc);
-            sb.append("mcc");
-        } else {
-            sb.append("?mcc");
-        }
-        if (mnc != 0) {
-            sb.append(mnc);
-            sb.append("mnc");
-        } else {
-            sb.append("?mnc");
-        }
-        fixUpLocaleList();
-        if (!mLocaleList.isEmpty()) {
-            sb.append(" ");
-            sb.append(mLocaleList);
-        } else {
-            sb.append(" ?localeList");
-        }
-        int layoutDir = (screenLayout&SCREENLAYOUT_LAYOUTDIR_MASK);
-        switch (layoutDir) {
-            case SCREENLAYOUT_LAYOUTDIR_UNDEFINED: sb.append(" ?layoutDir"); break;
-            case SCREENLAYOUT_LAYOUTDIR_LTR: sb.append(" ldltr"); break;
-            case SCREENLAYOUT_LAYOUTDIR_RTL: sb.append(" ldrtl"); break;
-            default: sb.append(" layoutDir=");
-                sb.append(layoutDir >> SCREENLAYOUT_LAYOUTDIR_SHIFT); break;
-        }
-        if (smallestScreenWidthDp != SMALLEST_SCREEN_WIDTH_DP_UNDEFINED) {
-            sb.append(" sw"); sb.append(smallestScreenWidthDp); sb.append("dp");
-        } else {
-            sb.append(" ?swdp");
-        }
-        if (screenWidthDp != SCREEN_WIDTH_DP_UNDEFINED) {
-            sb.append(" w"); sb.append(screenWidthDp); sb.append("dp");
-        } else {
-            sb.append(" ?wdp");
-        }
-        if (screenHeightDp != SCREEN_HEIGHT_DP_UNDEFINED) {
-            sb.append(" h"); sb.append(screenHeightDp); sb.append("dp");
-        } else {
-            sb.append(" ?hdp");
-        }
-        if (densityDpi != DENSITY_DPI_UNDEFINED) {
-            sb.append(" "); sb.append(densityDpi); sb.append("dpi");
-        } else {
-            sb.append(" ?density");
-        }
-        switch ((screenLayout&SCREENLAYOUT_SIZE_MASK)) {
-            case SCREENLAYOUT_SIZE_UNDEFINED: sb.append(" ?lsize"); break;
-            case SCREENLAYOUT_SIZE_SMALL: sb.append(" smll"); break;
-            case SCREENLAYOUT_SIZE_NORMAL: sb.append(" nrml"); break;
-            case SCREENLAYOUT_SIZE_LARGE: sb.append(" lrg"); break;
-            case SCREENLAYOUT_SIZE_XLARGE: sb.append(" xlrg"); break;
-            default: sb.append(" layoutSize=");
-                    sb.append(screenLayout&SCREENLAYOUT_SIZE_MASK); break;
-        }
-        switch ((screenLayout&SCREENLAYOUT_LONG_MASK)) {
-            case SCREENLAYOUT_LONG_UNDEFINED: sb.append(" ?long"); break;
-            case SCREENLAYOUT_LONG_NO: /* not-long is not interesting to print */ break;
-            case SCREENLAYOUT_LONG_YES: sb.append(" long"); break;
-            default: sb.append(" layoutLong=");
-                    sb.append(screenLayout&SCREENLAYOUT_LONG_MASK); break;
-        }
-        switch (orientation) {
-            case ORIENTATION_UNDEFINED: sb.append(" ?orien"); break;
-            case ORIENTATION_LANDSCAPE: sb.append(" land"); break;
-            case ORIENTATION_PORTRAIT: sb.append(" port"); break;
-            default: sb.append(" orien="); sb.append(orientation); break;
-        }
-        switch ((uiMode&UI_MODE_TYPE_MASK)) {
-            case UI_MODE_TYPE_UNDEFINED: sb.append(" ?uimode"); break;
-            case UI_MODE_TYPE_NORMAL: /* normal is not interesting to print */ break;
-            case UI_MODE_TYPE_DESK: sb.append(" desk"); break;
-            case UI_MODE_TYPE_CAR: sb.append(" car"); break;
-            case UI_MODE_TYPE_TELEVISION: sb.append(" television"); break;
-            case UI_MODE_TYPE_APPLIANCE: sb.append(" appliance"); break;
-            case UI_MODE_TYPE_WATCH: sb.append(" watch"); break;
-            default: sb.append(" uimode="); sb.append(uiMode&UI_MODE_TYPE_MASK); break;
-        }
-        switch ((uiMode&UI_MODE_NIGHT_MASK)) {
-            case UI_MODE_NIGHT_UNDEFINED: sb.append(" ?night"); break;
-            case UI_MODE_NIGHT_NO: /* not-night is not interesting to print */ break;
-            case UI_MODE_NIGHT_YES: sb.append(" night"); break;
-            default: sb.append(" night="); sb.append(uiMode&UI_MODE_NIGHT_MASK); break;
-        }
-        switch (touchscreen) {
-            case TOUCHSCREEN_UNDEFINED: sb.append(" ?touch"); break;
-            case TOUCHSCREEN_NOTOUCH: sb.append(" -touch"); break;
-            case TOUCHSCREEN_STYLUS: sb.append(" stylus"); break;
-            case TOUCHSCREEN_FINGER: sb.append(" finger"); break;
-            default: sb.append(" touch="); sb.append(touchscreen); break;
-        }
-        switch (keyboard) {
-            case KEYBOARD_UNDEFINED: sb.append(" ?keyb"); break;
-            case KEYBOARD_NOKEYS: sb.append(" -keyb"); break;
-            case KEYBOARD_QWERTY: sb.append(" qwerty"); break;
-            case KEYBOARD_12KEY: sb.append(" 12key"); break;
-            default: sb.append(" keys="); sb.append(keyboard); break;
-        }
-        switch (keyboardHidden) {
-            case KEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
-            case KEYBOARDHIDDEN_NO: sb.append("/v"); break;
-            case KEYBOARDHIDDEN_YES: sb.append("/h"); break;
-            case KEYBOARDHIDDEN_SOFT: sb.append("/s"); break;
-            default: sb.append("/"); sb.append(keyboardHidden); break;
-        }
-        switch (hardKeyboardHidden) {
-            case HARDKEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
-            case HARDKEYBOARDHIDDEN_NO: sb.append("/v"); break;
-            case HARDKEYBOARDHIDDEN_YES: sb.append("/h"); break;
-            default: sb.append("/"); sb.append(hardKeyboardHidden); break;
-        }
-        switch (navigation) {
-            case NAVIGATION_UNDEFINED: sb.append(" ?nav"); break;
-            case NAVIGATION_NONAV: sb.append(" -nav"); break;
-            case NAVIGATION_DPAD: sb.append(" dpad"); break;
-            case NAVIGATION_TRACKBALL: sb.append(" tball"); break;
-            case NAVIGATION_WHEEL: sb.append(" wheel"); break;
-            default: sb.append(" nav="); sb.append(navigation); break;
-        }
-        switch (navigationHidden) {
-            case NAVIGATIONHIDDEN_UNDEFINED: sb.append("/?"); break;
-            case NAVIGATIONHIDDEN_NO: sb.append("/v"); break;
-            case NAVIGATIONHIDDEN_YES: sb.append("/h"); break;
-            default: sb.append("/"); sb.append(navigationHidden); break;
-        }
-        if (seq != 0) {
-            sb.append(" s.");
-            sb.append(seq);
-        }
-        sb.append('}');
-        return sb.toString();
-    }
-
-```
-##### 发送广播出现权限问题
-```java
-java.lang.SecurityException: Permission Denial: not allowed to send broadcast android.intent.action.TIME_SET from pid=4404, uid=10033
-
-1. 查找位置：
-grep -irn 'Permission\ Denial:\ not\ allowed\ to\ send\ broadcast'
-
->base/services/core/java/com/android/server/am/ActivityManagerService.java:17701: 
-
-2. 定位代码
-isProtectedBroadcast = AppGlobals.getPackageManager().isProtectedBroadcast(action);
-
-3. PMS 查找代码
-
-    @Override
-    public boolean isProtectedBroadcast(String actionName) {
-        synchronized (mPackages) {
-            if (mProtectedBroadcasts.contains(actionName)) {
-                return true;
-            } else if (actionName != null) {
-                // TODO: remove these terrible hacks
-                if (actionName.startsWith("android.net.netmon.lingerExpired")
-                        || actionName.startsWith("com.android.server.sip.SipWakeupTimer")
-                        || actionName.startsWith("com.android.internal.telephony.data-reconnect")
-                        || actionName.startsWith("android.net.netmon.launchCaptivePortalApp")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-grep -irn --include="*.xml" 'protected-broadcast android:name="android.intent.action.TIME_SET'
-base/core/res/AndroidManifest.xml:32:    <protected-broadcast android:name="android.intent.action.TIME_SET" />
-```
-### SystemUI
-QuickStatusBarHeader
-  quick_status_bar_expanded_header.xml
-  QuickStatusBarHeader（system_icons.xml）
-    BluetoothLayout
-    BatteryMeterLayout
-```
-
-com.android.systemui.statusbar.CommandQueue#mHandler 接收消息
-com.android.systemui.statusbar.phone.PhoneStatusBarPolicy#mIntentReceiver 
-
-
-statusbar 隐藏原生图标
-com.android.systemui.statusbar.phone.StatusBarIconController.IconManager
-com.android.systemui.statusbar.StatusBarIconView
-
-```
-SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
-- stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
-
-其他进程,状态栏系统图标（蓝牙，WiFi）
-- ![其他进程,状态栏图标](其他进程,状态栏图标.png)
-获取系统图标
-```java
-com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
-```
-#### SystemUI启动的子服务
-```java
-private final Class<?>[] SERVICES = new Class[] {
-            com.android.systemui.tuner.TunerService.class, //定制状态栏服务
-            com.android.systemui.keyguard.KeyguardViewMediator.class,//锁屏模块
-            com.android.systemui.recents.Recents.class,//最近应用
-            com.android.systemui.volume.VolumeUI.class,//全局音量控制
-            com.android.systemui.statusbar.SystemBars.class,//系统状态栏
-            com.android.systemui.usb.StorageNotification.class,//Storage存储通知
-            com.android.systemui.power.PowerUI.class,//电量管理相关
-            com.android.systemui.media.RingtonePlayer.class,//铃声播放
-            com.android.systemui.keyboard.KeyboardUI.class,//键盘相关
-};
-```
-#### SystemBars 常见界面
-PhoneStatusBarView，PanelHolder，keyguardbouncer
 
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)
 
-### Retrofit
+### Retrofit 动态代理
 动态代理创建Service类，适配返回类型Call支持其他类型， 注解信息依赖注入ServiceMethod
 
 转换器注入 Converter#convert
@@ -1849,7 +78,7 @@ val searchResult = service.getSearchResult()
 ```
 
 [Retrofit 2.6 对协程的支持](https://blog.csdn.net/weixin_44946052/article/details/93225439)
-### Okhttp（Square）
+### Okhttp 责任链（Square）
 可加快内容加载速度并节省带宽。
 缓存
  
@@ -2984,7 +1213,8 @@ IM：
                             TCP Header Format
 ```
 TCP层的Flag
-```
+```js
+ 
 SYN表示建立连接，
 FIN表示关闭连接，
 ACK表示响应，
@@ -2992,7 +1222,7 @@ PSH表示有 DATA数据传输，
 RST表示连接重置。
 URG(urgent紧急)
 
-```
+ ```
 ##### 抓包
 // testSocket("104.31.70.56");//tcp http://www.plantuml.com/
 ```plantuml
@@ -3097,13 +1327,20 @@ Frame format
  +---------------------------------------------------------------+
                    Frame Layout
 ```
+提示文案：
+√已联网，√未联网，√连接被拒，√信号差，√不可达，满载，√其他保存记录
+刷新的情况
+  1. 创建
+  2. update(ScanResult result) 
+  3. update(WifiInfo info, DetailedState state)，接收到广播的情况
 
+ 
 ##### SSL/TLS
 [SSL/TLS Handshake](http://blog.fourthbit.com/2014/12/23/traffic-analysis-of-an-ssl-slash-tls-session/#:~:text=Record%20Protocol%20format.%20The%20TLS%20Record%20header%20comprises,header%20itself%29.%20The%20maximum%20supported%20is%2016384%20%2816K%29.)
 ###### TLS Handshake
 ```js
                TLS Handshake
-
+ 
                +-----+                              +-----+
                |     |                              |     |
                |     |        ClientHello           |     |
@@ -3289,7 +1526,7 @@ Sec-WebSocket-Accept: ps47fOR7Y0K9tgpbHog3Zw6H7/4=
   服务端发送【TCP ACK】
 ```
 #### WebRTC
-[](知识体系-平台-多媒体.md)
+[](知识体系-平台-media.md)
 
 ### 即时聊天协议
 [即时聊天协议](https://blog.csdn.net/netease_im/article/details/83823212)
@@ -3350,7 +1587,7 @@ Publisher -> Publisher : Delete Message
 @enduml
 ```
 Qos 1
-    需要应用层处理重复消息
+    需要应用层处理重复消息。临时存储发送，接收方回溯确认（pubback）
 ```plantuml
 @startuml
 Publisher -> Publisher : Store Message
@@ -3365,7 +1602,7 @@ Broker -> Broker : Delete Message
 @enduml
 ```
 Qos 2
-（消息的丢失会造成生命或财产的损失），且不希望收到重复的消息
+（消息的丢失会造成生命或财产的损失），且不希望收到重复的消息。存储发送，接收确认，发送方挥手（pubcomp），完成确认
 ```plantuml
 @startuml
 Publisher -> Publisher : Store Message
@@ -3401,3 +1638,2225 @@ asmack
 
 #### 缺点
 xml传输，二进制需要转化Base64
+## 本地存储
+网络,SQLite数据库,方式文件存储,SharedPreferences/MMKV,内容提供器（Content provider）
+ContentProvider->保存和获取数据，并使其对所有应用程序可见
+## Sqlite
+### h2 /JOOQ/SnakeYAML 
+### xutils
+[xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
+
+### 缓存GreenDAO /Jetpack-Room
+
+
+## 图片文件 Glide
+Glide是一个快速高效的Android图片加载库，注重于平滑的滚动。
+不同数据源加载Fetcher，解码decode，变换transform，平滑过渡transition
+三级缓存和ResourceManager及Target生命周期管理
+[中文文档](https://muyangmin.github.io/glide-docs-cn/)
+三级缓存 
+      ActiveResources 活动缓存，weakreference提高命中率
+      LruResourceCache 最近最少使用，剔除
+      InternalCacheDiskCacheFactory（装饰DiskLruCache） 磁盘缓存
+图片解码缓存
+      LruBitmapPool    缓存bitmap，复用                              //BitmapFactory.Options#inBitmap
+      LruArrayPool     复用字节/Integer数组，避免频繁GC，导致内存抖动 // BitmapFactory.Options#inTempStorage
+
+单例     
+         Glide#get() //volatile+双检锁
+简单工厂      
+        //资源简单工厂
+        Glide#with(android.content.Context):RequestManager
+        RequestManager#as():RequestBuilder::BaseRequestOptions
+        RequestBuilder#into():Target//ViewTaget 对View的生命周期管理，构建Request下载到Target
+        RequestBuilder#buildRequest():Request/SingleRequest#obtain():Request
+        DecodeJob#getNextGenerator():DataFetcherGenerator// 数据请求，磁盘缓存
+        ModelLoader#buildLoadData():LoadData             //加载图片数据
+        BitmapResource#obtain():BitmapResource
+
+工厂方法 
+        /request/transition/TransitionFactory#build
+        RequestManagerFactory#build():RequestManager
+
+
+构建器   
+         GlideBuilder#build()
+原型    
+        BaseRequestOptions#clone
+
+转化器
+       ResourceTranscoder#transcode():T
+       Transformation#transform():Resource<T>
+桥接
+        RequestManagerRetriever#get(android.app.Activity):RequestManager//获取RequestManager 给RequestManagerRetriever实现
+
+外观模式 
+        Glide，GlideContext ，
+        Engine类：
+        Registry：
+                ModelLoaderRegistry       //判断是否可以加载数据，并构建 ModelLoader#buildLoadData():LoadData
+                EncoderRegistry          //流编码，写入文件等
+                ResourceEncoderRegistry   //流编码，写入文件等
+                ResourceDecoderRegistry   //数据源转化为Resource<T>
+                DataRewinderRegistry      //流或buffer可以重置状态
+                TranscoderRegistry         
+                ImageHeaderParserRegistry //解析文件类型 ImageHeaderParser#getType():ImageType
+享元  
+        SingleRequest#POOL//复用Request
+
+静态代理 
+      Glide代理Engine
+装饰   
+      EngineJob 封装 DecodeJob
+      LoadData 装饰 DataFetcher
+      BitmapResource 装饰 Bitmap ，增加 BitmapPool 回收功能
+      DataRewinder#rewindAndGet() //根据不同策略，增加流或buffer可以重置状态
+      EngineResource              //装饰Resource，增添acquired计数功能
+命令
+       Engine#load()              //先从缓存获取
+       DecodeJob#run()
+观察者 
+      /request/target/ViewTarget
+       RequestManagerFragment 观察生命周期，管理 RequestManager
+      DataFetcher.DataCallback#onDataReady                            //DataFetcherGenerator 观察 DataFetcher 返回图片数据数据
+      DataFetcherGenerator.FetcherReadyCallback#onDataFetcherReady() //DecodeJob观察DataFetcherGenerator返回原生图片数据
+      DecodeJob.DecodeCallback#onResourceDecoded                     //DecodeJob通过DecodeCallback，观察DecodePath，返回图片数据。并进行Transformation
+      EngineJob#onResourceReady                                      //EnginJob观察DecodeJob返回 DataSource
+      Engine#onEngineJobComplete()                                   //Engine观察EngineJob返回EngineResource数据
+      SingleRequest#onResourceReady()                                //Request观察Engine返回<Resource>
+      Target#onResourceReady()                                       //Target观察Request，返回<Resource>
+      OnAttachStateChangeListener#onViewAttachedToWindow()           //Target观察View添加到界面，启动Request或暂停Request
+      BaseTarget：观察Request生命周期状态                             //BaseTarget
+
+      RequestManager                                                 //RequestManager观察ApplicationLifecycle，ActivityFragmentLifecycle生命周期执行
+      ActivityFragmentLifecycle                                       //ActivityFragmentLifecycle观察RequestManagerFragment的onstart，onstop，onDestroy事件
+      TargetTracker                                                  //TargetTracker观察ActivityFragmentLifecycle，给Target发送事件
+      Target                                                         //Target通过TargetTracker#track，观察生命周期，并设置ViewHold，onResourceReady进行转场动画transition
+适配器 
+       ViewAdapter#transition
+
+模板。。。
+
+策略   LruPoolStrategy（SizeConfigStrategy SizeStrategy AttributeStrategy）
+       Encoder#encode()
+       DataFetcher#loadData()：AssetPathFetcher，HttpUrlFetcher，FileFetcher，HttpUrlFetcher
+       /load/model/ModelLoader 工厂方法
+       磁盘缓存策略：ResourceCacheGenerator，DataCacheGenerator，SourceGenerator
+      BitmapTransformation：
+              CenterCrop，CenterInside，CircleCrop，FitCenter，Rotate，RoundedCorners
+
+迭代 
+      DataCacheGenerator#hasNextModelLoader() //迭代ModelLoader，加载图片数据
+
+##### 源码
+RequestManager：请求管理（ RequestManager#requestTracker）， 生命周期管理 （观察Fragment生命周期）
+      Request 构建器
+Engine（命令模式load；）：
+    EngineJob：图片加载。
+    DecodeJob：图片处理
+
+```
+
+----------------+---------------------------------------------------------------------+--------------------------------------------+---------------------------------+--------------+-----------------------------------------+
+|               |            |assets  raw  drawable ContentProvider| Picking a        |     Glide.with(fragment).asDrawable()      |                                 |              |                                         |
+|               |ModelLoaders|SD   http/https                      | resource type    |                                            |                                 |              |                                         |
+|               +-----------------------------------------------------------------------------------------+------------------------+                                 |              |                                         |
+|    Component  |                                                  |                  |                   |   Placeholder          |                                 |              |                                         |
+|    Options    |   ResourceEncoders, Encoders                     |                  |  placeholders     |   Error                |                                 |              |                                         |
+|    load()     |   ResourceDecoders,                              |                  |                   |   Fallback             |                                 |              |                                         |
++------------------------------------------------------------------+                  +--------------------------------------------+                                 |              |                                         |
+|  Application  |  Memory cache   LruResourceCache                 |  Request         | Transformations   |  circleCrop CenterCrop |                                 |              |                                         |
+|  Options      |                                                  |  options         +--------------------------------------------+                                 |              |                                         |
+|               |  Bitmap pool    LruBitmapPool                    |                  |  Caching          |                        |                                 |              |                                         |
+|               |  Disk Cache     DiskLruCacheWrapper              |  apply()         |  Strategies       |                        |                                 |              |                                         |
+|               +--------------------------------------------------+                  +--------------------------------------------+                                 |              |                                         |
+|               | Default         format(DecodeFormat.RGB_565)     |                  |  Component        |                        |  View fade in                   |              |                                         |
+|               | Request Options disallowHardwareBitmaps()        |                  |  specific         |                        |  Cross fade from the placeholder|  into()  size|  GlideExtension                         |
+|               | UncaughtThrowableStrategy                        +------------------+-------------------+------------------------+  No transition                  |              |               GlideOption               |
+|               | Log le^el                                        |  Thumbnail                                                    |                                 |              |               GlideType (GIFs, SVG etc) |
+|               +------------------------------------------------------------------------------------------------------------------+                                 |              |                                         |
+|               |  GlideModule                                     |  error                                                        |                                 |              |                                         |
++---------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                                                  |                                                               |                                 |              |                                         |
+|                                                                  |                 Request                                       |    Transition                   |   Targets    |     Generated API                       |
+|             Configuration                                        |                 Builder                                       |                                 |              |                                         |
++------------------------------------------------------------------+---------------------------------------------------------------+---------------------------------+--------------+-----------------------------------------+
+
+Singleton: Platform 
+Builder:OkHttpClient、Request、Response、MultipartBody、HttpUrl
+Strategy: CookieJar
+Observer:EventListener， WebSocketListener
+Chain of Responsibility:Interceptor
+
+  001_initial_code          1903a3ba2b980fd5c0556bfe869333a34411f5f5 initial commit of source from project
+  002_presenter_imageloader f9a436a1bfb5e4b6901506ea61dc490a9b2fe5ae Add presenter system for wrapping imageviews
+  003_pathLoader            1afd6153d474f6f54a9b42d0df263e48ffaf4154 Refactor ImageLoader -> PathLoader + ImageLoader
+  004_start_stop_diskcache  b362a3df8471b8d8716b5747690b492e8fb2a984 Add start/stop to disk cache
+* 005_flickr_sample         51c51e7fa4d247864f3debfff8aaff4078aaac7b Initial commit of flickr sample
+                            +-------------------------------------------------------------------+
+                            |  diskCache                                                        |
+                            |                                                                   |
+                            |  memoryCache  mainHandler                                         |
+                            |                                                                   |
+                            |  bitmapCache  executor    resizer                     pathLoader  |
+                            |                                                       imageLoader |
+                            |                                                                   |
+                            +----------------------------------------+--------------------------+
+                            |      ImageManager                      |            ImagePresenter|
+                            |                                        |                          |
+                            +----------------------------------------+--------------------------+
+
+
+  200_v2.0_a                64186e3971a8f9ec14a8da2bec752e8182a2057a Bump targetSdkVersion
+                            +----------------------------------------+--------------------------+
+                            |                                        |      pathLoader          |
+                            |  diskCache                             |      imageLoader         |
+                            |                                        |                          |
+                            |  memoryCache  mainHandler              +--------------------------+
+                            |                                        |      ImagePresenter      |
+                            |  bitmapCache  executor    resizer      |                          |
+                            |                                        +--------------------------+
+                            |                                        |       ModelLoader        |
+                            +----------------------------------------+                          |
+                            |      ImageManager                      |   volley.RequestQueue    |
+                            |                                        |                          |
+                            +----------------------------------------+--------------------------+
+                            |                         Glide                                     |
+                            +-------------------------------------------------------------------+
+
+
+ 490_v4.9.0                3035749168c8a4187cf3a51d19a6aee3bc5958d1 Bump version to 4.9.0
+                          +------------------------------------+------------------------------+
+                          |                   resourceRecycler |   DiskCache                  |
+                          |                   diskCacheProvider|   MemoryCache                |
+                          |                   memoryCache      |   BitmapPool                 |
+                          |                          engine    |   arrayPool                  |
+                          +-------------------------------------------------------------------+
+                          |   ViewTarget       Request         |                              |
+                          |      :Target                       |                              |
+                          +------------------------------------+                              |
+                          |  RequestBuilder                    |                              |
+                          |                                    |                              |
+                          |GlideRequests                       |                              |
+                          | :RequestManager                    |                              |
+                          +------------------------------------+                              |
+                          |          Glide                                                    |
+                          +-------------------------------------------------------------------+
+
+```
+
+
+
+
+## 配置文件 Sharedpreference 
+
+
+
+### Context
+
+```java
+W/Resources: Drawable com.android.systemui:drawable/ic_lockscreen_ime has unresolved theme attributes! 
+ContextCompat.getDrawable() 获取vector
+
+名称获取id
+getResources().getIdentifier(val, "drawable", getPackageName());
+
+获取图片名称
+mContext.getResources().getResourceEntryName(resourceId)
+```
+### 配置参数存储
+#### SharedPreference
+```
+                +----------------------------------------------------------------------------------------+
+                |  ContextImpl                                                                           |
+                |    mSharedPrefsPaths:ArrayMap<String, File>                                            |
+                |    getSharedPreferencesPath(String name): File                                         |
+                |                                                                                        |
+                |    sSharedPrefsCache                                                                   |
+                |         :ArrayMap<String, ArrayMap<File, SharedPreferencesImpl> >                      |
+                |    getSharedPreferences():SharedPreferencesImpl                                        |
+                |                                                                                        |
+                |    getSharedPreferencesCacheLocked()                                                   |
+                |         :ArrayMap<File, SharedPreferencesImpl>                                         |
+                |                                                                                        |
+                +----------------------------------------------------------------------------------------+
+                |   SharedPreferencesImpl             mMap:Map<String, Object>        enqueueDiskWrite() |
+                |           makeBackupFile():File     edit():EditorImpl               writeToFile()      |
+                |           loadFromDisk()                                                               |
+                |                             +----------------------------------------------------------+
+                |                             | EditorImpl:Editor                                        |
+                |                             |    mModified:Map<String, Object>   mEditorLock:Object    |
+                |                             |    apply()                         mModified             |
+                |                             |    commit()                         :Map<String, Object> | 
+                |                             |                                                          |
+                |                             | commitToMemory():MemoryCommitResult                      |
+                |                             | mListeners                                               |
+                |                             |   :WeakHashMap<OnSharedPreferenceChangeListener, Object> |
+                +----------------------------------------------------------------------------------------+
+                |XmlUtils                     |                                                          |
+                |  readMapXml()               |     MemoryCommitResult                                   |
+                +-----------------------------+          writtenToDiskLatch //commit() wait return       |
+                |Xml                          |                                                          |
+                |  newPullParser():KXmlParser |                                                          |
+                +-----------------------------+                                                          |
+                | KXmlParser: XmlPullParser   |                                                          |
+                ------------------------------+----------------------------------------------------------+
+
+
+```
+
+####  MMKV for Android “零拷贝问题” -  sharepreference优化
+mmap（微信mars，美图logan，网易）
+## 进程间通讯
+###  IPC机制与方法 
+1. 1940 年，计算机存储中就使用了"文件"。
+2. 1961 年，由Buroughs MCP和麻省理工学院兼容时间共享系统引入的"文件系统"的概念
+3. 1973年，管道被实现，Ken Thompson将管道添加到了UNIX操作系统。使用的记号(垂直线)
+    传统管道属于匿名管道，是计算机进程间的一种单工先进先出通信机制。
+    ❌ 只能在具有亲缘关系的进程间使用
+    ❌ 生存期不超过创建管道的进程的生存期
+    ❌ 不支持异步读、写操作
+4. 命名管道	被视为文件的管道。进程与使用匿名管道时那样使用标准输入和输出，而是从命名管道写入和读取，就像它是常规文件一样。
+   ⭐允许无亲缘关系进程间的通信
+5. 信号起源于20世纪70年代的贝尔实验室Unix。
+   通常不用于传输数据，而是用于远程命令合作伙伴进程。
+6. 1963年，Dijkstra提出了n个进程互斥算法（Dekker算法的泛化）信号量机制
+7. POSIX 还提供用于将文件映射到内存的 API;可以共享映射，允许将文件的内容用作共享内存。mmap
+   最快的 IPC 方式
+8. 消息队列类似于套接字的数据流，但通常保留消息边界。
+    ⭐克服了信号传递信息少、管道只能承载无格式字节流以及缓冲区大小受限等缺点
+9. 1983年8月4.2BSD，包含socket
+    ⭐不同主机，C/S架构
+10. 2005年，Linux 3.19版本集成 OpenBinder
+    ⭐安全性
+趋势：导向，传输数据量，C/S一对多架构，速度，安全性
+Linux中的RPC方式有管道，消息队列，共享内存等。（传统 pipe，无名管道fifo，信号；AT&T 信号量， 共享内存，消息队列；BSD 跨单机的socket）
+管道：**ls |grep "hello"** ls进程输出，输入到grep进程
+
+```
+pipe：
+process1 | process2 | process3
+ls -l | grep key | less
+
+```
+
+消息队列和管道采用存储-转发方式，即数据先从发送方缓存区拷贝到内核开辟的缓存区中，然后再从内核缓存区拷贝到接收方缓存区，这样就有两次拷贝过程。
+Binder一次拷贝原理(直接拷贝到目标线程的内核空间，内核空间与用户空间对应)。
+```java
+实用性(Client-Server架构)/传输效率(性能)/操作复杂度/安全性
+，并发，一对多
+                         +--------------+---------+------------------+
+                         |Intent/Bundle | Messager|  Content Provider|
+         +------------------------------+---------+-----------------------------------+-----------------+
+         |               |   AIDL    +-------------------------------+                |                 |
+         |               |           | byte, char, short, int, long, |                |                 |
+         |               |           | float, double, boolean        |                |                 |
+         |               |           | String, CharSequence          |                |                 |
+         |               |           | Parcelable                    |                |                 |
+         |               |           | List<>, Map<>                 |                |                 |
+         |               |           | interface                     |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | import Parcelable package     |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |           | in out inout                  |                |                 |
+         | SendFile      |           +-------------------------------+                |                 |
+         | MemoryFile    |           | oneway                        |                |                 |
+         |               |           +-------------------------------+                |                 |
+         |               |-------------------------------------------|                |                 |
+         | ashmem        |   read/write  Parcel                      |  pipe/fifo     |                 |
+         +-----------------------------------------------------------+  signal        |                 |
+         |               |                                           |  messagequeue  |  File           |
+         | Shared memory |   Binder                                  |  semaphore     | SharedPreference|
+         |               |                                           |  Socket        |                 |
+         +----------------------------------------------------------------------------------------------+
+copy     |      0        |                 1                         |       2                          |
+times    +---------------+-------------------------------------------+----------------+-----------------+
+
+应用安装器打开应用及应用安装器打开应用，第二次launcher打开应用
+{                                                                                {
+    "mAction": "android.intent.action.MAIN",                                         "mAction": "android.intent.action.MAIN",
+    "mCategories": [                                                                 "mCategories": [
+        "android.intent.category.LAUNCHER"                                               "android.intent.category.LAUNCHER"
+    ],                                                                               ],
+    "mComponent": {                                                                  "mComponent": {
+        "mClass": "com.example.proj.activity.SplashActivity",                              "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"                                                     "mPackage": "com.example.proj"
+    },                                                                               },
+    "mContentUserHint": -2,                                                          "mContentUserHint": -2,
+    "mFlags": 268435456,//10000000000000000000000000000  10000000                    "mFlags": 274726912,//10000011000000000000000000000  10600000 =10400000 |10200000 =
+    "mPackage": "com.example.proj"          //FLAG_ACTIVITY_BROUGHT_TO_FRONT/FLAG_RECEIVER_FROM_SHELL|FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+}                                                                                        "mSourceBounds": {
+                                                                                         "bottom": 395,
+                                                                                         "left": 540,
+                                                                                         "right": 800,
+                                                                                         "top": 120
+                                                                                     }
+                                                                                 }
+
+ 
+
+直接打开及直接打开第二次
+{
+    "mAction": "android.intent.action.MAIN",
+    "mCategories": [
+        "android.intent.category.LAUNCHER"
+    ],
+    "mComponent": {
+        "mClass": "com.example.proj.activity.SplashActivity",
+        "mPackage": "com.example.proj"
+    },
+    "mContentUserHint": -2,
+    "mFlags": 270532608,//10000001000000000000000000000 10200000 FLAG_ACTIVITY_RESET_TASK_IF_NEEDED/FLAG_RECEIVER_VISIBLE_TO_INSTANT_APPS
+    "mSourceBounds": {
+        "bottom": 395,
+        "left": 540,
+        "right": 800,
+        "top": 120
+    }
+}
+ 
+
+
+public class Intent implements Parcelable, Cloneable {
+    private String mAction;
+    private Uri mData;
+    private String mType;
+    private String mPackage;
+    private ComponentName mComponent;
+    private int mFlags;
+    private ArraySet<String> mCategories;
+    private Bundle mExtras;
+    private Rect mSourceBounds;
+    private Intent mSelector;
+    private ClipData mClipData;
+    private int mContentUserHint = UserHandle.USER_CURRENT;
+    /** Token to track instant app launches. Local only; do not copy cross-process. */
+    private String mLaunchToken;
+}
+public final class Messenger implements Parcelable {
+    private final IMessenger mTarget;
+}
+
+import android.os.Message;
+/** @hide */
+oneway interface IMessenger {
+    void send(in Message msg);
+}
+```
+
+```bash
+root@x86:/ # ls /dev/socket/
+adbd
+cryptd
+dnsproxyd
+fwmarkd
+installd
+lmkd
+logd
+logdr
+logdw
+mdns
+netd
+property_service
+rild
+rild-debug
+sap_uim_socket1
+vold
+wpa_eth1
+zygote// zygote socket通信设备文件
+
+```
+
+### Binder机制/通讯协议
+OpenBinder以及合入到Linux Kernel主线 3.19版本
+
+**序列化（Parcelable，Serializable）与通讯** Serializable->Parcelable->Binder->{AIDL,Messenger}
+
+Binder驱动不涉及任何外设，本质上只操作内存，负责将数据从一个进程传递到另外一个进程。
+[Binder机制分析](http://gityuan.com/2014/01/01/binder-gaishu/) 
+[Binder在java framework层的框架](http://gityuan.com/2015/11/21/binder-framework/)
+
+#### Linux Binder driver
+Binder定向制导
+Binder binder_proc结构体的四棵红黑树  ，threads，nodes，refs_by_desc，refs_by_node
+[](https://maoao530.github.io/2016/12/21/android-binder-01/)
+
+[](./知识体系-平台-Linux.md)
+#### IPCThreadState （client/server libs）
+系统调用 ioctl的 BINDER_WRITE_READ，BINDER_THREAD_EXIT
+存储结构 Parcel
+### servicemanager
+系统调用 open 打开驱动
+
+系统调用 ioctl的 BINDER_WRITE_READ，BINDER_SET_CONTEXT_MGR
+
+### system_server
+binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager（系统服务路由）,Binder驱动
+
+```java
+n：native
+p：proxy
+
++----------------+------------+--------------------------------------+-------------------------+
++----------------+------------+          java  layer  / JNI          |          Native         |frameworks/base/libs/utils
++----------------+------------+--------------------------------------+-------------------------+
+|                |            | Binder                BinderProxy    | +---------------------+ |              
+|                |            +--------------------------------------| |  AndroidRuntime.cpp | |       
+|                |  Client    |Android_util_Binder                   | |                     | |BpInterface/BnInterface
+|                |            |    JavaBBinderHolder    (BpBinder)   + |                     | |      
+|                |  process   |    JavaBBinder                       | |  IBinder IInterface | |   
+|                |            |android_os_Parcel                     | +                     | |BBinder/
+|                +---------------------------------------------------+ |  BpBinder           | |
+|                |            | Binder                               | |  ProcessState       | |   binder/binderproxy
+|                |            | BinderInternal                       | |  IPCThreadState     | | +-----------+
+|                |  Server    +--------------------------------------+ +                     + |             |
+|                |  process   |                                      | |                     | |             |
+|  user space    +---------------------------------------------------+ |---------------------+ |             |
+|                |            | ServiceManager                       | |                     | |             |
+|                | system     |          ServiceManagerNative        | |IserviceManager      | |             |   
+|                | service    |          ServiceManagerProxy         | |    BpServiceManager | |  binder(0)  |
+|                |            |                                      | |    BnServiceManager | | +------+    |    
+|                |            |                                      | +---------------------+ |        |    | 
+|                +------------+--------------------------------------+-------------------------+        |    |
+|                                                                         |     ^              |        |    |
+|                                                             getbinder0  v     |  findBinder  |        |    |
+|                +------------+----------------------------------------------------------------+        |    |
+|                |  Service   |  (handle id = 0)                                               |        v    v
+|                |  Manager   |  servicemanager/binder.c                                       |   +------------------+
+|                |  process   |  service_manager.c                                             |   |  open/mmap/ioctl |
++----------------+------------+----------------------------------------------------------------+   +------------------+
++----------------+------------+----------------------------------------------------------------+        |    |      
+|                |            |                                                                | <------+    |      
+|                |  Binder    |                                                                |             |      
+|  kernel space  |  Driver    |   drivers/staging/android/binder.c                             | <-----------+     
++----------------+------------+----------------------------------------------------------------+
+                                                                                  +       ^
+                                                                                  |       |
+                                                                                  v       +
+                                                                               +---------------+
+                                                                               |  kernel memory|
+                                                                               +---------------+
+java层->JNI层->libs/IPCThreadState ==> driver （binder_proc）==>servicemanager/server
+
+binder_write_read
+  read_buffer(servicemanager/binder_txn 或server)
+
+
+
+```
+
+#### AMS 栈管理（任务栈），启动模式，亲和度
+Activity的启动模式必不可少的要是launchMode、Flags、taskAffinity
+
+```java
+//ActivityStarter的启动模式代码阅读
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_INSTANCE;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TASK;
+import static android.content.pm.ActivityInfo.LAUNCH_SINGLE_TOP; 
+```
+
+ 
+ [ActivityStack](https://blog.csdn.net/guoqifa29/article/details/54863237)
+
+android N开始有5种窗口类型（窗口类型及ActivityType决定ActivityStack） ：
+全屏 FullScreenStack
+DockedStack（分屏Activity） configChanges:screenLayout   onMultiWindowModeChanged
+PinnedStack（画中画Activity）。PinnedStack非Focusable stack，处于paused状态，故无法接受key事件，也无法成为输入法焦点窗口
+freeformstack(自由模式  Activity) ：FreeForm Stack
+homeStack（launcher和recents Activity）和其他
+```java
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_HOME;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_RECENTS;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_STANDARD;
+import static android.app.WindowConfiguration.ACTIVITY_TYPE_UNDEFINED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FREEFORM;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN;
+import static android.app.WindowConfiguration.WINDOWING_MODE_FULLSCREEN_OR_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_PINNED;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_PRIMARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_SPLIT_SCREEN_SECONDARY;
+import static android.app.WindowConfiguration.WINDOWING_MODE_UNDEFINED;
+```
+
+
+ 桌面Launcher、任务栏Recents属于id=HOME_STACK的栈中。多窗口不仅仅是控制Activity放入不同ActivityStack中，同时还要改变Activity的生命周期，即Focus Activity是resume状态，其他可见Activity是Pause状态，并不会进入Stop状态
+
+```
+ActivityDisplay#0（一般只有一显示器） 
++--------------------------------------------------------------------------------------+
+| ActivityStack#0                                                                      |//不用类型（mHomeStack，mFocusedStack）
+|    +---------------------+                                                           |//区分ActivityStack
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |//亲和度（taskAffinity）区分TaskRecord
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
++--------------------------------------------------------------------------------------+
+| ActivityStack#1                                                                      |
+|    +---------------------+                                                           |
+|    | +----------------+  |      +---------------------+                              |
+|    | |ActivityRecord  |  |      |                     |                              |
+|    | +----------------+  |      |                     |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    | |ActivityRecord  |  |      | |ActivityRecord  |  |                              |
+|    | +----------------+  |      | +----------------+  |                              |
+|    +---------------------+      +---------------------+                              |
+|    +---------------------+      +---------------------+                              |
+|    |  TaskRecord#0       |      | TaskRecord#1        |                              |
+|    +---------------------+      +---------------------+                              |
++--------------------------------------------------------------------------------------+
+
+
+
+
+```
+
+
+[四大组件的管理](http://gityuan.com/2017/05/19/ams-abstract/)
+[Activity启动模式](gityuan.com/2017/06/11/activity_record/)
+
+```
++------------+-----------------------+------------------------------+
+|            |                       |newIntent()|taskAffinity      |
+|            +------------------------------------------------------+
+|            |        standard       |           |                  |
+|            +------------------------------------------------------+
+|            |        singleTop      |   √       |                  |
+| launch mode+------------------------------------------------------+
+|            |        singleTask     |   √       |choice  TaskRecord|
+|            +------------------------------------------------------+
+|            |        singleInstance |   √       |                  |
++-------------------------------------------------------------------+
+|  Flags     | FLAG_ACTIVITY_NEW_TASK|           |choice TaskRecord |
++-------------------------------------------------------------------+
+|            |   allowTaskReparenting|           |change to affinity task|
++------------+------------------------------------------------------+
+FLAG_ACTIVITY_NEW_TASK
+在google的官方文档中介绍，它与launchMode="singleTask"具有相同的行为。实际上，并不是完全相同！
+很少单独使用FLAG_ACTIVITY_NEW_TASK，通常与FLAG_ACTIVITY_CLEAR_TASK或FLAG_ACTIVITY_CLEAR_TOP联合使用。因为单独使用该属性会导致奇怪的现象，通常达不到我们想要的效果！尽管如何，后面还是会通过"FLAG_ACTIVITY_NEW_TASK示例一"和"FLAG_ACTIVITY_NEW_TASK示例二"会向你展示单独使用它的效果。
+
+FLAG_ACTIVITY_SINGLE_TOP
+在google的官方文档中介绍，它与launchMode="singleTop"具有相同的行为。实际上，的确如此！单独的使用FLAG_ACTIVITY_SINGLE_TOP，就能达到和launchMode="singleTop"一样的效果。
+
+FLAG_ACTIVITY_CLEAR_TOP
+顾名思义，FLAG_ACTIVITY_CLEAR_TOP的作用清除"包含Activity的task"中位于该Activity实例之上的其他Activity实例。FLAG_ACTIVITY_CLEAR_TOP和FLAG_ACTIVITY_NEW_TASK两者同时使用，就能达到和launchMode="singleTask"一样的效果！
+
+FLAG_ACTIVITY_CLEAR_TASK
+FLAG_ACTIVITY_CLEAR_TASK的作用包含Activity的task。使用FLAG_ACTIVITY_CLEAR_TASK时，通常会包含FLAG_ACTIVITY_NEW_TASK。这样做的目的是启动Activity时，清除之前已经存在的Activity实例所在的task；这自然也就清除了之前存在的Activity实例！
+```
+
+android:noHistory： “true”值意味着Activity不会留下历史痕迹。比如启用界面的就可以借用这个。
+android:alwaysRetainTaskState触发时机在系统清理后台Task，且Activity实例为根Activity时。 
+android:finishOnTaskLaunch Task重新启动时(比如桌面上点击某一个应用图标)，会销销毁此Task中的该Activity实例。
+android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
+
+
+单任务无法内存回收。多任务，内存回收
+```
+单栈的进程，Activity跟进程声明周期一致
+多栈的，只有不可见栈的Activity可能被销毁（Java内存超过3/4,不可见）
+该回收机制利用了Java虚拟机的gc机finalize(ActivityThread->BinderInternal.addGcWatcher)
+至少两个TaskRecord占才有效，所以该机制并不激进，因为主流APP都是单栈。
+```
+
+###### Configuration
+![蓝牙连接手持按键](configuration.png)
+
+
+configuration 配置后，走onRestart；没配置走onDestroy
+```java 
+android 7 Configuration.java
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder(128);
+        sb.append("{");
+        sb.append(fontScale);
+        sb.append(" ");
+        if (mcc != 0) {
+            sb.append(mcc);
+            sb.append("mcc");
+        } else {
+            sb.append("?mcc");
+        }
+        if (mnc != 0) {
+            sb.append(mnc);
+            sb.append("mnc");
+        } else {
+            sb.append("?mnc");
+        }
+        fixUpLocaleList();
+        if (!mLocaleList.isEmpty()) {
+            sb.append(" ");
+            sb.append(mLocaleList);
+        } else {
+            sb.append(" ?localeList");
+        }
+        int layoutDir = (screenLayout&SCREENLAYOUT_LAYOUTDIR_MASK);
+        switch (layoutDir) {
+            case SCREENLAYOUT_LAYOUTDIR_UNDEFINED: sb.append(" ?layoutDir"); break;
+            case SCREENLAYOUT_LAYOUTDIR_LTR: sb.append(" ldltr"); break;
+            case SCREENLAYOUT_LAYOUTDIR_RTL: sb.append(" ldrtl"); break;
+            default: sb.append(" layoutDir=");
+                sb.append(layoutDir >> SCREENLAYOUT_LAYOUTDIR_SHIFT); break;
+        }
+        if (smallestScreenWidthDp != SMALLEST_SCREEN_WIDTH_DP_UNDEFINED) {
+            sb.append(" sw"); sb.append(smallestScreenWidthDp); sb.append("dp");
+        } else {
+            sb.append(" ?swdp");
+        }
+        if (screenWidthDp != SCREEN_WIDTH_DP_UNDEFINED) {
+            sb.append(" w"); sb.append(screenWidthDp); sb.append("dp");
+        } else {
+            sb.append(" ?wdp");
+        }
+        if (screenHeightDp != SCREEN_HEIGHT_DP_UNDEFINED) {
+            sb.append(" h"); sb.append(screenHeightDp); sb.append("dp");
+        } else {
+            sb.append(" ?hdp");
+        }
+        if (densityDpi != DENSITY_DPI_UNDEFINED) {
+            sb.append(" "); sb.append(densityDpi); sb.append("dpi");
+        } else {
+            sb.append(" ?density");
+        }
+        switch ((screenLayout&SCREENLAYOUT_SIZE_MASK)) {
+            case SCREENLAYOUT_SIZE_UNDEFINED: sb.append(" ?lsize"); break;
+            case SCREENLAYOUT_SIZE_SMALL: sb.append(" smll"); break;
+            case SCREENLAYOUT_SIZE_NORMAL: sb.append(" nrml"); break;
+            case SCREENLAYOUT_SIZE_LARGE: sb.append(" lrg"); break;
+            case SCREENLAYOUT_SIZE_XLARGE: sb.append(" xlrg"); break;
+            default: sb.append(" layoutSize=");
+                    sb.append(screenLayout&SCREENLAYOUT_SIZE_MASK); break;
+        }
+        switch ((screenLayout&SCREENLAYOUT_LONG_MASK)) {
+            case SCREENLAYOUT_LONG_UNDEFINED: sb.append(" ?long"); break;
+            case SCREENLAYOUT_LONG_NO: /* not-long is not interesting to print */ break;
+            case SCREENLAYOUT_LONG_YES: sb.append(" long"); break;
+            default: sb.append(" layoutLong=");
+                    sb.append(screenLayout&SCREENLAYOUT_LONG_MASK); break;
+        }
+        switch (orientation) {
+            case ORIENTATION_UNDEFINED: sb.append(" ?orien"); break;
+            case ORIENTATION_LANDSCAPE: sb.append(" land"); break;
+            case ORIENTATION_PORTRAIT: sb.append(" port"); break;
+            default: sb.append(" orien="); sb.append(orientation); break;
+        }
+        switch ((uiMode&UI_MODE_TYPE_MASK)) {
+            case UI_MODE_TYPE_UNDEFINED: sb.append(" ?uimode"); break;
+            case UI_MODE_TYPE_NORMAL: /* normal is not interesting to print */ break;
+            case UI_MODE_TYPE_DESK: sb.append(" desk"); break;
+            case UI_MODE_TYPE_CAR: sb.append(" car"); break;
+            case UI_MODE_TYPE_TELEVISION: sb.append(" television"); break;
+            case UI_MODE_TYPE_APPLIANCE: sb.append(" appliance"); break;
+            case UI_MODE_TYPE_WATCH: sb.append(" watch"); break;
+            default: sb.append(" uimode="); sb.append(uiMode&UI_MODE_TYPE_MASK); break;
+        }
+        switch ((uiMode&UI_MODE_NIGHT_MASK)) {
+            case UI_MODE_NIGHT_UNDEFINED: sb.append(" ?night"); break;
+            case UI_MODE_NIGHT_NO: /* not-night is not interesting to print */ break;
+            case UI_MODE_NIGHT_YES: sb.append(" night"); break;
+            default: sb.append(" night="); sb.append(uiMode&UI_MODE_NIGHT_MASK); break;
+        }
+        switch (touchscreen) {
+            case TOUCHSCREEN_UNDEFINED: sb.append(" ?touch"); break;
+            case TOUCHSCREEN_NOTOUCH: sb.append(" -touch"); break;
+            case TOUCHSCREEN_STYLUS: sb.append(" stylus"); break;
+            case TOUCHSCREEN_FINGER: sb.append(" finger"); break;
+            default: sb.append(" touch="); sb.append(touchscreen); break;
+        }
+        switch (keyboard) {
+            case KEYBOARD_UNDEFINED: sb.append(" ?keyb"); break;
+            case KEYBOARD_NOKEYS: sb.append(" -keyb"); break;
+            case KEYBOARD_QWERTY: sb.append(" qwerty"); break;
+            case KEYBOARD_12KEY: sb.append(" 12key"); break;
+            default: sb.append(" keys="); sb.append(keyboard); break;
+        }
+        switch (keyboardHidden) {
+            case KEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case KEYBOARDHIDDEN_NO: sb.append("/v"); break;
+            case KEYBOARDHIDDEN_YES: sb.append("/h"); break;
+            case KEYBOARDHIDDEN_SOFT: sb.append("/s"); break;
+            default: sb.append("/"); sb.append(keyboardHidden); break;
+        }
+        switch (hardKeyboardHidden) {
+            case HARDKEYBOARDHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case HARDKEYBOARDHIDDEN_NO: sb.append("/v"); break;
+            case HARDKEYBOARDHIDDEN_YES: sb.append("/h"); break;
+            default: sb.append("/"); sb.append(hardKeyboardHidden); break;
+        }
+        switch (navigation) {
+            case NAVIGATION_UNDEFINED: sb.append(" ?nav"); break;
+            case NAVIGATION_NONAV: sb.append(" -nav"); break;
+            case NAVIGATION_DPAD: sb.append(" dpad"); break;
+            case NAVIGATION_TRACKBALL: sb.append(" tball"); break;
+            case NAVIGATION_WHEEL: sb.append(" wheel"); break;
+            default: sb.append(" nav="); sb.append(navigation); break;
+        }
+        switch (navigationHidden) {
+            case NAVIGATIONHIDDEN_UNDEFINED: sb.append("/?"); break;
+            case NAVIGATIONHIDDEN_NO: sb.append("/v"); break;
+            case NAVIGATIONHIDDEN_YES: sb.append("/h"); break;
+            default: sb.append("/"); sb.append(navigationHidden); break;
+        }
+        if (seq != 0) {
+            sb.append(" s.");
+            sb.append(seq);
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
+```
+##### 发送广播出现权限问题
+```java
+java.lang.SecurityException: Permission Denial: not allowed to send broadcast android.intent.action.TIME_SET from pid=4404, uid=10033
+
+1. 查找位置：
+grep -irn 'Permission\ Denial:\ not\ allowed\ to\ send\ broadcast'
+
+>base/services/core/java/com/android/server/am/ActivityManagerService.java:17701: 
+
+2. 定位代码
+isProtectedBroadcast = AppGlobals.getPackageManager().isProtectedBroadcast(action);
+
+3. PMS 查找代码
+
+    @Override
+    public boolean isProtectedBroadcast(String actionName) {
+        synchronized (mPackages) {
+            if (mProtectedBroadcasts.contains(actionName)) {
+                return true;
+            } else if (actionName != null) {
+                // TODO: remove these terrible hacks
+                if (actionName.startsWith("android.net.netmon.lingerExpired")
+                        || actionName.startsWith("com.android.server.sip.SipWakeupTimer")
+                        || actionName.startsWith("com.android.internal.telephony.data-reconnect")
+                        || actionName.startsWith("android.net.netmon.launchCaptivePortalApp")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+grep -irn --include="*.xml" 'protected-broadcast android:name="android.intent.action.TIME_SET'
+base/core/res/AndroidManifest.xml:32:    <protected-broadcast android:name="android.intent.action.TIME_SET" />
+```
+#### WindowManager
+Type 窗口分为应用窗口，子窗口和系统窗口,优先级根据Type定义，如TYPE_SYSTEM_DIALOG
+
+PhoneWindow 迪米特法则，委托，帮助Activity管理View初始化过程，添加DecorView，
+ViewRootImpl：用于处理View 添加窗口到WMS，绘制，事件分发。
+          WMS调用mWindowMap.put(client.asBinder(), win);，保证可以和应用可以通讯，窗口才正在attach到屏幕，Activity才是Running状态
+
+PopupWindow 与 Dialog 的 Show() 方法后就不会出现 "is your activity running ?"。
+再onResume后 post显示 ,保证 Activity 执行 wm.addView(decor, l); token被 put 到 map 中,其后调用。wms调用addWindow
+在2s内退出 Activity，要进行判断是否 isFinishing()
+
+
+#### 其他组件 View ，controls,layouts
+
+``` 
+SystemUI（Statusbar）
++-----------------------------------+
+|               Activity            |
+|  +-----------------------------+  |
+|  |       Phone Window          |  |
+|  |   +---------------------+   |  |
+|  |   |     DecorView       |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  |TitleView +---------------->+ActionBarContainer+--->+ ActionBar |
+|  |   |  |  +----------+ |  |   |  |     +------------------+    +-----------+
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  | Content  | |  |   |  |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |   View   +---------------->+ FrameLayout      |
+|  |   |  |  |          | |  |   |  |     +------------------+
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  |          | |  |   |  |
+|  |   |  |  +----------+ |  |   |  |
+|  |   |  +---------------+  |   |  |
+|  |   +---------------------+   |  |
+|  |                             |  |
+|  +-----------------------------+  |
++-----------------------------------+
+SystemUI（NavigateUI）
+
+
+Toolbar
++-------------+------------+------------+------------------------------+-------------------------+ 
+|             |            |   Title    |                              |                         |
+|  NavImageBtn|   Logo     |            |   CustomView                 |      ActionMenuView     |
+|             |            +------------+                              |                         |
+|             |            |   subTitle |                              |                         | 
++-------------+------------+------------+------------------------------+-------------------------+
+
+```
+ 
+
+##### WMS 窗口动画动画事件 
+[动画天梯榜](https://zhuanlan.zhihu.com/p/45597573?utm_source=androidweekly.io&utm_medium=website)
+```
+ +-------------+-------------------------------+------------------+-------------------+-------------------+
+ |  layout     |                               | request layout   |  requestLayout()  |  target          |
+ |  Animation  |                               |                  |  draw Command     |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |Drawble/Frame|   webp/gif                    |                  |                   |                   |
+ | Animation   |                               |                  |                   |                   |
+ +---------------------------------------------+  invalidate draw |  draw command     |   views           |
+ |             |   draw() + invalidate()       |                  |                   |                   |
+ |  Draw       +-------------------------------+                  |                   |                   |
+ |  Animation  |                               |                  |                   |                   |
+ |             |   computeScroll()+invalidate()|                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  View/Tween |  translate/rotate/scale/alpha |  parent          |  View Property    |    views          |
+ |  Animation  |  Fragment compat Transition   |  Render Node     |                   |alpha,matrix(translate,scale,rotate)|
+ +------------------------------------------------------------------------------------+-------------------+
+ |             |   View.animate()              |                  |                   |                   |
+ |  Animator   |                               |                  |                   |    objects        |
+ |             |   offsetChildrenTopAndBottom  |  Render Property |  View Property    |                   |
+ |             |   ActivityOptions Transition  |                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  Render     |   AnimatedVectorDrawable      |                  |                   |                   |
+ |  Thread     |   RippleComponet              |  Inter-Process   | view property     |                   |
+ |  Amimation  |   Revel Animation             |                  |                   |                   |
+ +------------------------------------------------------------------------------------+-------------------+
+ |  Window     |                               | SystemServer     |                   |                   |
+ |  Transition |   Window Transition Animation | WindowManager    | some view property|                   |
+ |  Animation  |                               |                  |                   |                   |
+ +-------------+-------------------------------+------------------+-------------------+-------------------+
+
+```
+
+插值器是时间的函数，定义了动画的变化规律
+
+- 补间动画  Animation（Rotate,Scale,translate,alpha）
+  动画的数据（Transformation/alpha,matrix/），计算（插值器），绘制，回调
+
+```java
+计算，回调
+  +android.view.View#draw(android.graphics.Canvas, android.view.ViewGroup, long)
+    +android.view.View#applyLegacyAnimation
+[插值器](http://cogitolearning.co.uk/2013/10/android-animations-tutorial-5-more-on-interpolators/)
+绘制
+canvas.concat(transformToApply.getMatrix());或
+renderNode.setAnimationMatrix(transformToApply.getMatrix());
+```
+
+   箭头动画
+   启动图片放大动画
+   弹窗动画
+ 
+
+ 
+
+- 逐帧动画 AnimationDrawable
+     烟花效果
+```java
+     AnimationDrawable.start()
+    +android.graphics.drawable.Drawable#scheduleSelf
+        +android.view.View#scheduleDrawable //mChoreographer.postCallbackDelayed( Choreographer.CALLBACK_ANIMATION...)
+```
+- 属性动画 Animator
+补间动画，动画作用目标单一，动画类型少，View只有绘制，属性没有改变
+  动画的数据（ValueAnimator#PropertyValuesHolder[]），计算（插值器），绘制，回调
+
+```java
+ValueAnimator,ObjectAnimator
+
+
+    +android.animation.ValueAnimator#start(boolean)
+          +android.animation.AnimationHandler#addAnimationFrameCallback// Choreographer#postCallbackDelayedInternal(CALLBACK_ANIMATION
+          +android.animation.ValueAnimator#addAnimationCallback //垂直同步回调
+          +android.animation.ValueAnimator#doAnimationFrame   //计算数据     
+          +android.animation.ValueAnimator#doAnimationFrame   //计算数据   
+          +android.animation.ValueAnimator#animateBasedOnTime
+          +android.view.ViewPropertyAnimator.AnimatorEventListener#onAnimationUpdate//mView.invalidateParentCaches(); 或更新RenderNode ,
+public class View implements Drawable.Callback, KeyEvent.Callback,
+        AccessibilityEventSource {
+    /**
+     * Object that handles automatic animation of view properties.
+     */
+    private ViewPropertyAnimator mAnimator = null;
+}
+```
+估值器自定义滑动效果
+插值器（Interpolator）和估值器（TypeEvaluator）
+
+- 窗口转场
+  [窗口转场](https://www.jianshu.com/p/c3217053d18d)
+  +com.android.server.wm.WindowManagerService#relayoutWindow
+        +com.android.server.wm.WindowManagerService#windowForClientLocked(com.android.server.wm.Session, IWindow, boolean)
+        +com.android.server.wm.WindowState#prepareWindowToDisplayDuringRelayout
+1. Viewpager转化动画
+
+2. Camera 3D动画
+3. AR沉浸式效果（ARCore）
+##### NMS( NotificationManagerService) 
+**通知**是一个可以在应用程序正常的用户界面之外显示给用户的消息。
+
+```java
+
+public class NotificationManagerService extends SystemService {
+    private final IBinder mService = new INotificationManager.Stub();
+    private WorkerHandler mHandler;
+}
+}
+
+ protected class NotificationListenerWrapper extends INotificationListener.Stub {
+```
+**NotificationListenerService** 获取系统通知相关信息，主要包含：通知的新增和删除，获取当前通知数量，通知内容相关信息
+NotificationManager/nofitycation
+```
++-----------------------------------+         +-------------------------------------+
+|  SystemServer                     |         |  SystemUI(App process)              |
+|                                   |         |                                     |
+|                                   |         |                                     |
+|       +-------------------------+ |         |   +-------------------------+       |
+|       | NMS                     | |         |   | NotificationListener    |       |
+|       |                         | |         |   |                         |       |
+|       |   sound/vibrate/LIGHTS  | |         |   |                         +----+  |
+|       |                         | |         |   |                         |    |  |
+|       |   INotificationListener +<---------------->  onBind(Intent intent)|    |  |
+|       |                         | |         |   |                         |    |  |
+|       +-------------------------+ |         |   +-------------------------+    |  |
+|                                   |         |   +---------------------------+  |  |
+|                                   |         |   | NotificationEntryManager  |  |  |
+|                                   |         |   |       NotificationPanel   | <+  |
+|                                   |         |   |       Heads-up            |     |
+|                                   |         |   |       NotificationClicker |     |
+|                                   |         |   +---------------------------+     |
++-----------------------------------+         +-------------------------------------+
+
+```
+[SystemUI应用启动](https://www.jianshu.com/p/2e0f403e5299)
+```
+Status Bar状态栏信息显示，比如电池，wifi信号，3G/4G等icon显示
+Notification Panel 通知面板，比如系统消息，第三方应用消息
+Recents 近期任务栏显示面板，比如长按近期任务快捷键，显示近期使用的应用
+NavigationBar（导航栏）
+Keyguard（锁屏界面）
+Screenshot截图服务
+壁纸服务
+VolumeUI 音量调节对话框
+PowerUI 电源界面
+Ringtoneplayer 铃声播放器页面
+
+android 7.0:
+StackDriver分屏功能调节器
+PipUI画中画界面
+```
+
+ 
+##### InputManagerService
+
+
+```java
+public class ActivityStackSupervisor extends ConfigurationContainer implements DisplayListener,
+        RecentTasks.Callbacks {
+    private final SparseArray<ActivityDisplay> mActivityDisplays = new SparseArray<>();
+        
+}
+
+```
+
+ 
+```
++-----------------------------------------------------------------------------------------+
++------------------------------+           +----------------------------------------------+
+|  App process                 |           | SystemServer IMS         +-----------------+ |
+|                              |           |                          |  InputReader    | |
+|                              |           |                          | +------+        | |
+|  +---------------------------+           +--------------------+     | |input |        | |
+|  |  ViewRootImpl             |           | InputDispatcher    |     | |mapper|        | |
+|  |  +------------------------+           +------------------+ |     | +------+        | |
+|  |  |  InputEventReceiver    |           | InputPublisher   | |     |      +--------+ | |
+|  |  |    +-------------------+  socket   +---------------+  | |     |      |eventhub| | |
+|  |  |    |   InputChannel    | <------>  | Inputchannel  |  | |     |      +--------+ | |
+|  |  |    |                   |(low api pipe)|            |  | |     +-----------------+ |
++--+--+----+-------------------+-----------+---------------+--+-+-------------------------+
+                                                                                 |  ^
+                                                                     Linux epoll |  | inotify
+                                                                                 v  |
+                                                                       ----------+--+-----+
+                                                                       | /dev/input/event |event driver
+                                                                       +------------------+
+
+```
+
+```java
+android.view.ViewRootImpl.WindowInputEventReceiver extends InputEventReceiver{
+    
+}
+
+
+public abstract class InputEventReceiver {
+    private final CloseGuard mCloseGuard = CloseGuard.get();
+
+    private long mReceiverPtr;
+
+    // We keep references to the input channel and message queue objects here so that
+    // they are not GC'd while the native peer of the receiver is using them.
+    private InputChannel mInputChannel;
+    private MessageQueue mMessageQueue;
+
+    // Map from InputEvent sequence numbers to dispatcher sequence numbers.
+    private final SparseIntArray mSeqMap = new SparseIntArray();
+
+}
+```
+
+
+[事件](https://blog.csdn.net/shareus/article/details/50763237)
+[Touch事件](http://gityuan.com/2016/12/10/input-manager/)
+```java
+public final class MotionEvent extends InputEvent implements Parcelable {
+    private long mNativePtr;
+    private MotionEvent mNext;
+
+    protected int mSeq;
+    /** @hide */
+    protected boolean mRecycled;
+    private RuntimeException mRecycledLocation;
+
+}
+```
+事件传递由 **Activity#dispatchTouchEvent**开始，有PhoneWindow传到Decorview进行遍历
+```
+                                    +-------------------------+        +-----------------+
+                                    |        Activity         |        | ACTION_DOWN     |
+                                    |  +------------------+   |  <---+ |                 |
+              +---------------------+  |dispatchTouchEvent|   |        +-----------------+
+              |                     |  |                  |   |
+              |            +------> |  +------------------+   |
+              |            | True   |                         |
+              |            |        |  +------------------+   |
+              |            |        |  |onTouchEvent      |   |
+              |            +----->  |  |                  |   |
+              |            | False  |  +------------------+   |
+              |            |        +-------------------------+
+              |            |
+              |            |                        True
+              v            |             +---------------------------------+
+                           |             |                                 |
+       +-------------------+-------+     |                     +-----------+-----------------+
+       |         ViewGroup         |     |                     |          View               |
+       |    +-----------------+    |     |                     |     +-----------------+     |
++----> | +--+dispatchTouchEvent    |     |             +-----> |  +--+dispatchTouchEvent <-+ |
+|      | |  |                 +    | <---+             |       |  |  |                 |   | |
+|      | |  +-----------------+    |                   |       |  |  +-----------------+   | | True
+|      | |                         |            False  |       |  |                        | |
++----+ | |  +-----------------+    |                   |       |  |  +-----------------+   | |
+       | +> |onIntercept      |    |                   |       |  |  |onTouchEvent     |   | |
+       |    |TouchE^ent       |  +---------------------+       |  +> |                 | +-+ |
+       |    +-----------------+    |                           |     +-----------------+     |
+       |                           |                           |                             |
+       |    +-----------------+    |                           |                             |
+       |    |onTouchEvent     |    |                           |                             |
+       |    |                 |    |                           |                             |
+       |    +-----------------+    |                           |                             |
+       +---------------------------+                           +-----------------------------+
+
+
+```
+ 
+#### PackageManager 静默安装
+```java
+小于Android 5      通过IPackageInstallObserver进行跨进程通信
+                    1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
+                    2.2 base/core/java/android/app/ContextImpl.java:1638:    static final class ApplicationPackageManager extends PackageManager {
+                    4.4 base/core/core/java/android/app/ApplicationPackageManager.java:61:final class ApplicationPackageManager extends PackageManager {
+Android 5（api21） 调用PackageManager#installPackage(Uri.class,android.app.PackageInstallObserver.int.class,String.class)；
+                      通过PackageInstallObserver的binder（IPackageInstallObserver2）进行进程间通信
+                     base/core/java/android/app/ApplicationPackageManager.java:78:final class ApplicationPackageManager extends PackageManager {
+Android 7.0（api24）（和5.0 通用的方法可行） 调用PackageManager#installPacakageAsUser
+                  base/core/java/android/app/ApplicationPackageManager.java:98:public class ApplicationPackageManager extends PackageManager
+Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，PackageInstaller.Session写入pms,广播接收通知
+                  base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
+
+```
+##### apk安装过程/应用进程创建过程/应用安装过程
+[Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
+- [安装](http://gityuan.com/2016/11/13/android-installd/)
+
+- 运行时权限
+```
++----------------------------------------------------------------------------------w---+
+|                                                                                     |
+|                                                                                     |
++----------+-------+----------+---------+------------+-------+---------+----+---------+
+| CALENDAR |CAMERA | CONTACTS | LOCATION| MICROPHONE | PHONE | SENSORS | SMS| STORAGE |
++----------+-------+----------+---------+------------+-------+---------+----+---------+
+
+```
+- hind api
+
+##### Resource Manager
+
+```
++--------------------------------------------+
+|   App                                      |
+|   +--------------------------------------+ |
+|   |  Resource                            | |
+|   |     AssetManager                     | |
+|   |     DisplayMetrics                   | |
+|   |     Configuration                    | |
+|   |     DisplayAdjustments               | |
+|   +--------------------------------------+ |
++--------------------------------------------+
+
+```
+
+APK文件中有一个文件resource.arsc。这个文件存放的是APK中资源的ID和资源类型，属性，文件名的读经关系表和所有的字符串，装载APK，就是解析该文件生成ResRTable对象
+
+
+```
++----------+-------------+-----------+----------+----------------
+|          |  make dirs  | compile   |   R.java |  access       |
++---------------------------------------------------------------+
+|  assets  |      √      |  x        |     x    | AssetManager  |
+|          |             |           |          |               |
++---------------------------------------------------------------+
+|  res/raw |      x      |  √        |     √    | Resource      |
+|          |             |           |          |               |
++----------+-------------+-----------+----------+---------------+
+
+
+```
+Dex加固
+```
+    +--------------------------------+
+    |  APK                           |
+    |         +----------------------+
+    |         | Assets               |
+    |         |         shell dex    |
+    |         |                      |
+    |         +----------------------+
+    |                                |
+    |                  Unpack dex    |
+    +--------------------------------+
+```
+脱壳dex文件的作用主要有两个，一个是解密加密后的dex文件；二是基于dexclassloader动态加载解密后的dex文件 
+#### SystemServer - LocationManagerService
+```java
+public class LocationManagerService extends ILocationManager.Stub { 
+}
+```
+
+#### SystemServer - mediaserver
+### SystemUI
+
+
+QuickStatusBarHeader
+  quick_status_bar_expanded_header.xml
+  QuickStatusBarHeader（system_icons.xml）
+    BluetoothLayout
+    BatteryMeterLayout
+```
+
+com.android.systemui.statusbar.CommandQueue#mHandler 接收消息
+com.android.systemui.statusbar.phone.PhoneStatusBarPolicy#mIntentReceiver 
+
+
+statusbar 隐藏原生图标
+com.android.systemui.statusbar.phone.StatusBarIconController.IconManager
+com.android.systemui.statusbar.StatusBarIconView
+
+```
+SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
+- stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
+
+其他进程,状态栏系统图标（蓝牙，WiFi）
+- ![其他进程,状态栏图标](其他进程,状态栏图标.png)
+获取系统图标
+```java
+com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
+```
+##### SystemUI启动的子服务
+systemservice
+zygote ->systemserver -ams-> systemui
+```java
+private final Class<?>[] SERVICES = new Class[] {
+            com.android.systemui.tuner.TunerService.class, //⭐定制状态栏服务
+            com.android.systemui.keyguard.KeyguardViewMediator.class,//⭐锁屏模块
+            com.android.systemui.recents.Recents.class,//最近应用
+            com.android.systemui.volume.VolumeUI.class,//全局音量控制
+            com.android.systemui.statusbar.SystemBars.class,//⭐系统状态栏
+            com.android.systemui.usb.StorageNotification.class,//⭐Storage存储通知
+            com.android.systemui.power.PowerUI.class,//电量管理相关
+            com.android.systemui.media.RingtonePlayer.class,//铃声播放
+            com.android.systemui.keyboard.KeyboardUI.class,//键盘相关
+};
+```
+##### SystemBars 三个常见界面
+StatusBarService 管理界面
+
+PhoneStatusBarView（状态栏）
+  status_bar_contents
+    notification_icon_area（外设）
+      notification_icon_area_inner
+        moreIcon
+        notificationIcons
+  system_icon_area
+    include_system_icons.xml
+      statusIcons（蓝牙）
+      signal_cluster_view（SIM卡）
+      battery(电量)
+    clock（时间）
+
+PanelHolder（下拉窗）
+  StatusBarHeaderView
+  NotifacationQuickSettingsContainer
+
+keyguardbouncer（解锁界面）
+#### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
+##### WIFI
+ 
+adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
+adb shell am start com.android.settings/com.android.settings.Settings
+adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
+
+
+```java
+  this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
+    mWifiManager.getWifiApState();
+ 
+    java.lang.IllegalStateException: java.io.IOException: Failed to parse network stats
+        at com.android.server.NetworkManagementService.getNetworkStatsUidDetail(NetworkManagementService.java:1877)
+        at com.android.server.net.NetworkStatsService.getNetworkStatsUidDetail(NetworkStatsService.java:1619)
+        at com.android.server.net.NetworkStatsService.recordSnapshotLocked(NetworkStatsService.java:1204)
+        at com.android.server.net.NetworkStatsService.performPollLocked(NetworkStatsService.java:1294)
+        at com.android.server.net.NetworkStatsService.updateIfacesLocked(NetworkStatsService.java:1108)
+        at com.android.server.net.NetworkStatsService.updateIfaces(NetworkStatsService.java:1084)
+        at com.android.server.net.NetworkStatsService.forceUpdateIfaces(NetworkStatsService.java:862)
+        at com.android.server.ConnectivityService.notifyIfacesChangedForNetworkStats(ConnectivityService.java:5793)
+        at com.android.server.ConnectivityService.disconnectAndDestroyNetwork(ConnectivityService.java:2499)
+        at com.android.server.ConnectivityService.updateNetworkInfo(ConnectivityService.java:5651)
+        at com.android.server.ConnectivityService.access$1500(ConnectivityService.java:198)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.maybeHandleNetworkAgentMessage(ConnectivityService.java:2203)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.handleMessage(ConnectivityService.java:2342)
+        at android.os.Handler.dispatchMessage(Handler.java:106)
+        at android.os.Looper.loop(Looper.java:193)
+        at android.os.HandlerThread.run(HandlerThread.java:65)
+
+
+ @hide，不对外开放，但通过revoke机制调用到。
+    getWifiApState
+    setWifiApEnabled
+    getWifiApConfiguration
+    isWifiApEnabled
+
+
+  
+```
+
+SSI 更新改为 30s
+
+```java
+WIFI 连接文案 frameworks\base\packages\SettingsLib\src\com\android\settingslib\wifi\AccessPoint.java
+base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
+
+```
+
+```java
+设置热点
+WifiManager.getConfiguredNetworks() //获取配置好的网络
+mWifiManager.getScanResults()       //获取扫描到的网络，可能包含配置好的网络
+ScanResult.SSID //某个WiFi热点名称
+
+
+    public void refresh() {
+        if (mForSavedNetworks) {
+            setTitle(mAccessPoint.getConfigName());//mConfig.providerFriendlyName
+        } else {
+            setTitle(mAccessPoint.getSsid());
+        }
+
+
+        setSummary(mForSavedNetworks ? mAccessPoint.getSavedNetworkSummary()
+                : mAccessPoint.getSettingsSummary());
+
+        mContentDescription = getTitle();
+        if (getSummary() != null) {
+            mContentDescription = TextUtils.concat(mContentDescription, ",", getSummary());
+        }
+        if (level >= 0 && level < WIFI_CONNECTION_STRENGTH.length) {
+            mContentDescription = TextUtils.concat(mContentDescription, ",",
+                    getContext().getString(WIFI_CONNECTION_STRENGTH[level]));
+        }
+    }
+
+```
+
+##### 蓝牙连接
+控制蓝牙图标显示
+com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
+
+adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+
+##### AudioManager
+frameworks/base/services/core/java/com/android/server/audio/AudioService.java
+### 四大组件
+
+#### 四大组件之Service 
+```
++------------+----------------------------------+------------------------------+
+|            |   System Service                |    anonymous binder           |
+|            | (AMS, PMS, WMS)                 | (depend on ServiceConn#binder)|   
++------------------------------------------------------------------------------+
+|  launch    | SystemServer                    |   bindService                 |
++------------------------------------------------------------------------------+
+| regist and |ServiceManager.addService        |  ActivityManagerService       |
+| manager    |                                 |                               |
+|            |SystemServiceManager.startService|                               |
+|------------+---------------------------------+-------------------------------+
+| communicate| SystemServer#getService         |  ServiceConnection            |
+|            |                                 |  (binder.asInterface)         |
+|------------+---------------------------------+-------------------------------+
+
+通过startService开启的服务，一旦服务开启，这个服务和开启他的调用者之间就没有任何关系了（动态广播 InnerReceiver）;
+通过bindService开启服务， ServiceConnection#asbinder()与AMS关联通讯，Service#onBind()与client关联通讯。
+
+实名binder必须是建立在一个实名binder之上的，实名binder就是在service manager中注册过的。
+首先client和server通过实名binder建立联系，然后把匿名binder通过这个实名通道“传递过去”
+
+```
+
+AIDL 文件生成对应类，类里包含继承Binder的stub内部类和实现AIDL的内部类；
+
+- Bundle(实现了接口Parcelable)
+
+[Android O 后台startService限制简析](https://www.jianshu.com/p/f2db0f58d47f)
+```java
+不允许Application启动服务。kill应用会出现问题。
+startService(new Intent(this,BackService.class));
+    java.lang.RuntimeException: Unable to create application edu.ptu.gson.DApplication: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6227)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+     Caused by: java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{e41908c u0a129 SVC  idle change:idle|uncached procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.DApplication.onCreate(DApplication.java:10)
+        at android.app.Instrumentation.callApplicationOnCreate(Instrumentation.java:1182)
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:6222)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:211) 
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1778) 
+        at android.os.Handler.dispatchMessage(Handler.java:107) 
+        at android.os.Looper.loop(Looper.java:214) 
+        at android.app.ActivityThread.main(ActivityThread.java:7116) 
+        at java.lang.reflect.Method.invoke(Native Method) 
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492) 
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925) 
+
+服务所在的应有在后台60秒后，不允许启动服务
+    @Override
+    protected void onPause() {
+        super.onPause();
+        new Handler().postDelayed(() -> {
+            startService(new Intent(MainActivity.this,BackService.class));
+        },TimeUnit.SECONDS.toMillis(65));
+
+    }
+    java.lang.IllegalStateException: Not allowed to start service Intent { cmp=edu.ptu.gson/.BackService }: app is in background uid UidRecord{f7b20eb u0a129 LAST bg:+1m4s234ms idle change:idle procs:1 seq(0,0,0)}
+        at android.app.ContextImpl.startServiceCommon(ContextImpl.java:1616)
+        at android.app.ContextImpl.startService(ContextImpl.java:1571)
+        at android.content.ContextWrapper.startService(ContextWrapper.java:669)
+        at edu.ptu.gson.MainActivity.lambda$onPause$1$MainActivity(MainActivity.java:48)
+        at edu.ptu.gson.-$$Lambda$MainActivity$wl8e-hH5EF00KzpSg6rkpcKD2N8.run(Unknown Source:2)
+        at android.os.Handler.handleCallback(Handler.java:883)
+        at android.os.Handler.dispatchMessage(Handler.java:100)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+需要设置startForeground()
+startForegroundService(new Intent(MainActivity.this,BackService.class));
+    android.app.RemoteServiceException: Context.startForegroundService() did not then call Service.startForeground(): ServiceRecord{266d400 u0 edu.ptu.gson/.BackService}
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1864)
+        at android.os.Handler.dispatchMessage(Handler.java:107)
+        at android.os.Looper.loop(Looper.java:214)
+        at android.app.ActivityThread.main(ActivityThread.java:7116)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:492)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:925)
+
+/**
+ * 8.0以上需要增加channel
+ */
+```
+##### service三大生命周期
+
+#### 四大组件-Activity
+1. 协议
+client binder: 
+  IApplicationThread(ActivityThread.ApplicationThread)
+server binder:
+  ams(IActivityManager)
+  IApplicationToken(ActivityRecord)
+```
++---------------------------------------------------------------+
+|   AMS                                                         |
+|     +-------------------------------------------------------+ |
+|     |ProcessRecord                                          | |
+|     |                                                       | |
+|     |    ActivityRecord                                     | |
+|     |                                                       | |
+|     |    ServiceRecord   ConnectionRecord                   | |
+|     |                                                       | |
+|     |    BroadcastRecord  ReceiverList                      | |
+|     |                                                       | |
+|     |    ContentProviderRecord    ContentProviderConnection | |
+|     |                                                       | |
+|     +-------------------------------------------------------+ |
++---------------------------------------------------------------+
+
+```
+##### 7大生命周期
+```
+                                  +--------+
+                                  | Start  |
+                                  +----+---+
+                                       v                                                   +-----------------+
+                                  +----+---+                            Activity States    |onAttach         |
+      +------------------------>  |onCreate|                                               |oncreate         |
+      |                           +---+----+                                               |oncreateView     +<---+
+      | back to                       v  created +------------------------------------>    |onActivityCreated|    |
+      | foreground                +---+----+        +-----------+                          |                 |    |
+      |                           |onStart |  <-----+ onRestart +--+                       +-----------------+    |
+      | recreate                  |        |        +-----------+  |                                              |
++-----+---------+                 +----+---+                       |                       +---------+            |
+| Process killed|                      v started                   |   +-------------->    |onStart  |            |
++-----+---------+       +-------+ +----+---+   (singleTop/Task)    |                       +---------+            |
+      |                 v         |onResume|  <-----+activity      |                                              |
+      |             +---+------+  +--------+        |froreground   |                       +---------+            |
+      |   other     |Running   |         resumed    |              |   +-------------->    |onResume |<-----+     |
+      |   activity  +---+------+                    |              |                       +---------+      |     |
+      |   foreground    |         +--------+        |              |                              Fragm is  |     |
+      |                 +-------> |onPause |        |    activity  |                        retaininstance  | onBack
+      | <-----------------------+ |        | +----->+    foreground|                          onactivityRecreate  |
+      |   other app               +---+----+                       |                       +---------+      |     |
+      |   need memory                 v  paused                    |     +------------>    |onPause  |------|     |
+      |                                  no longe visiable         |                       +---------+            |
+      |                           +--------+                       |                                              |
+      +-------------------------+ |onStop  | +---------------------+                                              |
+                                  +---+----+                                               +---------+            |
+                                      v  stoped                       +--------------->    |onStop   |            |
+                                  +---+----+                                               +---------+            |
+  *configChanges                  |onDestroy                                                                      |
+                                  |        +                                               +-v-----v------+       |
+                                  +---+----+                                               |onDestroyView +-------+
+                                      v  destroyed  +--------------------------------->    |onDestroy     |
+                                  +---+----+                                               |onDetach      |
+                                  |shutdown|                                               +--------------+
+                                  +--------+
+
+
+```
+
+##### 复用activity ，newIntent保证差异
+newIntent传输数据，紧随当前activity，onpause之后
+##### onsaveInstance 备忘用于破坏后重建，onRestoreInstanceState 恢复现场，不同activity对象之间
+onsaveInstance 传输数据，紧随新启动activity的onResume之后
+onRestoreInstanceState 前台破坏后重建，如configurationchange，紧随start
+##### fragment 6大部分生命周期
+#### 四大组件之广播
+1. 协议
+client binder: 
+  IIntentReceiver(LoadedApk.ReceiverDispatcher.InnerReceiver)
+  IApplicationThread(ActivityThread.ApplicationThread)
+server binder:
+  ams(IActivityManager)
+
+2. 通讯
+   
+```
+
+                                                      +---------------------------------------+
++---------------------+-----------+-----------+       | SystemServer                          |
+|                     | runtime   | location  |       |                                       |
+|                     |           |           |       |   PMS                                 |
++---------------------------------------------+       |     mReceivers:ActivityIntentResolver |
+|                     |           |           |       |                                       |
+|   mReceivers        |  install  |  WMS      |       |     mReceiverResolver                 |
+|                     |           |           |       |                                       |
++---------------------------------------------+       |   AMS                                 |
+|   mReisterdReceivers|  run app  |  AMS      |       |     mReisterdReceivers:IIntentReceiver|
+|                     |           |           |       |                                       |
++---------------------+-----------+-----------+       +---------------------------------------+
+
+```
+3. LocalBroadCastManager
+   使用Handler处理penddingBroadCast
+
+4. 7.0 版本上静态注册android.net.conn.CONNECTIVITY_CHANGE
+
+#### 四大组件之contentProvider
+安装时候，会在AMS注册providers
+1. 协议
+client binder: 
+  IApplicationThread(ActivityThread.ApplicationThread)
+  IContentProvider(ContentProvider.Transport holder:ContentProviderRecord)
+server binder:
+  ams(IActivityManager)
+1. registerContentObserver协议
+client binder: 
+  IContentObserver
+server binder:
+  IContentService(ContentService holder:ApplicationContentResolver)
+
+3. ContentService扮演者ContentObserver的注册中心
+
+ContentProvider——内容提供者， 在android中的作用是对外共享数据，也就是说你可以通过ContentProvider把应用中的数据共享给其他应用访问，其他应用可以通过ContentProvider 对你应用中的数据进行添删改查。
+
+ContentResolver——内容解析者， 其作用是按照一定规则访问内容提供者的数据（其实就是调用内容提供者自定义的接口来操作它的数据）。
+ContentObserver——内容观察者，目的是观察(捕捉)特定Uri引起的数据库的变化，继而做一些相应的处理，它类似于数据库技术中的触发器(Trigger)，当ContentObserver所观察的Uri发生变化时，便会触发它。 
+
+```java
+    private static final class ApplicationContentResolver extends ContentResolver {
+        private final ActivityThread mMainThread;
+    }
+ 
+
+    public class ContentProviderHolder implements Parcelable {
+            public final ProviderInfo info;
+        public IContentProvider provider;
+        public IBinder connection;// IContentProvider 通过这个对象传输数据,由ContentProvider#mTransport赋值
+        public boolean noReleaseNeeded;
+    }
+
+                                          +-------------------------------------------------------------+
+                                          |  SystemServer                                               |
+                                          |             +-------------------------------------+         |
+                   +---------------------------+        |   ContentService                    |   +----------------------+
+                   |                      |    |        |      ObserverNode                   |   |     |                |
+                   v                      |    +-------------+   IContentObserver      +----------+     |                v
+                                          |             |                                     |         |
++--------------------------------------+  |             +-------------------------------------+         |  +---------------------------------+
+|  App                                 |  |                                                             |  |  App2                           |
+|                     ActivityManager. |  |     +-------------------------------------------------------+  |                                 |
+|    mProviderMap       getService()   |  |     | AMS                 +->  mProviderMap                ||  |    +---->  mProviderMap         |
+|                                      |  |     +                     |         +                      ||  |    |                            |
+|      +  ^            +-------------------> getContentProvider()  +--+         v                      ||  |    |             +              |
+|      |  |                            |  |     +                                                      ||  |    |             |              |
+|      |  |                            |  |     |                         +-----------------------------+  |    |             v              |
+|      |  |                            |  |     |                         |        IApplicationThread  |   |    |                            |
+|      |  |                            |  |     +                         |                            +--------+   scheduleInstallProvider()|
+|      |  +---------------------------------+ ContentProviderHolder  <--+-+ContentPro^iderRecord.wait()||  |                                 |
+|      |                               |  |     +                       ^ +-----------------------------|  |                                 |
+|      |                               |  |     |               +-------+                              ||  |                                 |
+|      |                               |  |     |               |   +------------------------------+   ||  |          ActivityManager.       |
+|      |                               |  |     |               |   |     publishContentProviders()|  <--------------+  getService()         |
+|      |                               |  |     |               +---+ContentPro^iderRecord.notify()|   ||  |                                 |
+|      |                               |  |     |                   +------------------------------+   ||  | +-------------------------------+
+|      |                               |  |     +-------------------------------------------------------+  | |  ContentProvider             ||
+|      |                               |  |                                                             |  | |    Transport:IContentProvider||
+|      |                               |  |                                                             |  | +-------------------------------|
++--------------------------------------+  +-------------------------------------------------------------+  +---------------------------------+
+       |                                                                                                                  ^
+       +------------------------------------------------------------------------------------------------------------------+
+
+
+   URI = scheme:[//authority]path[?query][#fragment]
+
+   normal
+低风险权限，只要申请了就可以使用，安装时不需要用户确认。 
+dangerous
+高风险权限，安装时需要用户确认授权才可使用。  
+signature
+只有当申请权限应用与声明此权限应用的数字签名相同时才能将权限授给它。 
+signatureOrSystem
+签名相同或者申请权限的应用为系统应用才能将权限授给它 
+```
+
+
+
+## 进程内通讯
+### EventBus
+反射与注解
+观察者模式
+### ARouter
+控制反转和面向切面
+### 应用内消息机制（异步）
+- Thread
+- Handler        子线程与主线程通讯
+- AsyncTask      界面回调，异步任务，一次性
+- HandlerThread  异步队列，子线程与子线程通讯
+- Timer/TimerTask  定时任务
+- IntentServices 无界面，异步任务
+- ThreadPool     并行任务
+
+```
+查看权限
+adb shell pm list permissions -d -g                 
+```
+
+[hind api](https://android.googlesource.com/platform/prebuilts/runtime/+/master/appcompat)
+
+**/art/tools/veridex/appcompat.sh --dex-file=test.apk**
+``` dot
+APK文件->Gradle编译脚本->APK打包安装及加载流程->AndroidManifest->四大组件->{Activity,Service,BrocastReceiver,ContentProvider}
+ 
+```
+
+```
+
+打包参数
+manifestPlaceholders = [ app_label_name:"xxxxxxx"]
+//${app_label_name}
+getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_DATA).metaData.getString("app_label_name")
+
+
+```
+#### HandlerThread
+装饰模式（封装Thread）
+  装饰Thread，增加mLooper，可以让工作Handler设置Looper
+
+
+
+## 缓存篇
+
+### Bitmp
+简单工厂 Bitmap（无数据源）：wrapHardwareBuffer，createScaledBitmap/createBitmap 
+        BitmapFactory（有数据源）：decodeFile（decodeResource/decodeResourceStream）/decodeStream，decodeByteArray，decodeFileDescriptor
+### 编译，加载
+
+#### 类加载机制，类加载器，双亲委派
+```
+                 C++
+ +-----------------------+
+ | Bootstrap ClassLoader |  Framework classs
+ +----------^------------+
+            |
+  +---------+----------+   
+  | BaseDexClassLoader |   <|-------------------+
+  +---------^----------+                        |
+            |  DexPathList                       |
+            |                                   |
+            |                                   |
++-----------+-------------+                     |
+| PathClassLoader         | apk class           |
++-----------^-------------+                     |
+            |  parent                           |
++-----------+------------+           extends    |
+| DexClassLoader         | +--------------------+
++------------------------+
+
+
+
+```
+#### 类加载问题
+[pre-verify问题](https://www.jianshu.com/p/7217d61c513f)
+QQ空间补丁
+```
+1. 阻止相关类打上Class_ispreverified标志
+2. 动态更改BaseDexClassLoader间接引用的dexElements
+```
+[Redex](https://blog.csdn.net/tencent_bugly/article/details/53375240)
+
+### 虚拟机与执行器
+
+#### dalvik bytecode
+```
+dx --dex --output=Hello.dex Hello.class
+```
+
+#### NDK
+
+```md
+GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
+
+[编译linux内核所用的gcc版本？ - jiangtao9999的回答 - 知乎](https://www.zhihu.com/question/58955848/answer/305063368)
+```
+
+```md
+    1.预处理是解决一些宏定义的替换等工作，为编译做准备,对应的gcc操作为：gcc -E xx.c -o xx.i(xx为源文件名)。
+    2.编译是将源码编译为汇编语言的过程，对应的gcc操作为:gcc -S xx.i -o xx.s。由xx.i 产生xx.s文件。
+    3.汇编是将汇编代码的文件汇编为机器语言的过程，对应的gcc操作为：gcc -c xx.s -o xx.o
+    4.链接是将目标文件链接为一个整的可执行文件的过程，对应的gcc操作为 gcc xx.o -o xx(xx成为可执行,运行时候可以用 "./xx" 的方式运行)。
+
+    [程序员的自我修养--链接、装载与库](https://www.cnblogs.com/zhouat/p/3485483.html)
+```
+
+[Android-MD doc](https://source.codeaurora.cn/quic/la/platform/ndk/docs/ANDROID-MK.html)
+
+```java
++------------------------------------------------------------+
+|                 build-binary.mk                            |
+|                                                            |
+|                 setup-toolchain.mk                         |
+|                 setup-abi.mk                               |
+|                                                            |
+|                  setup-app.mk                              |
+|                  build-all.mk                              |
+|                  init.mk                                   |
+|                  build-local.mk                            |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|   Module-description variables                             |
+|                                                            |
+|   NDK-provided variables    NDK-provided function macros   |
+|                                                            |
++------------------------------------------------------------+
+|                                                            |
+|              ndk-build                                     |
++------------------------------------------------------------+
+|                     NDK                                    |
++------------------------------------------------------------+
+|                 GNU Make                                   |
++------------------------------------------------------------+
+
+
+
+```
+ 
+### 编译
+⭐ ndk-build出问题，需要用 命令行 gradlew assemble，提示的信息更全
+```
+Android NDK: APP_STL gnustl_static is no longer supported. Please switch to either c++_static or c++_shared.
+
+1. APP_STL  := gnustl_static 改为 APP_STL := c++_static；
+
+2.删除NDK_TOOLCHAIN or NDK_TOOLCHAIN_VERSION；
+
+
+
+
+found local symbol '__bss_start' 
+查看：readelf -s *.so |grep "__bss_start"  
+解决：Android.mk :：     APP_LDFLAGS := -fuse-ld=gold
+
+
+
+not found file "...h"
+查看：$(warning "the value of LOCAL_C_INCLUDES is$(LOCAL_C_INCLUDES)") 查看路径是否正确。
+解决：在wls 下面，$(win)返回的仍然是1，导致路径都替换成window的“c：/。。/”，注释掉代码。
+
+
+Operation not permitted
+虽然是警告，但是可能导致文件不能拷贝。
+使用sudo ndk-build
+
+```
+
+
+###  2 内存泄漏/内存抖动（monitor.bat/systrace.py，Android Profiler- memory）
+GC Root :
+堆，方法区内存：static（对象，容器），final，
+栈：ActivityThread的activitys，Handler使用WeakReference持有activity引用
+本地方法栈：File，Cursor，WebView
+
+#### GC
+Reference
+Lrucache,Bitmap
+ArrayMap
+
+##### ART-dalvik 
+```
+              |java compiler(javac)
+    +-----------------------+
+    | java byte code(.class)|
+    +---------+-------------+
+              |   Dex compiler
+              v   (dx.bat)
+     +--------+--------------+
+     | Dalvik byte code(.dex)|
+     +---+-----------------+-+
+         | dex2oat         |dexopt
++--------v---+       +-----+-------+
+|.oat(elf file)|     |    .odex    |
++---+--------+       +----+--------+
+    |                     |   Register-based
+    |  +---------+        |   +---------------+
+    |  | ART     |        |   |   Dalvik VM   |
+    |  |      AOT|        |   |           JIT |
+    |  +---------+        |   +---------------+
+    |                     |
+    |moving collector     | MarkSweep collector
+    v                     v
+
++--------+---------+
+|        | Active  |
+|        | Heap    |
+|DalvikVM|         |
+|  Heap  |         |
+|(Ashmem)|         |
+| mspace |         |
+|        +---------+
+|        | Zygote  |
+|        | Heap    |
+|        | (shared)|
++----------------------+--------------------+----------------------+
+|        |             | Image Space                               |
+|        | Continuous  +---------------+---------------------------+
+|        |             | Zygote Space  | Zygote Space              |
+|  ART   | Space       |               +---------------------------+
+|        |             |               | Allocation Space          |
+|  Heap  |             |               |     ....                  |
+|        +-------------+---------------+---------------------------+
+|        |Discontinuous  Large Object                              |
+|        |    Space    | Space                                     |
++--------+-------------+-------------------------------------------+
+
+
+                                           +
+                                           |new ArrayList
+                                           |
+                                           v
+      +--------+  +------+ +-------+  +-+-----+ +-------+ 
+      |  ART   |  | Image| | Zygote|  |       | | Large | 
+Heap  |        |  | Space| | Space |  | Alloc | | Object| 
+      |  L+    |  |      | |       |  | Space | | Space | 
+      +--------+  +------+ +-------+  +-------+ +-------+ 
+
+      +--------+           +-------+  +------+           
+      |DalvikVM|           | Zygote|  |Active|           
+      |  <L    |           | Heap  |  |Heap  |           
+      |        |           |       |  |      |           
+      +--------+           +-------+  +------+           
+
+
+```
+Art Java堆的主要组成包括Image Space、Zygote Space、Allocation Space和Large Object Space四个Space
+        （详细的话main space、image space、zygote space、non moving space、large object space）
+        Image Space用来存在一些预加载的类（boot.art ） 
+        Zygote Space和Allocation Space对应Dalvik虚拟机垃圾收集机制中的Zygote堆和Active堆的。
+        ( 创建进程时，已经使用了的那部分堆内存Zygote Space，还没有使用的堆内存划分为Allocation Space)
+        Large Object Space就是一些离散地址的集合
+
+###### GC分类
+日志：D/dalvikvm: <GC_Reason> <Amount_freed>, <Heap_stats>, <External_memory_stats>, <Pause_time>
+Dalvik 有两种基本的 GC 模式， GC_CONCURRENT 和 GC_FOR_ALLOC 。
+GC_CONCURRENT 对于每次收集将阻塞主线程大约 5ms 。GC_CONCURRENT 通常不会造成你的应用丢帧。
+              GC_MALLOC, 内存分配失败时触发
+              GC_CONCURRENT，当分配的对象大小超过384K时触发
+              GC_EXPLICIT，对垃圾收集的显式调用(System.gc)
+              GC_EXTERNAL_ALLOC，外部内存分配失败时触发
+              GC_HPROF_DUMP_HEAP：当你请求创建 HPROF 文件来分析堆内存时出现的GC。
+GC_FOR_ALLOC 是一种 stop-the-world 收集，可能会阻塞主线程达到 125ms 以上。
+              GC_FOR_ALLOC 几乎每次都会造成你的应用丢失多个帧，导致视觉卡顿，特别是在滑动的时候。
+
+I/art: <GC_Reason> <GC_Name> <Objects_freed>(<Size_freed>) AllocSpace Objects,<Large_objects_freed>(<Large_object_size_freed>) <Heap_stats> LOS objects, <Pause_time(s)>
+ART新增GC原因：
+              LOS_Space_Status
+
+###### GC回收
+Davik 仅有一种 Mark-Sweep。
+        Live Bitmap和Mark Bitmap分代标记上次GC存活和这次需标记被引用的对象。
+        mark阶段，其他线程可以并发执行（Concurrent GC）。CardTable记录非垃圾回收线程对对象的引用
+
+ART：
+ 
+zygote space 类似Davik
+
+##### android触发垃圾回收
+[android gc](https://proandroiddev.com/collecting-the-garbage-a-brief-history-of-gc-over-android-versions-f7f5583e433c)
+[dalvik:tracing garbage collector, using a Mark and Sweep approach](https://android.googlesource.com/platform/dalvik.git/+/android-4.3_r2/vm/alloc/MarkSweep.cpp)
+[art 粘性CMS和部分CMS](https://android.googlesource.com/platform/art/+/master/runtime/gc/)
+当Bitmap和NIO Direct ByteBuffer对象分配外部存储（机器内存，非Dalvik堆内存）触发。
+系统需要更多内存的时候触发。
+HPROF时触发。
+
+[回收机制](https://blog.csdn.net/f2006116/article/details/71775193)
+[android hash](https://blog.csdn.net/xusiwei1236/article/details/45152201)
+
+[smalidea 无源码调试 apk](https://blog.csdn.net/hackooo/article/details/53114838)
+
+#### Handler/Dialog/Thread泄漏
+
+1. PopupWindow 
+
+```java 
+android.view.WindowManager$BadTokenException: Unable to add window -- token null is not valid; is your activity running?
+>  popwindow必须依附于某一个view
+
+1. onWindowFocusChanged()或使用view的post()显示界面
+2. if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){}
+
+```
+
+2.  AlertDialog不能使用application作为context 
+```
+android.view.WindowManager$BadTokenException: Unable to add window --token null is not for an application
+ 
+```
+3. dialog.show()
+```java
+android.view.WindowManager$BadTokenException
+if (!isFinishing()|| Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1&&!isDestroyed()){
+   dialog.show();
+}
+```
+
+4. Dialog.dismiss()
+```java
+ View not attached to window manager
+    if(mDialog != null) {
+        if(mDialog.isShowing()) {   
+            Context context = ((ContextWrapper)mDialog.getContext()).getBaseContext();  
+            if(context instanceof Activity) { 
+                if(!((Activity)context).isFinishing() && !((Activity)context).isDestroyed()) 
+                    mDialog.dismiss();
+            } else
+                mDialog.dismiss();
+        }
+        mDialog = null;
+    }
+```
+5. 没有及时关闭dialog
+```java
+  Activity xxxx has leaked， that was originally added here
+
+@Override
+public void onDestroy(){
+    super.onDestroy();
+    if ( mDialog!=null && mDialog.isShowing() ){
+        mDialog.cancel();
+    }
+}
+
+```
+#### 内存泄漏
+ 
+ 工具：profiler，eclipse mat
+ [Activity 泄漏和重复创建的冗余Bitmap-ResourceCanary](https://mp.weixin.qq.com/s/KtGfi5th-4YHOZsEmTOsjg?utm_source=androidweekly.io&utm_medium=website)
+```
+LeakCanary通过ApplicationContext统一注册监听的方式，来监察所有的Activity生命周期，并在Activity的onDestroy时，执行RefWatcher的watch方法，该方法的作用就是检测本页面内是否存在内存泄漏问题。
+
+所有未被回收的 Bitmap 的数据 buffer 取出来，然后先对比所有长度为 1 的 buffer，找出相同的，记录所属的 Bitmap 对象；再对比所有长度为 2 的、长度为 3 的 buffer ……直到把所有buffer都比对完，这样就记录下了所有冗余的 Bitmap 对象了，接着再套用 LeakCanary 获取引用链的逻辑把这些 Bitmap 对象到 GC Root 的最短强引用链找出来即可。
+```
+ 内存泄漏优化 - 资源未释放
+        3.1 单例
+        3.2 非静态内部类
+        3.3 资源未关闭（webview没执行 destroy）
+        3.4 ListView 未缓存
+        3.5 集合类未销毁
+
+
+```sh
+
+adb shell am dumpheap $(ps | grep com.example.proj | awk '{print $2}') /mnt/sdcard/my_heap/dumpheap.hprof
+
+adb shell 'am dumpheap com.example.proj /mnt/sdcard/dumpheap.hprof'
+
+
+>adb shell dumpsys meminfo edu.ptu.java.kotlinbase
+Applications Memory Usage (kB):
+Uptime: 53403267 Realtime: 53403267
+
+** MEMINFO in pid 32724 [edu.ptu.java.kotlinbase] **
+                   Pss  Private  Private  Swapped     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------
+  Native Heap        0        0        0        0    15616    14393     1222
+  Dalvik Heap     2908     2416        0        0    13722     9283     4439
+ Dalvik Other      680      532        0        0
+        Stack      260      260        0        0
+       Ashmem        2        0        0        0
+    Other dev        4        0        4        0
+     .so mmap     3713      340      924        0
+    .apk mmap      972        0       88        0
+    .ttf mmap      164        0      132        0
+    .dex mmap     3259        4     2652        0
+    .oat mmap     2602        0      520        0
+    .art mmap     1016      680        4        0
+   Other mmap       39        8        0        0
+      Unknown     3795     3612        0        0
+        TOTAL    19414     7852     4324        0    29338    23676     5661
+
+ App Summary
+                       Pss(KB)
+                        ------
+           Java Heap:     3100
+         Native Heap:        0
+                Code:     4660
+               Stack:      260
+            Graphics:        0
+       Private Other:     4156
+              System:     7238
+
+               TOTAL:    19414      TOTAL SWAP (KB):        0
+
+ Objects
+               Views:       18         ViewRootImpl:        1
+         AppContexts:        3           Activities:        1
+              Assets:        2        AssetManagers:        2
+       Local Binders:        9        Proxy Binders:       13
+       Parcel memory:        3         Parcel count:       12
+    Death Recipients:        0      OpenSSL Sockets:        0
+
+ SQL
+         MEMORY_USED:        0
+  PAGECACHE_OVERFLOW:        0          MALLOC_SIZE:        0
+```
+
+#### LeakCanary&shark（Square）
+ LRUCACHE
+```
++------------------------------------------------------------------------------+
+|                                    LruCache                                  |
+|                                         cache:LinkedHashMap                  |
+|                                         initialMaxSize:long                  |
+|                                         maxSize:long                         |
+|                                         currentSize:long                     |
+|                                                                              |
+|                                         put()                                |
+|                                         getSize()           entryRemoved()   |
+|                                         onItemEvicted()                      |
+|                                         evict()                              |
+|                                                                              |
+|                                         get()                                |
++------------------------------------------------------------------------------+
+
+
+```
+
+```
+* 001_initial f0cc04dfbf3cca92a669f0d250034d410eb05816 Initial import
+                +-----------------------------------------------------------------------------------------------------+------------------------------+
+                |                                                LeakCanary                                           |                              |
+                |                                                   install(app:Application)                          |                              |
+                +------------------------------------------------------------------------------------------------------------------------------------+
+                |                                 RefWatcher                                                          |                              |
+                |                                     queue:ReferenceQueue                                            |                              |
+                |                                     retainedKeys:Set<String>                                        |                              |
+                |                                                                                                     |                              |
+                |                                     watch()                                                         |                              |
+                |                                     removeWeaklyReachableReferences()                               |                              |
+                |                                     gone()                                                          |                              |
+                +------------------------------------------------------------------------------------------------------------------------------------+
+                | AndroidWatchExecutor    GcTrigger   AndroidHeapDumper    ServiceHeapDumpListener: HeapDump.Listener |                              |
+                |                            runGc()       dumpHeap()          analyze(h:HeapDump)                    |                              |
+                |                                                                                                     |                              |
+                | AndroidDebuggerControl              Debug                HeapAnalyzerService                        |                              |
+                |                                        dumpHprofData()     heapAnalyzer:HeapAnalyzer                |                              |
+                |                              dalvik_system_VMDebug.c       runAnalysis()                            | DisplayLeakActivity          |
+                |           Dalvik_dalvik_system_VMDebug_dumpHprofData()     listenerServiceClass                     |                              |
+                |                                                              :DisplayLeakService                    | AbstractAnalysisResultService|
+                |                                                                                                     |                              |
+                +------------------------------------------------------------------------------------------------------------------------------------+
+                |                                         HeapDump               HeapAnalyzer                         |                              |
+                |                                           heapDumpFile:File        checkForLeak():AnalysisResult    |                              |
+                |                                                                    findLeakTrace():AnalysisResult   |                              |
+                +------------------------------------------------------------------------------------------------------------------------------------+
+                |                                                              proj(:haha-1.1)                        |                              |
+                |                                                                                                     |                              |
+                +-----------------------------------------------------------------------------------------------------+------------------------------+
+
+                +----------------------------------------------------------------------------------------------------------------+ 
+                | [haha]                                    SnapshotFactory                                                      |
+                |                                                  openSnapshot():ISnapshot                                      | 
+                |                                           Snapshot                                                             |
+                |                                               createSnapshot():ISnapshot                                       | 
+                |                                           SnapshotImpl                                                         |
+                |                                               readFromFile():ISnapshot                                         |
+                |                                               parse():ISnapshot                                                | 
+                +----------------------------------------------------------------------------------------------------------------+
+ 
+* 200_v2.0    49510378fa14e14e110985da4cab838facbf4864 Prepare 2.0 release
+使用[shark]代理[haha]作为dump parse
+
+                +-----------------------------------------------------------------------------------------------------+
+                |[leakcanary-object-watcher-android]                                                                  |
+                |                          sealed AppWatcherInstaller:ContentProvider()                               |
+                +-----------------------------------------------------------------------------------------------------+
+                |                                   InternalAppWatcher                                                |
+                |                                                                                                     |
+                |        ActivityDestroyWatcher                 FragmentDestroyWatcher                                |
+                |                                                                                                     |
+                +-----------------------------------------------------------------------------------------------------+
+                | [leakcanary-object-watcher]                                                                         |
+                |                                ObjectWatcher                                                        |
+                +-----------------------------------------------------------------------------------------------------+
+                |  [leakcanary-android-core]                                                                          |
+                |                            HeapDumpTrigger                                                          |
+                |                                 onObjectRetained()                                                  |
+                |                                 heapDumper: HeapDumper                                              |
+                |                                                                                                     |
+                |                            AndroidHeapDumper                                                        |
+                |                                  dumpHeap()                                                         |
+                |                                                                                                     |
+                |                             Debug                                                                   |
+                |                               dumpHprofData()                                                       |
+                +-----------------------------------------------------------------------------------------------------+
+                |   [shark]                                                                                           |
+                |             HeapAnalyzer                 FindLeakInput                                              |
+                |                 analyze()                      findLeaks()                                          |
+                |                                                buildLeakTraces()                                    |
+                +-----------------------------------------------------------------------------------------------------+
+                |        [shark-hprof]                      [shark-graph]                                             |
+                |             Hprof                             HprofHeapGraph                                        |
+                |               open(hprofFile: File)                                                                 |
+                +-----------------------------------------------------------------------------------------------------+
+
+```
+#### 对象的生命周期绑定
+Obsevable
+## 精简
+[square](https://github.com/square?q=android&type=&language=)
+
+常见优化库
+LeakCanary、Glide、Retrofit、OkHttp、RxJava、GreenDAO
+[Studio Profiler](https://github.com/JetBrains/android/tree/master/profilers/src/com/android/tools/profilers/memory)
+
+和内核模块类似：内存管理，文件存储，进程调度，进程间调度，网络接口
+
+### 缓存
+ 活动缓存 - WeakReference提高命中率；字节缓存，防止内存抖动；
+
+#### 磁盘缓存 - DiskLruCache
+1. 文档及配置文件
+2. 源码
+3. 单元测试
+4. 性能及容错
+5. 重用，封装，解耦，通讯
+6. 文档
+
+```
+初定修订版本数据结构
++-----------------------+----------------------------+
+|    maxSize            |  lruEntries(LinkedHashMap) |
++----------------------------------------------------+
+|                       |  edit()  remove() get()    |
+|                       +----------------------------+
+|    magic              |  DIRTY   REMOVE READ  CLEAN|
+|    version            | (Editor)      (Snapshot)   |
+|    appVersionString   +----------------------------+
+|    valueCountString   |    Entry                   |
++-----------------------+----------------------------+
+|                   JOURNAL_FILE                     |
++----------------------------------------------------+
+|                  DiskLruCache                      |
++----------------------------------------------------+
+
+valueCountString: hash冲突时候，保留的多个冲突对象。后缀名解决冲突 0,1,2,3
+
+```
+
+

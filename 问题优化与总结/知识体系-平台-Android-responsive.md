@@ -399,7 +399,7 @@ adb shell dumpsys window displays |head -n 3
 
 ### 图片闪动
 滑动停止才进行显示图片
- 
+
 ### 显示（Surface）与窗口（WindowManageGloabal，PhoneWindow）
 
 WindowManageGloabal 关联 RootViewImpl 和 contentView
