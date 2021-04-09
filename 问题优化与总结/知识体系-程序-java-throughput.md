@@ -1043,20 +1043,3 @@ main                 	 RUNNABLE 	 5 	 Normal
 Attach Listener      	 RUNNABLE 	 5 	 Daemon
 
 ```
-```java
-android 线程
-
-main                                     	 RUNNABLE 	 5 	 Normal
-ReferenceQueueDaemon                     	 WAITING 	   5 	 Daemon
-Signal Catcher                           	 WAITING 	   5 	 Daemon
-FinalizerDaemon                          	 WAITING 	   5 	 Daemon //java.lang.Daemons.FinalizerDaemon
-FinalizerWatchdogDaemon                  	 WAITING 	   5 	 Daemon //java.lang.Daemons.FinalizerDaemon
-Binder:8901_2                            	 RUNNABLE 	 5 	 Normal
-Binder:8901_1                            	 RUNNABLE 	 5 	 Normal
-Binder:8901_4                            	 RUNNABLE 	 5 	 Normal
-Binder:8901_3                            	 RUNNABLE 	 5 	 Normal
-HeapTaskDaemon                           	 WAITING 	   5 	 Daemon
-Profile Saver                            	 RUNNABLE 	 5 	 Daemon
-Jit thread pool worker thread 0          	 RUNNABLE 	 5 	 Daemon
-
-```
