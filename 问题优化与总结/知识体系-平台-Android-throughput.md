@@ -1,5 +1,26 @@
 # 高并发提高吞吐量
 
+adb shell "ps | grep -E 'zygote|PID'"
+adb shell "ps -T -p <pid>"
+adb shell "top -H -p <pid>"
+```java
+android 线程
+
+main                                     	 RUNNABLE 	 5 	 Normal
+ReferenceQueueDaemon                     	 WAITING 	   5 	 Daemon
+Signal Catcher                           	 WAITING 	   5 	 Daemon
+FinalizerDaemon                          	 WAITING 	   5 	 Daemon //java.lang.Daemons.FinalizerDaemon
+FinalizerWatchdogDaemon                  	 WAITING 	   5 	 Daemon //java.lang.Daemons.FinalizerDaemon
+Binder:8901_2                            	 RUNNABLE 	 5 	 Normal
+Binder:8901_1                            	 RUNNABLE 	 5 	 Normal
+Binder:8901_4                            	 RUNNABLE 	 5 	 Normal
+Binder:8901_3                            	 RUNNABLE 	 5 	 Normal
+HeapTaskDaemon                           	 WAITING 	   5 	 Daemon
+Profile Saver                            	 RUNNABLE 	 5 	 Daemon
+Jit thread pool worker thread 0          	 RUNNABLE 	 5 	 Daemon
+
+```
+
 ## CPU有限，防止抢占，降低吞吐量，不考虑低延时。用于消息传递
 [](https://developer.android.google.cn/topic/performance/threads)
 每个线程至少需要占用 64k 内存

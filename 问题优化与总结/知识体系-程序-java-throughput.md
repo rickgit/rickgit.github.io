@@ -1002,3 +1002,44 @@ join
 
 ### 并发问题 
 采用共享内存。
+
+### 线程状态
+
+```java
+    public static enum State {
+        NEW,
+        RUNNABLE,
+        BLOCKED,
+        WAITING,//wait(),park(),unpark()...
+        TIMED_WAITING,//sleep(),wait(time),...
+        TERMINATED;
+
+        private State() {
+        }
+    }
+```
+### 存在的线程
+```java
+        Set<Thread> threads = Thread.getAllStackTraces().keySet();
+
+        for (Thread t : threads) {
+            String name = t.getName();
+            Thread.State state = t.getState();
+            int priority = t.getPriority();
+            String type = t.isDaemon() ? "Daemon" : "Normal";
+            System.out.printf("%-30s \t %s \t %d \t %s\n", name, state, priority, type);
+        }
+        System.out.printf("=========================\n" );
+
+        ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
+        ThreadInfo[] threadInfos = threadMXBean.dumpAllThreads(false, false);
+        for(ThreadInfo threadInfo : threadInfos) {
+        System.out.println(threadInfo.getThreadId() + "-" + threadInfo.getThreadName());}
+
+Reference Handler    	 WAITING 	  10 	 Daemon
+Signal Dispatcher    	 RUNNABLE 	 9 	 Daemon
+Finalizer            	 WAITING 	   8 	 Daemon
+main                 	 RUNNABLE 	 5 	 Normal
+Attach Listener      	 RUNNABLE 	 5 	 Daemon
+
+```

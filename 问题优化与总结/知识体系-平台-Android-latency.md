@@ -1213,7 +1213,8 @@ IM：
                             TCP Header Format
 ```
 TCP层的Flag
-```
+```js
+ 
 SYN表示建立连接，
 FIN表示关闭连接，
 ACK表示响应，
@@ -1221,7 +1222,7 @@ PSH表示有 DATA数据传输，
 RST表示连接重置。
 URG(urgent紧急)
 
-```
+ ```
 ##### 抓包
 // testSocket("104.31.70.56");//tcp http://www.plantuml.com/
 ```plantuml
@@ -1326,13 +1327,20 @@ Frame format
  +---------------------------------------------------------------+
                    Frame Layout
 ```
+提示文案：
+√已联网，√未联网，√连接被拒，√信号差，√不可达，满载，√其他保存记录
+刷新的情况
+  1. 创建
+  2. update(ScanResult result) 
+  3. update(WifiInfo info, DetailedState state)，接收到广播的情况
 
+ 
 ##### SSL/TLS
 [SSL/TLS Handshake](http://blog.fourthbit.com/2014/12/23/traffic-analysis-of-an-ssl-slash-tls-session/#:~:text=Record%20Protocol%20format.%20The%20TLS%20Record%20header%20comprises,header%20itself%29.%20The%20maximum%20supported%20is%2016384%20%2816K%29.)
 ###### TLS Handshake
 ```js
                TLS Handshake
-
+ 
                +-----+                              +-----+
                |     |                              |     |
                |     |        ClientHello           |     |
@@ -2764,6 +2772,7 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
 
 ```
+ 
 #### PackageManager 静默安装
 ```java
 小于Android 5      通过IPackageInstallObserver进行跨进程通信
@@ -2915,11 +2924,16 @@ PanelHolder（下拉窗）
 keyguardbouncer（解锁界面）
 #### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
 ##### WIFI
+ 
 adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
 adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
 adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
+adb shell am start com.android.settings/com.android.settings.Settings
+adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
 
-```
+
+```java
   this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
     mWifiManager.getWifiApState();
  

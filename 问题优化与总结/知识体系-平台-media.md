@@ -2129,13 +2129,14 @@ https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GG
 glm::mat4
 glm::vec4
 ### Android 滤镜
+[封装OpenGL](https://github.com/google/grafika)
 [40多个滤镜](https://github.com/wuhaoyu1990/MagicCamera)
-[70多个滤镜](https://github.com/google/grafika)
-[](https://github.com/cats-oss/android-gpuimage)
+[70多个滤镜](https://github.com/cats-oss/android-gpuimage)
 
+ 
 [脸部识别](https://github.com/OAID/TengineKit)
 [彩妆](https://github.com/DingProg/Makeup)
-
+ 
 [](https://github.com/CainKernel/CainCamera)
 ### Opengl 介绍
 OpenGl只是一个标准；实际的OpenGL库的开发者通常是显卡的生产商，Windows中的opengl32.dll，以及Unix /usr/lib/libGL.so，Android 实现是 platform_frameworks_native  agl;

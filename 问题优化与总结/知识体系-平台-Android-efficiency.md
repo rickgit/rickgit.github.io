@@ -464,7 +464,7 @@ adb shell  dumpsys window windows |grep "Window #"
 
 ### 手机交互工具
 https://github.com/eleme/UETool
-
+https://hub.fastgit.org/barry-ran/QtScrcpy
 ## 可拓展
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
