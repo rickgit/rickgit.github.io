@@ -1275,7 +1275,7 @@ GT 工具
 https://libraries.io/github/koreader/koreader
 https://www.unisystem-displays.com/en/news/interactive-epaper.html
 http://www.xjishu.com/zhuanli/55/201510450954.html
-
+[重排功能依赖另一个开源软件项目K2pdfopt](重排功能依赖另一个开源软件项目K2pdfopt)
 
 ## 绘制
 ### ViewTreeObserver 

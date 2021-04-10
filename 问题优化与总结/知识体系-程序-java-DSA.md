@@ -14,15 +14,15 @@
         无向
 存储结构（节点和下个节点的关系）：    
     顺序存储结构
-    链式存储结构（单链，双链，跳跃列表）
     散列存储结构：顺序存储+散列（HashMap）
     索引存储结构：顺序存储+索引（tlv格式，Serizable，protoBuffer，flatBuffer）
+    链式存储结构（单链，双链，跳跃列表）
+
 操作：
     增删改，索引，查找，销毁
 
 ### 可视化
-https://www.cs.usfca.edu/~galles/visualization/Algorithms.html
-
+[](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
 《Intruduce arthrigsim》
 KNUTH -《The Art of Computer Programming》基本算法，排序与搜索，半数值计算，
 组合算法（枚举与回溯-图论-最优化与递归），造句算法

@@ -99,11 +99,11 @@ project
 
 
 Git与SVN区别:
-1. Git是分布式的，操作几乎不需要联网，SVN是CS模式；
-2. Git是整个仓库拷贝，SVN是相当于工作区拷贝
-3. Git分支工作流 branch(master,dev,feature,release,hotfix),tag；SVN branch(分支) tag(标记)都是trunk(主线) 的拷贝
-4. Git文件持久化为工作区，暂存区，贮藏区，仓库，远程仓库；SVN只有本地工作区拷贝和远程仓库；
-5. Git每次修订是sha1;SVN是用全局版本号；
+1. Git文件持久化为工作区，暂存区，贮藏区，仓库，远程仓库；SVN只有本地工作区拷贝和远程仓库；
+2. Git是分布式的，操作几乎不需要联网，SVN是CS模式；
+4. Git是整个仓库拷贝，SVN是相当于工作区拷贝
+5. Git分支工作流 branch(master,dev,feature,release,hotfix),tag提交记录；SVN branch(分支) tag(标记)都是trunk(主线) 的拷贝
+3. Git每次修订是sha1;SVN是用全局版本号；
 6. Git文件是元数据方式存储（snapshot），而SVN是按文件
 
 https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
@@ -133,31 +133,11 @@ https://git-scm.com/book/en/v2/Git-Internals-Plumbing-and-Porcelain
 
 git merge squash/rebase 
 
-
-```js
-git config --system
-D:\Program\Git/etc/gitconfig
-
-git config --global 
-C:\Users\Administrator\.gitconfig
-
-git config
-G:\workspace\ws-github\.git\config
-```
-
 git config --global http.postbuffer 524288000 
  
 ### 代理设置
 ```js
 
-
-git config --global http.proxy 'socks://127.0.0.1:8580'
-git config --global --unset http.proxy
-
-
-配置git上代理地址 
-git config --global http.proxy "127.0.0.1:8580"
-git config --global http.proxy "127.0.0.1:9666"
 
 Winodws系统的做法：打开CMD，输入ipconfig /flushdns 
 Linux的做法：在终端输入sudo /etc/init.d/networking restart 
@@ -165,11 +145,6 @@ Linux的做法：在终端输入sudo /etc/init.d/networking restart
 
 如需取消代理配置,输入 
 git config --global --unset http.proxy
-
-git log --reverse
-git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
-
-git log --all --reverse --grep='搜索关键字'
 
 git branch initial_revision <commit id>
  //显示分支
@@ -179,9 +154,6 @@ git ls-files --stage //显示stage文件
 git add -i //显示stage文件
 git show-ref
 
-//显示tag
- git tag -n --sort=taggerdate
- git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 
  git checkout -b <new branch name> <tag_name>
 
@@ -237,18 +209,18 @@ git commit //添加到仓库
 git diff --cached //对比stage和branch之间的差异
 git ls-files --stage //object文件
 git cat-file //object对象
-3 记录管理
+3 仓库记录管理
 git log
 git show
 
-3.1 记录的文件恢复
+3.1 仓库记录的文件恢复
 git reset -- <file>                     //恢复仓库修改到索引区，索引区unstage到工作区
 git restore --staged <file>             //恢复仓库修改到索引区
 git restore <file>                      //恢复索引区修改改到工作区
 git restore --staged --worktree <file> //恢复仓库修改到工作区
 git checkout -- HEAD <file> //恢复仓库修改到工作区
 
-3.2 记录的恢复
+3.2 仓库记录的恢复
 git reverse      // 未提交需要提交，错误记录提交撤销修改，新创建记录提交
 git reset --soft // 未提交不删除不修改，提交记录重置的放到index 区，提交记录删除 
 git reset --mix  // 未提交不删除并移到工作区，提交记录重置的放到工作区，提交记录删除 
@@ -257,10 +229,14 @@ git checkout     // 未提交需要提交，不删除已经commit 记录
 git checkout  -f // 未提交删除，不删除已经commit 记录
 git switch (2.23)// 未提交删除，不删除已经commit 记录，不能切换commit id
 
-3.3 记录搜索
+3.3 仓库记录搜索
 git log --grep='' --author="anshu.wang"
 git log -- <filepath>    //某个文件的修改
 git bisect
+
+git log --reverse
+git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
+git log --all --reverse --grep='搜索关键字'
 
 4.贮藏区
 git stash list //管理贮藏
@@ -271,7 +247,7 @@ git stash pop //取出最近贮藏区修改
 git stash apply stash@{message} //取出最近贮藏区修改，并删除记录
 git stash drop stash@{message} //管理删除
 
-5. 协同
+5. 协同/工作流
 git init //初始化仓库
 git clone //初始化仓库&checkout
 git remote -v
@@ -279,15 +255,39 @@ git push //添加记录到远程仓库
 git fetch //拉取记录到本地分支
 git pull //fetch &merge 拉取记录到本地仓库并工作区
 
-5.1 配置
-git config
 5.1 记录分支管理
 git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
 git merge
 git rebase
-git tag
+//显示tag
+ git tag -n --sort=taggerdate
+ git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 git push origin --delete develop_AA //删除远程分支
+
+
+6 配置
+
+git config --global http.proxy 'socks://127.0.0.1:8580'
+git config --global --unset http.proxy
+
+
+配置git上代理地址 
+git config --global http.proxy "127.0.0.1:8580"
+git config --global http.proxy "127.0.0.1:9666"
+```js
+git config --system
+D:\Program\Git/etc/gitconfig
+
+git config --global 
+C:\Users\Administrator\.gitconfig
+
+git config
+G:\workspace\ws-github\.git\config
 ```
+
+
+
+
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
 ### 常见问题
 ```shell
