@@ -349,6 +349,8 @@ adb shell 命令源码地址（find -iname 'cmds'）：
 #### system/core
 adb shell "getprop ro.build.version.release"
 adb shell "getprop ro.build.version.sdk"
+
+adb shell " getprop | grep product"
 #### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000
