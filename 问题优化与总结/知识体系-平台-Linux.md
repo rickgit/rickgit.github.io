@@ -327,3 +327,6 @@ awk：适合对文本进行较复杂的格式化处理；
 ### find
 
 ### locate whereis which type 
+
+### 磁盘分析
+du -c -d 1  -m | sort -n

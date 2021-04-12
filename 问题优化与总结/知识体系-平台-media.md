@@ -1761,7 +1761,10 @@ ImageView
             StateListDrawable 
 
 
-#### SurfaceView,GLSurfaceView（）,TextureView
+
+
+
+#### SurfaceView（Surface）,GLSurfaceView（）,TextureView（SurfaceTexture）
 ```java
 +----------------+-----------------------------+-----------+
 |                | own   Surface|   EGL/Render |  hard acc |
@@ -1775,12 +1778,19 @@ ImageView
 
 ```
 
-#### CameraX.PreviewView
-PreviewView
-装饰者：
-    封装 PreviewViewImplementation（SurfaceViewImplementation，TextureViewImplementation），添加mPreviewStreamStateLiveData 使显示能观察生命周期
+SurfaceView
+    独立窗口,可以放在单独线程渲染, 但不能变形和动画。
+Surface
+    内存中的一段绘图缓冲区。 EGL14.eglCreateWindowSurface关联OpenGLES
+GLSurfaceView
+    加入了EGL的管理，渲染线程（Renderer）
 
-CameraSelector ，ImageAnalysis ，ImageCapture ，
+TextureView
+    将纹理输出在TextureView, 需要是一个硬件加速层。
+SurfaceTexture（ Android 3.0）
+     camera读取到的预览（preview）在 SurfaceTexture，不需要显示出来，GL外部纹理，用于二次处理。
+     SurfaceTexture创建可以传入GL的textureId
+
 
 #### drawText
     工厂模式
@@ -1822,9 +1832,13 @@ mPaint.setStyle(Paint.Style.STROKE);
 canvas.drawRect(mCoordX,l,t,r,b, mPaint);
 mPaint.setStyle(style2);
 ```
-### 分离合成轨道
+### 分离（MediaExtractor）合成轨道
 
 MediaExtractor的作用是把音频和视频的数据进行分离。
+    MediaExtractor设置文件路径  setDataSource
+    指定类型的轨道              selectTrack
+    创建解码器                  MediaCodec
+    释放资源
 MediaMuxer的作用是生成音频或视频文件；还可以把音频与视频混合成一个音视频文件。
 
 ### 音视频采集/播放（声卡 AudioRecord，摄像头 Camera，音视频MediaRecorder）
@@ -1865,7 +1879,18 @@ android 设备信息
 AudioRecord
 构建器 AudioRecord.Builder
  
+#### CameraX.PreviewView
+PreviewView
+装饰者：
+    封装 PreviewViewImplementation（SurfaceViewImplementation，TextureViewImplementation），添加mPreviewStreamStateLiveData 使显示能观察生命周期
 
+CameraSelector ，ImageAnalysis ，ImageCapture ，
+#### 录屏 MediaProjection + MediaRecorder  组合
+MediaRecorder
+    MediaProjectionManager（API 21）申请，onActivityResult返回
+    MediaProjection 关联 MediaRecorder    
+    MediaRecorder 录制 
+ 
 ### MediaCodec/Lame（Android 硬编码）
 #### 图片Bitmap
 [bitmap管理](https://developer.android.com/topic/performance/graphics/manage-memory.html)
@@ -1968,7 +1993,7 @@ stop()            |      stop() |                +--------------------+         
 ```
 获取多媒体信息 使用系统应用
 拍照/录像 /录音 （见前文） 
-录屏 MediaProjection + MediaRecorder + 组合，或 MediaProjection + MediaCodec + MediaMuxer
+录屏 MediaProjection + MediaRecorder  组合，或 MediaProjection + MediaCodec + MediaMuxer
 
 显示图片 ImageView
 播放音视频 MediaRecorder
@@ -2009,13 +2034,17 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 坐标变换（❌glTranslate*()、glRotate*()和glScale*()，glViewPoint，⭐辅助库glm）
 
 光照（glLight*() 、glLightModel*() ；高光/位置-方向-角度，环境光，散射光）
-    环境光（光的混合）：ambientStrength * lightColor* objectColor;
+    辐射光（Emitted Light 物体发出）
+    环境光（Ambient Light光的混合）：ambientStrength * lightColor* objectColor;
+    漫射光（Diffuse Light 来自一个方向，各个方向上均匀地发散出去）
+    镜面光（Specular Light 自特定方向并沿另一方向反射出去）
+
     冯氏光照模型：
         ambient材质向量定义了在环境光照下这个物体反射得颜色（物体颜色）
         diffuse材质向量定义了在漫反射光照下物体的颜色。（和环境光照一样）
         specular材质向量设置的是镜面光照对物体的颜色影响
         shininess影响镜面高光的散射/半径
-    材质（glMaterial*）
+    材质（glMaterial*）材料颜色也分成环境、漫反射和镜面反射成分
 
 阴影（恒定，平滑）
 模型与网络
@@ -2030,6 +2059,7 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
 堆栈
 
 ```
+右手坐标
                      ▲  Y
                      │
                      │
@@ -2086,17 +2116,28 @@ https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GG
 
 ### GLSL
 
-存储标识符：const, attribute, uniform , varying ,centroid varying
-访问修饰符： in, const in, out , inout
+存储标识符：
+    GLSL ES 1.00 ：const, uniform ，attribute, varying
+    ❌attribute, varying关键字，GL3.x中，废弃了，分别用in/out作为前置关键字。
+        Get某个attribute的location带来的开销。
+       
+变量gl_Position
+变量gl_FragColor
+
+
 ### GLM 向量和矩阵数据结构
 glm::mat4
 glm::vec4
-
 ### Android 滤镜
-https://github.com/google/grafika
-https://github.com/wuhaoyu1990/MagicCamera
+[封装OpenGL](https://github.com/google/grafika)
+[40多个滤镜](https://github.com/wuhaoyu1990/MagicCamera)
+[70多个滤镜](https://github.com/cats-oss/android-gpuimage)
 
-
+ 
+[脸部识别](https://github.com/OAID/TengineKit)
+[彩妆](https://github.com/DingProg/Makeup)
+ 
+[](https://github.com/CainKernel/CainCamera)
 ### Opengl 介绍
 OpenGl只是一个标准；实际的OpenGL库的开发者通常是显卡的生产商，Windows中的opengl32.dll，以及Unix /usr/lib/libGL.so，Android 实现是 platform_frameworks_native  agl;
 EGL代替的是原先wgl/glx 管理context，Android 使用 egl。
