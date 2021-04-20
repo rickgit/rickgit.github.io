@@ -351,6 +351,8 @@ adb shell 命令源码地址（find -iname 'cmds'）：
 #### system/core
 adb shell "getprop ro.build.version.release"
 adb shell "getprop ro.build.version.sdk"
+adb shell " getprop | grep product"
+
 
 #### system/extras/su 提权
 1. Android 4.4，system分区多被挂载为nosuid，即使修改su.c ，关掉selinux setenforce 0，也有framework验证。init进程开启一个su daemon 守护进程，init进程具有天然的root权限，由它 fork 出的su daemon也有（https://www.jianshu.com/p/6bc251ee9026）
@@ -362,6 +364,8 @@ adb shell "getprop ro.build.version.sdk"
 https://anthony-f-tannous.medium.com/android-10-emulation-of-magisk-supersu-on-an-aosp-avd-de93ed080fad
 https://github.com/topjohnwu/libsu
 https://source.android.google.cn/devices/bootloader/system-as-root?hl=zh-cn
+
+
 #### MONKEY
 1. monkey tools 测试
 adb shell monkey -p com.bla.yourpackage -v 1000
