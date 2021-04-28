@@ -2924,8 +2924,15 @@ PanelHolder（下拉窗）
 keyguardbouncer（解锁界面）
 
 com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist //不展示在状态栏
-mSlots.get(0).mHolder.mIcon.icon.loadDrawable();
 
+Drawable drawable = mSlots.get(21).mHolder.mIcon.icon.loadDrawable(mContext);
+Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+        drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+Canvas canvas = new Canvas(bitmap);
+drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+drawable.draw(canvas);
+bitmap
+volume
 #### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
 ##### WIFI
  
