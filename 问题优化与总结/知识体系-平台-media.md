@@ -79,7 +79,14 @@ SkPath - contours of lines and curves
   +----------------------------------------------------------------------------------------------------------+
 ### 显卡
  freetyp2  Agg  skia
-### 多媒体应用历史
+### 多媒体应用历史（多种媒介为一体）
+5300-4300年期间，良渚刻画《良渚文化刻画符号》
+公元前14世纪，殷商甲骨文（文字是人类用表义符号记录表达信息以传之久远的方式和工具）
+            《甲骨文对照表》金文代表《静簋》
+1839年，世界上第一台照相机是法国的达盖尔发明的。
+1857年，法国发明家斯科特（Scott）发明了的声波振记器
+1877年，爱迪生制造出人类史上第一部留声机，开始储存媒体的领域
+
 1980年至90年代中期，模拟视频监控技术阶段
 1990年代中期到21世纪初，半数字视频本地监控系统
 21世纪初至今，全数字远程视频监控阶段
@@ -1824,7 +1831,7 @@ html/resource 使用 &#160;
 &#8195;，&emsp;，em空格 （一个中文宽度）
 &#12288;，中文全角空格 （一个中文宽度）
 
-#### 图标组成
+#### 图表主要组成
 [](https://www.highcharts.com.cn/docs/basic-compose)
 ```java
 Paint.Style style2 = mPaint.getStyle();
@@ -2136,8 +2143,16 @@ glm::vec4
  
 [脸部识别](https://github.com/OAID/TengineKit)
 [彩妆](https://github.com/DingProg/Makeup)
+[自动彩妆]()
  
 [](https://github.com/CainKernel/CainCamera)
+
+opencv 脸部识别
+    能识别出静态图片和视频上帧上的人脸，不能进行真实场景识别
+mobilefacenets
+insightface
+facenet
+
 ### Opengl 介绍
 OpenGl只是一个标准；实际的OpenGL库的开发者通常是显卡的生产商，Windows中的opengl32.dll，以及Unix /usr/lib/libGL.so，Android 实现是 platform_frameworks_native  agl;
 EGL代替的是原先wgl/glx 管理context，Android 使用 egl。
