@@ -187,7 +187,7 @@ remote            +              tag
 
 ```
 
-### ⭐ 仓库仓用命令
+### ⭐ Git 仓库仓用命令
 ```shell
 1.工作区
 git status //（红色文件）管理本地修改状态
@@ -237,6 +237,11 @@ git bisect
 git log --reverse
 git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
 git log --all --reverse --grep='搜索关键字'
+
+3.4 仓库记录操作
+git rebase -i hash
+
+
 
 4.贮藏区
 git stash list //管理贮藏

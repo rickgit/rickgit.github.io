@@ -751,7 +751,8 @@ ViewPager2支持：
 +---------------------------------------------------------------------------------+
 
 ```
-
+###### Spinner
+Spinner 修改字体颜色时 设置style是无效的 只有设置app:theme=""才会有效
 ###### Progressbar
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
