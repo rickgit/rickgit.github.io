@@ -2860,31 +2860,6 @@ public class LocationManagerService extends ILocationManager.Stub {
 ### SystemUI
 
 
-QuickStatusBarHeader
-  quick_status_bar_expanded_header.xml
-  QuickStatusBarHeader（system_icons.xml）
-    BluetoothLayout
-    BatteryMeterLayout
-```
-
-com.android.systemui.statusbar.CommandQueue#mHandler 接收消息
-com.android.systemui.statusbar.phone.PhoneStatusBarPolicy#mIntentReceiver 
-
-
-statusbar 隐藏原生图标
-com.android.systemui.statusbar.phone.StatusBarIconController.IconManager
-com.android.systemui.statusbar.StatusBarIconView
-
-```
-SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
-- stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
-
-其他进程,状态栏系统图标（蓝牙，WiFi）
-- ![其他进程,状态栏图标](其他进程,状态栏图标.png)
-获取系统图标
-```java
-com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
-```
 ##### SystemUI启动的子服务
 systemservice
 zygote ->systemserver -ams-> systemui
@@ -2923,6 +2898,38 @@ PanelHolder（下拉窗）
 
 keyguardbouncer（解锁界面）
 
+
+
+
+QuickStatusBarHeader
+  quick_status_bar_expanded_header.xml
+  QuickStatusBarHeader（system_icons.xml）
+    BluetoothLayout
+    BatteryMeterLayout
+    
+###### statusbar 隐藏原生图标
+com.android.systemui.statusbar.phone.StatusBar#loadDimens 设置进度条高度
+com.android.internal.R.dimen.status_bar_height 进度条高度
+```
+
+com.android.systemui.statusbar.CommandQueue#mHandler 接收消息
+com.android.systemui.statusbar.phone.PhoneStatusBarPolicy#mIntentReceiver 
+
+
+com.android.systemui.statusbar.phone.StatusBarIconController.IconManager
+com.android.systemui.statusbar.StatusBarIconView
+
+```
+
+SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
+- stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
+
+其他进程,状态栏系统图标（蓝牙，WiFi）
+- ![其他进程,状态栏图标](\res\statubar\其他进程,状态栏图标.png)
+- ![其他进程,状态栏图标](\res\statubar\systemicon1.png)
+获取系统图标
+```java
+com.android.systemui.statusbar.StatusBarIconView#getIcon(android.content.Context, com.android.internal.statusbar.StatusBarIcon)
 com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist //不展示在状态栏
 
 Drawable drawable = mSlots.get(21).mHolder.mIcon.icon.loadDrawable(mContext);
@@ -2933,6 +2940,13 @@ drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
 drawable.draw(canvas);
 bitmap
 volume
+
+
+com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
+
+
+```
+
 #### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
 ##### WIFI
  
@@ -3829,6 +3843,24 @@ Uptime: 53403267 Realtime: 53403267
 ```
 #### 对象的生命周期绑定
 Obsevable
+
+
+## 传感器
+重力传感器
+        mSensorManager = (SensorManager) getSupportActivity().getSystemService(Activity.SENSOR_SERVICE);
+        if (mSensorManager == null) {
+            return;
+        }
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (mAccelerometer != null) {
+            mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
+方向传感器
+        mSensorManager = (SensorManager) getSupportActivity().getSystemService(Activity.SENSOR_SERVICE);
+        mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_DEVICE_ORIENTATION);
+        mSensorManager.registerListener(this, mSensor, mRate, mHandler);
+
 ## 精简
 [square](https://github.com/square?q=android&type=&language=)
 

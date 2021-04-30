@@ -1897,7 +1897,22 @@ MediaRecorder
     MediaProjectionManager（API 21）申请，onActivityResult返回
     MediaProjection 关联 MediaRecorder    
     MediaRecorder 录制 
- 
+
+
+##### MediaRecorder
+```
+\frameworks\base\include\media\mediarecorder.h
+start called in an invalid state
+enum media_recorder_states {
+    MEDIA_RECORDER_ERROR                 =      0,
+    MEDIA_RECORDER_IDLE                  = 1 << 0,
+    MEDIA_RECORDER_INITIALIZED           = 1 << 1,
+    MEDIA_RECORDER_DATASOURCE_CONFIGURED = 1 << 2,
+    MEDIA_RECORDER_PREPARED              = 1 << 3,
+    MEDIA_RECORDER_RECORDING             = 1 << 4,
+};
+
+```
 ### MediaCodec/Lame（Android 硬编码）
 #### 图片Bitmap
 [bitmap管理](https://developer.android.com/topic/performance/graphics/manage-memory.html)
@@ -2214,4 +2229,5 @@ PBO是OpenGL ES 3.0开始提供的一种方式，主要应用于从内存快速�
 
 
 ```
-
+## 编辑和智能编辑
+## 去中心化
