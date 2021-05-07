@@ -123,7 +123,7 @@ SkPath - contours of lines and curves
 Android 音频：位宽（sample format），采样率（bit rate），通道数（channels）
 音频压缩 G.711 G.722 ...
 1. 位深/位宽（很亮音高） 16bit
-  声压 0.00002pa~0.63pa；声压和分贝换算公式：（。。。。）
+  声压 0.00002pa~0.63pa；声压和分贝换算公式：（声压级（分贝）= 20×lgP/P0）
       ```js
       模拟信号与音强
                               X           X                                  XX        XXX         XXX
@@ -159,10 +159,10 @@ Android 音频：位宽（sample format），采样率（bit rate），通道数
 
 3. 通道 
       单声道(mono)
-      双声道(stereo)
+      双声道(stereo) 立体声
       2.1声道（增加低音声道）
       四声道立体声(quad)
-      杜比声（5.1声道）
+      杜比声（5.1声道）源于4.1环绕，增加了一个中置单元负责传送低于80Hz的声音信号，有利于加强人声
       7.1声道
 ##### 音频帧
       音频帧：音频在量化得到二进制的码字后，需要进行变换，而变换（MDCT）是以块为单位（block）进行的，一个块由多个（120或128）样本组成。而一帧内会包含一个或者多个块。帧的常见大小有960、1024、2048、4096等。一帧记录了一个声音单元
@@ -321,7 +321,7 @@ ES流 PES流 TS流 rtsp流 rtmp流 hls流
 #### 音频
 
 Uncompressed            Compressed - Lossless     Compressed - Lossy
-Audio CD                Apple Lossless Audio       Mp3
+Audio CD                Apple Lossless Audio       AMR/Mp3
 Audio DVD               TTA                        AAC
 PCM WAV and AIFF        FLAC                       WMA
 Vinyl Record            Monkey's Audio             Mini Disc 
@@ -360,8 +360,10 @@ DAT                     WavPack
     TAG_V1（5byte ID3V1）
 ```
 ##### AAC 
+1998年 提出 AMR(Adaptive Multi-Rate)标准, AMR被3gp替代
+
 1997年，基于MPEG-2的音频编码技术。
-2000年，MPEG-4标准出现后，加入了SBR技术和PS技术，MPEG-4 AAC 
+2000年，MPEG-4标准出现后，加入了SBR技术和PS技术，MPEG-4 AAC ，取代mp3
 2017年，Technicolor也已将授权即将终止的信息告知制造厂商
 ```
 +--------------------+-------------------+-----------------+------------------+
@@ -374,6 +376,8 @@ DAT                     WavPack
 ADTS 头中有 采样率、声道数、帧长度
 
 AAC专利有专利
+
+
 ##### Opus（取代Speex和Vorbi）
 2012年7月2日，Opus被IETF批准用于标准化。
 
@@ -389,8 +393,45 @@ AAC专利有专利
 播放等待，pts,dts
 
 
+##### 字幕
+Teletext 20世纪70年代由英国制定的电视文本信息传送服务。   
+Subtitles 是电影或电视节目中一种显示对话文本的字幕。
+Closed Caption 一种字幕的标准。选择开启这项功能的人才能看到。
+   CC主要遵循两个标准：EIA-608和EIA-708（CEA-708）标准。 
+   EIA－608，由美国电子工业协会（EIA）制定，规定了PAL/NTSC模拟电视上Line21行所包含的caption信息。字幕在line21行一个肉眼看不见的视频数据区域来传输，采用固定带宽960bit/s。 
 
-
+   EIA－708（CEA-708），由美国电子工业协会制定，在美国和加拿大是ATSC数字电视的CC字幕标准。不像DVB标准下的字幕，ECEA-708的字幕反而更接近于传统的line21线的文本字幕。不过，与传统line21线字幕不同的是，CEA-708的字幕包含大部分的Latin-1字符。能全面兼容西班牙与和法语，能够兼容大部分的其他西欧语种。在美国，FCC组织要求所有13”以上的数字电视都必须要支持CEA-708解码。
+```java
+switch (mimeType) {
+    case MimeTypes.TEXT_VTT:
+    return new WebvttDecoder();
+    case MimeTypes.TEXT_SSA:
+    return new SsaDecoder(format.initializationData);
+    case MimeTypes.APPLICATION_MP4VTT:
+    return new Mp4WebvttDecoder();
+    case MimeTypes.APPLICATION_TTML:
+    return new TtmlDecoder();
+    case MimeTypes.APPLICATION_SUBRIP:
+    return new SubripDecoder();
+    case MimeTypes.APPLICATION_TX3G:
+    return new Tx3gDecoder(format.initializationData);
+    case MimeTypes.APPLICATION_CEA608:
+    case MimeTypes.APPLICATION_MP4CEA608:
+    return new Cea608Decoder(
+        mimeType,
+        format.accessibilityChannel,
+        Cea608Decoder.MIN_DATA_CHANNEL_TIMEOUT_MS);
+    case MimeTypes.APPLICATION_CEA708:
+    return new Cea708Decoder(format.accessibilityChannel, format.initializationData);
+    case MimeTypes.APPLICATION_DVBSUBS:
+    return new DvbDecoder(format.initializationData);
+    case MimeTypes.APPLICATION_PGS:
+    return new PgsDecoder();
+    default:
+    break;
+}
+Webvtt、Tx3g、Subrip、Ssa、Dvb、Pgs、Ttml
+```
 ##### 编码其他           
 codecs
 H.264(AVC) H.265(HEVC) VP9 AVI
@@ -451,6 +492,9 @@ slice的目的是为了限制误码的扩散和传输，使编码片相互间保
 帧间压缩技术原理
 DCT
 CABAC压缩原理
+序列参数集SPS（Sequence Paramater Set），保存了一组编码视频序列(Coded video sequence)的**全局参数**。
+图像参数集PPS，包含**一幅图像**所用的公共参数，即一幅图像中所有片段SS（Slice Segment）引用同一个PPS
+
 
 获取h264
 ffmpeg -i 8x8.png -pix_fmt yuv420p 8x8.h264
@@ -519,6 +563,14 @@ AV1完全是对标H.265去的。H.265目前有比较高的专利门槛，和H.26
 #### qsv硬编码
 
 ### 文件或媒体流
+视频格式有：mp4/m4v/3gp/mpg、flv/f4v/swf、avi、gif、wmv、rmvb、mov、mts/m2t、webm/ogg/mkv
+音频：mp3、aac/mp4/M4A、ape/flac、wav、wma、amr、mid
+图片——点阵：jpg、png、gif、bmp、ico、tif(tiff)、psd/psb、WebP、RAW、pdf、DCM、sai/rif
+图片——矢量图：eps/ai/cdr、svg、ttf
+
+[音视频格式分析](https://hexinator.com/)
+
+
 [多媒体文件 Sample](https://filesamples.com/)
 [分割视频](https://www.aconvert.com/cn/audio/split/)
 #### 储存和传输图片的格式（PNG，JEPG，BMP，GIF）
@@ -669,9 +721,49 @@ TLV格式规范：
 11	Date type	
 12	Long string type	后面4个字节为长度
 ```
+[FLV 格式](/res/doc/音视频格式.xlsx)
 ##### FLV AAC
 [](https://blog.csdn.net/weiyuefei/article/details/70880919)
 [](https://www.cnblogs.com/lidabo/p/9020423.html)
+[FLV AAC TAG](https://www.cnblogs.com/lidabo/p/7205022.html)
+音频Tag头一般由一个字节定义（AAC用两个字节），第一个字节的定义如下：
+音频格式 4bits | 采样率 2bits | 采样精度 1bits | 声道数 1bits|
+
+音频格式 4bits
+0x00 = Linear PCM, platform endian
+0x01 = ADPCM
+0x02 = MP3
+0x03 = Linear PCM, little endian
+0x04 = Nellymoser 16-kHz mono
+0x05 = Nellymoser 8-kHz mono
+0x06 = Nellymoser
+0x07 = G.711 A-law logarithmic PCM
+0x08 = G.711 mu-law logarithmic PCM
+0x09 = reserved
+0x0A = AAC
+0x0B = Speex
+0x0E = MP3 8-Khz
+0x0F = Device-specific sound
+
+采样率 2bits
+0 = 5.5-kHz
+1 = 11-kHz
+2 = 22-kHz
+3 = 44-kHz
+对于AAC总是3，这里看起来FLV不支持48K AAC，其实不是的，后面还是可以定义为48K。
+
+采样精度 1bits
+0 = snd8Bit
+1 = snd16Bit
+压缩过的音频都是16bit
+
+声道数 1bits
+0 = sndMono
+1 = sndStereo
+对于AAC总是1
+
+
+
 #### MP4
 1998年10月，公布第1版 MPEG-4[](ISO/IEC 14496)
 1999年01月，成为国际标准
@@ -720,7 +812,12 @@ sample是媒体数据存储的单位，存储在media的chunk中
 结构：
     Length1+NALU1+Length2+NALU2+....
 ```
+#### WEBM
+AVI——采用的视频编码并不统一，但普遍相同，其内容体积比较大
+MKV——是Matroska公司为取代avi所开发的视频格式
+WebM——是谷歌的一个开放免费的视频格式，它是基于MKV格式开发的
 ####  MPEG-TS 流
+
 1995年，MPEG-2第一部分
 [mpeg2ts 分析](http://www.pjdaniel.org.uk/mpeg/)
 TS流与PS流的区别在于TS流的包结构是固定长度的，而PS流的包结构是可变长度的。
@@ -824,7 +921,7 @@ Data: 56443355443343232221110402400000000000000000abaa…
 Bitmap（png,jpeg,gif）
 ### 点播协议（延时可忍受）-基于文件分片
 [RTMP 测试地址](https://www.cnblogs.com/juanxincai/p/12900303.html)
-#### HTTP-FLV（长连接 Http1.1 + flv分块/tag + Adobe_Flash_Player）
+#### ⭐HTTP-FLV（长连接 Http1.1 + flv分块/tag + Adobe_Flash_Player/flv.js）
 CCTV1高清：http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8
 CCTV3高清：http://ivi.bupt.edu.cn/hls/cctv3hd.m3u8
 CCTV5高清：http://ivi.bupt.edu.cn/hls/cctv5hd.m3u8
@@ -837,12 +934,14 @@ HTTP断点续传下载FLV到本地缓存
 
 
 
-#### HLS（短连接 HTTP 传输 + HLS协议 + mp4分片/m4s或mpts/ts）
+#### ⭐HLS（短连接 HTTP 传输 + HLS协议/.m3u8文件 + mp4分片/m4s或mpts/ts播放文件）
 2009年，QuickTime和iPhone3GS的一个标准
 2017年8月，RFC 8216发布，描述了HLS协议第7版的定义
 2019年，国外年度视频行业调查，最流行的流媒体格式
 HTTP Live Streaming，是Apple的开放标准，基于HTTP流。每下载一个分片都需要发生一次 HTTP 请求
 [浏览器支持HLS情况](https://caniuse.com/?search=hls)
+❌PC端只有Safari支持HLS，其他浏览器则需要借助hls.js
+
 
 分割成磁盘ts文件，而不是像rtmp放在内存
 ffmpeg -i D:\file\ffmpeg\big_buck_bunny.mp4 -vcodec copy -an -f hls D:\cache\video\test.m3u8
@@ -875,7 +974,10 @@ cctv1hd-1601050915000.ts
 
 ##### AMF 二进制数据编码格式
 
-#### DASH
+#### DASH （http协议 + dash协议 + 分片化的MP4）
+Dynamic Adaptive Streaming ove HTTP的缩写，替换flash，dash.js拓展浏览器支持
+YouTube使用
+
 VR直播技术中
 安卓平台上的ExoPlayer支持MPEG-DASH
 
@@ -883,13 +985,16 @@ VR直播技术中
 
 ### 流媒体协议（低延迟，监控/会议）
 边缓冲边播放的媒体协议
+流式文件（flv、rmvb、mov、asf）是可以边传边解的，开始不需要整个文件。 
+容器格式（mpeg,avi,mpe）的文件的在线播放，必须要服务器支持流式播放接口，例如RTSP协议
+
 [RTMP、WebRTC、UDP 三种互动直播方案的优劣比较](https://www.pttcn.net/a/zixun/guona/2018/0603/27205.html)
-#### RTMP（TCP 传输 + RTMP 协议+  flv分块/f4v数据）
+#### ⭐RTMP（TCP 传输 + RTMP 协议+  flv分块/f4v数据）
 最初由Macromedia开发
 [2012 年 12 月 21 日，Adobe 发布了协议版本 1.0 的规范](https://www.adobe.com/devnet/rtmp.html)
 
 
-浏览器需要加载 flash插件才能播放
+浏览器需要加载 ❌flash插件才能播放
 RTMP 为 Adobe 私有协议
 基于 TCP 传输，可能会被防火墙阻拦
 
@@ -978,6 +1083,9 @@ Real Time Messaging Protocol (AMF0 Data onMetaData())
 Real Time Messaging Protocol (Video Data)
 Real Time Messaging Protocol (Video Data)
 ```
+
+####  Smooth Streaming
+微软下一代流媒体解决方案。 
 #### ~~RTSP~~ +ts/mp4
 ~~RTSP~~ 是一种双向实时数据传输协议，它允许客户端向服务器端发送请求，如回放、快进、倒退等操作。
 
@@ -1695,8 +1803,8 @@ Camera->Camera.PreviewCallback（rawdatas）->PlanarYUVLuminanceSource（从屏�
 |                 tinyalsa audio driver                           | |                          v4l2 camera driver                               |
 +-----------------------------------------------------------------+ +---------------------------------------------------------------------------+
 ```
-### emoj
-✨❌⭐
+### emoj✨❌⭐
+
 ### Palette
 Median-cut
 简单工厂
@@ -2023,9 +2131,45 @@ stop()            |      stop() |                +--------------------+         
 - MediaPlayer + SurfaceView
 - VideoView
 - FFmpeg
-
+### MediaSync Android M同步音视频
+[](https://www.cnblogs.com/renhui/p/10751755.html)
 ### ExoPlayer
 [ExoPlayer](https://github.com/google/ExoPlayer) 支持 Android 的 MediaPlayer API 当前不支持的功能
+
+library
+    ui com.google.android.exoplayer2.ui.PlayerView 创建surfaceview
+    extractor 解封装 amr flac flv mkv mp3 mp4 ogg rawcc ts wav
+    core      渲染
+    hls,dash,smotthstream
+解码拓展
+
+MediaCodec
+音视频同步机制中的同步基准有两种选择：利用系统时间或audio playback position
+视频同步
+    MediaCodecVideoRenderer#shouldDropOutputBuffer 过早不显示，过晚丢弃。调用releaseOutputBuffer方法来将视频帧送显
+音频
+    AudioTrack的write方法，写入音频数据，同时还会调用AudioTrack的getTimeStamp、getPlaybackHeadPosition、getLantency方法来获得“Audio当前播放的时间”
+#### 工作线程
+```js
+generic_x86_arm:/ $ ps -T  16050|grep -E 'exo|Exo|PID'
+USER           PID   TID  PPID     VSZ    RSS WCHAN            ADDR S CMD
+u0_a89       16050 16050  1709 1631268 166948 0                   0 S exoplayer2.demo
+u0_a89       16050 16079  1709 1631268 166948 0                   0 S ExoPlayer:DownloadManager
+u0_a89       16050 18251  1709 1631268 166948 0                   0 S ExoPlayer:FrameReleaseChoreographer
+u0_a89       16050 18252  1709 1631268 166948 0                   0 S ExoPlayer:Playback
+u0_a89       16050 18260  1709 1631268 166948 0                   0 S ExoPlayer:DrmRequestHandler
+```
+DrmRequestHandler 下载DRM
+https://proxy.uat.widevine.com/proxy?provider=widevine_test
+#### 渲染
+buildVideoRenderers
+buildAudioRenderers
+buildTextRenderers
+buildMetadataRenderers
+buildCameraMotionRenderers
+buildMiscellaneousRenderers 
+### Android本地 NuPlayer 
+5.0之后Android的音视频本地播放框架不使用AwesomePlayer，采用NuPlayer框架
 
 ## OpenGL
 ### 介绍
@@ -2150,16 +2294,24 @@ https://www.youtube.com/watch?v=5W7JLgFCkwI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GG
 ### GLM 向量和矩阵数据结构
 glm::mat4
 glm::vec4
+
+### IMGUI 控件
 ### Android 滤镜
 [封装OpenGL](https://github.com/google/grafika)
 [40多个滤镜](https://github.com/wuhaoyu1990/MagicCamera)
 [70多个滤镜](https://github.com/cats-oss/android-gpuimage)
 
- 
+[opencv人脸识别，目标追踪](https://github.com/kongqw/OpenCVForAndroid)
 [脸部识别](https://github.com/OAID/TengineKit)
 [彩妆](https://github.com/DingProg/Makeup)
-[自动彩妆]()
+[磨皮，彩妆](https://github.com/msoftware/HighPassSkinSmoothing-Android)
+[自动彩妆](https://github.com/msoftware/HighPassSkinSmoothing-Android)
  
+脸部（粉底/祛斑/美白/磨皮），口红，腮红，眉毛，眼部（睫毛，眼影，双眼皮，眼线，美瞳，大眼）
+瘦脸，瘦身，长腿，丰胸
+
+[滤镜特效](https://www.photofilters.com/)
+
 [](https://github.com/CainKernel/CainCamera)
 
 opencv 脸部识别
@@ -2229,5 +2381,18 @@ PBO是OpenGL ES 3.0开始提供的一种方式，主要应用于从内存快速�
 
 
 ```
-## 编辑和智能编辑
+### 人脸检测 人脸跟踪
+基于mtcnn人脸检测+onet人脸跟踪
+
+OpenTLD
+
+目标跟踪，使用CameShift算法
+目标追踪之卡尔曼滤波
+多目标跟踪方法：deep-sort
+
+
+目标跟踪
+1. Opencv
+2. BoofCv
+3. FastCv
 ## 去中心化

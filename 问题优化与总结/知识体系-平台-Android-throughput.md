@@ -273,3 +273,7 @@ way 1   +---------> |   | FutureTask(WorkerRunnable) |           |        +---> 
 
 ```
 
+#### HandlerThread结合Handler#callback的用法
+```java
+mediaSourceHandler = Util.createHandler(mediaSourceThread.getLooper(), /* callback= */ this);
+```

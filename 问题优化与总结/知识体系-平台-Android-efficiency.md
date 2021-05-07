@@ -175,7 +175,31 @@ Art正式替代Dalvik VM
 [](知识体系-存储-VCS.md)
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
+### 烧录
+[烧录内核](https://www.cnblogs.com/hixin/p/6892206.html)
+```js
+adb reboot bootloader 
+fastboot flash boot boot.img 
+fastboot reboot
+```
 
+[编译到烧录系统](https://zhuanlan.zhihu.com/p/77795607)
+[烧录系统](https://blog.csdn.net/weixin_45767368/article/details/105962606)
+```js
+1、adb reboot bootloader
+2、fastboot flashing unlock
+3、source ./build/envsetup.sh
+lunch aosp_sargo-userdebug
+export ANDROID_PRODUCT_OUT=//（boot.img,system.img, cache.img, userdata.img）
+fastboot flashall -w
+```
+#### adb root 模拟器
+adbd cannot run as root in production builds
+不能root
+    Pixel_2_API_28(**Google Play**) 
+可以root
+    Pixel_2_API_28(**Google APIs**)
+emulator.exe -avd Pixel_2_API_28  -writable-system  -selinux disabled
 ### 包内精简 - APK打包 （编译，打包，优化，签名，安装）
 [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
 gradle,Transform的应用

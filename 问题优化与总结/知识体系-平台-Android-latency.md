@@ -1,6 +1,9 @@
 
 ## 网络通讯
 [高性能浏览器网络](https://hpbn.co/)
+ 
+ Android系统访问PC电脑IP为10.0.2.2，设备自身IP为10.0.2.15/127.0.0.1
+
 
 ### Retrofit 动态代理
 动态代理创建Service类，适配返回类型Call支持其他类型， 注解信息依赖注入ServiceMethod
@@ -1066,8 +1069,8 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 
 }
 ```
-
-
+### Cronet
+Using HTTP3/QUIC with Cronet 
 ### 数据交换格式
 
 #### Serial（Twitter）
@@ -1638,6 +1641,8 @@ asmack
 
 #### 缺点
 xml传输，二进制需要转化Base64
+
+
 ## 本地存储
 网络,SQLite数据库,方式文件存储,SharedPreferences/MMKV,内容提供器（Content provider）
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
@@ -1908,6 +1913,9 @@ mContext.getResources().getResourceEntryName(resourceId)
 ####  MMKV for Android “零拷贝问题” -  sharepreference优化
 mmap（微信mars，美图logan，网易）
 ## 进程间通讯
+/packages/浏览器，计算器，电话，画廊，launcher，音乐，安装器 
+/frameworks/core/packages/systemui
+/system/extra/su
 ###  IPC机制与方法 
 1. 1940 年，计算机存储中就使用了"文件"。
 2. 1961 年，由Buroughs MCP和麻省理工学院兼容时间共享系统引入的"文件系统"的概念
@@ -2269,6 +2277,8 @@ android:clearTaskOnLaunch 只会作用于某一Task的根Activity。
 ```
 
 ###### Configuration
+方向传感器，重力传感器
+
 ![蓝牙连接手持按键](configuration.png)
 
 
@@ -2858,6 +2868,23 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 #### SystemServer - mediaserver
 ### SystemUI
+状态栏PhoneStatusBarView：通知图标，系统图表（蓝牙，WiFi，电量），时间
+下拉后NotificationPanelView：
+  StatusBarHeaderView/锁屏状态栏（KeyguardStatubarView）
+  快捷设置面板（屏幕亮度调节器ToggleSlderView，9个快捷功能QSPanel，设置页脚QSFooterImpl）
+  通知面板 NotificationStackScrollLayout
+  锁屏切换
+截屏界面
+全局音量管理（音量键） VolumeUI
+底部导航栏 NavigationBar
+电量 PowerUI（电量提醒的模块，包括低电提醒和高低温关机提醒）
+最近应用视图 Recents
+锁屏 keyguardbouncer
+铃声播放 RingtonePlayer
+Android 7.0
+  控制管理分屏 StackDivider
+  画中画模式管理  PipUI
+网络，usb...
 
 
 ##### SystemUI启动的子服务
@@ -3319,6 +3346,10 @@ signatureOrSystem
 签名相同或者申请权限的应用为系统应用才能将权限授给它 
 ```
 
+### Process 打开进程
+打开sh，进行读写
+
+busybox权限
 
 
 ## 进程内通讯
