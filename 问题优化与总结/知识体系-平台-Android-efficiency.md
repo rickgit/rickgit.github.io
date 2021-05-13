@@ -353,6 +353,9 @@ try{Looper.loop()}
 systrace.py -b 8000 -t 5 -o systrace.html
 d:\Program\Python27\python.exe systrace.py sched freq idle am wm gfx view sync binder_driver irq workq input -b 8000 -t 5  -o systrace.html
 chromium打开：chrome://tracing/ load加载html文件
+可能引起jank代码地方，添加如下内容标记（使用-a或--app）：
+Trace.beginSection("Tag.mycode"); 和 Trace.endSection();
+
 #### uiautomator
 dump
 events

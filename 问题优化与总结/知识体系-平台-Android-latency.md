@@ -2798,6 +2798,20 @@ Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，Packa
                   base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
 
 ```
+##### 软件更新
+```
+2021-04-29 19:33:16.284 276-423/? V/installed: DexInv: --- END '/data/app/com.xxx.xxx-WzWcTmGHWEG-06kuyXy5WQ==/base.apk' (success) ---
+2021-04-29 19:33:16.321 366-407/system_process D/PackageManager: Instant App installer not found with android.intent.action.INSTALL_INSTANT_APP_PACKAGE
+2021-04-29 19:33:16.321 366-407/system_process D/PackageManager: Clear ephemeral installer activity
+2021-04-29 19:33:16.386 276-423/? E/installd: Failed to delete /data/app/vmdl1541396224.tmp: No such file or directory
+2021-04-29 19:33:16.408 366-428/system_process E/ActivityManager: Sending non-protected broadcast com.install from system uid 1000 pkg com.xxx.xxx
+2021-04-29 19:33:16.451 366-407/system_process I/ActivityManager: Force stopping com.xxx.xxx appid=1000 user=0: pkg removed
+2021-04-29 19:33:16.452 366-407/system_process I/ActivityManager: Killing 3377:com.xxx.xxx/1000 (adj 0): stop com.xxx.xxx
+2021-04-29 19:33:16.482 366-396/system_process W/libprocessgroup: kill(-3377, 9) failed: No such process
+2021-04-29 19:33:16.492 366-407/system_process W/ActivityManager: Force removing ActivityRecord{f7b6036 u0 com.xxx.xxx/.home.ActivityHome t101}: app died, no saved state
+
+软件更新重启
+```
 ##### apk安装过程/应用进程创建过程/应用安装过程
 [Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
 - [安装](http://gityuan.com/2016/11/13/android-installd/)

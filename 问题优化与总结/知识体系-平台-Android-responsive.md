@@ -402,6 +402,9 @@ adb shell dumpsys window displays |head -n 3
 
 ### 显示（Surface）与窗口（WindowManageGloabal，PhoneWindow）
 
+dialog/alert,popover,actionsheet,activitycontent,modalbottomsheet
+toast,snackbar,hub
+
 WindowManageGloabal 关联 RootViewImpl 和 contentView
 PhoneWindow 维持 contentView
 
