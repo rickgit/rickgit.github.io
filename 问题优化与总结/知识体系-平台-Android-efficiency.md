@@ -505,6 +505,10 @@ adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activi
 adb shell  dumpsys window windows |grep "Window #"
 
 ```
+##### anr
+```
+adb shell " dumpsys window | grep anr"
+```
 
 ### 手机交互工具
 https://github.com/eleme/UETool
