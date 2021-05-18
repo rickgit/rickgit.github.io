@@ -175,6 +175,21 @@ Art正式替代Dalvik VM
 [](知识体系-存储-VCS.md)
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
+### codesource 编译
+wsl文件夹大小写敏感设置
+fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
+参考 
+https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/
+https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
+repo sync同步拉取代码时，经常会出现卡住或者失败的情况 解决方法1：修改dns  http://www.ip33.com/dns.html
+步骤一： repo命令
+https://source.codeaurora.cn/quic/la/tools/repo/
+步骤二： manifest
+repo init -u http://source.codeaurora.cn/quic/la/platform/manifest  -b  refs/tags/android-9.0.0_r16
+ repo init -u git://git.omapzoom.org/platform/manifest -b android-2.3.5_r1
+步骤三：
+\.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
+https://www.cnblogs.com/kobe8/p/3990297.html
 ### 烧录
 [烧录内核](https://www.cnblogs.com/hixin/p/6892206.html)
 ```js
