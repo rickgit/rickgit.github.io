@@ -518,3 +518,8 @@ https://hub.fastgit.org/barry-ran/QtScrcpy
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
 [](知识体系-平台-Android-desigin.md)
 ### 并发
+
+
+
+### Android编译
+http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar

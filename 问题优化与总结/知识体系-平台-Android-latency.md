@@ -2899,7 +2899,20 @@ Android 7.0
   控制管理分屏 StackDivider
   画中画模式管理  PipUI
 网络，usb...
+##### SystemUI通讯
+```java
+1. 
+com.android.systemui.statusbar.policy.BatteryControllerImpl
+会导致刷新时间
 
+窗口隐藏：AIDL CommandQueue#setWindowState
+BatteryControllerImpl作为CommandQueue的CallBack
+管理电池 View 的刷新
+
+2. 
+QSTileImpl 定时刷新快捷面板，每十分钟会刷新一次
+创建工厂是QSFactoryImpl
+```
 
 ##### SystemUI启动的子服务
 systemservice
@@ -2916,6 +2929,7 @@ private final Class<?>[] SERVICES = new Class[] {
             com.android.systemui.media.RingtonePlayer.class,//铃声播放
             com.android.systemui.keyboard.KeyboardUI.class,//键盘相关
 };
+
 ```
 ##### SystemBars 三个常见界面
 StatusBarService 管理界面
