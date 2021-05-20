@@ -538,3 +538,8 @@ https://hub.fastgit.org/barry-ran/QtScrcpy
 
 ### Android编译
 http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
+wsl路径：
+C:\Users\anshu\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
+
+cannot execute binary file: Exec format error
+https://www.cnblogs.com/JiuHuan/p/10073632.html

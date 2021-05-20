@@ -2396,3 +2396,6 @@ OpenTLD
 2. BoofCv
 3. FastCv
 ## 去中心化
+
+## 3d动画步骤（建模，布局/动画，渲染）
+https://www.media-freaks.com/the-process-of-3d-animation/
