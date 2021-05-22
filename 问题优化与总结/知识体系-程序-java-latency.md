@@ -1251,11 +1251,13 @@ PDB Standard Palm extension, Fictionwise 使用
 开放电子书格式(epub/oeb,mobi,lit,imp)
 
 TCR     20世纪90年代开发的老Psion公司系列3掌上型装置
-rtf     1992年, 1.0规范
+rtf     1992年, 1.0规范。格式化文本。
 PDF     1992年， 发布版本 1.0
 Djuv    1996年起由AT&T实验室开发的一种图像压缩技术
 PlamDoc 1996, 扩展名.pdb，.prc。mobi格式是这种格式的超集，也可以读取这种格式
 CHM     1998年微软推出的基于HTML文件特性的帮助文件系统。http://www.jedrea.com/chmlib/{filename}
+RB      1998年，NuvoMedia的 Rocket eBook。1997年马丁与马克相遇并共同创业了一个电子阅读器公司（Nuvo Media)。
+        在2000年1月“电子书三巨头”的Gemstar公司，收购了生产第一款阅读器 Rocket eBook 。2003年合作创办的了特斯拉（Tesla）。马丁任公司CEO，马克担任CFO。
 EPub    1999年，David Ornstein 发布 HTML-based早期的epub格式oeb规范 ，基于HTML格式。2007年9月成为国际数位出版论坛([IDPF](http://idpf.org/epub/dir/))的正式标准
 mobi    2000年，Mobipocket Reader发布基于OEB标准的HTML文件（PRC 格式），支持不同屏幕。2005，Amazon 终结PRC文件。MOBI基于XHTML支持DRM版权.
         （mobi7变种kf6/7后缀名mobi或azw；2011 年 mobi8变种kf8拓展名azw3，支持更丰富排版.AZW4用于教科书的新版本（类似于PDF）;AZW8是KFX的扩展,KFX是ios版本）
@@ -1269,7 +1271,19 @@ docx    2006年，office 2007使用docx（microsoft office open Xml），文件�
 caj     2007年，杂志阅读格式
 snb     2011年,三星snote 应用保存格式
 
-源电子书格式可以是AZW，CBZ，CBR，CBC，CHM，DJVU，DOCX，EPUB，FB2，HTML，LIT，LRF，MOBI，ODT，PDF，PRC，PDB，PML，RTF，SNB，TCR或TXT等
+源电子书格式可以是
+1 纯文本或格式化文本（顺序结构） ：
+TXT，FB2，RTF，PML，LRF，HTML
+2 文本索引（索引结构）：
+TCR，DJVU，PDF，LIT，
+3 zip包+html/二进制文件 （多文件压缩）：
+CBZ，CBR，CBC，DOC，ODT，DOCX，CHM，PRC，EPUB，MOBI，PDB，AZW，SNB
+ 
+
+calibre支持格式转化：
+txt,fb2,rtf,lrf
+tcr,pdf,rb,lit（CHM文件的简单扩展）,
+zip,txtz,htmlz,pmlz,docx,epub,mobi,pdb,azw3
 
 #### PDF
 
@@ -1287,6 +1301,7 @@ https://resources.infosecinstitute.com/topic/pdf-file-format-basic-structure/
 http://djvu.sourceforge.net/
 https://github.com/barak/djvulibre
 
+https://www.cuminas.jp/docs/techinfo/DjVu3Spec.pdf
 #### office
 https://github.com/07101994/LibreOffice-Core-android
 https://docs.libreoffice.org/android.html

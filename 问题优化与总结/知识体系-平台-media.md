@@ -599,15 +599,15 @@ RLE 压缩
         Chunk Type（4Byte）
             （Chunk Data）
                 IHDR（4byte "IHDR"）
-                    width（4Byte）
-                    heigth（4Byte）
-                    bit depth（1Byte）
-                    ColorType（1Byte）
-                    Compression method（1Byte 。0 lz77滑动窗口）
-                    Filter method（1Byte ）
+                    width（⭐4Byte）
+                    heigth（⭐4Byte）
+                    bit depth（⭐1Byte 索引彩色图像：1，2，4或8  灰度图像：1，2，4，8或16  真彩色图像：24或32或48）
+                    ColorType（⭐1Byte 0：灰度图像 2：真彩色图像  3：索引彩色图像 4：带α通道数据的灰度图像 6：带α通道数据的真彩色图像）
+                    Compression method（⭐1Byte 。0 lz77滑动窗口）
+                    Filter method（⭐1Byte 0,自适应，方框滤波，均值滤波，高斯滤波，中值滤波，双边滤波）
                     Interlace method（1Byte 0 非隔行扫描；1 Adam7；）
                 PLTE（4byte "PLTE"。color type 等于3时，必须有；2 and 6 可选；0 and 4，灰度图没有）
-                IDAT Image data（需要使用zlib压缩）
+                IDAT Image data（先扫描后，通过filter method，再使用zlib压缩）
                 IEND（4byte "IEND"）
         CRC（4Byte）
         （辅助区块）
@@ -616,10 +616,86 @@ RLE 压缩
         Textual 
         Miscellaneous 
 
+Hexinator导出的数据：
+PNG File [0] (0)
+{
+    Header [0] (0)
+    {
+        Eye catcher: Eye catcher: 89 50 4E 47 0D 0A 1A 0A  [0]
+    }
+    IHDR [0] (8)
+    {
+        Length: 13 [0]
+        Type: IHDR: 0x49484452 [0]
+        Data [0] (16)
+        {
+            Width: 8 [0]
+            Height: 8 [0]
+            Bit depth: 8 [0]
+            Color type: Type2: 2 [0]
+            Compression method: deflate/inflate: 0 [0]
+            Filter method: Adaptive: 0 [0]
+            Interlace method: No interlace: 0 [0]
+        }
+        CRC: 4B 6D 29 DC  [0]
+    }
+    Chunks [0] (33)
+    {
+        sRGB [0] (33)
+        {
+            Length: 1 [0]
+            Type: 0x73524742 [0]
+            Data [0] (41)
+            {
+            }
+            CRC: AE CE 1C E9  [0]
+        }
+        gAMA [0] (46)
+        {
+            Length: 4 [0]
+            Type: 0x67414D41 [0]
+            Data [0] (54)
+            {
+                Gamma: 45455 [0]
+            }
+            CRC: 0B FC 61 05  [0]
+        }
+        pHYs [0] (62)
+        {
+            Length: 9 [0]
+            Type: 0x70485973 [0]
+            Data [0] (70)
+            {
+                Pixels per unit, x axis: 4724 [0]
+                Pixels per unit, y axis: 4724 [0]
+                Unit specifier: unit is the metre: 1 [0]
+            }
+            CRC: DE 66 1F 78  [0]
+        }
+        IDAT [0] (83)
+        {
+            Length: 51 [0]
+            Type: 0x49444154 [0]
+            Data [0] (91)
+            {
+                Image Data: 18 57 63 50 50 50 60 C0 00 1C 1C 1C ... [0]
+            }
+            CRC: 66 D4 CC 76  [0]
+        }
+        IEND [0] (146)
+        {
+            Length: 0 [0]
+            Type: 0x49454E44 [0]
+            CRC: AE 42 60 82  [0]
+        }
+    }
+}
 ```
 [Color Type](http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.Critical-chunks)  
     0 灰度；2 真彩；3 索引彩色；4 带a 通道灰度；6 带a通道真彩；
 
+
+[PNG解析](https://www.w3.org/TR/2003/REC-PNG-20031110/#4Concepts)
 
 ##### [WebP](https://developers.google.cn/speed/webp/docs/riff_container)
 ```js

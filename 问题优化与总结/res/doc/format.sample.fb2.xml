@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:l="http://www.w3.org/1999/xlink">
+<description>
+    <title-info>
+        <genre>antique</genre>
+        <author><first-name></first-name><last-name>Unknown</last-name></author>
+        <book-title>format.sample.pdf</book-title>
+        <lang>zh</lang>
+    </title-info>
+    <document-info>
+        <author><first-name></first-name><last-name>Unknown</last-name></author>
+        <program-used>calibre 5.6.0</program-used>
+        <date>22.5.2021</date>
+        <id>d424e1ae-f970-4502-9a11-3018e305cdc2</id>
+        <version>1.0</version>
+    </document-info>
+    <publish-info>
+        <year>0101</year>
+    </publish-info>
+</description>
+<body>
+<section>
+<p>%PDFâˆ’1.4</p>
+<p><strong>1 0 obj</strong></p>
+<p>&lt;&lt; <emphasis>Type </emphasis>Catalog</p>
+<p>/Outlines 2 0 R</p>
+<p>/Pages 3 0 R</p>
+<p>&gt;&gt;</p>
+<p>endobj</p>
+<p><strong>2 0 obj</strong></p>
+<p>&lt;&lt; <emphasis>Type </emphasis>Outlines</p>
+<p>/Count 0</p>
+<p>&gt;&gt;</p>
+<p>endobj</p>
+<p><strong>3 0 obj</strong></p>
+<p>&lt;&lt; <emphasis>Type </emphasis>Pages</p>
+<p>/Kids [4 0 R]</p>
+<p>/Count 1</p>
+<p>&gt;&gt;</p>
+<p>endobj</p>
+<p><strong>4 0 obj</strong></p>
+<p>&lt;&lt; <emphasis>Type </emphasis>Page</p>
+<p>/Parent 3 0 R</p>
+<p>/MediaBox [0 0 612 792]</p>
+<p>/Contents 5 0 R</p>
+<p><emphasis>Resources &lt;&lt; </emphasis>ProcSet 6 0 R</p>
+<p><emphasis>Font &lt;&lt; </emphasis>F1 7 0 R &gt;&gt;</p>
+<p>&gt;&gt;</p>
+<p>&gt;&gt;</p>
+<p>endobj</p>
+<p><strong>5 0 obj</strong></p>
+<p>&lt;&lt; /Length 73 &gt;&gt;</p>
+<p>stream</p>
+<p>BT</p>
+<p>/F1 24 Tf</p>
+<p><strong>100 100 Td</strong></p>
+<p>(Hello World) Tj</p>
+<p>ET</p>
+<p>endstream</p>
+<p>endobj</p>
+<p><strong>6 0 obj</strong></p>
+<p>[/PDF /Text]</p>
+<p>endobj</p>
+<p><strong>7 0 obj</strong></p>
+<p>&lt;&lt; <emphasis>Type </emphasis>Font</p>
+<p>/Subtype /Type1</p>
+<p>/Name /F1</p>
+<p>/BaseFont /Helvetica</p>
+<p>/Encoding /MacRomanEncoding</p>
+<p>&gt;&gt;</p>
+<p>endobj</p>
+<p>xref</p>
+<p>0 8</p>
+<p>0000000000 65535 f</p>
+<p>0000000009 00000 n</p>
+<p>0000000074 00000 n</p>
+<p>0000000120 00000 n</p>
+<p>0000000179 00000 n</p>
+<p>0000000364 00000 n</p>
+<p>0000000466 00000 n</p>
+<p><strong>0000000496 00000 n</strong></p>
+<p><strong>trailer</strong></p>
+<p>&lt;&lt; /Size 8</p>
+<p>/Root 1 0 R</p>
+<p>&gt;&gt;</p>
+<p>startxref</p>
+<p>625</p>
+<p>%%EOF</p>
+</section>
+</body>
+
+</FictionBook>
