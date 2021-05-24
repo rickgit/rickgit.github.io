@@ -589,9 +589,11 @@ AV1完全是对标H.265去的。H.265目前有比较高的专利门槛，和H.26
 JFIF 是一个图片文件格式标准，它是一种使用 JPEG 图像压缩技术存储摄影图像的方法
 ##### BMP
 RLE 压缩
-##### JPEG
+BMP采用的是RGB颜色空间
+##### JPEG 颜色转换、离散余弦变换、Huffman编码、顺序编码模式
+YCrCb颜色空间
 
-##### [PNG](http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html)
+##### PNG 先扫描（Interlace method）后，通过filter method，再使用zlib压缩
 ```
     PNG signature（8Byte： 89  50  4e  47  0d  0a  1a  0a）
     chunk
@@ -694,7 +696,7 @@ PNG File [0] (0)
 [Color Type](http://www.libpng.org/pub/png/spec/1.2/PNG-Chunks.html#C.Critical-chunks)  
     0 灰度；2 真彩；3 索引彩色；4 带a 通道灰度；6 带a通道真彩；
 
-
+[PNG](http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html)
 [PNG解析](https://www.w3.org/TR/2003/REC-PNG-20031110/#4Concepts)
 
 ##### [WebP](https://developers.google.cn/speed/webp/docs/riff_container)

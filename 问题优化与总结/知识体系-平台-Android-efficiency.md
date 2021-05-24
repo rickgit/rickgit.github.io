@@ -190,6 +190,25 @@ repo init -u http://source.codeaurora.cn/quic/la/platform/manifest  -b  refs/tag
 步骤三：
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
+
+
+cannot execute binary file: Exec format error
+    sudo apt install qemu-user-static
+    sudo update-binfmts --install i386 /usr/bin/qemu-i386-static --magic '\x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00' --mask '\xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff'
+    service binfmt-support start
+
+prebuilts/clang/host/linux-x86/clang-4691093/bin/clang++.real: error while loading shared libraries: libtinfo.so.5: cannot open shared object file: No such file or directory
+arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install libncurses5
+/bin/sh: 1: unzip: not found
+arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install unzip
+/bin/bash: zip: command not found
+arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install zip
+
+dex2oat did not finish after 2850 seconds
+    build/core/dex_preopt_libart.mk
+        ANDROID_LOG_TAGS="*:e" $(DEX2OAT) \
+            -j1 \
+            --runtime-arg -Xms$(DEX2OAT_XMS) --runtime-arg -Xmx$(DEX2OAT_XMX) \
 ### 烧录
 [烧录内核](https://www.cnblogs.com/hixin/p/6892206.html)
 ```js
