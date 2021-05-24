@@ -176,7 +176,7 @@ Art正式替代Dalvik VM
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 ### codesource 编译
-wsl文件夹大小写敏感设置
+wsl文件夹大小写敏感设置，编译的时候会提示
 fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
 参考 
 https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/
@@ -209,6 +209,17 @@ dex2oat did not finish after 2850 seconds
         ANDROID_LOG_TAGS="*:e" $(DEX2OAT) \
             -j1 \
             --runtime-arg -Xms$(DEX2OAT_XMS) --runtime-arg -Xmx$(DEX2OAT_XMX) \
+#### Android编译
+http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
+wsl路径：
+C:\Users\anshu\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
+
+cannot execute binary file: Exec format error
+https://www.cnblogs.com/JiuHuan/p/10073632.html
+
+fsutil.exe file queryCaseSensitiveInfo 
+(Get-ChildItem -Recurse -Directory).FullName | ForEach-Object {fsutil.exe file setCaseSensitiveInfo $_ enable}
+
 ### 烧录
 [烧录内核](https://www.cnblogs.com/hixin/p/6892206.html)
 ```js
@@ -555,10 +566,3 @@ https://hub.fastgit.org/barry-ran/QtScrcpy
 
 
 
-### Android编译
-http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
-wsl路径：
-C:\Users\anshu\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
-
-cannot execute binary file: Exec format error
-https://www.cnblogs.com/JiuHuan/p/10073632.html
