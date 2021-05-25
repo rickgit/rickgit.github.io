@@ -1285,6 +1285,10 @@ txt,fb2,rtf,lrf
 tcr,pdf,rb,lit（CHM文件的简单扩展）,
 zip,txtz,htmlz,pmlz,docx,epub,mobi,pdb,azw3
 
+
+TXT、EPUB、EBK2、EBK3、PDF、UMD、MOBI、AZW3、TTF、TTC、OTF、MP3、M4A、WAV、AAC、FLAC、DOC、PPT、XLS、JPG、JPEG、PNG、DOCX、XLSX、PPTX、DJVU、ZIP、AZW3
+
+
 #### PDF
 
 https://github.com/PDFium/PDFium.git
