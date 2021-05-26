@@ -209,6 +209,22 @@ dex2oat did not finish after 2850 seconds
         ANDROID_LOG_TAGS="*:e" $(DEX2OAT) \
             -j1 \
             --runtime-arg -Xms$(DEX2OAT_XMS) --runtime-arg -Xmx$(DEX2OAT_XMX) \
+
+编译后emulator aosp\out\target\product\generic_x86\system 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
+并修改 xxx-qemu.img 替换原来的xxx.img，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
+
+模块编译
+find  frameworks -name Android.mk
+cat   frameworks/base/packages/SystemUI/Android.mk | grep LOCAL_MODULE
+1.  make  SystemUI //LOCAL_MODULE:= SystemUI
+2. 相对目录编译 mmm packages/apps/phone
+3. 模块根目录编译 mm  //当前目录 packages/apps/phone
+
+ make systemimage //重现编译system.img，包含systemui.apk；#make bootimage 编译boot.img； make userdataimage-nodeps 快速编译userdata.img；
+
+emulator.exe –avd {你的模拟器名称} –writable-system //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
+
+
 #### Android编译
 http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
 wsl路径：
