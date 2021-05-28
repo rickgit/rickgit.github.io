@@ -1250,6 +1250,7 @@ Textile   [Textile Markup Language](https://textile-lang.com/)
 PDB Standard Palm extension, Fictionwise 使用
 开放电子书格式(epub/oeb,mobi,lit,imp)
 
+OCR     1929年由德国科学家Tausheck最先提出来的，后来美国科学家Handel也提出了利用技术对文字进行识别的想法
 TCR     20世纪90年代开发的老Psion公司系列3掌上型装置
 rtf     1992年, 1.0规范。格式化文本。
 PDF     1992年， 发布版本 1.0
@@ -1286,7 +1287,10 @@ tcr,pdf,rb,lit（CHM文件的简单扩展）,
 zip,txtz,htmlz,pmlz,docx,epub,mobi,pdb,azw3
 
 
-TXT、EPUB、EBK2、EBK3、PDF、UMD、MOBI、AZW3、TTF、TTC、OTF、MP3、M4A、WAV、AAC、FLAC、DOC、PPT、XLS、JPG、JPEG、PNG、DOCX、XLSX、PPTX、DJVU、ZIP、AZW3
+TXT、EPUB、EBK2、EBK3、PDF、UMD、MOBI、AZW3、TTF、TTC、OTF、
+MP3、M4A、WAV、AAC、FLAC、
+DOC、PPT、XLS、DOCX、XLSX、PPTX、DJVU、ZIP、AZW3
+JPG、JPEG、PNG、
 
 
 #### PDF
@@ -1306,6 +1310,9 @@ http://djvu.sourceforge.net/
 https://github.com/barak/djvulibre
 
 https://www.cuminas.jp/docs/techinfo/DjVu3Spec.pdf
+
+https://djvu.com/djvu-technology/
+
 #### office
 https://github.com/07101994/LibreOffice-Core-android
 https://docs.libreoffice.org/android.html

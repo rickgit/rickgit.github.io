@@ -56,6 +56,7 @@ https://zwc365.com/2020/08/30/android10-baiduwangpan
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
 - 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；
+⭐安全问题-权限
 ⭐[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
 ⭐ 设备ID就不能获取，去掉了READ_PHONE_STATE权限，阻止设备跟踪 （OAID替换）
 ⭐ AndroidX代替v4,v7
@@ -175,18 +176,16 @@ Art正式替代Dalvik VM
 [](知识体系-存储-VCS.md)
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
-### codesource 编译
+### 科大源编译
 wsl文件夹大小写敏感设置，编译的时候会提示
 fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
 参考 
-https://mirrors.tuna.tsinghua.edu.cn/help/git-repo/
-https://mirrors.tuna.tsinghua.edu.cn/help/AOSP/
-repo sync同步拉取代码时，经常会出现卡住或者失败的情况 解决方法1：修改dns  http://www.ip33.com/dns.html
+https://mirrors.ustc.edu.cn/help/aosp.html
 步骤一： repo命令
-https://source.codeaurora.cn/quic/la/tools/repo/
-步骤二： manifest
-repo init -u http://source.codeaurora.cn/quic/la/platform/manifest  -b  refs/tags/android-9.0.0_r16
- repo init -u git://git.omapzoom.org/platform/manifest -b android-2.3.5_r1
+步骤二： [manifest版本号旋转](https://source.android.google.cn/setup/start/build-numbers?hl=zh-cn)
+repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-10.0.0_r1	
+
+
 步骤三：
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
@@ -223,6 +222,12 @@ cat   frameworks/base/packages/SystemUI/Android.mk | grep LOCAL_MODULE
  make systemimage //重现编译system.img，包含systemui.apk；#make bootimage 编译boot.img； make userdataimage-nodeps 快速编译userdata.img；
 
 emulator.exe –avd {你的模拟器名称} –writable-system //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
+
+
+### 系统签名
+1. 编译signapk.jar ,**make signapk**
+2. 拷贝/build/target/product/security/中，**platform.pk8 platform.x509.pem**
+3. 执行系统签名 **java -jar signapk.jar  platform.x509.pem platform.pk8　old.apk new.apk**
 
 
 #### Android编译

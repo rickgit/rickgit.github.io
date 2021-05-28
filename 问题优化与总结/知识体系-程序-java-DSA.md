@@ -532,6 +532,9 @@ Float.MIN_VALUE ~ Float.MAX_VALUE
 装饰 long时间戳
 懒加载 
 
+Calendar.HOUR 圆盘时钟 1~12，凌晨0点即早上12点，中午12点即下午12点
+Calendar.HOUR_OF_DAY 数字手表0~23
+
 ####  字符串结构及字符编码
 
 数据与二进制
