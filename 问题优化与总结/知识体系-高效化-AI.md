@@ -21,35 +21,36 @@
 |                                               +-----------------------------------------------------------+
 |                                               |lib                                                        |
 |                                               |      scikit-learn                                         |
-+-------------------+---------------------------+-----------------------------------------------------------+
-|                   |  Others           Reinforcement_Learning      NLP  CV                                 |
-|                   |                   Feature_selection    Recommender Systems ...                        |
-|(groupBySimilarity)| Deep Learning     CNN   RNNs DBN LSTMs  Stacked_Auto+Encoders  DBM                    |
-|                   |   (modern ANN)                                                                        |
-|                   | Ensemble          Boosting   Bagging  AdaBoost  Blending                  +-----------+
-|                   |                   Stacking   GBM     GBRT Random_Forest XGBoost           |           |
-|                   | Dimensionality    PCA   PCR  PLSR   Sammon_Mapping MDS  MDA    QDA FDA    |           |
-|                   |  Reduction        Projection_Pursuit  LDA                                 |           |
-|                   |                                                                           |           |
-|                   | ANN(classical )   Back+Propagation Perceptron MLP Hopfield_Network        |           |
-| Machine           |                  Stochastic_Gradient_Descent      RBFN                    |           |
-|                   | Association Rule  Apriori  Eclat                                          |           |
-| Learning          |  Learning                                                                 | estimation|
-|                   | clustering       k+Means   k+Medians     EM    Hierarchical_Clustering    |  method   |    
-| Algorithms        | Bayesian         Naive_Bayes Gaussian_Naive_Bayes Multinomial_Naive_Bayes |           |
-|                   |                   AODE    BBN   BN                                        |           |    
-|                   | Decision Tree     CART  ID3   C4.5/C5.0   CHAID  Decision_Stump  M5       |           |
-|                   |                   Conditional_Decision_Trees                              | feature   |
-|                   | Regularization    Ridge LASSO    Elastic_Net    LARS                      |engineering|
-|                   | Instance+based    kNN   LVQ   SOM      LWL    SVM                         |           |
-|                   | regression        Linear    Logistic    Stepwise  OLSR   MARS   LOESS     |           |
-|                   |                                                                           |           |
-|                   +--------------------------+------------------------------------------------------------|
-|                   | Semi-Supervised Learning | classification (image classification)  regression   Apriori|
-|(by learning style)| unsupervised learning    | K+Means                                                    |
-|                   | super^ised learning      | Logistic Regression, Back Propagation Neural Network       |
-|                   |                          |                                                            |
-+-------------------+--------------------------+------------------------------------------------------------|
++--------+----------+---------------------------+-----------------------------------------------------------+
+|        |          |  Others           Reinforcement_Learning      NLP  CV                                 |
+|        |          |                   Feature_selection    Recommender Systems ...                        |
+|      |(Similarity)| Deep Learning     CNN   RNNs DBN LSTMs  Stacked_Auto+Encoders  DBM                    |
+|        |          |   (modern ANN)                                                                        |
+|        |          | Ensemble          Boosting   Bagging  AdaBoost  Blending                  +-----------+
+|        |          |                   Stacking   GBM     GBRT Random_Forest XGBoost           |           |
+|        |          | Dimensionality    PCA   PCR  PLSR   Sammon_Mapping MDS  MDA    QDA FDA    |           |
+|        |          |  Reduction        Projection_Pursuit  LDA                                 |           |
+|        |          |                                                                           |           |MachineLearningAlgorithms
+|ML      |          | artificial                                                               |           |
+|Algorithms|        |   neural network  Back+Propagation Perceptron MLP Hopfield_Network        |           |
+|        |          |   (classical ANN) Stochastic_Gradient_Descent      RBFN                    |           |
+|        |          | Association Rule  Apriori  Eclat                                          |           |
+|        |          |  Learning                                                                 | estimation|
+|        |          | clustering       k+Means   k+Medians     EM    Hierarchical_Clustering    |  method   |    
+|        |          | Bayesian         Naive_Bayes Gaussian_Naive_Bayes Multinomial_Naive_Bayes |           |
+|        |          |                   AODE    BBN   BN                                        |           |    
+|        |          | Decision Tree     CART  ID3   C4.5/C5.0   CHAID  Decision_Stump  M5       |           |
+|        |          |                   Conditional_Decision_Trees                              | feature   |
+|        |          | Regularization    Ridge LASSO    Elastic_Net    LARS                      |engineering|
+|        |          | Instance+based    kNN   LVQ   SOM      LWL    SVM                         |           |
+|        |          | regression        Linear    Logistic    Stepwise  OLSR   MARS   LOESS     |           |
+|        |          |                                                                           |           |
+|        +----------+--------------------------+------------------------------------------------------------|
+|        | (learning| Semi-Supervised Learning | regression,  classification (image classification), Apriori|
+|        |    style)| unsupervised learning    | K+Means                                                    |
+|        |          | supervised learning      | Logistic Regression, Back Propagation Neural Network       |
+|        |          |                          |                                                            |
++--------+----------+--------------------------+------------------------------------------------------------|
 | computer           programming language             distributed system                                    |
 | technology                                          operating system                                      |
 |                    Algorithmics(Hashing )           the principle of computers                            |
@@ -60,9 +61,6 @@
 |                    GraphTheory(combinatorics)             linear algebra                                  |
 |                    Set theory                                                                             |
 +-----------------------------------------------------------------------------------------------------------+
-
-
-
 
 ```
 
@@ -76,7 +74,7 @@
 
 
 [各种算法和理论用到的数学知识](https://blog.csdn.net/SIGAI_CSDN/article/details/80733205https://blog.csdn.net/SIGAI_CSDN/article/details/80733205)
-## 
+## 数学
 《离散数学分册一-数理逻辑》
 《离散数学分册二-集合与图论》
 《离散数学分册三-代数结构与组合数学》
@@ -90,6 +88,25 @@
 
 支持向量机是人工智能的主要分类方法之一，其数学基础为核函数。
 可计算理论是人工智能的重要理论基础和工具，为了回答是否存在不可判定的问题，数理逻辑学家提出了关于算法的定义（把一般数学推理形式化为逻辑演绎）。
+### 函数
+⭐拟合 Regression 得到最优解
+     线性回归激活函数 y = mx + c 
+     逻辑回归激活函数 sigmoid 
+     Tanh激活函数 tanh(x)=2*sigmoid(2x)-1
+⭐分类 Classification
+聚类 clustering
+异常检测 anomaly detection
+⭐神经网络     
+  ReLu(x)=max(0,x)
+  正则化 避免过度拟合    
+    ⭐卷积神经网络 CNN 空间相关(卷积层 conv,含很多滤波器 ;激活层 RELU; 采样层 POOL; 全链接层 FC)
+    系综方法
+    多任务学习
+    半监督学习
+    生成式对抗网络
+  ⭐递归神经网络RNN 优化时间相关
+    LSTM/GRU 优化梯度弥散和梯度爆炸
+⭐增强学习 RL ,参数的量级限制了深度神经网络
 ### 机器学习
 ### 机器学习-ANN（DL）/GA
 ### 机器学习-监督学习-KNN
@@ -109,7 +126,7 @@
 
 octave
 
-###单变量线性回归 
+### 单变量线性回归 
 模型
 回归任务：预测离散值的输出
 训练集，输入/特性，输出/target
@@ -207,6 +224,8 @@ k均值法
 ### 应用 - 推荐系统
 
 ### 应用 - 学习大数据
+ 
+
 ### 应用 - 照片OCR
 
 

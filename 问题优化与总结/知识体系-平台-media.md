@@ -18,6 +18,7 @@ color text image audio video
 | hardware layer |                                                                 |
 +----------------+-----------------------------------------------------------------+
 
+视觉,听觉,嗅觉,味觉,触觉,电磁感应
 ## 显卡
 ### freetyp2
 ### Agg
@@ -1049,6 +1050,11 @@ cctv1hd-1601050915000.ts
 
 [实现文档](https://www.cnblogs.com/haibindev/p/8427503.html)
 
+##### FFMPEG 分片
+-hls_time n: 设置每片的长度，默认值为2。单位为秒
+-hls_list_size n:设置播放列表保存的最多条目，设置为0会保存有所片信息，默认值为5
+-hls_wrap n:设置多少片之后开始覆盖，如果设置为0则不会覆盖，默认值为0.这个选项能够避免在磁盘上存储过多的片，而且能够限制写入磁盘的最多的片的数量
+-hls_start_number n:设置播放列表中sequence number的值为number，默认值为0 
 
 ##### AMF 二进制数据编码格式
 
@@ -1067,10 +1073,11 @@ VR直播技术中
 容器格式（mpeg,avi,mpe）的文件的在线播放，必须要服务器支持流式播放接口，例如RTSP协议
 
 [RTMP、WebRTC、UDP 三种互动直播方案的优劣比较](https://www.pttcn.net/a/zixun/guona/2018/0603/27205.html)
-#### ⭐RTMP（TCP 传输 + RTMP 协议+  flv分块/f4v数据）
+#### ⭐RTMP（TCP 传输 + RTMP 协议+  flv[H264/AAC]分块/f4v数据）
+rtmp flv中body体的内容和flv文件中的body体内容相同，但是没有4字节的previous tag size
+
 最初由Macromedia开发
 [2012 年 12 月 21 日，Adobe 发布了协议版本 1.0 的规范](https://www.adobe.com/devnet/rtmp.html)
-
 
 浏览器需要加载 ❌flash插件才能播放
 RTMP 为 Adobe 私有协议
@@ -2071,13 +2078,35 @@ android 设备信息
 
 AudioRecord
 构建器 AudioRecord.Builder
- 
+
+#### FaceDetector (neven 人脸检测 使用opencv)
+基于卷积神经网络的低分辨率人脸识别算法——DCR模型
+滤波函数 提取边缘
+Polling 忽略噪声
+#### ml-kit
+文本识别 (Text recognition)
+条码扫描 (bar scanning)
+物体检测和追踪 (object detection)
+人脸检测 (face-detection)
+图像标注(Image Labeling)
+姿态检测( Pose detection)
+人像抠图（selfie segmentation）
 #### CameraX.PreviewView
 PreviewView
 装饰者：
     封装 PreviewViewImplementation（SurfaceViewImplementation，TextureViewImplementation），添加mPreviewStreamStateLiveData 使显示能观察生命周期
 
 CameraSelector ，ImageAnalysis ，ImageCapture ，
+
+
+camera1 
+    Camera.open
+    Camera.startPreview
+    Camera.takePicture
+
+Camera2
+##### 人脸检测接口 FaceDetectionListener
+
 #### 录屏 MediaProjection + MediaRecorder  组合
 MediaRecorder
     MediaProjectionManager（API 21）申请，onActivityResult返回
@@ -2392,7 +2421,7 @@ glm::vec4
 
 [](https://github.com/CainKernel/CainCamera)
 
-opencv 脸部识别
+#### opencv 脸部识别
     能识别出静态图片和视频上帧上的人脸，不能进行真实场景识别
 mobilefacenets
 insightface
