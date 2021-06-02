@@ -564,6 +564,8 @@ AV1完全是对标H.265去的。H.265目前有比较高的专利门槛，和H.26
 #### qsv硬编码
 
 ### 文件或媒体流
+FLV，MPEG，RMVB等都可以直接依次分包解析，而MP4，AVI一定要依赖索引表才行
+
 视频格式有：mp4/m4v/3gp/mpg、flv/f4v/swf、avi、gif、wmv、rmvb、mov、mts/m2t、webm/ogg/mkv
 音频：mp3、aac/mp4/M4A、ape/flac、wav、wma、amr、mid
 图片——点阵：jpg、png、gif、bmp、ico、tif(tiff)、psd/psb、WebP、RAW、pdf、DCM、sai/rif
