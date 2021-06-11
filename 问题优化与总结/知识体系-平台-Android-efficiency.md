@@ -540,7 +540,7 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 ```
 adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
 
-adb shell pm dump com.tencent.weread.eink | findstr “versionName”
+adb shell pm dump com.tencent.weread.eink | findstr "versionName"
 
 
 adb shell pm list package
