@@ -177,6 +177,10 @@ Art正式替代Dalvik VM
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 ### 科大源编译
+Failed to listen for path logs: listen unix out/.path_interposer_log: bind: invalid argument 需要升级wsl2 ：
+wsl -l -v #查看版本和名称
+wsl --set-version Ubuntu 2 #升级到WSL2
+
 wsl文件夹大小写敏感设置，编译的时候会提示
 fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
 参考 
@@ -190,7 +194,17 @@ repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-10.0.0_
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
 
+error： cannot initialize work tree的报错
+处理方法：
+执行repo sync -cdf输出sync的详细信息 
+error.GitError: cannot initialize work tree
+找到报错的仓库路径
+然后分别删除根目录下 
+.repo/projects/packages/apps/DocumentsUI.git和
+.repo/project-objects/packages/apps/DocumentsUI.git
+删除之后重新执行repo sync -j2 -c即可
 
+ 
 cannot execute binary file: Exec format error
     sudo apt install qemu-user-static
     sudo update-binfmts --install i386 /usr/bin/qemu-i386-static --magic '\x7fELF\x01\x01\x01\x03\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x03\x00\x01\x00\x00\x00' --mask '\xff\xff\xff\xff\xff\xff\xff\xfc\xff\xff\xff\xff\xff\xff\xff\xff\xf8\xff\xff\xff\xff\xff\xff\xff'
@@ -202,6 +216,10 @@ arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install libncurses5
 arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install unzip
 /bin/bash: zip: command not found
 arthur@LAPTOP-RBD26HNH:~/aosp$ sudo apt-get install zip
+一次性安装环境：
+sudo apt-get install git-core gnupg flex bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev libgl1-mesa-dev libxml2-utils xsltproc unzip
+
+
 
 dex2oat did not finish after 2850 seconds
     build/core/dex_preopt_libart.mk
@@ -522,7 +540,7 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 ```
 adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
 
-adb shell pm dump com.tencent.weread.eink | findstr “versionName”
+adb shell pm dump com.tencent.weread.eink | findstr "versionName"
 
 
 adb shell pm list package

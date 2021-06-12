@@ -384,6 +384,8 @@ onBackpressureLatest()
 
 基于 Kotlin 的应用，添加 kotlin-kapt 插件，使用 kapt 而不是annotationProcessor
 ## Jetpack
+
+https://hub.fastgit.org/skydoves/Pokedex
 ## 架构组件
 androidx.arch.core:core-runtime 主线程和io线程
 androidx.arch.core:core-common FastSafeIterableMap
@@ -424,6 +426,8 @@ android{
     视图与界面控制器之间维持干净的接口
     build\generated\source\kapt\debug\edu\ptu\java\app_kotlin\databinding\ActivityMainBindingImpl
 ##### Data Binding 
+
+CallBack和DataMapper模式
     数据绑定，事件绑定
     @Bindable CallBack模式
         1. onPropertyChanged，kotlin委托模式

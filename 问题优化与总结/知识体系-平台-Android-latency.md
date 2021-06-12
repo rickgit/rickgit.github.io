@@ -3905,6 +3905,7 @@ Obsevable
 
 
 ## 传感器
+[](https://source.android.google.cn/devices/sensors/sensor-types?hl=zh-cn)
 重力传感器
         mSensorManager = (SensorManager) getSupportActivity().getSystemService(Activity.SENSOR_SERVICE);
         if (mSensorManager == null) {
