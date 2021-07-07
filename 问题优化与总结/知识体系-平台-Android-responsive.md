@@ -643,10 +643,10 @@ RecyclerView，ConstraintLayout（约束布局）
    3. 对齐方式（Start_toStartOf ...）
    4. 基线对齐（基线属于BottomToBottom的特殊情况，基于文本对齐）
 2. Chains约束（线性布局，app:layout_constraintHorizontal_chainStyle="spread"）
-   1. spread ：默认，居中均匀分布，两侧有空隙
-   2. spread inside ：居中均匀分布，两侧无空隙
-   3. Weighted：约束方向0dp，并设置权重 layout_constraintHorizontal_weight，两侧无空隙
-   4. packed：居中紧凑布局
+   1. spread ：默认，居中均匀分布，两侧有空隙（   | - - - | ）
+   2. spread_inside ：居中均匀分布，两侧无空隙（ |-  -  -| ）
+   3. Weighted：约束方向0dp，并设置权重 layout_constraintHorizontal_weight，两侧无空隙（|--____| ）
+   4. packed：居中紧凑布局                    （|  ---  | ）
 3. Guidelines（作为**定位线**作用于全局，orientation="vertical" startToStart，endToEnd）
 4. Placeholder 配合TransitionManager，移动选中控件
 5. Helper（referenced_ids控件操作）

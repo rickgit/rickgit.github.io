@@ -2882,18 +2882,52 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 #### SystemServer - mediaserver
 ### SystemUI
+``` xml
+    <!-- SystemUI Services: The classes of the stuff to start. -->
+    <string-array name="config_systemUIServiceComponents" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.statusbar.CommandQueue$CommandQueueStart</item>
+        <item>com.android.systemui.keyguard.KeyguardViewMediator</item>
+        <item>com.android.systemui.recents.Recents</item>
+        <item>com.android.systemui.volume.VolumeUI</item>
+        <item>com.android.systemui.stackdivider.Divider</item>
+        <item>com.android.systemui.SystemBars</item>
+        <item>com.android.systemui.usb.StorageNotification</item>
+        <item>com.android.systemui.power.PowerUI</item>
+        <item>com.android.systemui.media.RingtonePlayer</item>
+        <item>com.android.systemui.keyboard.KeyboardUI</item>
+        <item>com.android.systemui.pip.PipUI</item>
+        <item>com.android.systemui.shortcut.ShortcutKeyDispatcher</item>
+        <item>@string/config_systemUIVendorServiceComponent</item>
+        <item>com.android.systemui.util.leak.GarbageMonitor$Service</item>
+        <item>com.android.systemui.LatencyTester</item>
+        <item>com.android.systemui.globalactions.GlobalActionsComponent</item>
+        <item>com.android.systemui.ScreenDecorations</item>
+        <item>com.android.systemui.fingerprint.FingerprintDialogImpl</item>
+        <item>com.android.systemui.SliceBroadcastRelayHandler</item>
+    </string-array>
+ 
+    <!-- SystemUI Services (per user): The classes of the stuff to start for each user. This is a subset of the config_systemUIServiceComponents -->
+    <string-array name="config_systemUIServiceComponentsPerUser" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.recents.Recents</item>
+    </string-array>
+
+```
+
 状态栏PhoneStatusBarView：通知图标，系统图表（蓝牙，WiFi，电量），时间
 下拉后NotificationPanelView：
   StatusBarHeaderView/锁屏状态栏（KeyguardStatubarView）
   快捷设置面板（屏幕亮度调节器ToggleSlderView，9个快捷功能QSPanel，设置页脚QSFooterImpl）
   通知面板 NotificationStackScrollLayout
-  锁屏切换
+  锁屏切换 keyguardbouncer（锁屏，熄屏，亮屏）
 截屏界面
 全局音量管理（音量键） VolumeUI
 底部导航栏 NavigationBar
 电量 PowerUI（电量提醒的模块，包括低电提醒和高低温关机提醒）
-最近应用视图 Recents
-锁屏 keyguardbouncer
+最近应用视图 Recents 
 铃声播放 RingtonePlayer
 Android 7.0
   控制管理分屏 StackDivider
@@ -3947,6 +3981,9 @@ Obsevable
 
 
 ## 传感器
+
+adb shell dumpsys sensorservice
+
 [](https://source.android.google.cn/devices/sensors/sensor-types?hl=zh-cn)
 重力传感器
         mSensorManager = (SensorManager) getSupportActivity().getSystemService(Activity.SENSOR_SERVICE);
