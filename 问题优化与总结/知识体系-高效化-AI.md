@@ -1,10 +1,15 @@
 # 知识体系 - 人工智能
+人工智能
+  机器学习
+    深度学习（现代神经网络）
+    增强学习
 ## 体系
 
 [技术体系](https://zhuanlan.zhihu.com/p/27920278)
 [算法手抄](https://github.com/FavioVazquez/ds-cheatsheets)
 深度学习做cv和nlp，传统机器学习做数据分析
 [机器算法分类](https://machinelearningmastery.com/a-tour-of-machine-learning-algorithms/)
+[](res/ai_map.png)
 ```
 +-----------------------------------------------------------------------------------------------------------+
 | Application                                                                                               |
@@ -46,10 +51,11 @@
 |        |          | regression        Linear    Logistic    Stepwise  OLSR   MARS   LOESS     |           |
 |        |          |                                                                           |           |
 |        +----------+--------------------------+------------------------------------------------------------|
-|        | (learning| Semi-Supervised Learning | regression,  classification (image classification), Apriori|
-|        |    style)| unsupervised learning    | K+Means                                                    |
-|        |          | supervised learning      | Logistic Regression, Back Propagation Neural Network       |
-|        |          |                          |                                                            |
+|        | (learning| ⭐supervised  Learning   | Logistic Regression, Back Propagation Neural Network       |
+|        |    style)| Semi-Supervised learning  | regression,  classification (image classification), Apriori|
+|        |          | Transfer   learning      |                                                            |
+|        |          | unsupervisedlearning     |      K+Means                                              |
+|        |          | Reforcement Learning     |                                                            |
 +--------+----------+--------------------------+------------------------------------------------------------|
 | computer           programming language             distributed system                                    |
 | technology                                          operating system                                      |
@@ -89,11 +95,11 @@
 支持向量机是人工智能的主要分类方法之一，其数学基础为核函数。
 可计算理论是人工智能的重要理论基础和工具，为了回答是否存在不可判定的问题，数理逻辑学家提出了关于算法的定义（把一般数学推理形式化为逻辑演绎）。
 ### 函数
-⭐拟合 Regression 得到最优解
+⭐拟合 Regression 得到最优解， 函数问题
      线性回归激活函数 y = mx + c 
      逻辑回归激活函数 sigmoid 
      Tanh激活函数 tanh(x)=2*sigmoid(2x)-1
-⭐分类 Classification
+⭐分类 Classification， 概率问题
 聚类 clustering
 异常检测 anomaly detection
 ⭐神经网络     

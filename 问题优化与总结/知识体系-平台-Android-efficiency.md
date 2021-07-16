@@ -239,7 +239,7 @@ cat   frameworks/base/packages/SystemUI/Android.mk | grep LOCAL_MODULE
 
  make systemimage //重现编译system.img，包含systemui.apk；#make bootimage 编译boot.img； make userdataimage-nodeps 快速编译userdata.img；
 
-emulator.exe –avd {你的模拟器名称} –writable-system //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
+.\sdk-ndk\emulator\emulator.exe -avd Nexus_5_API_28 -writable-system  //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
 
 
 ### 系统签名
@@ -419,11 +419,7 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
         .penaltyDeath()
         .build());
 ```
-### （异常 错误 安全）反编译
-[dex2jar](https://github.com/pxb1988/dex2jar)
-[jd-gui](https://github.com/java-decompiler/jd-gui)
-[Apktool](https://github.com/iBotPeaches/Apktool)
-[jad（不维护）](http://www.kpdus.com/jad.html)
+### （异常 错误 安全）
 
 [ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
 try{Looper.loop()}

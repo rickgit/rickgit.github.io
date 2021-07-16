@@ -7,18 +7,26 @@
 ### 四大组件基础 - Context
 Context作用
 ```
- ContextWrapper
-       ^   Context
+   Context //抽象类
+       ^   
+       |   
+ContextWrapper
+       ^   静态代理ContextImpl
+       |   LoadedApk, ResourcesManager, Resources，AssetManager, ClassLoader, ApplicationInfo, 
+       |   mSharedPrefsPaths, mDatabasesDir/mPreferencesDir/mFilesDir/mCacheDir...
+       |   activityToken, ApplicationContentResolver, PackageManager, IApplicationThread,
+       |   ActivityThread
+       |   Display,Theme, WallpaperManager
+ ContextThemeWrapper                                                       Application
+       ^   Theme,LayoutInflater,Resources,Configuration                        mComponentCallbacks,mActivityLifecycleCallbacks,mAssistCallbacks
        |
-       +
- ContextThemeWrapper
-       ^   Theme,LayoutInflater,Resources,Configuration
-       |
- Activity
-       ^   Dialog,Cursor,Context,生命周期参数的NonConfigurationInstances
-       |
-ComponentActivity
-       ^     LifecycleRegistry,ViewModelStore,SavedStateRegistryController
+ Activity                                                                                
+       ^   Dialog,Cursor,Context,生命周期参数的NonConfigurationInstances                        
+       |   mInstrumentation,mApplication,mIntent,mActivityInfo,mSearchManager,mMenuInflater
+       |   mWindow,mWindowManager,mFragments
+ComponentActivity(app,activity)
+       ^     mLifecycleRegistry, mExtraDataMap,
+       |     LifecycleRegistry,ViewModelStore,SavedStateRegistryController
        |     OnBackPressedDispatcher,mContentLayoutId
  FragmentActivity
        ^     FragmentController,LifecycleRegistry
@@ -721,6 +729,10 @@ ViewPager2支持：
 垂直方向 setOrientation
 离屏加载 setOffscreenPageLimit 默认0（v1.0默认1）
 使用 viewpager2.FragmentStateAdapter 代替 RecyclerView.Adapter
+
+
+ViewPager: childView#offsetLeftAndRight
+
 
 ###### RecyclerView 缓存
 1. 缓存ViewHolder
