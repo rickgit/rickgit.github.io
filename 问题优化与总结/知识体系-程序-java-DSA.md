@@ -19,7 +19,7 @@
     链式存储结构（单链，双链，跳跃列表）
 
 操作：
-    增删改，索引，查找，销毁
+    增删改，索引遍历，查找排序，销毁
 
 ### 可视化
 [](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
@@ -785,7 +785,7 @@ MIME： A-Za-z0-9+/（=用来填充）
 
 
 
-## 算法 - 七大查找
+## 算法 - 七大（逻辑结构）查找
 1. 线性表查找：
      1. 顺序查找（String.contains()，），
      2. 二分法/折半有序查找 log₂(n) ，**int mid = low+(high-low)/2;**
@@ -801,16 +801,60 @@ MIME： A-Za-z0-9+/（=用来填充）
             expect>arr[mid]，则low=mid+1，k-=2；
             expect<arr[mid]，则high=mid-1，k-=1。
         ```
-     5. 索引表顺序查找/分块查找（优化顺序查找）
-     6. 哈希存储查找
+     5. 哈希存储查找
          1. 以空间换时间，复杂度O(1)
          2. 变形：位图，布隆过滤         
+     6. 索引表顺序查找/分块查找（优化顺序查找）
+
 2. 树形查找：
         二叉搜索树（AVL/红黑树），
         多叉树（b树，b+，b*），
 3. 图形查找：
         深度优先，广度优先
-#### 平衡树
+
+### 排序
+3个维度：时间复杂度（最好，平均，最坏），空间复杂度，稳定性
+[](问题优化与总结\知识体系-理论-DSA.md)
+[排序算法](https://en.wikipedia.org/wiki/Sorting_algorithm)
+
+|--|--|--|--|空间|稳定|~~复杂~~|
+|--|--|--|--|--|--|--|
+**比较排序**| | | | | | | |
+冒泡交换|   没有交换O(N)|O(n²)         |       |O(1)      |    稳定|简单             
+快速交换|               |  O(N*㏒₂N)|全交换O(n²)| O(㏒₂n)|   不稳定|复杂
+| | | | | | | |
+归并排序|               |O(N*㏒₂N)     |       |    O(n)  |   稳定|复杂       
+| | | | | | | |
+插入：  |    没有插入O(N) |O(N²)       |         |  O(1)    | 稳定|简单
+希尔：  |            O(N) |O(N^1.3)   | O(N^1.5)|  O(1)    | 不稳定|复杂
+| | | | | | | |
+直接选择|                 |O(N²)       |        |  O(1)     | 不稳定|    
+堆排序  |                 |   O(N*㏒₂N) |       |   O(1)    |不稳定|复杂
+**非比较排序**|分布排序<br>n：关键字个数；k：桶数；<br>r：桶里数字范围；d：关键字长度；<br>|||||n<<2^k
+计数|               -   | O(n+r)|            | O(n+r)|稳定|是
+桶|                   - |O(n+r)|            | O(n+r) |稳定|是
+基数|               -   |O(n*k/d)|  |O(n+2^d)|稳定|不
+
+**其他排序**|并发排序，<br>混合排序
+
+
+计数排序：每个桶只存储单一键值；
+桶排序：每个桶存储一定范围的数值；
+基数排序：根据键值的每位数字来分配桶；
+
+计算复杂性理论
+    常量时间 O(1)
+    线性时间  Ο(n)
+    指数时间
+
+1954年由 Harold H. Seward 提出 计数排序
+
+
+#### TimSort
+Arrays.sort
+https://blog.csdn.net/bryansun/article/details/105182778?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase
+
+### 平衡树
 
 1. AVL平衡树
     1.1 其根的左右子树高度之差的绝对值不能超过1
@@ -820,7 +864,7 @@ MIME： A-Za-z0-9+/（=用来填充）
     2.2. 根总是黑色的
     2.3. 如果节点是红色的，则它的子节点必须是黑色的（反之不一定成立）
     2.4. 从根到叶节点或空子节点的每条路径，必须包含相同数目的黑色节点。
-#### 哈希表存储
+### 哈希表存储
 [散列表](https://zh.wikipedia.org/wiki/%E5%93%88%E5%B8%8C%E8%A1%A8)
 
 ##### 哈希值生成函数
@@ -980,47 +1024,6 @@ java.util.UUID.Holder#numberGenerator
     private final long leastSigBits;
 
 ```
-### 排序
-3个维度：时间复杂度（最好，平均，最坏），空间复杂度，稳定性
-[](问题优化与总结\知识体系-理论-DSA.md)
-[排序算法](https://en.wikipedia.org/wiki/Sorting_algorithm)
-
-|--|--|--|--|空间|稳定|~~复杂~~|
-|--|--|--|--|--|--|--|
-**比较排序**| | | | | | | |
-冒泡交换|   没有交换O(N)|O(n²)         |       |O(1)      |    稳定|简单             
-快速交换|               |  O(N*㏒₂N)|全交换O(n²)| O(㏒₂n)|   不稳定|复杂
-| | | | | | | |
-归并排序|               |O(N*㏒₂N)     |       |    O(n)  |   稳定|复杂       
-| | | | | | | |
-插入：  |    没有插入O(N) |O(N²)       |         |  O(1)    | 稳定|简单
-希尔：  |            O(N) |O(N^1.3)   | O(N^1.5)|  O(1)    | 不稳定|复杂
-| | | | | | | |
-直接选择|                 |O(N²)       |        |  O(1)     | 不稳定|    
-堆排序  |                 |   O(N*㏒₂N) |       |   O(1)    |不稳定|复杂
-**非比较排序**|分布排序<br>n：关键字个数；k：桶数；<br>r：桶里数字范围；d：关键字长度；<br>|||||n<<2^k
-计数|               -   | O(n+r)|            | O(n+r)|稳定|是
-桶|                   - |O(n+r)|            | O(n+r) |稳定|是
-基数|               -   |O(n*k/d)|  |O(n+2^d)|稳定|不
-
-**其他排序**|并发排序，<br>混合排序
-
-
-计数排序：每个桶只存储单一键值；
-桶排序：每个桶存储一定范围的数值；
-基数排序：根据键值的每位数字来分配桶；
-
-计算复杂性理论
-    常量时间 O(1)
-    线性时间  Ο(n)
-    指数时间
-
-1954年由 Harold H. Seward 提出 计数排序
-
-
-#### TimSort
-Arrays.sort
-https://blog.csdn.net/bryansun/article/details/105182778?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-7.nonecase
 
 
 ## 密码学家6个重要的工具

@@ -424,6 +424,16 @@ StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 [ Crash防护](https://www.jianshu.com/p/01b69d91a3a8)
 try{Looper.loop()}
 
+
+Application Not Responding          不在主线程访问网络文件复杂逻辑
+java.lang.OutOfMemoryException      生命周期完释放，activity fragment bitmap 等
+java.lang.NullPointerException      增加判断
+java.lang.IndexOutOfBoundsException 数据index判断
+java.lang.IllegalStateException     fragment获取不到context，activity destroy
+java.lang.ClassCastException        使用接口或泛型，代替类型转化
+java.lang.ClassNotFoundException    避免反射
+java.util.ConcurrentModificationException 考虑并发情况
+
 ### sdk
 /cmdline-tools 下载安装器
 #### /tools/monitor.bat       DDMS/animator dump/systrace,Hierarchy ivew, pixel perfect
@@ -459,7 +469,7 @@ adb shell 命令源码地址（find -iname 'cmds'）：
 adb shell "getprop ro.build.version.release"
 adb shell "getprop ro.build.version.sdk"
 adb shell " getprop | grep product"
-
+adb shell pm path com.zhangyue.iReader.Eink
 
 #### system/extras/su 提权
 1. Android 4.4，system分区多被挂载为nosuid，即使修改su.c ，关掉selinux setenforce 0，也有framework验证。init进程开启一个su daemon 守护进程，init进程具有天然的root权限，由它 fork 出的su daemon也有（https://www.jianshu.com/p/6bc251ee9026）
@@ -467,7 +477,7 @@ adb shell " getprop | grep product"
 
 1. Ensure /system/xbin/su exists
 2. chmod 06755 /system/xbin/su
-3. symlink ../xbin/su -> /bin/su
+3. symlink  ../xbin/su -> /bin/su
 https://anthony-f-tannous.medium.com/android-10-emulation-of-magisk-supersu-on-an-aosp-avd-de93ed080fad
 https://github.com/topjohnwu/libsu
 https://source.android.google.cn/devices/bootloader/system-as-root?hl=zh-cn

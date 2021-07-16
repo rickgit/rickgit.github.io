@@ -2882,18 +2882,52 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 #### SystemServer - mediaserver
 ### SystemUI
+``` xml
+    <!-- SystemUI Services: The classes of the stuff to start. -->
+    <string-array name="config_systemUIServiceComponents" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.statusbar.CommandQueue$CommandQueueStart</item>
+        <item>com.android.systemui.keyguard.KeyguardViewMediator</item>
+        <item>com.android.systemui.recents.Recents</item>
+        <item>com.android.systemui.volume.VolumeUI</item>
+        <item>com.android.systemui.stackdivider.Divider</item>
+        <item>com.android.systemui.SystemBars</item>
+        <item>com.android.systemui.usb.StorageNotification</item>
+        <item>com.android.systemui.power.PowerUI</item>
+        <item>com.android.systemui.media.RingtonePlayer</item>
+        <item>com.android.systemui.keyboard.KeyboardUI</item>
+        <item>com.android.systemui.pip.PipUI</item>
+        <item>com.android.systemui.shortcut.ShortcutKeyDispatcher</item>
+        <item>@string/config_systemUIVendorServiceComponent</item>
+        <item>com.android.systemui.util.leak.GarbageMonitor$Service</item>
+        <item>com.android.systemui.LatencyTester</item>
+        <item>com.android.systemui.globalactions.GlobalActionsComponent</item>
+        <item>com.android.systemui.ScreenDecorations</item>
+        <item>com.android.systemui.fingerprint.FingerprintDialogImpl</item>
+        <item>com.android.systemui.SliceBroadcastRelayHandler</item>
+    </string-array>
+ 
+    <!-- SystemUI Services (per user): The classes of the stuff to start for each user. This is a subset of the config_systemUIServiceComponents -->
+    <string-array name="config_systemUIServiceComponentsPerUser" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.recents.Recents</item>
+    </string-array>
+
+```
+
 状态栏PhoneStatusBarView：通知图标，系统图表（蓝牙，WiFi，电量），时间
 下拉后NotificationPanelView：
   StatusBarHeaderView/锁屏状态栏（KeyguardStatubarView）
   快捷设置面板（屏幕亮度调节器ToggleSlderView，9个快捷功能QSPanel，设置页脚QSFooterImpl）
   通知面板 NotificationStackScrollLayout
-  锁屏切换
+  锁屏切换 keyguardbouncer（锁屏，熄屏，亮屏）
 截屏界面
 全局音量管理（音量键） VolumeUI
 底部导航栏 NavigationBar
 电量 PowerUI（电量提醒的模块，包括低电提醒和高低温关机提醒）
-最近应用视图 Recents
-锁屏 keyguardbouncer
+最近应用视图 Recents 
 铃声播放 RingtonePlayer
 Android 7.0
   控制管理分屏 StackDivider
@@ -3083,6 +3117,48 @@ ScanResult.SSID //某个WiFi热点名称
     }
 
 ```
+
+
+###### WiFi弹窗
+WIFI（WireleSS Fidelity）俗称无线宽带，又叫802．11b标准，是IEEE定义的一个无线网络通信的工业标准。
+IEEE802．11b标准是在IEE E802．11的基础上发展起来的，工作在2．4 Hz频段，最高传输率能够达到11 Mbps。
+```
+
+信号
+分类
+  按照幅值是否连续分类
+    模拟信号
+    数字信号
+  按信号载体分类(用什么来表述信号的信息)
+    电信号
+    电压信号
+    电流信号(直流电、交流电、脉冲电)
+    电磁波中的无线电信号
+    波信号(机械波、电磁波)
+  按传输介质分类(传输的都是电磁波)
+    有线信号(电线传输的电信号、光缆传输的光信号)
+    无线信号(自由空间 传输的无线电、微波等）
+  按是否调制分类
+    基带信号
+    频带信号(电力载波、光载波) 
+```
+
+1. 本质的特点
+不再使用通信电缆将计算机与网络连接起来，而是通过无线的方式连接，从而使网络的构建和终端的移动更加灵活。
+```
+安全性
+  无
+  WEP
+  WPA
+    WPA PSK
+    WPA2 PSK
+    WPA/WPA2 PSK
+  802.1x EAP
+    
+ 
+```
+WIFI无线网络目前使用最广泛的加密模式是WPA-PSK（TKIP 使用RC4算法）和WPA2-PSK（AES）两种加密模式。
+
 
 ##### 蓝牙连接
 控制蓝牙图标显示
@@ -3905,6 +3981,9 @@ Obsevable
 
 
 ## 传感器
+
+adb shell dumpsys sensorservice
+
 [](https://source.android.google.cn/devices/sensors/sensor-types?hl=zh-cn)
 重力传感器
         mSensorManager = (SensorManager) getSupportActivity().getSystemService(Activity.SENSOR_SERVICE);

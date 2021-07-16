@@ -2035,7 +2035,18 @@ Paint.Style style2 = mPaint.getStyle();
 mPaint.setStyle(Paint.Style.STROKE);
 canvas.drawRect(mCoordX,l,t,r,b, mPaint);
 mPaint.setStyle(style2);
+
+
 ```
+
+
+#### 图表调试（调试每个draw方法）
+```
+Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+Canvas canvas1 = new Canvas(bitmap);
+canvas1.drawPath(mBoltPath,mBoltPaint);
+```
+
 ### 分离（MediaExtractor）合成轨道
 
 MediaExtractor的作用是把音频和视频的数据进行分离。
