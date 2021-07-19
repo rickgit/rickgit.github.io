@@ -1320,3 +1320,7 @@ https://cgit.freedesktop.org/libreoffice/core/
 
 #### comic
 rar,7z,zip,tar
+
+
+#### 重排
+https://github.com/koreader/libk2pdfopt
