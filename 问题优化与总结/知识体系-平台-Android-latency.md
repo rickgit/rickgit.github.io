@@ -2933,6 +2933,8 @@ Android 7.0
   控制管理分屏 StackDivider
   画中画模式管理  PipUI
 网络，usb...
+
+
 ##### SystemUI通讯
 ```java
 1. 
@@ -3036,6 +3038,11 @@ com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
 
 ```
 
+
+###### 更换 Statubar 图标
+  PhoneStatusBarPolicy 系统图标
+  DemoStatusIcons（演示模式 ）
+  com.android.settingslib.bluetooth.HidProfile 蓝牙图标
 #### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
 ##### WIFI
  
