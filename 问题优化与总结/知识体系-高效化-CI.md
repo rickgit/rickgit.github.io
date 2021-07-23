@@ -636,6 +636,7 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 
 ## android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
 
+Gradle Transform API 在2.x加入
 #### 插件
 1. 依赖 JavaBasePlugin（apply plugin: 'java-base'），关注 createAssembleTask()，
 2. "android" Extension 关联 **AppExtension** ，productFlavors,buildTypes,signiingConfigs
@@ -898,6 +899,8 @@ gradlew build --refresh-dependencies
 ```gradle
     gradle -q dependencies your-app-project:dependencies
 ```
+
+
 ### kotlin-gradle-plugin
 
 
