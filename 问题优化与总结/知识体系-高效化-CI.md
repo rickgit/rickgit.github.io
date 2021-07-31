@@ -635,7 +635,7 @@ Gradle models its builds as Directed Acyclic Graphs (DAGs) of tasks (units of wo
 
 
 ## android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
-
+[编译](https://fucknmb.com/2017/06/01/Android-Gradle-Plugin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E7%BC%96%E8%AF%91/)
 Gradle Transform API 在2.x加入
 #### 插件
 1. 依赖 JavaBasePlugin（apply plugin: 'java-base'），关注 createAssembleTask()，
@@ -643,128 +643,13 @@ Gradle Transform API 在2.x加入
 
 #### tasks
 ```java
-依赖java-base 的 task
-
-Build tasks
------------
-assemble - Assembles the outputs of this project.
-build - Assembles and tests this project.
-buildDependents - Assembles and tests this project and all projects that depend on it.
-buildNeeded - Assembles and tests this project and all projects it depends on.
-clean - Deletes the build directory.
-
-Build Setup tasks
------------------
-init - Initializes a new Gradle build.
-wrapper - Generates Gradle wrapper files.
-
-Help tasks
-----------
-buildEnvironment - Displays all buildscript dependencies declared in root project 'ws-gradle'.
-components - Displays the components produced by root project 'ws-gradle'. [incubating]
-dependencies - Displays all dependencies declared in root project 'ws-gradle'.
-dependencyInsight - Displays the insight into a specific dependency in root project 'ws-gradle'.
-dependentComponents - Displays the dependent components of components in root project 'ws-gradle'. [incubating]
-help - Displays a help message.
-model - Displays the configuration model of root project 'ws-gradle'. [incubating]
-projects - Displays the sub-projects of root project 'ws-gradle'.
-properties - Displays the properties of root project 'ws-gradle'.
-tasks - Displays the tasks runnable from root project 'ws-gradle'.
-
-Verification tasks
-------------------
-check - Runs all checks.
-
-Other tasks
------------
-prepareKotlinBuildScriptModel
-```
-```java
-Android tasks
--------------
-androidDependencies - Displays the Android dependencies of the project.
-signingReport - Displays the signing info for the base and test modules
-sourceSets - Prints out all the source sets defined in this project.
-
-Build tasks
------------
-assemble - Assemble main outputs for all the variants.
-assembleAndroidTest - Assembles all the Test applications.
-build - Assembles and tests this project.
-buildDependents - Assembles and tests this project and all projects that depend on it.
-buildNeeded - Assembles and tests this project and all projects it depends on.
-bundle - Assemble bundles for all the variants.
-classes - Assembles main classes.
-clean - Deletes the build directory.
-cleanBuildCache - Deletes the build cache directory.
-compileDebugAndroidTestSources
-compileDebugSources
-compileDebugUnitTestSources
-compileReleaseSources
-compileReleaseUnitTestSources
-extractDebugAnnotations - Extracts Android annotations for the debug variant into the archive file
-extractReleaseAnnotations - Extracts Android annotations for the release variant into the archive file
-jar - Assembles a jar archive containing the main classes.
-testClasses - Assembles test classes.
-
-Build Setup tasks
------------------
-init - Initializes a new Gradle build.
-wrapper - Generates Gradle wrapper files.
-
-Cleanup tasks
--------------
-lintFix - Runs lint on all variants and applies any safe suggestions to the source code.
-
-Documentation tasks
--------------------
-groovydoc - Generates Groovydoc API documentation for the main source code.
-javadoc - Generates Javadoc API documentation for the main source code.
-
-Help tasks
-----------
-buildEnvironment - Displays all buildscript dependencies declared in root project 'Test-java'.
-components - Displays the components produced by root project 'Test-java'. [incubating]
-dependencies - Displays all dependencies declared in root project 'Test-java'.
-dependencyInsight - Displays the insight into a specific dependency in root project 'Test-java'.
-dependentComponents - Displays the dependent components of components in root project 'Test-java'. [incubating]
-help - Displays a help message.
-model - Displays the configuration model of root project 'Test-java'. [incubating]
-outgoingVariants - Displays the outgoing variants of root project 'Test-java'.
-projects - Displays the sub-projects of root project 'Test-java'.
-properties - Displays the properties of root project 'Test-java'.
-tasks - Displays the tasks runnable from root project 'Test-java' (some of the displayed tasks may belong to subprojects).
-
-Install tasks
--------------
-installDebug - Installs the Debug build.
-installDebugAndroidTest - Installs the android (on device) tests for the Debug build.
-uninstallAll - Uninstall all applications.
-uninstallDebug - Uninstalls the Debug build.
-uninstallDebugAndroidTest - Uninstalls the android (on device) tests for the Debug build.
-uninstallRelease - Uninstalls the Release build.
-
-Upload tasks
-------------
-uploadArchives - Uploads all artifacts belonging to configuration ':GradlePlugin:archives'
-
-Verification tasks
-------------------
-check - Runs all checks.
-connectedAndroidTest - Installs and runs instrumentation tests for all flavors on connected devices.
-connectedCheck - Runs all device checks on currently connected devices.
-connectedDebugAndroidTest - Installs and runs the tests for debug on connected devices.
-deviceAndroidTest - Installs and runs instrumentation tests using all Device Providers.
-deviceCheck - Runs all device checks using Device Providers and Test Servers.
-lint - Runs lint on all variants.
-lintDebug - Runs lint on the Debug build.
-lintRelease - Runs lint on the Release build.
-lintVitalRelease - Runs lint on just the fatal issues in the release build.
-test - Run unit tests for all variants.
-testDebugUnitTest - Run unit tests for the debug build.
-testReleaseUnitTest - Run unit tests for the release build.
-
-```
+依赖java-base 的 task，查看源码classpath的plugin脚本
+查看 android Gradle build 源码 ，java-base 依赖
+      implementation gradleApi()
+    implementation localGroovy()
+     compileOnly 'com.android.tools.build:gradle:3.4.1'
+查看 DefaultTask的继承关系，子类注释 @TaskAction @Input 是执行 
+``` 
 #### 源码
 查询Gradle 版本 
 ```bash
@@ -775,7 +660,7 @@ android gradle plugin
 
 #git tag | grep -P 'gradle'
 ```
-[android sdl /platform/tools/base](https://source.codeaurora.cn/quic/la/platform/tools/base/)
+[android sdl /platform/tools/base/+/refs/tags/gradle_3.0.0/build-system](https://source.codeaurora.cn/quic/la/platform/tools/base/)
 ```
   002_initial_base             940b0f9046fe7ca212f8f1c24b373dd7b0dc0af7 Copy code from sdk.git to base.git
                               +--------------------------------------------------------------------------------------------------------+
@@ -823,7 +708,7 @@ android gradle plugin
  
 
 [gradle.build(ant-javacompiler;ivy;maven-repo;groovy-asm-parseclass;jetbrains-kotlin-gradle-plugin;android-gradle-plugin ) dex2jar,jd-gui,apktool)](./知识体系-项目-efficiency-CI.md:)
-#### Android-DSL
+#### Android-DSL (Android BUild Gradle)
 
 ```
 +---------------------------------------------+

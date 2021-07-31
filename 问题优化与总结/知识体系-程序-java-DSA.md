@@ -1090,6 +1090,7 @@ new String[] {
 [JDK sun impl](jdk\src\share\classes\sun\security\provider\MD5.java)
 [FFmpeg impl](libavutil\md5.c)
 [freebsd MD5](https://svnweb.freebsd.org/base/stable/12/lib/libcrypt/crypt-md5.c?view=markup)
+填充，字，块，遍历，拼接
 1. initial val word h0(32bit),h1,h2,h3
 2. Value+padding0+length（64bit）
 3. chunk (512bit)
