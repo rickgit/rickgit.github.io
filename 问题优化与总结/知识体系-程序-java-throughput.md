@@ -827,6 +827,11 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
 4-Signal Dispatcher   分发处理发送给JVM信号的线程　　
 5-Attach Listener     负责接收外部的命令的线程
 
+### 线程状态
+https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/tooldescr034.html
+https://howtodoinjava.com/java/multi-threading/java-thread-life-cycle-and-thread-states/
+NEW   RUNNABLE  BLOCKED WAITING TIMED_WAITING TERMINATED
+
 ### 多线程问题
 线程生命周期 
 join
