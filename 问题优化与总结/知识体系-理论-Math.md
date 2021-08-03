@@ -24,13 +24,16 @@
 [数学书](https://www.cnblogs.com/xitingxie/p/5684254.html)
 
 [公式生成](https://www.desmos.com/calculator?lang=zh-CN)
-
+《数学之旅附：数学历史长廊》
+[The Map of Mathematics](./res/The%20Map%20of%20Mathematics.jpg)
+[mathematics_trench_chinese](./res/mathematics_trench_chinese.jpg)
 ## 绘图
 https://webdemo.myscript.com/views/math/index.html#
 
 ## 集合（基础）
 ## 数集
-自然数 N，整数Z（包括负数），有理数Q（包括小数），实数R（包括无理数）,复数C（包括虚数I）
+自然数 N，整数Z（包括负数），有理数Q（整数的“比率”/ratio，包括小数），实数R（定义为与数轴上点相对应的数。包括无理数,也称为无限不循环小数）,复数C（包括虚数I）
+
 
 常数 ：
 普朗克常数 h
@@ -43,7 +46,12 @@ https://webdemo.myscript.com/views/math/index.html#
 三个宇宙速度
 元电荷e 法拉第常数F
 史瓦西半径
+
+### 七大实数理论互推
+确界存在定理、单调有界定理、有限覆盖定理、聚点定理、致密性定理、闭区间套定理和柯西收敛准则
 ### 无理数常量
+无理数：
+    非完全平方数的平方根、π和e（其中后两者均为超越数）黄金比例φ
 φ 黄金比例是一个定义为 (√5-1)/2的无理数，约为0.618
 √2 1.4142
 π 圆周率：3.141592654
@@ -136,7 +144,11 @@ https://www.youtube.com/watch?v=v2uHiBH85mk
         多因素
             偏导数
 ```
+[代数](./res/linear.png)
 ## 几何（空间）
+几何是低维的代数，代数是高维的几何
+
+
  [几何公式](https://www.geogebra.org/classic)
 弦切角定理 
 中線定理 
