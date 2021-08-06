@@ -390,12 +390,43 @@ aar 给主模块使用的代码混淆文件
           aapt2 --stable-ids ,--emit-ids
 
 
+在aar/jar的build.gradle中添加下面的代码禁止生成BuildConfig即可。
 
+afterEvaluate {
+    generateReleaseBuildConfig.enabled = false
+    generateDebugBuildConfig.enabled = false
+}
 ## 可分析
 调试和分析
 异常处理
 日志
+包大小 jdx
+界面解析 qtscrcpy
 ### 日志 Timer 
+制造商，CPU型号，品牌及型号，编译标识	，系统版本号，系统SDK版本
+adb shell getprop | grep product
+```
+[ro.build.product]: [aud8112s801s]
+[ro.product.board]: [SR801S]
+[ro.product.brand]: [iReader]
+[ro.product.cpu.abi]: [armeabi-v7a] CPU型号
+[ro.product.device]: [SR801S]
+[ro.product.first_api_level]: [28]
+[ro.product.locale]: [zh-CN]
+[ro.product.manufacturer]: [alps] 硬件/主板制造商
+[ro.product.model]: [Smart Xs] 型号
+[ro.product.name]: [SR801S]
+[ro.product.vendor.brand]: [ireader] 品牌
+[ro.product.vendor.device]: [aud8112s801s]
+[ro.product.vendor.manufacturer]: [alps] 
+[ro.product.vendor.model]: [aud8112s801s]
+[ro.product.vendor.name]: [full_aud8112s801s]
+[ro.build.id]: [PQ2A.190405.003] 编译版本号
+[ro.build.version.release]: [9]  系统版本号
+[ro.build.version.sdk]: [28]     系统版本值
+
+```
+
 ### 日志埋点/布点 AspectJ
 Android AspectJ 常用埋点
 ### 应用稳定性（Stability：how many failures an application exhibits）-异常及严苛模式
