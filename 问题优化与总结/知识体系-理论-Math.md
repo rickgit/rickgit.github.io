@@ -29,7 +29,7 @@
 [mathematics_trench_chinese](./res/mathematics_trench_chinese.jpg)
 ## 绘图
 https://webdemo.myscript.com/views/math/index.html#
-
+manim
 ## 集合（基础）
 集合的三要素. 分别有确定性、互异性、无序性。
 ## 数集
@@ -155,7 +155,9 @@ https://www.youtube.com/watch?v=v2uHiBH85mk
  矩阵 x 列向量, 相当于矩阵的列向量的线性组合. 矩阵是数据集合，列向量是代数的系数。
  矩阵 x 矩阵（多个列向量), 相当于矩阵的多个列向量的线性组合. 左矩阵是数据集合，右矩阵（多个列向量)是多个代数的系数。
 
-
+行列式
+|1 0|
+|0 1|  二维意义：面积 1
 
 ## 几何（空间），代数具象化
 几何是低维的代数，代数是高维的几何
@@ -174,3 +176,12 @@ https://www.youtube.com/watch?v=v2uHiBH85mk
 餘弦定理
 
 ## 微积分（变化），非线性
+
+
+## 统计学
+离散分布：
+伯努利实验
+二项分布 负二项分布
+几何分布 超几何分布
+
+泊松分布

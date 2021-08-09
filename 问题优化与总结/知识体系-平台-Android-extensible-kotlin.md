@@ -617,6 +617,9 @@ K2JVMCompiler.main(new String[]{"hello.kt ","-include-runtime"," -d","hello.jar"
 
 ```
 ### 协程
+解决问题：
+调度（分发器），生命周期（协程范围，协程上下文-组合模式，Job-状态），异常处理
+
 [kotlinx.coroutines](https://github.com/Kotlin/kotlinx.coroutines.git)
 ```
 [](https://blog.csdn.net/qfanmingyiq/article/details/105184822)

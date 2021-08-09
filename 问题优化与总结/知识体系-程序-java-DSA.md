@@ -59,319 +59,6 @@ Concurrent access
 ```
 
 
-#### 浮点型 IEEE-754格式标准
-Float
-```
-第一步：[176.0625换成二进制数](https://blog.csdn.net/k346k346/article/details/50487127)，
-        整数部分采用"除2取余，逆序排列"法：
-        小数点前:176 / 2 = 88  
-        余数为 088 / 2=44 余数为 0                             
-        44 / 2 =22    余数为 0                       
-        22 / 2= 11    余数为 0                              
-        11 / 2 =5     余数为 1        
-        5 / 2=2       余数为 1                             
-        2/ 2  =1      余数为 0                                                                             
-        1/ 2=0        余数为 1    商为0，结束。                                                                       
-        小数点前整数转换为二进制:10110000    
-        ---------------------  
-        
-        小数部分采用 "乘2取整，顺序排列"法部分：
-        0.0625 * 2 = 0.125   整数为0                 
-        0.125 * 2 = 0.25     整数为0             
-        0.25* 2 = 0.50       整数为0             
-        0.5* 2 = 1.0         整数为1，小数部分为0,结束
-        小数点后整数转换为二进制:0001 
-
-        得到二进制位：10110000.0001
-
-第二步：在换算成内存格式（IEEE-754格式标准）  SEEEEEEE    EMMMMMMM    MMMMMMMM    MMMMMMMM
-      S 0正数，1负数
-      E 第一位（1：大于1的十进制，0：0~1之间的十进制），第2到8位（减法后的值： [占1位；小数点移位至到个位1.若右移0，否则1][占7位，小数点移位的二进制] −1）
-      M 小数点移位到个位1后，截取后面23二进制
-      即 0 10000110 0110000 00010000 00000000
-
-```
--Float.MAX_VALUE ~ Float.MAX_VALUE
-=[-3.40282346638528860e+38 , -1.40129846432481707e-45] ∪ [1.40129846432481707e-45 ~ 3.40282346638528860e+38]
-正负是对称的，看下正数部分
-Float.MIN_VALUE ~ Float.MAX_VALUE
-=2^(-126) ~~ 2(1-2^(-24)) * 2^(2^7-1)
-=2^(-126) ~~ 2(1-2^(-24)) * 2^(127)
-=1.1754943508223e-38 ~ 3.4e+38
-= （已知e-24位 涅槃寂静，暂时找不到可以衡量的计数单位） ~ 3.4*(10^38)(计数单位约等于34涧)
-
-- Double
-内存里的存储结构（IEEE-754格式标准）：SEEE EEEE EEEE MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM
-正数范围：
-2^(-1022-52) ~~ 2-2^-52)*(2^((2^10)-1))
-#### 时间戳封装 - 日期Date/Canadar
-装饰 long时间戳
-懒加载 
-
-Calendar.HOUR 圆盘时钟 1~12，凌晨0点即早上12点，中午12点即下午12点
-Calendar.HOUR_OF_DAY 数字手表0~23
-
-
-####  字符串结构及字符编码
-
-数据与二进制
-- 字长
-  [字长](http://www.cnblogs.com/chakyu/p/7405275.html)
-  [进制转化](https://www.branah.com/ascii-converter)
-- 字节，编码，字符集 
-sun.jnu.encoding是指操作系统的默认编码，
-file.encoding是指JAVA文件的编码
-```java
-javac -encoding utf-8 TextFileEncoding.java  //必须设置和文件编码一直的编码
-
-java -Dfile.encoding=utf-8 TextFileEncoding
-
-```
-[java -h 相关启动参数帮助文档](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html)
-
-《The Unicode® Standard Version 9.0 》
-BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
-```
-                            256
-                   128
-              16
-            +------+---------+------------+
-        16  | 128  |         |            |
-            | 0xf  |         |            |
-            +------+         |            |
-            |       256      |            |
-    128     |      0xff      |            |
-256         +----------------+            |
-            |               65536         |Redundancy
-            |               0xffff        |
-            |                             |
-            +-----------------------------+
- 
-       +--------------------------------+ colomns 256  +--------------------------------+
-
- +    +---------------------------------------------------------------------------------+    +
- |    |             ascii                 |                   latin1                    |BMP |
- |    +---------------------------------------------------------------------------------+    |
- |    |                                                                           .     |    +
- |    |                                                                           .     |   rows 256
- |    |                                                                           .     |    +
- |    +---------------------------------------------------------------------------------+    +
- |                                                                                       SMP
- |                                           .                                           SIP  
-                                             .
-planes 0x10                                  .                                           SSP
- +                                                                                       SPUA-A
- |    +---------------------------------------------------------------------------------+
- |    |                                                                                 |SPUA-B
- |    |                                                                                 |
- +    +---------------------------------------------------------------------------------+
- 
-1字节 0xxxxxxx 
-2字节 110xxxxx 10xxxxxx 
-3字节 1110xxxx 10xxxxxx 10xxxxxx 
-4字节 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 
-5字节 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
-6字节 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
-```
-[unicode 及位置](https://unicode-table.com/en/#control-character)
- [emoji位置](https://unicode-table.com/en/#emoticons)  80个字符(1F600— 1F64F)
-UCS-4 第1个字节2^7=128个group，第2个字节2^8=256个平面（plane）,第3个字节分为256行 （row），第4个字节代表每行有256个码位（cell）
-unicode 有0x10FFFF个cell，分为 17平面，(2^8=256)行，(2^8=256)单元
- 
-- 涉及类
-  1. [Character.UnicodeBlock](https://en.wikipedia.org/wiki/Unicode_block)
-- [Unicode与UTF-8转化](https://zh.wikipedia.org/wiki/UTF-8)
-- [UTF-16](https://en.wikipedia.org/wiki/UTF-16) 
-  UTF-16编码（二进制）就是：xxxxxxxx xxxxxxxx（0区）
-  或110110yy yyyyyyyy 110111xx xxxxxxxx（超过三个字节 Unicode 用四个字节的UTF-16编码）
-  
-```java
-  System.out.println("a".getBytes(StandardCharsets.UTF_16).length);//结果为4，是因为加上BOM(字节顺序标记(ByteOrderMark))大端序，用FEFF表示，FEFF占用两个字节。
-```
-
-  BOM大端，高位字节存储在内存地址的低位地址
-
-```
-    0x CC AA 88 66
-
-   Big-Endian
-   +--------+--------+-------+--------+
-   |  CC    |  AA    |  88   |  66    |
-   |        |        |       |        |
-   +--------+--------+-------+--------+
-
-   Little-Endian
-   +--------+--------+-------+--------+
-   |  66    |  88    |  AA   |  CC    |
-   |        |        |       |        |
-   +--------+--------+-------+--------+
-```
-##### 字符串-字符数组
-stringbuilder 
-```
-+----------------------------------------------------------------------------+
-|                 StringBuilder                StringBuffer                  |
-|                                                                            |
-+----------------------------------------------------------------------------+
-|                                                                            |
-|                      AbstractStringBuilder                                 |
-|                            value:char[]                                    |
-|                            count:int                                       |
-|                                                                            |
-+----------------------------------------------------------------------------+
-
-
-```
-初始 默认16
-扩容 插入时，期望数组长度大于value数组长度，(value.length << 1) + 2，如果不够直接用期望数组长度。[(value.length << 1) + 2](https://stackoverflow.com/questions/45094521/java-stringbuilderstringbuffers-ensurecapacity-why-is-it-doubled-and-incre)
-    （保证初始化长度为0，也能扩容。并且可能JVM内存结构有关，不考虑markword和clazz，数组长度 4byte+（16*2+2)*2byte(char) 有概率能被8整除，内存对齐）
-Arrays.copyof 扩容空间，拷贝源数组
-System.arraycopy 拷贝到新数据 
-```
-+---------------+----------+----------+
-|               |  final   |  synchro |
-+-------------------------------------+
-| String        |   √      |          |
-+-------------------------------------+
-| StringBuffer  | char[]   |    √     |
-+-------------------------------------+
-| StringBuilder | char[]   |    x     |
-+---------------+----------+----------+
-
-```
-
-##### 指令 - 运算符（算术，位运算，赋值，比较，逻辑）
-Byte通过加法实现加减，移位和加法实现乘除法
-
-- 原码，反码，补码
-  正数：原码，反码，补码一致
-  负数：反码符号位不变其他位按位取反，补码为反码加1（取反加一，两个过程符号位都不变）
-```
-或者换成时钟，0，1，2，3，4，5，-6，-1，-2，-3，-4，-5
-3bit有符号二进制
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|  -3       |    -2     |   -1    |  -4    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 原码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-
-负数反码，相当与在负数范围换下位置。 
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|   -4      |    -1     |   -2    |  -3    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
- 
-负数补码，整个数变得有序
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-|        |           |           |         |        |         |          |         |        |
-| Decimal|   -1      |    -2     |   -3    |  -4    |   3     | 2        | 1       |    0   |
-+-------------------------------------------------------------------------------------------+
-|        |           |           |         |        |         |          |         |        |
-| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
-+--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
-
-
-```
-  原码：加负数，不是预期值（1-1= 00000001^1000001（原码）=10000010=-2）
-  反码：正数原码加负数的原码，计算的结果不是想要的值（1-1= 00000001（反）^11111110（反码）=11111111（反）=10000000（原））。
-  补码：正数加负数的反码，符号位不对，用补码可以正确（1-1= 00000001（补）^11111111(补码)=00000000=0）
-- [补码原理：同余](https://www.cnblogs.com/baiqiantao/p/7442907.html)
-  负数取模：A mod b= A-B*Math.floor（A/B）
-  
-  1. 反码，实际上是这个数对于一个膜的同余数；而这个膜并不是我们的二进制，而是所能表示的最大值
-  2. 反码的基础上+1，只是相当于增加了膜的值
-```
-byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
-    取补求值，相当于（a+b） mod 128，保证不会溢出
-```
-
-- 位运算 **& | ~ ^**
- 
-##### Hex（用于打印字符）/Base16（用于编码比特流），Base32
-##### URL（安全字符+非安全字符Base16编码）
-```java
-Apache-codec
-    static {
-        // alpha characters
-        for (int i = 'a'; i <= 'z'; i++) {
-            WWW_FORM_URL_SAFE.set(i);
-        }
-        for (int i = 'A'; i <= 'Z'; i++) {
-            WWW_FORM_URL_SAFE.set(i);
-        }
-        // numeric characters
-        for (int i = '0'; i <= '9'; i++) {
-            WWW_FORM_URL_SAFE.set(i);
-        }
-        // special chars
-        WWW_FORM_URL_SAFE.set('-');
-        WWW_FORM_URL_SAFE.set('_');
-        WWW_FORM_URL_SAFE.set('.');
-        WWW_FORM_URL_SAFE.set('*');
-        // blank to be replaced with +
-        WWW_FORM_URL_SAFE.set(' ');
-
-        // Create a copy in case anyone (ab)uses it
-        WWW_FORM_URL = (BitSet) WWW_FORM_URL_SAFE.clone();
-    }
-```
-非安全字符
-```java
-        buffer.write(ESCAPE_CHAR);
-        final char hex1 = Utils.hexDigit(b >> 4);
-        final char hex2 = Utils.hexDigit(b);
-        buffer.write(hex1);
-        buffer.write(hex2);
-```
-##### Base64
-> Base64是一种基于64个可打印字符来表示二进制数据的表示方法。log{2}64=6 。[](https://zh.wikipedia.org/wiki/Base64)
-```java 
-Apache-codec
-
-    //1. 邮件内容 MINE；
-    //2. 图片传输 data:image/png;base64 ；
-    private static final byte[] STANDARD_ENCODE_TABLE = {
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
-    };
-
-    /**
-     * This is a copy of the STANDARD_ENCODE_TABLE above, but with + and /
-     * changed to - and _ to make the encoded Base64 results more URL-SAFE.
-     * This table is only used when the Base64's mode is set to URL-SAFE.
-     */
-    private static final byte[] URL_SAFE_ENCODE_TABLE = {
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
-    };
-```
-Simple： A-Za-z0-9+/（.用来填充）
-URL： A-Za-z0-9+_（.用来填充）
-MIME： A-Za-z0-9+/（=用来填充）
-
-
-#### 比特串/字节数组结构（二进制编码）
-    基本数据类型与字节（固定长度二进制代表数据类型）
-
-boolean,byte,char,short,int,long,float,double
-
-创建对象
-    简单工厂 valueof
-
-- Char
-  jdk 9采用压缩字符串，Iso-8891，使用一个字节，否则用 UTF-16 编码。
-
 
 
 #### ArrayList
@@ -784,6 +471,319 @@ cache模式
 缓存arrayamp
 
 
+## 比特串/字节数组结构（二进制编码）
+### 基本数据类型与字节（固定长度二进制代表数据类型）
+
+boolean,byte,char,short,int,long,float,double
+
+创建对象
+    简单工厂 valueof
+
+- Char
+  jdk 9采用压缩字符串，Iso-8891，使用一个字节，否则用 UTF-16 编码。
+
+
+#### 浮点型 IEEE-754格式标准
+Float
+```
+第一步：[176.0625换成二进制数](https://blog.csdn.net/k346k346/article/details/50487127)，
+        整数部分采用"除2取余，逆序排列"法：
+        小数点前:176 / 2 = 88  
+        余数为 088 / 2=44 余数为 0                             
+        44 / 2 =22    余数为 0                       
+        22 / 2= 11    余数为 0                              
+        11 / 2 =5     余数为 1        
+        5 / 2=2       余数为 1                             
+        2/ 2  =1      余数为 0                                                                             
+        1/ 2=0        余数为 1    商为0，结束。                                                                       
+        小数点前整数转换为二进制:10110000    
+        ---------------------  
+        
+        小数部分采用 "乘2取整，顺序排列"法部分：
+        0.0625 * 2 = 0.125   整数为0                 
+        0.125 * 2 = 0.25     整数为0             
+        0.25* 2 = 0.50       整数为0             
+        0.5* 2 = 1.0         整数为1，小数部分为0,结束
+        小数点后整数转换为二进制:0001 
+
+        得到二进制位：10110000.0001
+
+第二步：在换算成内存格式（IEEE-754格式标准）  SEEEEEEE    EMMMMMMM    MMMMMMMM    MMMMMMMM
+      S 0正数，1负数
+      E 第一位（1：大于1的十进制，0：0~1之间的十进制），第2到8位（减法后的值： [占1位；小数点移位至到个位1.若右移0，否则1][占7位，小数点移位的二进制] −1）
+      M 小数点移位到个位1后，截取后面23二进制
+      即 0 10000110 0110000 00010000 00000000
+
+```
+-Float.MAX_VALUE ~ Float.MAX_VALUE
+=[-3.40282346638528860e+38 , -1.40129846432481707e-45] ∪ [1.40129846432481707e-45 ~ 3.40282346638528860e+38]
+正负是对称的，看下正数部分
+Float.MIN_VALUE ~ Float.MAX_VALUE
+=2^(-126) ~~ 2(1-2^(-24)) * 2^(2^7-1)
+=2^(-126) ~~ 2(1-2^(-24)) * 2^(127)
+=1.1754943508223e-38 ~ 3.4e+38
+= （已知e-24位 涅槃寂静，暂时找不到可以衡量的计数单位） ~ 3.4*(10^38)(计数单位约等于34涧)
+
+- Double
+内存里的存储结构（IEEE-754格式标准）：SEEE EEEE EEEE MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM MMMM
+正数范围：
+2^(-1022-52) ~~ 2-2^-52)*(2^((2^10)-1))
+#### 时间戳封装 - 日期Date/Canadar
+装饰 long时间戳
+懒加载 
+
+Calendar.HOUR 圆盘时钟 1~12，凌晨0点即早上12点，中午12点即下午12点
+Calendar.HOUR_OF_DAY 数字手表0~23
+
+####  字符串结构及字符编码
+
+数据与二进制
+- 字长
+  [字长](http://www.cnblogs.com/chakyu/p/7405275.html)
+  [进制转化](https://www.branah.com/ascii-converter)
+- 字节，编码，字符集 
+sun.jnu.encoding是指操作系统的默认编码，
+file.encoding是指JAVA文件的编码
+```java
+javac -encoding utf-8 TextFileEncoding.java  //必须设置和文件编码一直的编码
+
+java -Dfile.encoding=utf-8 TextFileEncoding
+
+```
+[java -h 相关启动参数帮助文档](https://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html)
+
+《The Unicode® Standard Version 9.0 》
+BCD->ASCII（128）->ISO/IEC8859-1，又称Latin-1（256）->Unicode(1_114_112)
+```
+                            256
+                   128
+              16
+            +------+---------+------------+
+        16  | 128  |         |            |
+            | 0xf  |         |            |
+            +------+         |            |
+            |       256      |            |
+    128     |      0xff      |            |
+256         +----------------+            |
+            |               65536         |Redundancy
+            |               0xffff        |
+            |                             |
+            +-----------------------------+
+ 
+       +--------------------------------+ colomns 256  +--------------------------------+
+
+ +    +---------------------------------------------------------------------------------+    +
+ |    |             ascii                 |                   latin1                    |BMP |
+ |    +---------------------------------------------------------------------------------+    |
+ |    |                                                                           .     |    +
+ |    |                                                                           .     |   rows 256
+ |    |                                                                           .     |    +
+ |    +---------------------------------------------------------------------------------+    +
+ |                                                                                       SMP
+ |                                           .                                           SIP  
+                                             .
+planes 0x10                                  .                                           SSP
+ +                                                                                       SPUA-A
+ |    +---------------------------------------------------------------------------------+
+ |    |                                                                                 |SPUA-B
+ |    |                                                                                 |
+ +    +---------------------------------------------------------------------------------+
+ 
+1字节 0xxxxxxx 
+2字节 110xxxxx 10xxxxxx 
+3字节 1110xxxx 10xxxxxx 10xxxxxx 
+4字节 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx 
+5字节 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
+6字节 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 
+```
+[unicode 及位置](https://unicode-table.com/en/#control-character)
+ [emoji位置](https://unicode-table.com/en/#emoticons)  80个字符(1F600— 1F64F)
+UCS-4 第1个字节2^7=128个group，第2个字节2^8=256个平面（plane）,第3个字节分为256行 （row），第4个字节代表每行有256个码位（cell）
+unicode 有0x10FFFF个cell，分为 17平面，(2^8=256)行，(2^8=256)单元
+ 
+- 涉及类
+  1. [Character.UnicodeBlock](https://en.wikipedia.org/wiki/Unicode_block)
+- [Unicode与UTF-8转化](https://zh.wikipedia.org/wiki/UTF-8)
+- [UTF-16](https://en.wikipedia.org/wiki/UTF-16) 
+  UTF-16编码（二进制）就是：xxxxxxxx xxxxxxxx（0区）
+  或110110yy yyyyyyyy 110111xx xxxxxxxx（超过三个字节 Unicode 用四个字节的UTF-16编码）
+  
+```java
+  System.out.println("a".getBytes(StandardCharsets.UTF_16).length);//结果为4，是因为加上BOM(字节顺序标记(ByteOrderMark))大端序，用FEFF表示，FEFF占用两个字节。
+```
+
+  BOM大端，高位字节存储在内存地址的低位地址
+
+```
+    0x CC AA 88 66
+
+   Big-Endian
+   +--------+--------+-------+--------+
+   |  CC    |  AA    |  88   |  66    |
+   |        |        |       |        |
+   +--------+--------+-------+--------+
+
+   Little-Endian
+   +--------+--------+-------+--------+
+   |  66    |  88    |  AA   |  CC    |
+   |        |        |       |        |
+   +--------+--------+-------+--------+
+```
+##### 字符串-字符数组
+stringbuilder 
+```
++----------------------------------------------------------------------------+
+|                 StringBuilder                StringBuffer                  |
+|                                                                            |
++----------------------------------------------------------------------------+
+|                                                                            |
+|                      AbstractStringBuilder                                 |
+|                            value:char[]                                    |
+|                            count:int                                       |
+|                                                                            |
++----------------------------------------------------------------------------+
+
+
+```
+初始 默认16
+扩容 插入时，期望数组长度大于value数组长度，(value.length << 1) + 2，如果不够直接用期望数组长度。[(value.length << 1) + 2](https://stackoverflow.com/questions/45094521/java-stringbuilderstringbuffers-ensurecapacity-why-is-it-doubled-and-incre)
+    （保证初始化长度为0，也能扩容。并且可能JVM内存结构有关，不考虑markword和clazz，数组长度 4byte+（16*2+2)*2byte(char) 有概率能被8整除，内存对齐）
+Arrays.copyof 扩容空间，拷贝源数组
+System.arraycopy 拷贝到新数据 
+```
++---------------+----------+----------+
+|               |  final   |  synchro |
++-------------------------------------+
+| String        |   √      |          |
++-------------------------------------+
+| StringBuffer  | char[]   |    √     |
++-------------------------------------+
+| StringBuilder | char[]   |    x     |
++---------------+----------+----------+
+
+```
+
+#### 指令 - 运算符（算术，位运算，赋值，比较，逻辑）
+Byte通过加法实现加减，移位和加法实现乘除法
+
+- 原码，反码，补码
+  正数：原码，反码，补码一致
+  负数：反码符号位不变其他位按位取反，补码为反码加1（取反加一，两个过程符号位都不变）
+```
+或者换成时钟，0，1，2，3，4，5，-6，-1，-2，-3，-4，-5
+3bit有符号二进制
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|  -3       |    -2     |   -1    |  -4    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 原码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+
+负数反码，相当与在负数范围换下位置。 
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|   -4      |    -1     |   -2    |  -3    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+ 
+负数补码，整个数变得有序
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+|        |           |           |         |        |         |          |         |        |
+| Decimal|   -1      |    -2     |   -3    |  -4    |   3     | 2        | 1       |    0   |
++-------------------------------------------------------------------------------------------+
+|        |           |           |         |        |         |          |         |        |
+| 反码    |  111      |    110    |  101    |  100   |  011    |  010     |  001    | 000    |
++--------+-----------+-----------+---------+--------+---------+----------+---------+--------+
+
+
+```
+  原码：加负数，不是预期值（1-1= 00000001^1000001（原码）=10000010=-2）
+  反码：正数原码加负数的原码，计算的结果不是想要的值（1-1= 00000001（反）^11111110（反码）=11111111（反）=10000000（原））。
+  补码：正数加负数的反码，符号位不对，用补码可以正确（1-1= 00000001（补）^11111111(补码)=00000000=0）
+- [补码原理：同余](https://www.cnblogs.com/baiqiantao/p/7442907.html)
+  负数取模：A mod b= A-B*Math.floor（A/B）
+  
+  1. 反码，实际上是这个数对于一个膜的同余数；而这个膜并不是我们的二进制，而是所能表示的最大值
+  2. 反码的基础上+1，只是相当于增加了膜的值
+```
+byte （byte范围 -128~127）取反求值，相当于值 (a+b) mod 127
+    取补求值，相当于（a+b） mod 128，保证不会溢出
+```
+
+- 位运算 **& | ~ ^**
+ 
+### Hex（用于打印字符）/Base16（用于编码比特流），Base32
+### URL（安全字符+非安全字符Base16编码）
+```java
+Apache-codec
+    static {
+        // alpha characters
+        for (int i = 'a'; i <= 'z'; i++) {
+            WWW_FORM_URL_SAFE.set(i);
+        }
+        for (int i = 'A'; i <= 'Z'; i++) {
+            WWW_FORM_URL_SAFE.set(i);
+        }
+        // numeric characters
+        for (int i = '0'; i <= '9'; i++) {
+            WWW_FORM_URL_SAFE.set(i);
+        }
+        // special chars
+        WWW_FORM_URL_SAFE.set('-');
+        WWW_FORM_URL_SAFE.set('_');
+        WWW_FORM_URL_SAFE.set('.');
+        WWW_FORM_URL_SAFE.set('*');
+        // blank to be replaced with +
+        WWW_FORM_URL_SAFE.set(' ');
+
+        // Create a copy in case anyone (ab)uses it
+        WWW_FORM_URL = (BitSet) WWW_FORM_URL_SAFE.clone();
+    }
+```
+非安全字符
+```java
+        buffer.write(ESCAPE_CHAR);
+        final char hex1 = Utils.hexDigit(b >> 4);
+        final char hex2 = Utils.hexDigit(b);
+        buffer.write(hex1);
+        buffer.write(hex2);
+```
+### Base64
+> Base64是一种基于64个可打印字符来表示二进制数据的表示方法。log{2}64=6 。[](https://zh.wikipedia.org/wiki/Base64)
+```java 
+Apache-codec
+
+    //1. 邮件内容 MINE；
+    //2. 图片传输 data:image/png;base64 ；
+    private static final byte[] STANDARD_ENCODE_TABLE = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+    };
+
+    /**
+     * This is a copy of the STANDARD_ENCODE_TABLE above, but with + and /
+     * changed to - and _ to make the encoded Base64 results more URL-SAFE.
+     * This table is only used when the Base64's mode is set to URL-SAFE.
+     */
+    private static final byte[] URL_SAFE_ENCODE_TABLE = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '_'
+    };
+```
+Simple： A-Za-z0-9+/（.用来填充）
+URL： A-Za-z0-9+_（.用来填充）
+MIME： A-Za-z0-9+/（=用来填充）
+
+
 
 ## 算法 - 七大（逻辑结构）查找
 1. 线性表查找：
@@ -1090,7 +1090,7 @@ new String[] {
 [JDK sun impl](jdk\src\share\classes\sun\security\provider\MD5.java)
 [FFmpeg impl](libavutil\md5.c)
 [freebsd MD5](https://svnweb.freebsd.org/base/stable/12/lib/libcrypt/crypt-md5.c?view=markup)
-填充，字，块，遍历，拼接
+字，填充，块，遍历，拼接
 1. initial val word h0(32bit),h1,h2,h3
 2. Value+padding0+length（64bit）
 3. chunk (512bit)
@@ -1453,6 +1453,14 @@ TLS 1.0开始支持PSK-RSA，SRP。不需要部属 CA 证书
 整数加法校验和，One’s complement “checksum”，Fletcher Checksum
 
 Adler Checksum，ATN Checksum (AN/466)，模 2 除法
+
+
+error correction:
+1949  汉明码
+1950  香农信息论
+1960 里德-所罗门码
+1990 涡轮码
+1991 量子纠错码 shor codes quantum
 #### 校验和
 [](https://www.youtube.com/watch?v=ga_1YP7HExw)
 发送方 Alice：
