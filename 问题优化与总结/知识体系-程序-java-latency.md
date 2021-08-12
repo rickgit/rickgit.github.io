@@ -462,7 +462,7 @@ javap –verbose Hello.class 可以看到更加清楚的信息
 
 
 
-##### JVM 内存区域
+##### JVM 内存分区
 OOP-KLASS模型
 
 [jol查看内存结构](http://hg.openjdk.java.net/code-tools/jol/file/tip/jol-samples/src/main/java/org/openjdk/jol/samples/)

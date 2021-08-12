@@ -17,14 +17,8 @@
 JMM：线程之间的共享变量存储在主内存（main memory）中，每个线程都有一个私有的本地内存（local memory），本地内存中存储了该线程以读/写共享变量的副本。
 内存模型描述了执行轨迹是否是该程序的一次合法执行。并发过程中如何处理原子性、可见性和顺序性。抽象CPU结局硬件平台的差异性。
 https://www.cnblogs.com/chihirotan/p/6486436.html 
- 
-### 原子性
-
-- 8个原子操作 read,load,store,write,use,assign,lock,unlock（monitorenter和monitorexit来隐式地使用这两个操作）
-[IA32 指令](https://www.intel.cn/content/www/cn/zh/architecture-and-technology/64-ia-32-architectures-software-developer-vol-1-manual.html)
 
 ```
- 
 http://vorboss.dl.sourceforge.net/project/fcml/fcml-1.1.1/hsdis-1.1.1-win32-amd64.zip 解压文件放到 jdk/jre/bin/server
 -Xcomp -XX:+UnlockDiagnosticVMOptions -XX:+PrintAssembly   -XX:CompileCommand=dontinline,*Test.testFieldNoVolatile -XX:CompileCommand=compileonly,*Test.testFieldNoVolatile 
 
@@ -85,13 +79,47 @@ write   v            | +-------------+ |                  |                 |
                store +-----------------+                  +-----------------+
  
 ```
-### 可见性
-### 有序性
 
+并发编程三大特性：原子性，可见性，有序性
+### 原子性
+
+- 8个原子操作 read,load,store,write,use,assign,lock,unlock（monitorenter和monitorexit来隐式地使用这两个操作，volatile 读写，）
+[IA32 指令](https://www.intel.cn/content/www/cn/zh/architecture-and-technology/64-ia-32-architectures-software-developer-vol-1-manual.html)
+
+### 可见性
+  volatile 
+### 有序性
+#### 内存屏障
+  jdk 使用 Lock会对CPU总线和高速缓存加锁，软实现内存屏障。可通过源码源码查看（hotspot\src\share\vm\interpreter\bytecodeInterpreter.cpp）
+ volatile写操作:  StoreStore，Store value，StoreLoad
+ volatile读操作: LoadLoad，load value，LoadStore
 #### happens-before 关系（8个）
+https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading/happens-before.html
+ 
+
+1. 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
+2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
+3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
+5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
+6. join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。
+7. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
+8. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
+9. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
+
+ [](https://juejin.im/post/5ae6d309518825673123fd0e#heading-5)
+ [](https://www.cnblogs.com/skorzeny/p/6480012.html)
+#### volatile JMM内存模型
+ volatile 内存可见性， 顺序一致性(重排序)
+ final 内存语义：在退出构造器后，不管是异常还是正常退出，对象的 final_field 上都会发生冻结动作。反射修改后，马上冻结，且不能反射修改static fianl 字段
+ hanpen before，指两个操作指令的执行顺序
+ CAS 读改写原子性
+
+ 可以保证变量的可见性 ，不能保证变量状态的“原子性操作”，原子性操作需要lock或cas
 
 final 语义：在 退出构造器后，不管是异常还是正常退出，对象的 final_field 上都会发生冻结动作。反射修改后，马上冻结，且不能反射修改static fianl 字段
-  
+  写final字段值前插入StoreStore屏障完毕后才能引用和读取
+  读final字段值前插入了LoadLoad屏障
+
 ## 提高吞吐量 J.U.C
 - 内存原理（AQS）
 - 并发容器与阻塞队列
@@ -108,8 +136,6 @@ volatile原理是基于CPU内存屏障指令实现的
 |             |              | (Exclusi^e,pessimism)|                  |                        |                       |
 +-------------+--------------+------------------------------------------------------------------------------------------+
 |  volatile   | J.U.C.atomic |                                                                                          |
-|             |              |                                                                                          |
-|             |              |                                                                                          |
 |             |              |                                                                                          |
 |             +-------------------------------------+----------------+------------------------+-------------------------+
 |             |              |  ReentrantLock       |                |                        |                         |
@@ -131,27 +157,9 @@ volatile原理是基于CPU内存屏障指令实现的
 
 ```
 
-#### volatile JMM内存模型
- volatile 内存可见性， 顺序一致性(重排序)
- final 内存语义：在退出构造器后，不管是异常还是正常退出，对象的 final_field 上都会发生冻结动作。反射修改后，马上冻结，且不能反射修改static fianl 字段
- hanpen before，指两个操作指令的执行顺序
- CAS 读改写原子性
 
- 可以保证变量的可见性 ，不能保证变量状态的“原子性操作”，原子性操作需要lock或cas
 
-##### Happens-before
 
-1. 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
-2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
-3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
-5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
-6. join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。
-7. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
-8. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
-9. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
-
- [](https://juejin.im/post/5ae6d309518825673123fd0e#heading-5)
- [](https://www.cnblogs.com/skorzeny/p/6480012.html)
 #### 原子性问题（CAS 保证读改写）
 
 
