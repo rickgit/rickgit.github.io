@@ -150,6 +150,7 @@ superSafeWebView.startSafeBrowsing(this, new ValueCallback<Boolean>() {
 [Android 7.0 行为变更](https://developer.android.google.cn/about/versions/nougat/android-7.0-changes?hl=zh-cn)
 - 低耗电
 - 夜间模式
+- 多窗口
 V2签名
 Android 7.x中,PopupWindow高度为match_parent时,会出现兼容性问题,需要处理兼容性
 ⭐FileProvider访问文件
@@ -617,13 +618,13 @@ adb shell dumpsys activity intents--------------查看Intent信息
 adb shell dumpsys activity processes---------查看进程信息
 
 
-adb shell dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'
-adb shell dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+adb shell "dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'"
+adb shell "dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'"
 
-adb shell dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'
+adb shell "dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'"
 
 
-adb shell  dumpsys window windows |grep "Window #"
+adb shell  "dumpsys window windows |grep "Window #""
 
 ```
 ##### anr

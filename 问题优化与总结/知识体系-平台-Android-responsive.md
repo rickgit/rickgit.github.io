@@ -1136,7 +1136,9 @@ ANR Input dispatching timed out (Waiting because the touched window has not fini
 
 adb shell uiautomator dump /sdcard/ui.xml
 
-
+### 屏幕旋转 
+adb shell settings put system accelerometer_rotation 0  #disable auto-rotate
+adb shell settings put system user_rotation 3  #270° clockwise
 ### 屏幕参数
 > 屏幕尺寸：手机对角线的物理大小，单位为英寸（inch），1英寸=2.54cm，Android手机常见的尺寸有5寸、5.5寸、6寸等等
 
