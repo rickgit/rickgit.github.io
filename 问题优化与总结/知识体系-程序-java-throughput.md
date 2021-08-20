@@ -83,21 +83,24 @@ write   v            | +-------------+ |                  |                 |
 并发编程三大特性：原子性，可见性，有序性
 ### 原子性
 
-- 8个原子操作 read,load,store,write,use,assign,lock,unlock（monitorenter和monitorexit来隐式地使用这两个操作，volatile 读写，）
+- 8个原子操作 
+  - read,load,use
+  - write,store,assign
+  - lock(对CPU总线和高速缓存加锁),unlock（monitorenter和monitorexit来隐式地使用这两个操作，volatile 读写，）
 [IA32 指令](https://www.intel.cn/content/www/cn/zh/architecture-and-technology/64-ia-32-architectures-software-developer-vol-1-manual.html)
 
 ### 可见性
   volatile 
 ### 有序性
-#### 内存屏障
+#### 重排序与内存屏障
   jdk 使用 Lock会对CPU总线和高速缓存加锁，软实现内存屏障。可通过源码源码查看（hotspot\src\share\vm\interpreter\bytecodeInterpreter.cpp）
  volatile写操作:  StoreStore，Store value，StoreLoad
  volatile读操作: LoadLoad，load value，LoadStore
 #### happens-before 关系（8个）
 https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading/happens-before.html
  
-
-1. 程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
+单线程，锁，可见性，线程方法 start，join，interrupted，对象finalize，传递
+1. 单线程规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
 2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
 3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
 5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
