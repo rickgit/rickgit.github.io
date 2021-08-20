@@ -291,7 +291,7 @@ G:\workspace\ws-github\.git\config
 ```
 
 git config --global http.sslVerify "false"
-
+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 
 
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
 ### 常见问题
