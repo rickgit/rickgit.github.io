@@ -290,7 +290,7 @@ git config
 G:\workspace\ws-github\.git\config
 ```
 
-
+git config --global http.sslVerify "false"
 
 
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
