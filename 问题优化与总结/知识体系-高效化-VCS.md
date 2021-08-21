@@ -269,6 +269,14 @@ git rebase
  git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 git push origin --delete develop_AA //删除远程分支
 
+登录方式一：账号密码
+登录方式二：
+Personal access tokens : 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 
+登录方式三：
+  到 ~/.ssh目录：ssh-keygen -t rsa -C "my email" ，生成私钥id_rsa和公钥id_rsa.pub
+  添加私约：ssh-add ~/.ssh/id_rsa
+  GitHub添加公钥内容
+  测试：ssh -T git@github.com:sshGitRepoUrl
 
 6 配置
 
@@ -279,6 +287,8 @@ git config --global --unset http.proxy
 配置git上代理地址 
 git config --global http.proxy "127.0.0.1:8580"
 git config --global http.proxy "127.0.0.1:9666"
+
+git config --list --show-origin
 ```js
 git config --system
 D:\Program\Git/etc/gitconfig
@@ -291,7 +301,6 @@ G:\workspace\ws-github\.git\config
 ```
 
 git config --global http.sslVerify "false"
-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 
 
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
 ### 常见问题

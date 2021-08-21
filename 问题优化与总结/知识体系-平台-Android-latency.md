@@ -2788,50 +2788,6 @@ public final class MotionEvent extends InputEvent implements Parcelable {
 
 ```
  
-#### PackageManager 静默安装
-```java
-小于Android 5      通过IPackageInstallObserver进行跨进程通信
-                    1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
-                    2.2 base/core/java/android/app/ContextImpl.java:1638:    static final class ApplicationPackageManager extends PackageManager {
-                    4.4 base/core/core/java/android/app/ApplicationPackageManager.java:61:final class ApplicationPackageManager extends PackageManager {
-Android 5（api21） 调用PackageManager#installPackage(Uri.class,android.app.PackageInstallObserver.int.class,String.class)；
-                      通过PackageInstallObserver的binder（IPackageInstallObserver2）进行进程间通信
-                     base/core/java/android/app/ApplicationPackageManager.java:78:final class ApplicationPackageManager extends PackageManager {
-Android 7.0（api24）（和5.0 通用的方法可行） 调用PackageManager#installPacakageAsUser
-                  base/core/java/android/app/ApplicationPackageManager.java:98:public class ApplicationPackageManager extends PackageManager
-Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，PackageInstaller.Session写入pms,广播接收通知
-                  base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
-
-```
-##### 软件更新
-```
-2021-04-29 19:33:16.284 276-423/? V/installed: DexInv: --- END '/data/app/com.xxx.xxx-WzWcTmGHWEG-06kuyXy5WQ==/base.apk' (success) ---
-2021-04-29 19:33:16.321 366-407/system_process D/PackageManager: Instant App installer not found with android.intent.action.INSTALL_INSTANT_APP_PACKAGE
-2021-04-29 19:33:16.321 366-407/system_process D/PackageManager: Clear ephemeral installer activity
-2021-04-29 19:33:16.386 276-423/? E/installd: Failed to delete /data/app/vmdl1541396224.tmp: No such file or directory
-2021-04-29 19:33:16.408 366-428/system_process E/ActivityManager: Sending non-protected broadcast com.install from system uid 1000 pkg com.xxx.xxx
-2021-04-29 19:33:16.451 366-407/system_process I/ActivityManager: Force stopping com.xxx.xxx appid=1000 user=0: pkg removed
-2021-04-29 19:33:16.452 366-407/system_process I/ActivityManager: Killing 3377:com.xxx.xxx/1000 (adj 0): stop com.xxx.xxx
-2021-04-29 19:33:16.482 366-396/system_process W/libprocessgroup: kill(-3377, 9) failed: No such process
-2021-04-29 19:33:16.492 366-407/system_process W/ActivityManager: Force removing ActivityRecord{f7b6036 u0 com.xxx.xxx/.home.ActivityHome t101}: app died, no saved state
-
-软件更新重启
-```
-##### apk安装过程/应用进程创建过程/应用安装过程
-[Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
-- [安装](http://gityuan.com/2016/11/13/android-installd/)
-
-- 运行时权限
-```
-+----------------------------------------------------------------------------------w---+
-|                                                                                     |
-|                                                                                     |
-+----------+-------+----------+---------+------------+-------+---------+----+---------+
-| CALENDAR |CAMERA | CONTACTS | LOCATION| MICROPHONE | PHONE | SENSORS | SMS| STORAGE |
-+----------+-------+----------+---------+------------+-------+---------+----+---------+
-
-```
-- hind api
 
 ##### Resource Manager
 
@@ -2884,61 +2840,7 @@ Dex加固
 public class LocationManagerService extends ILocationManager.Stub { 
 }
 ```
-
-#### SystemServer - mediaserver
-### SystemUI
-``` xml
-    <!-- SystemUI Services: The classes of the stuff to start. -->
-    <string-array name="config_systemUIServiceComponents" translatable="false">
-        <item>com.android.systemui.Dependency</item>
-        <item>com.android.systemui.util.NotificationChannels</item>
-        <item>com.android.systemui.statusbar.CommandQueue$CommandQueueStart</item>
-        <item>com.android.systemui.keyguard.KeyguardViewMediator</item>
-        <item>com.android.systemui.recents.Recents</item>
-        <item>com.android.systemui.volume.VolumeUI</item>
-        <item>com.android.systemui.stackdivider.Divider</item>
-        <item>com.android.systemui.SystemBars</item>
-        <item>com.android.systemui.usb.StorageNotification</item>
-        <item>com.android.systemui.power.PowerUI</item>
-        <item>com.android.systemui.media.RingtonePlayer</item>
-        <item>com.android.systemui.keyboard.KeyboardUI</item>
-        <item>com.android.systemui.pip.PipUI</item>
-        <item>com.android.systemui.shortcut.ShortcutKeyDispatcher</item>
-        <item>@string/config_systemUIVendorServiceComponent</item>
-        <item>com.android.systemui.util.leak.GarbageMonitor$Service</item>
-        <item>com.android.systemui.LatencyTester</item>
-        <item>com.android.systemui.globalactions.GlobalActionsComponent</item>
-        <item>com.android.systemui.ScreenDecorations</item>
-        <item>com.android.systemui.fingerprint.FingerprintDialogImpl</item>
-        <item>com.android.systemui.SliceBroadcastRelayHandler</item>
-    </string-array>
  
-    <!-- SystemUI Services (per user): The classes of the stuff to start for each user. This is a subset of the config_systemUIServiceComponents -->
-    <string-array name="config_systemUIServiceComponentsPerUser" translatable="false">
-        <item>com.android.systemui.Dependency</item>
-        <item>com.android.systemui.util.NotificationChannels</item>
-        <item>com.android.systemui.recents.Recents</item>
-    </string-array>
-
-```
-
-状态栏PhoneStatusBarView：通知图标，系统图表（蓝牙，WiFi，电量），时间
-下拉后NotificationPanelView：
-  StatusBarHeaderView/锁屏状态栏（KeyguardStatubarView）
-  快捷设置面板（屏幕亮度调节器ToggleSlderView，9个快捷功能QSPanel，设置页脚QSFooterImpl）
-  通知面板 NotificationStackScrollLayout
-  锁屏切换 keyguardbouncer（锁屏，熄屏，亮屏）
-截屏界面
-全局音量管理（音量键） VolumeUI
-底部导航栏 NavigationBar
-电量 PowerUI（电量提醒的模块，包括低电提醒和高低温关机提醒）
-最近应用视图 Recents 
-铃声播放 RingtonePlayer
-Android 7.0
-  控制管理分屏 StackDivider
-  画中画模式管理  PipUI
-网络，usb...
-
 
 ##### SystemUI通讯
 ```java
@@ -3048,139 +2950,110 @@ com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
   PhoneStatusBarPolicy 系统图标
   DemoStatusIcons（演示模式 ）
   com.android.settingslib.bluetooth.HidProfile 蓝牙图标
-#### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
-##### WIFI
- 
-adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
-adb shell am start com.android.settings/com.android.settings.Settings
-adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
-adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
-
-
-```java
-  this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
-    mWifiManager.getWifiApState();
- 
-    java.lang.IllegalStateException: java.io.IOException: Failed to parse network stats
-        at com.android.server.NetworkManagementService.getNetworkStatsUidDetail(NetworkManagementService.java:1877)
-        at com.android.server.net.NetworkStatsService.getNetworkStatsUidDetail(NetworkStatsService.java:1619)
-        at com.android.server.net.NetworkStatsService.recordSnapshotLocked(NetworkStatsService.java:1204)
-        at com.android.server.net.NetworkStatsService.performPollLocked(NetworkStatsService.java:1294)
-        at com.android.server.net.NetworkStatsService.updateIfacesLocked(NetworkStatsService.java:1108)
-        at com.android.server.net.NetworkStatsService.updateIfaces(NetworkStatsService.java:1084)
-        at com.android.server.net.NetworkStatsService.forceUpdateIfaces(NetworkStatsService.java:862)
-        at com.android.server.ConnectivityService.notifyIfacesChangedForNetworkStats(ConnectivityService.java:5793)
-        at com.android.server.ConnectivityService.disconnectAndDestroyNetwork(ConnectivityService.java:2499)
-        at com.android.server.ConnectivityService.updateNetworkInfo(ConnectivityService.java:5651)
-        at com.android.server.ConnectivityService.access$1500(ConnectivityService.java:198)
-        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.maybeHandleNetworkAgentMessage(ConnectivityService.java:2203)
-        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.handleMessage(ConnectivityService.java:2342)
-        at android.os.Handler.dispatchMessage(Handler.java:106)
-        at android.os.Looper.loop(Looper.java:193)
-        at android.os.HandlerThread.run(HandlerThread.java:65)
-
-
- @hide，不对外开放，但通过revoke机制调用到。
-    getWifiApState
-    setWifiApEnabled
-    getWifiApConfiguration
-    isWifiApEnabled
-
-
-  
-```
-
-SSI 更新改为 30s
-
-```java
-WIFI 连接文案 frameworks\base\packages\SettingsLib\src\com\android\settingslib\wifi\AccessPoint.java
-base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
-
-```
-
-```java
-设置热点
-WifiManager.getConfiguredNetworks() //获取配置好的网络
-mWifiManager.getScanResults()       //获取扫描到的网络，可能包含配置好的网络
-ScanResult.SSID //某个WiFi热点名称
-
-
-    public void refresh() {
-        if (mForSavedNetworks) {
-            setTitle(mAccessPoint.getConfigName());//mConfig.providerFriendlyName
-        } else {
-            setTitle(mAccessPoint.getSsid());
-        }
-
-
-        setSummary(mForSavedNetworks ? mAccessPoint.getSavedNetworkSummary()
-                : mAccessPoint.getSettingsSummary());
-
-        mContentDescription = getTitle();
-        if (getSummary() != null) {
-            mContentDescription = TextUtils.concat(mContentDescription, ",", getSummary());
-        }
-        if (level >= 0 && level < WIFI_CONNECTION_STRENGTH.length) {
-            mContentDescription = TextUtils.concat(mContentDescription, ",",
-                    getContext().getString(WIFI_CONNECTION_STRENGTH[level]));
-        }
-    }
-
-```
-
-
-###### WiFi弹窗
-WIFI（WireleSS Fidelity）俗称无线宽带，又叫802．11b标准，是IEEE定义的一个无线网络通信的工业标准。
-IEEE802．11b标准是在IEE E802．11的基础上发展起来的，工作在2．4 Hz频段，最高传输率能够达到11 Mbps。
-```
-
-信号
-分类
-  按照幅值是否连续分类
-    模拟信号
-    数字信号
-  按信号载体分类(用什么来表述信号的信息)
-    电信号
-    电压信号
-    电流信号(直流电、交流电、脉冲电)
-    电磁波中的无线电信号
-    波信号(机械波、电磁波)
-  按传输介质分类(传输的都是电磁波)
-    有线信号(电线传输的电信号、光缆传输的光信号)
-    无线信号(自由空间 传输的无线电、微波等）
-  按是否调制分类
-    基带信号
-    频带信号(电力载波、光载波) 
-```
-
-1. 本质的特点
-不再使用通信电缆将计算机与网络连接起来，而是通过无线的方式连接，从而使网络的构建和终端的移动更加灵活。
-```
-安全性
-  无
-  WEP
-  WPA
-    WPA PSK
-    WPA2 PSK
-    WPA/WPA2 PSK
-  802.1x EAP
-    
- 
-```
-WIFI无线网络目前使用最广泛的加密模式是WPA-PSK（TKIP 使用RC4算法）和WPA2-PSK（AES）两种加密模式。
-
-
-##### 蓝牙连接
-控制蓝牙图标显示
-com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
-
-adb shell am start -a android.settings.BLUETOOTH_SETTINGS
 
 ##### AudioManager
 frameworks/base/services/core/java/com/android/server/audio/AudioService.java
-### 四大组件
+#### 四大组件基础 - Context
+Context作用
+```
+   Context //抽象类
+       ^   
+       |   
+ContextWrapper
+       ^   静态代理ContextImpl
+       |   LoadedApk, ResourcesManager, Resources，AssetManager, ClassLoader, ApplicationInfo, 
+       |   mSharedPrefsPaths, mDatabasesDir/mPreferencesDir/mFilesDir/mCacheDir...
+       |   activityToken, ApplicationContentResolver, PackageManager, IApplicationThread,
+       |   ActivityThread
+       |   Display,Theme, WallpaperManager
+ ContextThemeWrapper                                                       Application
+       ^   Theme,LayoutInflater,Resources,Configuration                        mComponentCallbacks,mActivityLifecycleCallbacks,mAssistCallbacks
+       |
+ Activity                                                                                
+       ^   Dialog,Cursor,Context,生命周期参数的NonConfigurationInstances                        
+       |   mInstrumentation,mApplication,mIntent,mActivityInfo,mSearchManager,mMenuInflater
+       |   mWindow,mWindowManager,mFragments
+ComponentActivity(app,activity)
+       ^     mLifecycleRegistry, mExtraDataMap,
+       |     LifecycleRegistry,ViewModelStore,SavedStateRegistryController
+       |     OnBackPressedDispatcher,mContentLayoutId
+ FragmentActivity
+       ^     FragmentController,LifecycleRegistry
+       |
+AppCompatActivity
+             ActionBar
+
+应用包资源访问（loadapk,resource,pm），应用内存访问（cache,file,sp,db），四大组件通讯
++--------------------------------------------------------------------------------------------+
+|   ContextImpl                                                                              |
++-----------------------------------------------------+--------------------------------------+
+|     ActivityThread mMainThread                      |  File mDatabasesDir                  |
+|                                                     |  File mPreferencesDir                |
+|     LoadedApk mPackageInfo                          |  File mFilesDir                      |
+|     Resources mResources                            |  File mNoBackupFilesDir              |
+|     ResourcesManager mResourcesManager              |  File mCacheDir                      |
+|     PackageManager mPackageManager                  |  File mCodeCacheDir                  |
+|                                                     |                                      |
++-----------------------------------------------------+                                      |
+|       Display mDisplay                              |  ArrayMap<String, File>              |
+|       Theme mTheme                                  |   mSharedPrefsPaths                  | 
++-----------------------------------------------------+--------------------------------------+
+|       Object[] mServiceCache                                                               |
+|       ApplicationContentResolver mContentResolver                                          |
+|       IBinder mActivityToken                                                               |
+|       UserHandle mUser                                                                     |
++--------------------------------------------------------------------------------------------+
+界面元素（actionbar，搜索，菜单，popup窗口，对话框），fragment管理，窗口与配置变动，生命周期
++--------------------------------------------------------------------------------------------+
+|   Activity                                                                                 |
++-----------------------------------------------------+--------------------------------------+
+|  ActivityThread mMainThread       Thread mUiThread  |  boolean mCalled                     |
+|  Activity mParent                 Intent mIntent    |  boolean mResumed                    |
+|  ComponentName mComponent         mResultData:Intent|  boolean mStopped                    |
+|  Application mApplication         String mReferrer  |  boolean mFinished;                  |
+|  mFragments:FragmentController                      |  boolean mStartedActivity            |
+|  Instrumentation mInstrumentation mHandler:Handler  |  boolean mDestroyed;                 |
+|  IBinder mToken                                     |  boolean mDoReportFullyDrawn         |
+|  TaskDescription mTaskDescription                   |  boolean mRestoredFromBundle         |
+|                                                     |                                      |
+|  Window mWindow                                                                            |
+|  WindowManager mWindowManager                       |  boolean mWindowAdded                |
+|  Configuration mCurrentConfig                       |  boolean mVisibleFromServer          |
+|  mLastNonConfigurationInstances                     |  boolean mVisibleFromClient          |
+|                                                     |  boolean mCanEnterPictureInPicture   |
+|  mDecor:View                                        |  boolean mEnableDefaultActionBarUp   |
+|  mActionBar:ActionBar          CharSequence mTitle  |                                      |
+|  mMenuInflater                                      |                                      |
+|  mSearchManager                   mSearchEvent      |                                      |
+|  mAutofillPopupWindow             mAutofillManager  |                                      |
+|  SparseArray<ManagedDialog>  mManagedDialogs        |                                      |
+|                                                     |                                      |
++-----------------------------------------------------+--------------------------------------+
+|                                                                                            |
+|  ArrayList<ManagedCursor> mManagedCursors                                                  |
+|  TranslucentConversionListener mTranslucentCallback  SpannableStringBuilder mDefaultKeySsb |
+|  VoiceInteractor mVoiceInteractor                                                          |
+|                                                                                            |
++--------------------------------------------------------------------------------------------+
+
+                                  PKMS
+                                +------------------->  Permission/Pkginfo/HindAPI 
+                                |                     
+                                |  AMS                 Activity
+                                |                      BrocastReceiver
+                                |------------------->  ContentProvider
+                  SystemServer  |                      Service
++------------------+            |
+|                  | +----------+   WMS
+|     context      |            +------------------->  Activity/Dialog/PopupWindow/Toast  ---->SurfaceFlipper
+|                  |
++------------------+ +----------+
+                                |
+                ActivityThread  |   AssetManager
+                                +------------------->  loadResource
+```
+
+
 
 #### 四大组件之Service 
 ```
@@ -3462,7 +3335,253 @@ signatureOrSystem
 签名相同或者申请权限的应用为系统应用才能将权限授给它 
 ```
 
-### Process 打开进程
+ 
+
+
+#### SystemServer - mediaserver
+### SystemUI
+``` xml
+    <!-- SystemUI Services: The classes of the stuff to start. -->
+    <string-array name="config_systemUIServiceComponents" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.statusbar.CommandQueue$CommandQueueStart</item>
+        <item>com.android.systemui.keyguard.KeyguardViewMediator</item>
+        <item>com.android.systemui.recents.Recents</item>
+        <item>com.android.systemui.volume.VolumeUI</item>
+        <item>com.android.systemui.stackdivider.Divider</item>
+        <item>com.android.systemui.SystemBars</item>
+        <item>com.android.systemui.usb.StorageNotification</item>
+        <item>com.android.systemui.power.PowerUI</item>
+        <item>com.android.systemui.media.RingtonePlayer</item>
+        <item>com.android.systemui.keyboard.KeyboardUI</item>
+        <item>com.android.systemui.pip.PipUI</item>
+        <item>com.android.systemui.shortcut.ShortcutKeyDispatcher</item>
+        <item>@string/config_systemUIVendorServiceComponent</item>
+        <item>com.android.systemui.util.leak.GarbageMonitor$Service</item>
+        <item>com.android.systemui.LatencyTester</item>
+        <item>com.android.systemui.globalactions.GlobalActionsComponent</item>
+        <item>com.android.systemui.ScreenDecorations</item>
+        <item>com.android.systemui.fingerprint.FingerprintDialogImpl</item>
+        <item>com.android.systemui.SliceBroadcastRelayHandler</item>
+    </string-array>
+ 
+    <!-- SystemUI Services (per user): The classes of the stuff to start for each user. This is a subset of the config_systemUIServiceComponents -->
+    <string-array name="config_systemUIServiceComponentsPerUser" translatable="false">
+        <item>com.android.systemui.Dependency</item>
+        <item>com.android.systemui.util.NotificationChannels</item>
+        <item>com.android.systemui.recents.Recents</item>
+    </string-array>
+
+```
+
+状态栏PhoneStatusBarView：通知图标，时间，系统图表（蓝牙），WiFi，电量
+下拉后NotificationPanelView：
+  StatusBarHeaderView/锁屏状态栏（KeyguardStatubarView）
+  快捷设置面板（屏幕亮度调节器ToggleSlderView，9个快捷功能QSPanel，设置页脚QSFooterImpl）
+  通知面板 NotificationStackScrollLayout
+  锁屏切换 keyguardbouncer（锁屏，熄屏，亮屏）
+截屏界面
+全局音量管理（音量键） VolumeUI
+底部导航栏 NavigationBar
+电量 PowerUI（电量提醒的模块，包括低电提醒和高低温关机提醒）
+最近应用视图 Recents 
+铃声播放 RingtonePlayer
+Android 7.0
+  控制管理分屏 StackDivider
+  画中画模式管理  PipUI
+网络，usb...
+
+### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
+##### WIFI
+ 
+adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
+adb shell am start com.android.settings/com.android.settings.Settings
+adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
+
+
+```java
+  this.onCheckedChanged(!this.mWifiManager.isWifiEnabled());
+    mWifiManager.getWifiApState();
+ 
+    java.lang.IllegalStateException: java.io.IOException: Failed to parse network stats
+        at com.android.server.NetworkManagementService.getNetworkStatsUidDetail(NetworkManagementService.java:1877)
+        at com.android.server.net.NetworkStatsService.getNetworkStatsUidDetail(NetworkStatsService.java:1619)
+        at com.android.server.net.NetworkStatsService.recordSnapshotLocked(NetworkStatsService.java:1204)
+        at com.android.server.net.NetworkStatsService.performPollLocked(NetworkStatsService.java:1294)
+        at com.android.server.net.NetworkStatsService.updateIfacesLocked(NetworkStatsService.java:1108)
+        at com.android.server.net.NetworkStatsService.updateIfaces(NetworkStatsService.java:1084)
+        at com.android.server.net.NetworkStatsService.forceUpdateIfaces(NetworkStatsService.java:862)
+        at com.android.server.ConnectivityService.notifyIfacesChangedForNetworkStats(ConnectivityService.java:5793)
+        at com.android.server.ConnectivityService.disconnectAndDestroyNetwork(ConnectivityService.java:2499)
+        at com.android.server.ConnectivityService.updateNetworkInfo(ConnectivityService.java:5651)
+        at com.android.server.ConnectivityService.access$1500(ConnectivityService.java:198)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.maybeHandleNetworkAgentMessage(ConnectivityService.java:2203)
+        at com.android.server.ConnectivityService$NetworkStateTrackerHandler.handleMessage(ConnectivityService.java:2342)
+        at android.os.Handler.dispatchMessage(Handler.java:106)
+        at android.os.Looper.loop(Looper.java:193)
+        at android.os.HandlerThread.run(HandlerThread.java:65)
+
+
+ @hide，不对外开放，但通过revoke机制调用到。
+    getWifiApState
+    setWifiApEnabled
+    getWifiApConfiguration
+    isWifiApEnabled
+
+
+  
+```
+
+SSI 更新改为 30s
+
+```java
+WIFI 连接文案 frameworks\base\packages\SettingsLib\src\com\android\settingslib\wifi\AccessPoint.java
+base/packages/SettingsLib/res/values-zh-rCN/strings.xml:42:
+
+```
+
+```java
+设置热点
+WifiManager.getConfiguredNetworks() //获取配置好的网络
+mWifiManager.getScanResults()       //获取扫描到的网络，可能包含配置好的网络
+ScanResult.SSID //某个WiFi热点名称
+
+
+    public void refresh() {
+        if (mForSavedNetworks) {
+            setTitle(mAccessPoint.getConfigName());//mConfig.providerFriendlyName
+        } else {
+            setTitle(mAccessPoint.getSsid());
+        }
+
+
+        setSummary(mForSavedNetworks ? mAccessPoint.getSavedNetworkSummary()
+                : mAccessPoint.getSettingsSummary());
+
+        mContentDescription = getTitle();
+        if (getSummary() != null) {
+            mContentDescription = TextUtils.concat(mContentDescription, ",", getSummary());
+        }
+        if (level >= 0 && level < WIFI_CONNECTION_STRENGTH.length) {
+            mContentDescription = TextUtils.concat(mContentDescription, ",",
+                    getContext().getString(WIFI_CONNECTION_STRENGTH[level]));
+        }
+    }
+
+```
+
+
+###### WiFi弹窗
+WIFI（WireleSS Fidelity）俗称无线宽带，又叫802．11b标准，是IEEE定义的一个无线网络通信的工业标准。
+IEEE802．11b标准是在IEE E802．11的基础上发展起来的，工作在2．4 Hz频段，最高传输率能够达到11 Mbps。
+```
+
+信号
+分类
+  按照幅值是否连续分类
+    模拟信号
+    数字信号
+  按信号载体分类(用什么来表述信号的信息)
+    电信号
+    电压信号
+    电流信号(直流电、交流电、脉冲电)
+    电磁波中的无线电信号
+    波信号(机械波、电磁波)
+  按传输介质分类(传输的都是电磁波)
+    有线信号(电线传输的电信号、光缆传输的光信号)
+    无线信号(自由空间 传输的无线电、微波等）
+  按是否调制分类
+    基带信号
+    频带信号(电力载波、光载波) 
+```
+
+1. 本质的特点
+不再使用通信电缆将计算机与网络连接起来，而是通过无线的方式连接，从而使网络的构建和终端的移动更加灵活。
+```
+安全性
+  无
+  WEP
+  WPA
+    WPA PSK
+    WPA2 PSK
+    WPA/WPA2 PSK
+  802.1x EAP
+    
+ 
+```
+WIFI无线网络目前使用最广泛的加密模式是WPA-PSK（TKIP 使用RC4算法）和WPA2-PSK（AES）两种加密模式。
+
+
+##### 蓝牙连接
+控制蓝牙图标显示
+com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
+
+adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+
+### PackageInstaller（packages/apps/PackageInstaller）
+
+#### 静默安装
+```java
+小于Android 5      通过IPackageInstallObserver进行跨进程通信
+                    1.6 base/core/java/android/app/ApplicationContext.java:1531:    static final class ApplicationPackageManager extends PackageManager
+                    2.2 base/core/java/android/app/ContextImpl.java:1638:    static final class ApplicationPackageManager extends PackageManager {
+                    4.4 base/core/core/java/android/app/ApplicationPackageManager.java:61:final class ApplicationPackageManager extends PackageManager {
+Android 5（api21） 调用PackageManager#installPackage(Uri.class,android.app.PackageInstallObserver.int.class,String.class)；
+                      通过PackageInstallObserver的binder（IPackageInstallObserver2）进行进程间通信
+                     base/core/java/android/app/ApplicationPackageManager.java:78:final class ApplicationPackageManager extends PackageManager {
+Android 7.0（api24）（和5.0 通用的方法可行） 调用PackageManager#installPacakageAsUser
+                  base/core/java/android/app/ApplicationPackageManager.java:98:public class ApplicationPackageManager extends PackageManager
+Android 9.0（api28） 调用PackageManager#getPackageInstaller() 安装，PackageInstaller.Session写入pms,广播接收通知
+                  base/core/java/android/app/ApplicationPackageManager.java:111:public class ApplicationPackageManager extends PackageManager 已经删掉installPackage方法
+
+```
+##### 软件更新
+```
+软件更新重启
+
+killapp设置为false
+```
+##### apk安装过程/应用进程创建过程/应用安装过程
+[Android系统启动流程](http://gityuan.com/2016/02/01/android-booting/)
+- [安装](http://gityuan.com/2016/11/13/android-installd/)
+
+- 运行时权限
+```
++----------------------------------------------------------------------------------w---+
+|                                                                                     |
+|                                                                                     |
++----------+-------+----------+---------+------------+-------+---------+----+---------+
+| CALENDAR |CAMERA | CONTACTS | LOCATION| MICROPHONE | PHONE | SENSORS | SMS| STORAGE |
++----------+-------+----------+---------+------------+-------+---------+----+---------+
+
+```
+- hind a
+### SettingsProvider （\frameworks\base\packages\SettingsProvider）
+Android M (6.0)以前
+/data/data/com.android.providers.settings/databases/settings.db
+
+Android M (6.0)以后
+1|generic_x86:/ # ls /data/system/users/0/ | grep settings
+settings_global.xml
+settings_secure.xml
+settings_system.xml
+
+### SettingsProperties （/system/build.prop）
+bionic/libc/include/sys/_system_properties.h
+```java
+/default.prop 
+/system/build.prop 
+/system/default.prop 
+/data/local.prop 
+
+/dev/__properties__
+```
+
+### shell进程
 打开sh，进行读写
 
 busybox权限
@@ -3509,6 +3628,7 @@ getPackageManager().getApplicationInfo(getPackageName(),PackageManager.GET_META_
 装饰模式（封装Thread）
   装饰Thread，增加mLooper，可以让工作Handler设置Looper
 
+#### RenderThread
 
 
 ## 缓存篇
