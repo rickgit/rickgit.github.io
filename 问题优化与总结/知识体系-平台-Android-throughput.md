@@ -39,7 +39,7 @@ Jit thread pool worker thread 0          	 RUNNABLE 	 5 	 Daemon
 
 4. Binder 
      Binder_1 主线程，编号为1，并且主线程是不会退出的。
-     Binder_xx 普通线程
+     Binder_xx:xx 普通线程
      Binder 其他线程：其他线程是指并没有调用 spawnPooledThread 方法，而是直接调用 IPC.joinThreadPool()
 
 
