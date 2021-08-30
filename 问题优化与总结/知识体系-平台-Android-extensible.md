@@ -1,12 +1,19 @@
 
-## 编译时植入
-![编译时植入](./res/inject.png)
+## 代码织入
+![代码织入](./res/inject.png)
 java->class>dex->classloader->runtime
 
 ###  classloader
 
 [设计模式](https://java-design-patterns.com/patterns/)
 #### 反射
+```java
+fiedlclass.setAccessible(true); //访问private
+Field modifersField = Field.class.getDeclaredField("modifiers");
+modifersField.setAccessible(true);
+// 把指定的field中的final修饰符去掉
+modifersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+```
 ###  运行时
 
 #### Proxy

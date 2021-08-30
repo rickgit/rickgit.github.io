@@ -489,14 +489,8 @@ Context.getSystemService(Context.TELEPHONY_SERVICE) 获取远程服务代理对�
 
 ```
 
-### SystemServer - 窗口视图（ 测量，布局及绘制,事件，动画，适配）wms
 
 
-## 应用层
-Zygote 子线程
-```
-ps -t | grep -E "NAME| <zygote ps id> "
-```
 
 
 

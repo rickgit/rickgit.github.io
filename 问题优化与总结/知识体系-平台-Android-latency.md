@@ -2105,6 +2105,7 @@ Binder binder_proc结构体的四棵红黑树  ，threads，nodes，refs_by_desc
 
 ### system_server
 binder是C/S架构，包括Bn端(Server)和Bp端(Client)，ServiceManager（系统服务路由）,Binder驱动
+ SystemServer - 窗口视图（ 测量，布局及绘制,事件，动画，适配）wms
 
 ```java
 n：native
@@ -3586,6 +3587,11 @@ bionic/libc/include/sys/_system_properties.h
 
 busybox权限
 
+## 应用层
+Zygote 子线程
+```
+ps -t | grep -E "NAME| <zygote ps id> "
+```
 
 ## 进程内通讯
 ### EventBus
