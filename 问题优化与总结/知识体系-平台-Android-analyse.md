@@ -7,9 +7,21 @@ adb shell input keyevent
 public class KeyEvent extends InputEvent implements Parcelable {
     public static final int KEYCODE_HOME            = 3;
     /** Key code constant: Back key. */
+<<<<<<< Updated upstream
     public static final int KEYCODE_BACK            = 4;
+=======
+    public static final int KEYCODE_BACK            = 4; 
+
+    /** Key code constant: Enter key. */
+    public static final int KEYCODE_ENTER           = 66;
+>>>>>>> Stashed changes
 }
 ```
+### hidden api
+https://source.codeaurora.cn/quic/la/platform/prebuilts/runtime/tree/appcompat/veridex-linux.zip?h=LA.AU.0.1.0.r6
+/platform/prebuilts/runtime/archive/master/appcompat.tar.gz
+./appcompat.sh --dex-file=app-debug.apk --imprecise
+
 
 ## 加密
 
@@ -33,6 +45,7 @@ public class KeyEvent extends InputEvent implements Parcelable {
 
 jeb 调试反编译app
 
+<<<<<<< Updated upstream
 ## 日活量大的应用
 
 ### tiktop
@@ -171,3 +184,6 @@ jeb 调试反编译app
 
 ```
 [tinker](https://github.com/Tencent/tinker)
+=======
+
+>>>>>>> Stashed changes
