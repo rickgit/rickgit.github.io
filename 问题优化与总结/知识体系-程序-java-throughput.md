@@ -101,13 +101,13 @@ https://www.logicbig.com/tutorials/core-java-tutorial/java-multi-threading/happe
  
 单线程，锁，可见性，线程方法 start，join，interrupted，对象finalize，传递
 1. 单线程规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作。
-2. 监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁。
-3. volatile变量规则：对一个volatile域的写，happens-before于任意后续对这个volatile域的读。
-5. start()规则：如果线程A执行操作ThreadB.start()（启动线程B），那么A线程的ThreadB.start()操作happens-before于线程B中的任意操作。
-6. join()规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回。
-7. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
-8. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
-9. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
+2. 监视器锁规则：执行完一个锁块后，下一个才会获得锁。
+3. volatile变量规则：执行volatile写完，其他线程才能读到值。
+4. start()规则：执行完start，才能执行线程的代码
+5. join()规则：  执行join()及join线程的代码， 才会举行执行下面语句
+6. 程序中断规则：对线程interrupted()方法的调用先行于被中断线程的代码检测到中断时间的发生。
+7. 对象finalize规则：一个对象的初始化完成（构造函数执行结束）先行于发生它的finalize()方法的开始。
+8. 传递性：如果A happens-before B，且B happens-before C，那么A happens-before C。
 
  [](https://juejin.im/post/5ae6d309518825673123fd0e#heading-5)
  [](https://www.cnblogs.com/skorzeny/p/6480012.html)
@@ -707,6 +707,15 @@ java 7 **分段锁**技术,java 8 摒弃了Segment（锁段）的概念，采用
             Integer newV = key + 1;
             map.put("key", newV);
  解决方法是使用 replace 方法
+
+cas sync locksupport
+
+ nextTable：哈希表扩容时生成的数据，数组为扩容前的2倍
+sizeCtl：多个线程的共享变量，是操作的控制标识符，它的作用不仅包括threshold的作用，在不同的地方有不同的值也有不同的用途
+  -1代表正在初始化
+  -N代表有N-1个线程正在进行扩容操作
+  0代表hash表还没有被初始化
+  +N正数表示下一次进行扩容的容量大小
 ### ConcurrentSkipListMap(SkipList)
 ```
 +-----------------------------------------------------------------------------------+
