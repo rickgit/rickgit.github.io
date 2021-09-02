@@ -609,7 +609,7 @@ adb shell dumpsys -T 60000 activity -v all
 hw.gpu.enabled = no hw.gpu.mode = off
  
 
-adb shell dumpsys activity---------------查看ActvityManagerService 所有信息
+adb shell dumpsys activity ---------------查看ActvityManagerService 所有信息
 adb shell dumpsys activity activities----------查看Activity组件信息
 adb shell dumpsys activity services-----------查看Service组件信息
 adb shell dumpsys activity providers----------产看ContentProvider组件信息
