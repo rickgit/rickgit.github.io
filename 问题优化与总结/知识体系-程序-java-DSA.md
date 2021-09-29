@@ -19,7 +19,7 @@
     链式存储结构（单链，双链，跳跃列表）
 
 操作：
-    增删改，索引遍历，查找排序，销毁
+    增改查，索引遍历，找排序，删销毁
 
 ### 可视化
 [](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
