@@ -2862,6 +2862,10 @@ QSTileImpl 定时刷新快捷面板，每十分钟会刷新一次
 systemservice
 zygote ->systemserver -ams-> systemui
 ```java
+1. SystemUIService
+```
+```java
+
 private final Class<?>[] SERVICES = new Class[] {
             com.android.systemui.tuner.TunerService.class, //⭐定制状态栏服务
             com.android.systemui.keyguard.KeyguardViewMediator.class,//⭐锁屏模块
@@ -2875,6 +2879,55 @@ private final Class<?>[] SERVICES = new Class[] {
 };
 
 ```
+
+2. KeyguardService
+```java
+    // 当另一个窗口使用FLAG_SHOW_ON_LOCK_SCREEN解除Keyguard时PhoneWindowManager调用
+    public void setOccluded(boolean isOccluded, boolean animate) throws android.os.RemoteException;
+    // 添加锁屏状态回调
+    public void addStateMonitorCallback(com.android.internal.policy.IKeyguardStateCallback callback) throws android.os.RemoteException;
+    // 核验解锁（用于快捷启动）
+    public void verifyUnlock(com.android.internal.policy.IKeyguardExitCallback callback) throws android.os.RemoteException;
+    // 解除锁屏
+    public void dismiss(com.android.internal.policy.IKeyguardDismissCallback callback) throws android.os.RemoteException;
+    // 屏保开始（Intent.ACTION_DREAMING_STARTED）
+    public void onDreamingStarted() throws android.os.RemoteException;
+    // 屏保结束（Intent.ACTION_DREAMING_STOPPED）
+    public void onDreamingStopped() throws android.os.RemoteException;
+    // 设备开始休眠 reason：OFF_BECAUSE_OF_USER/OFF_BECAUSE_OF_ADMIN/OFF_BECAUSE_OF_TIMEOUT
+    public void onStartedGoingToSleep(int reason) throws android.os.RemoteException;
+    // 休眠完成
+    public void onFinishedGoingToSleep(int reason, boolean cameraGestureTriggered) throws android.os.RemoteException;
+    // 设备开始唤醒
+    public void onStartedWakingUp() throws android.os.RemoteException;
+    // 唤醒完成
+    public void onFinishedWakingUp() throws android.os.RemoteException;
+    // 正在亮屏
+    public void onScreenTurningOn(com.android.internal.policy.IKeyguardDrawnCallback callback) throws android.os.RemoteException;
+    // 已经亮屏完成
+    public void onScreenTurnedOn() throws android.os.RemoteException;
+    // 正在灭屏
+    public void onScreenTurningOff() throws android.os.RemoteException;
+    // 灭屏完成
+    public void onScreenTurnedOff() throws android.os.RemoteException;
+    // 外部应用取消Keyguard接口
+    public void setKeyguardEnabled(boolean enabled) throws android.os.RemoteException;
+    // 开机系统准备完成回调
+    public void onSystemReady() throws android.os.RemoteException;
+    // 延时锁屏 （用于自动休眠）
+    public void doKeyguardTimeout(android.os.Bundle options) throws android.os.RemoteException;
+    // 切换用户中
+    public void setSwitchingUser(boolean switching) throws android.os.RemoteException;
+    // 设置当前用户
+    public void setCurrentUser(int userId) throws android.os.RemoteException;
+    // 系统启动完成回调
+    public void onBootCompleted() throws android.os.RemoteException;
+    // Keyguard后面的activity已经绘制完成，可以开始移除壁纸和Keyguard flag
+    public void startKeyguardExitAnimation(long startTime, long fadeoutDuration) throws android.os.RemoteException;
+    // 通知Keyguard对power键做特殊处理，使设备不进行休眠或唤醒而是启动Home（目前是空实现）
+    public void onShortPowerPressedGoHome() throws android.os.RemoteException;
+```
+
 ##### SystemBars 三个常见界面
 StatusBarService 管理界面
 
