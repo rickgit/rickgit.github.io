@@ -98,6 +98,12 @@ ResTable_config::isBetterThan 查找适合的方法
 [流量研究院 - 移动设备分辨率排名](https://mtj.baidu.com/data/mobile/device)
 [腾讯移动分析 - 设备分辨率排名](https://mta.qq.com/mta/data/device/resolution)
 
+uetool
+分析布局
+adb shell uiautomator dump  /sdcard/ui.xml & adb pull /sdcard/ui.xml
+VirtualUETool
+
+
 #### 控件字体尺寸适配 - 生成所有分辨率对应像素数列表
 
 优点
@@ -165,7 +171,15 @@ Android渲染        layout.xml    LayoutInflater    style.xml   java虚拟机/s
      surfaceflinger/vsync
 Fluter 渲染        dart排版      skia解析          ThemeData    dart虚拟机/skia   本地pubspec.yaml/文件/db Sqflite
 
-#### 字体
+字体排印学（英语：typography）又称为文字设计，是通过排版使得文字易认、可读和优美的技艺。排版，即安排活字的方式，包括字体与字号的选取、栏宽与行高的设定以及字距的调整等。
+
+https://kikakurui.com/x4/X4051-2004-02.html
+
+
+图文混排，背景处理，段落布局，文本两端对齐，文本两端对齐，查看图集，左右切换，黑夜/白天模式切换，文本复制，多栏布局，等很多和文字排版相关的内容
+
+八种视觉组织系统为：轴线式、放射式、涟漪式、随机式、网格式、行进式、模组式、双边对称式
+#### 字体排印学
 https://design.tutsplus.com/articles/the-ultimate-guide-to-basic-typography--cms-33460
 字体样式，粗体，斜体
 字体权重，中等，粗体
