@@ -3646,6 +3646,64 @@ bionic/libc/include/sys/_system_properties.h
 
 busybox权限
 
+
+### 进程通讯
+
+framework          　　　　　　　　　　　　　　systemserver         hardware                      kernel
+FingerprintManager 　　　　　　　　　　　　　　FingerprintService   BiometricsFingerprint.cpp     调整源码buffer
+IFingerprintServiceReceiver.Stub
+```java
+framework/BiometricFingerprintConstants
+//public String getAcquiredString(int acquireInfo, int vendorCode) {helpstring
+    public static final int FINGERPRINT_ACQUIRED_GOOD = 0;
+    public static final int FINGERPRINT_ACQUIRED_PARTIAL = 1;//采集时触发
+    public static final int FINGERPRINT_ACQUIRED_INSUFFICIENT = 2;//采集时触发
+    public static final int FINGERPRINT_ACQUIRED_IMAGER_DIRTY = 3;//采集时触发
+    public static final int FINGERPRINT_ACQUIRED_TOO_SLOW = 4;//采集时触发
+    public static final int FINGERPRINT_ACQUIRED_TOO_FAST = 5;//采集,解锁时触发
+    public static final int FINGERPRINT_ACQUIRED_VENDOR = 6;
+    public static final int ACQUIRED_VENDOR_BASE =1000;
+
+
+
+    //public String getErrorString(int errMsg, int vendorCode) {
+    public static final int FINGERPRINT_ERROR_HW_UNAVAILABLE = 1;//指纹硬件无法使用，重启时后触发
+    public static final int FINGERPRINT_ERROR_UNABLE_TO_PROCESS = 2;
+    public static final int FINGERPRINT_ERROR_TIMEOUT = 3;//采集时触发
+    public static final int FINGERPRINT_ERROR_NO_SPACE = 4;
+    public static final int FINGERPRINT_ERROR_CANCELED = 5;//5;;;指纹操作已取消。，可能抢占上个监听，导致当前收到上个监听的取消
+    public static final int FINGERPRINT_ERROR_UNABLE_TO_REMOVE = 6;
+    public static final int FINGERPRINT_ERROR_LOCKOUT = 7;//解锁时尝试次数过多，请稍后重试。
+    public static final int FINGERPRINT_ERROR_VENDOR = 8;
+    public static final int FINGERPRINT_ERROR_LOCKOUT_PERMANENT = 9;//解锁时触发
+    public static final int FINGERPRINT_ERROR_USER_CANCELED = 10;
+    public static final int FINGERPRINT_ERROR_NO_FINGERPRINTS = 11;
+    public static final int FINGERPRINT_ERROR_HW_NOT_PRESENT = 12;
+    public static final int FINGERPRINT_ERROR_VENDOR_BASE = 1000;
+
+
+systemserver/FingerprintService
+    private static final long FAIL_LOCKOUT_TIMEOUT_MS = 30*1000;
+    private static final int MAX_FAILED_ATTEMPTS_LOCKOUT_TIMED = 5;
+    private static final int MAX_FAILED_ATTEMPTS_LOCKOUT_PERMANENT = 20;
+    private static final long CANCEL_TIMEOUT_LIMIT = 3000; // max wait for onCancel() from HAL,in ms
+
+```
+ ![!help](./res/fingerprint_help.png)
+ ![!error](./res/fingerprint_error.png)
+
+指纹
+    指纹识别率低
+    没有显示指纹重复
+    休眠时候，指纹识别（指纹，密码，灯光，电源键（keyguard）,power（Dreamservice），休眠（亮屏），插入电源电量变化）
+
+ 
+    
+    onAuthenticationError ⭐不能再识别了
+    onAuthenticationSucceeded ⭐不能再识别了
+input
+    没有改变键盘，view.requestforcese()
+
 ## 应用层
 Zygote 子线程
 ```

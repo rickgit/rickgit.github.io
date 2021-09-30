@@ -7,7 +7,6 @@ adb shell input keyevent
 public class KeyEvent extends InputEvent implements Parcelable {
     public static final int KEYCODE_HOME            = 3;
     /** Key code constant: Back key. */
-
     public static final int KEYCODE_BACK            = 4; 
 
     /** Key code constant: Enter key. */
