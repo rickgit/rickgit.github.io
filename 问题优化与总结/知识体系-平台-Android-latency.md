@@ -3603,14 +3603,7 @@ framework/BiometricFingerprintConstants
     public static final int FINGERPRINT_ACQUIRED_TOO_FAST = 5;//采集,解锁时触发
     public static final int FINGERPRINT_ACQUIRED_VENDOR = 6;
     public static final int ACQUIRED_VENDOR_BASE =1000;
-    ACQUIRED_WAIT_FINGER_INTPUT =1001;//监听的触发
-    ACQUIRED_FINGER_DOWN =1002;//触摸时候触发
-    ACQUIRED_FINGER_UP =1003; //fail后触发
-    ACQUIRED_INPUT_TOO_LONG =1004;
-    ACQUIRED_DUPLICATE_AREA =1005;//采集时触发
-    ACQUIRED_DUPLICATE_FINGER =1006;//采集时触发
-    ACQUIRED_SIMULATED_FINGER =1007;//采集时触发
-    ACQUIRED_TOUCH_BY_MISTAKE =1008;//采集时触发
+
 
 
     //public String getErrorString(int errMsg, int vendorCode) {
@@ -3642,6 +3635,8 @@ systemserver/FingerprintService
     private static final long CANCEL_TIMEOUT_LIMIT = 3000; // max wait for onCancel() from HAL,in ms
 
 ```
+ ![!help](./res/fingerprint_help.png)
+ ![!error](./res/fingerprint_error.png)
 
 指纹
     指纹识别率低
