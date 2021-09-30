@@ -3646,7 +3646,10 @@ bionic/libc/include/sys/_system_properties.h
 
 busybox权限
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 920e271... doc
 ### 进程通讯
 
 framework          　　　　　　　　　　　　　　systemserver         hardware                      kernel
@@ -3680,7 +3683,6 @@ framework/BiometricFingerprintConstants
     public static final int FINGERPRINT_ERROR_NO_FINGERPRINTS = 11;
     public static final int FINGERPRINT_ERROR_HW_NOT_PRESENT = 12;
     public static final int FINGERPRINT_ERROR_VENDOR_BASE = 1000;
-
 
 systemserver/FingerprintService
     private static final long FAIL_LOCKOUT_TIMEOUT_MS = 30*1000;
