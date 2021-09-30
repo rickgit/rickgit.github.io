@@ -94,6 +94,10 @@ ResTable_config::isBetterThan 查找适合的方法
    ❌ 图片会拉伸现象
 4. smallestWidth适配
    相比第2种方案，提高容错率
+
+ 1080x1920 dpi/480/x3 statusbar/72 navbar/144
+加载顺序
+      values-sw360dp-xxhdpi，values-sw360dp，value-w360dp，value-h568dp（高-状态栏高-导航栏高），values-1080x1776（高-导航栏高度），values
 #### 屏幕分布
 [流量研究院 - 移动设备分辨率排名](https://mtj.baidu.com/data/mobile/device)
 [腾讯移动分析 - 设备分辨率排名](https://mta.qq.com/mta/data/device/resolution)
