@@ -1035,22 +1035,27 @@ JVM性能调优监控工具jps、jstack、jmap、jhat、jstat、hprof
 
 MMU/MMAP
 
-bio
-   InputStream  、OutputStream基于字节操作的 IO
-        ByteArray,-StringBuffer,Filter(Buffered,Data,PushBack   ),File,Object,     Piped ,Sequence 
-        ByteArray,              Filter(Buffered,Data,PrintStream),File,Object,     Piped                       
-
-    Reader、 Writer基于字符操作的 IO
-        CharArray,String,      Buffered,Filter/PushBack ,       InputStream/File ,Piped 
-        CharArray,String,      Buffered,Filter          ,       OutputStream/File,Piped,Print 
-
-    File 基于磁盘操作的 IO
-    Socket 基于网络操作的 IO
-
-nio jdk1.4
-
-aio jdk7
-
+bio（面向流，阻塞）
+输入             内存             文件(各种数据交换格式)   网络                 成对       优化
+    字节输入
+                ByteArray        File/Object             Socket                Piped     Filter(Buffered,Data,PushBack)   
+                System.in 
+    字符输入
+                CharArray        File                                         Piped        
+                String                                                    
+                         
+输出
+    字节输出
+                                                                                          Filter(PrintStream/System.out)
+    字符输出 
+                                                                                          PrintWriter（封装PrintStream）
+new io jdk1.4(面向缓存Buffer，非阻塞Selector)
+                                RandomAccessFile        ServerSocketChannel  pipe.sink()
+                                /FileChannel            DatagramChannel       pipe.source()
+                                Path/Files               
+aio(jdk7加入nio)
+                             AsynchronousChannel/
+                             CompletionHandler
 ### Unix 5种I/O模型
 ```
 +---------------+------------------+--------------------------+--------------------+-----------------+
@@ -1371,6 +1376,9 @@ rar,7z,zip,tar
 
 #### 重排
 https://github.com/koreader/libk2pdfopt
-
+https://github.com/joniks/Android-MuPDF
+https://hub.fastgit.org/barteksc/AndroidPdfViewer
+https://www.jianshu.com/p/1bf49af6584d
+https://hub.fastgit.org/geometer/FBReader-Android-2/tree/master/fbreader/text-formats/src/main/jni/NativeFormats/common/fbreader/formats
 
 

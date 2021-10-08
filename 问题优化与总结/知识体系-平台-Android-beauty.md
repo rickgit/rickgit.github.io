@@ -47,12 +47,12 @@ adb shell settings put system user_rotation 3  #270° clockwise
 正常手机设备
 | 屏幕标准标准  |           |                         | 图标尺寸标准  | 比例    | 屏幕密度(dpi) | 边距(px) |
 | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| xxxhdpi | 3840*2160 | 4K分辨率                   | 192*192 | 4     | 640       | 12-16  |
-| xxhdpi  | 1920*1080 |                         | 144*144 | 3     | 480       | 8-12   |
-| xhdpi   | 1280*720  |                         | 96*96   | 2     | 320       | 6-8    |
-| hdpi    | 480*800   | 高分辨率<br/>WVGA (480x800) | 72*72   | 1.5   | 240       | 4-6    |
-| mdpi    | 480*320   | 中等分辨率 <br/>HVGA         | 48*48   | 1     | 160       | 3-4    |
-| ldpi    | 320*240   | 低分辨率 <br/>QVGA          | 36*36   | 0.75  | 120       | 2-3    |
+| xxxhdpi | 3840*2160 | 4K分辨率                   | 192*192 | 4     | <=640       | 12-16  |
+| xxhdpi  | 1920*1080 |                         | 144*144 | 3     | <=480       | 8-12   |
+| xhdpi   | 1280*720  |                         | 96*96   | 2     | <=320       | 6-8    |
+| hdpi    | 480*800   | 高分辨率<br/>WVGA (480x800) | 72*72   | 1.5   | <=240       | 4-6    |
+| mdpi    | 480*320   | 中等分辨率 <br/>HVGA         | 48*48   | 1     | <=160       | 3-4    |
+| ldpi    | 320*240   | 低分辨率 <br/>QVGA          | 36*36   | 0.75  | <=120       | 2-3    |
 
 
 中等分辨率（mdpi）1px 等于 1in/160 = 0.0157in =0.0157cm 
@@ -61,8 +61,22 @@ adb shell settings put system user_rotation 3  #270° clockwise
  
 ```
 ResTable::getResource 参数rid，density获取图片
+
+frameworks\base\libs\androidfw\ResourceTypes.cpp
 ResTable_config::isBetterThan 查找适合的方法
 ```
+
+资源ID 0xPPTTEEEE
+https://developer.android.google.cn/guide/topics/resources/providing-resources.html#BestMatch
+![](res/resources.arsc.png)
+[resources.arsc 解析](https://hub.fastgit.org/jiarWang/android-chunk-utils)
+
+smallest witdh(Android3.2)
+width size
+height size
+screen size( small large 被sw取代)
+radio
+density
 
 ### 像素相关单位
 
@@ -94,6 +108,10 @@ ResTable_config::isBetterThan 查找适合的方法
    ❌ 图片会拉伸现象
 4. smallestWidth适配
    相比第2种方案，提高容错率
+
+ 1080x1920 dpi/480/x3 statusbar/72 navbar/144
+加载顺序
+      values-sw360dp-xxhdpi，values-sw360dp，value-w360dp，value-h568dp（高-状态栏高-导航栏高），values-1080x1776（高-导航栏高度），values
 #### 屏幕分布
 [流量研究院 - 移动设备分辨率排名](https://mtj.baidu.com/data/mobile/device)
 [腾讯移动分析 - 设备分辨率排名](https://mta.qq.com/mta/data/device/resolution)

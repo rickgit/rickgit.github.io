@@ -1077,6 +1077,7 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 ### Cronet
 Using HTTP3/QUIC with Cronet 
 ### 数据交换格式
+####  XML （DOM sax）
 
 #### Serial（Twitter）
 模板方法 ObjectSerializer 
@@ -2890,14 +2891,29 @@ private final Class<?>[] SERVICES = new Class[] {
     public void verifyUnlock(com.android.internal.policy.IKeyguardExitCallback callback) throws android.os.RemoteException;
     // 解除锁屏
     public void dismiss(com.android.internal.policy.IKeyguardDismissCallback callback) throws android.os.RemoteException;
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 0354786ca52e7bdf907bab4084e0fe671b7d5ab9
     // 屏保开始（Intent.ACTION_DREAMING_STARTED）
     public void onDreamingStarted() throws android.os.RemoteException;
     // 屏保结束（Intent.ACTION_DREAMING_STOPPED）
     public void onDreamingStopped() throws android.os.RemoteException;
     // 设备开始休眠 reason：OFF_BECAUSE_OF_USER/OFF_BECAUSE_OF_ADMIN/OFF_BECAUSE_OF_TIMEOUT
     public void onStartedGoingToSleep(int reason) throws android.os.RemoteException;
+<<<<<<< HEAD
     // 休眠完成
     public void onFinishedGoingToSleep(int reason, boolean cameraGestureTriggered) throws android.os.RemoteException;
+=======
+     // 休眠完成
+    public void onFinishedGoingToSleep(int reason, boolean cameraGestureTriggered) throws android.os.RemoteException;
+     // 正在灭屏
+    public void onScreenTurningOff() throws android.os.RemoteException;
+    // 灭屏完成
+    public void onScreenTurnedOff() throws android.os.RemoteException;
+
+
+>>>>>>> 0354786ca52e7bdf907bab4084e0fe671b7d5ab9
     // 设备开始唤醒
     public void onStartedWakingUp() throws android.os.RemoteException;
     // 唤醒完成
@@ -2906,10 +2922,14 @@ private final Class<?>[] SERVICES = new Class[] {
     public void onScreenTurningOn(com.android.internal.policy.IKeyguardDrawnCallback callback) throws android.os.RemoteException;
     // 已经亮屏完成
     public void onScreenTurnedOn() throws android.os.RemoteException;
+<<<<<<< HEAD
     // 正在灭屏
     public void onScreenTurningOff() throws android.os.RemoteException;
     // 灭屏完成
     public void onScreenTurnedOff() throws android.os.RemoteException;
+=======
+
+>>>>>>> 0354786ca52e7bdf907bab4084e0fe671b7d5ab9
     // 外部应用取消Keyguard接口
     public void setKeyguardEnabled(boolean enabled) throws android.os.RemoteException;
     // 开机系统准备完成回调
@@ -2927,7 +2947,13 @@ private final Class<?>[] SERVICES = new Class[] {
     // 通知Keyguard对power键做特殊处理，使设备不进行休眠或唤醒而是启动Home（目前是空实现）
     public void onShortPowerPressedGoHome() throws android.os.RemoteException;
 ```
+<<<<<<< HEAD
 
+=======
+3. RecentsSystemUserService
+4. ImageWallpaper 
+5. TakeScreenshotService
+>>>>>>> 0354786ca52e7bdf907bab4084e0fe671b7d5ab9
 ##### SystemBars 三个常见界面
 StatusBarService 管理界面
 
@@ -3673,6 +3699,7 @@ framework/BiometricFingerprintConstants
     public static final int FINGERPRINT_ERROR_NO_FINGERPRINTS = 11;
     public static final int FINGERPRINT_ERROR_HW_NOT_PRESENT = 12;
     public static final int FINGERPRINT_ERROR_VENDOR_BASE = 1000;
+<<<<<<< HEAD
     ERROR_TOO_MUCH_UNDER_SATURATED_PIXELS=1001;
     ERROR_TOO_MUCH_OVER_SATURATED_PIXELS=1002;
     ERROR_SPI_COMMUNICATION=1003;
@@ -3680,6 +3707,8 @@ framework/BiometricFingerprintConstants
     ERROR_INCOMPLETE_TEMPLATE=1005;
     ERROR_INVALID_DATA=1005;
 
+=======
+>>>>>>> 0354786ca52e7bdf907bab4084e0fe671b7d5ab9
 
 systemserver/FingerprintService
     private static final long FAIL_LOCKOUT_TIMEOUT_MS = 30*1000;
