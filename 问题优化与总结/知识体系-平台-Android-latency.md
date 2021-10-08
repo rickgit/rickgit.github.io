@@ -1077,6 +1077,7 @@ public final class Buffer implements BufferedSource, BufferedSink, Cloneable, By
 ### Cronet
 Using HTTP3/QUIC with Cronet 
 ### 数据交换格式
+####  XML （DOM sax）
 
 #### Serial（Twitter）
 模板方法 ObjectSerializer 
@@ -3646,10 +3647,6 @@ bionic/libc/include/sys/_system_properties.h
 
 busybox权限
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 920e271... doc
 ### 进程通讯
 
 framework          　　　　　　　　　　　　　　systemserver         hardware                      kernel
