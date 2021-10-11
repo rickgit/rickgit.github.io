@@ -2846,7 +2846,19 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 ##### SystemUI通讯
 ```java
-1. 
+1. frameworks/base/core/java/com/android/internal/statusbar/IStatusBar.aidl
+Icon
+animateExpand
+setSystemUiVisibility
+RecentApps
+KeyboardShortcutsMenu
+appTransition
+Qs
+screen pinning
+ShutdownUi
+FingerprintDialog
+
+
 com.android.systemui.statusbar.policy.BatteryControllerImpl
 会导致刷新时间
 
@@ -2854,7 +2866,7 @@ com.android.systemui.statusbar.policy.BatteryControllerImpl
 BatteryControllerImpl作为CommandQueue的CallBack
 管理电池 View 的刷新
 
-2. 
+  
 QSTileImpl 定时刷新快捷面板，每十分钟会刷新一次
 创建工厂是QSFactoryImpl
 ```

@@ -71,6 +71,9 @@ https://developer.android.google.cn/guide/topics/resources/providing-resources.h
 ![](res/resources.arsc.png)
 [resources.arsc 解析](https://hub.fastgit.org/jiarWang/android-chunk-utils)
 
+[限定符命名规则](https://developer.android.google.cn/guide/topics/resources/providing-resources)
+
+
 smallest witdh(Android3.2)
 width size
 height size
