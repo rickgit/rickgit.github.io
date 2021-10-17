@@ -3468,14 +3468,27 @@ Android 7.0
 网络，usb...
 
 ### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
+
+https://juejin.cn/post/6956851213476298788
+``` java
+
+adb shell "dumpsys | grep SETTINGS | grep -i device"
+android.settings.DEVICE_INFO_SETTINGS
+
+需要系统权限
+adb shell am start -n com.android.settings/com.android.settings.SubSettings -e :android:show_fragment com.android.settings.DeviceInfoSettings
+
+
+源码设置应用fragment 入口
+/packages/apps/Settings/src/com/android/settings/core/gateway/SettingsGateway.java
+
+```
 ##### WIFI
  
 adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
-adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
 adb shell am start com.android.settings/com.android.settings.Settings
-adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
-adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
+adb shell am start com.android.settings/com.android.settings.Settings\$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings\$NetworkDashboardActivity
 
 
 ```java

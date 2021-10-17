@@ -488,12 +488,12 @@ runtest
 grep更适合单纯的查找或匹配文本，sed更适合编辑匹配到的文本，awk更适合格式化文本，对文本进行较复杂格式处理
 
 adb 命令源码地址：
-/system/core/adb/
+/system/core/ （adb logcat）
 /system/core/toolbox（getprop，cat GNU项目）
 adb shell 命令源码地址（find -iname 'cmds'）：
 /development/cmds/monkey
     /frameworks/av/cmds（）
-/frameworks/base/cmds/(am pm bugreport dumpsys ime imput  )
+/frameworks/base/cmds/( 操作命令：am pm  wm input；查看分析命令： dumpsys bugreport  )
     /frameworks/native/cmds/(bugreport)
     /frameworks/testing/uiautomator/cmds
 ```
@@ -501,7 +501,7 @@ adb shell 命令源码地址（find -iname 'cmds'）：
 adb shell "getprop ro.build.version.release"
 adb shell "getprop ro.build.version.sdk"
 adb shell " getprop | grep product"
-adb shell pm path com.zhangyue.iReader.Eink
+adb shell pm path com.android.settings
 
 #### system/extras/su 提权
 1. Android 4.4，system分区多被挂载为nosuid，即使修改su.c ，关掉selinux setenforce 0，也有framework验证。init进程开启一个su daemon 守护进程，init进程具有天然的root权限，由它 fork 出的su daemon也有（https://www.jianshu.com/p/6bc251ee9026）
@@ -598,9 +598,24 @@ adb shell pm enable <PACKAGE>
 
 ```
 #### dumpsys
+/frameworks/native/cmds/dumpsys
+``` bash
+adb shell dumpsys -l 显示所有服务，activity/ams package/pms window/wms input/ims power/pms battery dropbox ，cupinfo meminfo dbinfo
+adb shell dumpsys activity -h
+    adb shell dumpsys activity top 查看fragment，布局
+adb shell dumpsys package -h
+    adb shell "dumpsys package edu.ptu.java.application | grep version" 查看版本信息
+adb shell dumpsys window -h
+    adb shell "dumpsys window visible | grep 'Window #'"
+    adb shell " dumpsys window | grep anr"
+    adb shell "dumpsys window | grep mCurrent"
+    adb shell  "dumpsys window windows |grep "Window #""
 
-```bash
-adb shell dumpsys -T 60000 activity -v all
+adb shell "dumpsys cpuinfo | grep com.android.systemui"
+adb shell dumpsys meminfo --package com.android.settings
+adb shell "dumpsys dbinfo com.android.launcher3"
+adb shell dumpsys   sensorservice
+adb shell dumpsys fingerprint
 ```
  
 ```java
@@ -608,29 +623,12 @@ adb shell dumpsys -T 60000 activity -v all
 修改：C:\Users\anshu\.android\avd\Pixel_2_API_30.avd\config.ini
 hw.gpu.enabled = no hw.gpu.mode = off
  
-
-adb shell dumpsys activity ---------------查看ActvityManagerService 所有信息
-adb shell dumpsys activity activities----------查看Activity组件信息
-adb shell dumpsys activity services-----------查看Service组件信息
-adb shell dumpsys activity providers----------产看ContentProvider组件信息
-adb shell dumpsys activity broadcasts--------查看BraodcastReceiver信息
-adb shell dumpsys activity intents--------------查看Intent信息
-adb shell dumpsys activity processes---------查看进程信息
-
-
 adb shell "dumpsys activity activities | sed -En -e '/Running activities/,/Run #0/p'"
 adb shell "dumpsys activity activities | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'"
-
 adb shell "dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activities/,/Run #0/p'"
 
-
-adb shell  "dumpsys window windows |grep "Window #""
-
 ```
-##### anr
-```
-adb shell " dumpsys window | grep anr"
-```
+ 
 
 ### 手机交互工具
 https://github.com/eleme/UETool

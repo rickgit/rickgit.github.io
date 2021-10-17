@@ -266,6 +266,8 @@ echo    println "variantData "+project.extensions['android']['applicationVariant
 echo    println "assemble "+project.extensions['android']['applicationVariants'][0]['assemble'].name  >build.gradle & gradle
 echo    println "project.extension "+project.extensions['android']['sourceSets']['s601']['res']['source'][0] >build.gradle & gradle
 
+
+project [ant,gradle,startParameter,buildscript,extensions,repositories]
     //解析xml：XmlParser (dom)vs XmlSlurper(sax)
     //生成xml：MarkupBuilder和StreamingMarkupBuilder
 ```
