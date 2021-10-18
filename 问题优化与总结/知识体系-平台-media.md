@@ -1917,7 +1917,7 @@ Options
 4. 顶点/片元着色器
 5. 渲染图片
 6. GLKit
-7. 颜色，纹理，纹理与颜色
+7. 颜色，纹理，纹理与颜色 String.format("#%06X", 0xFFFFFF & intColor);
 8. 分屏滤镜
 #### View,Canvas,Paint
 View 白板：

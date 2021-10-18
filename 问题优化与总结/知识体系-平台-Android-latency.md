@@ -2846,19 +2846,7 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 ##### SystemUI通讯
 ```java
-1. frameworks/base/core/java/com/android/internal/statusbar/IStatusBar.aidl
-Icon
-animateExpand
-setSystemUiVisibility
-RecentApps
-KeyboardShortcutsMenu
-appTransition
-Qs
-screen pinning
-ShutdownUi
-FingerprintDialog
-
-
+1. 
 com.android.systemui.statusbar.policy.BatteryControllerImpl
 会导致刷新时间
 
@@ -2866,11 +2854,9 @@ com.android.systemui.statusbar.policy.BatteryControllerImpl
 BatteryControllerImpl作为CommandQueue的CallBack
 管理电池 View 的刷新
 
-  
+2. 
 QSTileImpl 定时刷新快捷面板，每十分钟会刷新一次
 创建工厂是QSFactoryImpl
-
-2.
 ```
 
 ##### SystemUI启动的子服务
@@ -2928,7 +2914,6 @@ private final Class<?>[] SERVICES = new Class[] {
     public void onScreenTurningOn(com.android.internal.policy.IKeyguardDrawnCallback callback) throws android.os.RemoteException;
     // 已经亮屏完成
     public void onScreenTurnedOn() throws android.os.RemoteException;
-
     // 外部应用取消Keyguard接口
     public void setKeyguardEnabled(boolean enabled) throws android.os.RemoteException;
     // 开机系统准备完成回调
@@ -3415,6 +3400,65 @@ signatureOrSystem
 
 #### SystemServer - mediaserver
 ### SystemUI
+#### 进程通讯
+```java
+CommandQueue extends IStatusBar.Stub 状态栏
+ @Deprecated
+    public static final int SYSTEM_UI_FLAG_VISIBLE = 0;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_LOW_PROFILE = 0x00000001;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_HIDE_NAVIGATION = 0x00000002;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_FULLSCREEN = 0x00000004;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_LAYOUT_STABLE = 0x00000100;
+    public static final int SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION = 0x00000200;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN = 0x00000400;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_IMMERSIVE = 0x00000800;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_IMMERSIVE_STICKY = 0x00001000;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_LIGHT_STATUS_BAR = 0x00002000;
+    private static final int SYSTEM_UI_RESERVED_LEGACY1 = 0x00004000;
+    private static final int SYSTEM_UI_RESERVED_LEGACY2 = 0x00010000;
+    @Deprecated
+    public static final int SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010;
+    @Deprecated
+    public static final int STATUS_BAR_HIDDEN = SYSTEM_UI_FLAG_LOW_PROFILE;
+    @Deprecated
+    public static final int STATUS_BAR_VISIBLE = SYSTEM_UI_FLAG_VISIBLE;
+    @UnsupportedAppUsage
+    public static final int STATUS_BAR_DISABLE_EXPAND = 0x00010000;
+    public static final int STATUS_BAR_DISABLE_NOTIFICATION_ICONS = 0x00020000;
+    public static final int STATUS_BAR_DISABLE_NOTIFICATION_ALERTS = 0x00040000;
+    public static final int STATUS_BAR_DISABLE_NOTIFICATION_TICKER = 0x00080000;
+    public static final int STATUS_BAR_DISABLE_SYSTEM_INFO = 0x00100000;
+    @UnsupportedAppUsage
+    public static final int STATUS_BAR_DISABLE_HOME = 0x00200000;
+    @UnsupportedAppUsage
+    public static final int STATUS_BAR_DISABLE_BACK = 0x00400000;
+    public static final int STATUS_BAR_DISABLE_CLOCK = 0x00800000;
+    @UnsupportedAppUsage
+    public static final int STATUS_BAR_DISABLE_RECENT = 0x01000000;
+    public static final int STATUS_BAR_DISABLE_SEARCH = 0x02000000;
+    public static final int STATUS_BAR_TRANSIENT = 0x04000000;
+    @UnsupportedAppUsage
+    public static final int NAVIGATION_BAR_TRANSIENT = 0x08000000;
+    public static final int STATUS_BAR_UNHIDE = 0x10000000;
+    public static final int NAVIGATION_BAR_UNHIDE = 0x20000000;
+    public static final int STATUS_BAR_TRANSLUCENT = 0x40000000;
+    public static final int NAVIGATION_BAR_TRANSLUCENT = 0x80000000;
+    public static final int NAVIGATION_BAR_TRANSPARENT = 0x00008000;
+    public static final int STATUS_BAR_TRANSPARENT = 0x00000008;
+
+IKeyguardService.Stub 锁屏
+  setOccluded //true时表示当前keyguard被遮挡了，也就是说当前即使手机还未解锁也不显示keyguard，即不显示NotificationShade窗口。例如锁屏相机、音乐app锁屏显示等。锁屏显示的方法是在AndroidManifest.xml中的Activity标签中加上：android:showWhenLocked="true"即可
+DreamServiceWrapper extends IDreamService.Stub 电源键
+```
+
 ``` xml
     <!-- SystemUI Services: The classes of the stuff to start. -->
     <string-array name="config_systemUIServiceComponents" translatable="false">
@@ -3468,27 +3512,14 @@ Android 7.0
 网络，usb...
 
 ### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
-
-https://juejin.cn/post/6956851213476298788
-``` java
-
-adb shell "dumpsys | grep SETTINGS | grep -i device"
-android.settings.DEVICE_INFO_SETTINGS
-
-需要系统权限
-adb shell am start -n com.android.settings/com.android.settings.SubSettings -e :android:show_fragment com.android.settings.DeviceInfoSettings
-
-
-源码设置应用fragment 入口
-/packages/apps/Settings/src/com/android/settings/core/gateway/SettingsGateway.java
-
-```
 ##### WIFI
  
 adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityEmpty  --ei "load_action" 0
+adb shell am start com.zhangyue.iReader.systemui/com.zhangyue.iReader.systemui.ActivityLunch  --es "Type" "setting"
 adb shell am start com.android.settings/com.android.settings.Settings
-adb shell am start com.android.settings/com.android.settings.Settings\$WifiSettingsActivity
-adb shell am start com.android.settings/com.android.settings.Settings\$NetworkDashboardActivity
+adb shell am start com.android.settings/com.android.settings.Settings$WifiSettingsActivity
+adb shell am start com.android.settings/com.android.settings.Settings$NetworkDashboardActivity
 
 
 ```java

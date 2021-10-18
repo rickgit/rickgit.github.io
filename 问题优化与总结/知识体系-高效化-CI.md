@@ -258,6 +258,7 @@ echo    println "project ant lib "+project.ant['ant.core.lib'] >build.gradle & g
 echo    println 'project gradle'+ project.gradle.getProperties() >build.gradle & gradle 
 echo    println "startParameter "+gradle.startParameter.getProperties() >build.gradle & gradle
 echo    println "startParameter "+gradle.startParameter['taskNames'][0] >build.gradle & gradle
+ echo    println "project plugins "+project.plugins.toString().replace(',',',\n') >build.gradle & gradle
 echo    println "project extension"+project.extensions.getProperties() >build.gradle & gradle
 echo    println "project java "+project.extensions['java'].getProperties() >build.gradle & gradle
 echo    println "android "+project.extensions['android'].getProperties() >build.gradle & gradle

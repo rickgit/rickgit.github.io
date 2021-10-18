@@ -1,5 +1,6 @@
 # 可分析
-
+https://developer.android.google.cn/studio/debug/am-logcat?hl=el
+https://developer.android.google.cn/topic/performance/vitals/launch-time?hl=zh-cn
 ## 调试工具
 
 adb shell input keyevent   
