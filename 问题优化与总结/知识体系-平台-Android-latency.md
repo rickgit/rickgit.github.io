@@ -2858,7 +2858,9 @@ BatteryControllerImpl作为CommandQueue的CallBack
 QSTileImpl 定时刷新快捷面板，每十分钟会刷新一次
 创建工厂是QSFactoryImpl
 ```
-
+priv-app在vendor分区，白名单文件 /vendor/etc/permissions/
+priv-app在system分区，白名单文件 /system/etc/permissions/
+priv-app在product分区，白名单文件 /product/etc/permissions/
 ##### SystemUI启动的子服务
 systemservice
 zygote ->systemserver -ams-> systemui
@@ -3457,6 +3459,7 @@ CommandQueue extends IStatusBar.Stub 状态栏
 IKeyguardService.Stub 锁屏
   setOccluded //true时表示当前keyguard被遮挡了，也就是说当前即使手机还未解锁也不显示keyguard，即不显示NotificationShade窗口。例如锁屏相机、音乐app锁屏显示等。锁屏显示的方法是在AndroidManifest.xml中的Activity标签中加上：android:showWhenLocked="true"即可
 DreamServiceWrapper extends IDreamService.Stub 电源键
+CommandQueue extends IStatusBar.Stub
 ```
 
 ``` xml
@@ -3640,6 +3643,20 @@ WIFI无线网络目前使用最广泛的加密模式是WPA-PSK（TKIP 使用RC4�
 com.android.systemui.statusbar.phone.StatusBarIconController#getIconBlacklist
 
 adb shell am start -a android.settings.BLUETOOTH_SETTINGS
+
+
+蓝牙设备类型cod（蓝牙class of device介绍）
+2bit<type> 6bit<minor> 5bit<major> 11bit<service> 
+
+
+http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html
+
+android.bluetooth.BluetoothClass.Device.Major
+android.bluetooth.BluetoothClass.Service
+/system/bt/internal_include/bt_target.h
+
+adb shell settings get global bluetooth_class_of_device
+adb shell settings put global bluetooth_class_of_device 256
 
 ### PackageInstaller（packages/apps/PackageInstaller）
 

@@ -269,6 +269,9 @@ git rebase
  git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 git push origin --delete develop_AA //删除远程分支
 
+ git branch -D  -r origin/dev_10.6.1
+ git push  origin :refs/heads/dev_10.6.1
+
 登录方式一：账号密码
 登录方式二：
 Personal access tokens : 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 

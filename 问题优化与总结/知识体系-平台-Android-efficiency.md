@@ -52,6 +52,8 @@ https://zwc365.com/2020/08/30/android10-baiduwangpan
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
+⭐ 强制分区存储，还需要访问系统文件
+<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
@@ -60,6 +62,7 @@ https://zwc365.com/2020/08/30/android10-baiduwangpan
 ⭐[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
 ⭐ 设备ID就不能获取，去掉了READ_PHONE_STATE权限，阻止设备跟踪 （OAID替换）
 ⭐ AndroidX代替v4,v7
+⭐ EPERM (Operation not permitted) 添加属性 compilesdk 29,requestLegacyExternalStorage https://developer.android.google.cn/training/data-storage/use-cases#opt-out-scoped-storage
 
 #### Android  9 API level 28
 [行为变更：以 API 级别 28 及更高级别为目标的应用](https://developer.android.google.cn/about/versions/pie/android-9.0-changes-28?hl=zh-cn)
