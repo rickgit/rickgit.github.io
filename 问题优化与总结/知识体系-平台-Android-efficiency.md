@@ -578,26 +578,19 @@ adb pull /data/anr/anr_2019-11-21-11-41-10-537 e:/bugs/
 [ChkBugReport下载地址](https://github.com/sonyxperiadev/ChkBugReport/wiki/Where-to-obtain-it)
 
 #### am  pm 
-```
+``` s
+adb shell am help
 adb shell am start -n com.android.music/com.android.music.MusicBrowserActivity
-
-adb shell pm dump com.tencent.weread.eink | findstr "versionName"
-
-
-adb shell pm list package
-
+adb shell am stack list
 adb shell am kill <packagename>
-
-If you want to kill the Sticky Service,the following command NOT WORKING:
-
 adb shell am force-stop <PACKAGE>
 adb shell kill <PID>
-The following command is WORKING:
 
-adb shell pm disable <PACKAGE>
-If you want to restart the app,you must run command below first:
-
-adb shell pm enable <PACKAGE>
+adb shell pm help
+adb shell pm dump <package>
+adb shell pm dump com.tencent.weread.eink | findstr "versionName"
+adb shell pm list features
+adb shell pm list package
 
 ```
 #### dumpsys
@@ -619,6 +612,9 @@ adb shell dumpsys meminfo --package com.android.settings
 adb shell "dumpsys dbinfo com.android.launcher3"
 adb shell dumpsys   sensorservice
 adb shell dumpsys fingerprint
+adb shell dumpsys batterystats
+adb shell dumpsys usagestats
+
 ```
  
 ```java
