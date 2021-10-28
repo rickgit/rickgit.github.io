@@ -3401,7 +3401,23 @@ signatureOrSystem
 
 
 #### SystemServer - mediaserver
+### Provision
+
+/data/system/packages.xml
+
+特许白名单配置
+```java
+/frameworks/base/core/java/com/android/server/SystemConfig.java#readPrivAppPermissions
+
+
+/product/etc/permissions/com.android.provision.xml
+
+ /product/etc/permissions/platform.xml 具有优先权
+```
 ### SystemUI
+window type
+TYPE_SYSTEM_ERROR 遮盖状态栏
+TYPE_SYSTEM_OVERLAY 可以遮盖，但没点击事件
 #### 进程通讯
 ```java
 CommandQueue extends IStatusBar.Stub 状态栏

@@ -150,6 +150,11 @@ VirtualUETool
 Configuration.orientation 两个方向
 Activity.getRequestedOrientation()包含ActivityInfo.screenOrientation 16个方向
 
+
+context.getSystemService(Context.WINDOW_SERVICE).getDefaultDisplay().getRotation();//Surface.ROTATION_270 4个方向
+
+
+
 网络错误默认页，页码，对话框，tab
 
 锁定正向横屏，切换到反向横屏，不能成功
