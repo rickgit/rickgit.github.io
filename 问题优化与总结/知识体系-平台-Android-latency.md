@@ -1653,6 +1653,13 @@ xml传输，二进制需要转化Base64
 网络,SQLite数据库,方式文件存储,SharedPreferences/MMKV,内容提供器（Content provider）
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 ## Sqlite
+``` sql
+.tables
+.headers on
+.mode column
+select * from <table>
+```
+
 ### h2 /JOOQ/SnakeYAML 
 ### xutils
 [xutils view,img,http,orm](https://github.com/zhuer0632/xUtils.git)
@@ -3723,6 +3730,10 @@ bionic/libc/include/sys/_system_properties.h
 busybox权限
 
 ### 进程通讯
+
+#### 指纹识别
+##### 设备密码
+/data/system/locksettings.db
 
 framework          　　　　　　　　　　　　　　systemserver         hardware                      kernel
 FingerprintManager 　　　　　　　　　　　　　　FingerprintService   BiometricsFingerprint.cpp     调整源码buffer
