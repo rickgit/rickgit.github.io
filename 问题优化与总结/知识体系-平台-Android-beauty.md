@@ -34,6 +34,8 @@ adb shell settings put system user_rotation 3  #270° clockwise
 
 > 屏幕分辨率：屏幕图像的精密度，是指显示器所能显示的像素有多少。 
 
+有可能hdpi的屏幕会读取xhdip的value值
+
 设备根据DPI，旋转分辨率文件夹
 | :-------------: | :-------------: |
 |0dpi   ~ 120dpi  | ldpi|
