@@ -295,6 +295,20 @@ ext.External=[
 2. 插件配置文件
 resources\META-INF\gradle-plugins\xxx.properties
 
+### 加速
+gradlew build -X lint -X lintVitalRelease
+
+jar作为本地仓库
+implementation (name:'lib',ext:'aar')
+换
+
+configurations.maybeCreate("default")
+artifacts.add("default",file('lib.aar'))
+
+或
+api(name: 'lib', ext: 'aar')
+
+资源 依赖 资源
 
 ## android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
 [编译](https://fucknmb.com/2017/06/01/Android-Gradle-Plugin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E7%BC%96%E8%AF%91/)

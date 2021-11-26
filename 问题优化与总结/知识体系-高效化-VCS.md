@@ -266,9 +266,12 @@ git merge
 git rebase
 //显示tag
  git tag -n --sort=taggerdate
+git push -v origin tag_v10.6.0
+
  git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 git push origin --delete develop_AA //删除远程分支
 
+删除远程分支
  git branch -D  -r origin/dev_10.6.1
  git push  origin :refs/heads/dev_10.6.1
 
