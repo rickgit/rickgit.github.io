@@ -3420,7 +3420,11 @@ signatureOrSystem
 /product/etc/permissions/com.android.provision.xml
 
  /product/etc/permissions/platform.xml 具有优先权
+
+
 ```
+
+[安卓预置应用的特权适配]( https://www.jianshu.com/p/5d6b7a0bf515)
 ### SystemUI
 window type
 TYPE_SYSTEM_ERROR 遮盖状态栏
