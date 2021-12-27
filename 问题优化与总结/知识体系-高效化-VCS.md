@@ -309,6 +309,12 @@ G:\workspace\ws-github\.git\config
 git config --global http.sslVerify "false"
 
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
+### 同步个人代码
+
+git log --author=anshu.wang --pretty=oneline/short/full/fuller/format --after="2021-03-21" –no-merges	
+git log --author=anshu.wang --oneline --after="2021-11-23" --no-merges
+git cherry-pick 
+
 ### 常见问题
 ```shell
 Please move or remove them before you can switch branches.
@@ -946,3 +952,5 @@ git config --system core.longpaths true
 
 gclient config git://source.codeaurora.cn/quic/lc 生成 **.gclient** 文件
 gclient sync  执行 **.DEPS** 依赖
+
+
