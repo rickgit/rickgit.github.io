@@ -3425,6 +3425,18 @@ signatureOrSystem
 window type
 TYPE_SYSTEM_ERROR 遮盖状态栏
 TYPE_SYSTEM_OVERLAY 可以遮盖，但没点击事件
+#### 编译
+如果编译debug版本：
+out/target/product/projectXX/system/framewor framework.jar
+如果是user版本：
+out/target/common/obj/JAVA_LIBRARIES/framework_intermediates/classes.jar 
+
+1. compileSdkVersion 29， 要跟你AOSP的版本匹配
+
+AAPT: error: unescaped apostrophe in string；Multiple substitutions
+><xliff 换为
+ formatted="false"><xliff
+
 #### 进程通讯
 ```java
 CommandQueue extends IStatusBar.Stub 状态栏
@@ -4334,8 +4346,12 @@ Uptime: 53403267 Realtime: 53403267
 ```
 #### 对象的生命周期绑定
 Obsevable
-
-
+## 存储
+Android 2.3 “ sdcard”格式化为VFAT（虚拟FAT）
+android4.4 fuse文件系统
+android 7.0 vold中，管理fuse文件系统
+Android 8上，FUSE替换为  SDCardFS 
+Android 11 为了更好的权限控制，又用FUSE 替换了SDCardFS
 ## 传感器
 
 adb shell dumpsys sensorservice

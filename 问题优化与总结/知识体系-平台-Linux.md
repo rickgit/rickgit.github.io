@@ -44,10 +44,13 @@ CPU Cache就是用来解决CPU与内存之间速度不匹配的问题，避免�
 《A Heavily Commented Linux kernel Source Code(Kernel 0.11)【Linux 内核 0.11 完全注释】》
 《The Art of Linux Kernel Desigin【Linux 内核设计的艺术】》
 内存高速缓存buffer-cache(buffer偏重于写，而cache偏重于读)
-## 操作系统
+## 操作系统（COMS信息 bios程序）
 "硬中断是外部设备对CPU的中断"
 "软中断通常是硬中断服务程序对内核的中断"
 "信号则是由内核（或其他进程）对某个进程的中断"
+实模式下，中断入口是中断向量表，BIOS和DOS都是存在于实模式下的程序，DOS中断只占用0x21这个中断号。
+保护模式下，中断入口是中断描述符表，二者一般在不同的位置
+
 [wiki](https://baike.baidu.com/item/软中断)
 [信号和中断的比较 + 中断和异常的比较 ](https://www.cnblogs.com/charlesblc/p/6277810.html)
 
@@ -330,3 +333,27 @@ awk：适合对文本进行较复杂的格式化处理；
 
 ### 磁盘分析
 du -c -d 1  -m | sort -n
+
+
+## 源码
+http://lxr.linux.no/linux-old+v0.01/
+https://elixir.bootlin.com/linux/0.01/source
+[linux 各个版本下载](http://ftp.sjtu.edu.cn/sites/ftp.kernel.org/pub/linux/kernel/v2.6/)
+
+定制 Android 内核，https://www.wenwenya.com/anquan/566628.html，使用编译出的 zImage-dtb（将 zImage 和 dtb 连接成一个文件） 参与编译出boot.img
+git://mirrors.ustc.edu.cn/aosp/kernel/msm.git
+/emulator -kernel 路径/kernel/goldfish/arch/arm/boot/zImage &
+
+[Android 版本和 Linux 版本](https://en.wikipedia.org/wiki/Android_version_history#Overview)
+
+
+
+zImage是vmlinuz经过gzip压缩后的文件，适用于小内核
+bzImage是vmlinuz经过gzip压缩后的文件，适用于大内核
+
+
+Linux 2.6.9 
+	linux-2.6.29.1\arch\x86\boot; linux-2.6.29.1\arch\x86\kernel;linux-2.6.29.1\init\#start_kernel
+	/system/core/init/Init.cpp;/system/core/init/init_parser.cpp;
+	linux-2.6.29.1\drivers\staging\android;
+Linux 3.19版本集成 OpenBinder

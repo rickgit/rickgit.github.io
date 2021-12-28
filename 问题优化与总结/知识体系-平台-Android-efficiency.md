@@ -54,12 +54,16 @@ https://zwc365.com/2020/08/30/android10-baiduwangpan
 - [Android 11 中的隐私权（存储文件和用户数据、请求权限以及请求位置信息）](https://developer.android.google.cn/preview/privacy?hl=zh-cn)
 ⭐ 强制分区存储，还需要访问系统文件
 <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+ android11 根目录创建文件夹<application android:preserveLegacyExternalStorage="true"/>
+     在Android11的机器上覆盖安装时，才能访问旧版存储位置，卸载重装会失效
 #### Android 10 API level 29
 [面向开发者的 Android 10](https://developer.android.google.cn/about/versions/10/highlights?hl=zh-cn#privacy_for_users)
 - 折叠屏（resizeableActivity）
 - 用户隐私设置：必须使用 MediaStore 来访问共享媒体文件；
 ⭐安全问题-权限
 ⭐[分区存储，对外部存储空间的分区访问权限（应用专属目录和 MediaStore）](https://developer.android.google.cn/training/data-storage/use-cases)
+<application
+    android:requestLegacyExternalStorage="true">
 ⭐ 设备ID就不能获取，去掉了READ_PHONE_STATE权限，阻止设备跟踪 （OAID替换）
 ⭐ AndroidX代替v4,v7
 ⭐ EPERM (Operation not permitted) 添加属性 compilesdk 29,requestLegacyExternalStorage https://developer.android.google.cn/training/data-storage/use-cases#opt-out-scoped-storage
@@ -610,11 +614,9 @@ adb shell dumpsys window -h
 adb shell "dumpsys cpuinfo | grep com.android.systemui"
 adb shell dumpsys meminfo --package com.android.settings
 adb shell "dumpsys dbinfo com.android.launcher3"
-adb shell dumpsys   sensorservice
-adb shell dumpsys fingerprint
-adb shell dumpsys batterystats
-adb shell dumpsys usagestats
-
+ 
+dbinfo, sensorservice,fingerprint,batterystats,usagestats,imms  input input_method, 
+statusbar,
 ```
  
 ```java
@@ -632,6 +634,12 @@ adb shell "dumpsys activity providers | sed -En -e '/Stack/p' -e '/Running activ
 ### 手机交互工具
 https://github.com/eleme/UETool
 https://hub.fastgit.org/barry-ran/QtScrcpy
+
+
+### 其他工具
+
+https://www.androiddevtools.cn/
+
 ## 可拓展
 
 ### 可维护性/通讯 - 架构之模块化（插件化及组件化）
