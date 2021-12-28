@@ -2991,7 +2991,7 @@ com.android.systemui.statusbar.StatusBarIconView
 SystemUI状态栏通知图标（静音图标等，关键字 stat_sys）
 - stat_sys_ringer_silent.xml ；广播 android.media.AudioManager#RINGER_MODE_CHANGED_ACTION
 
-其他进程,状态栏系统图标（蓝牙，WiFi）
+其他进程,状态栏系统图标（蓝牙，WiFi）,PhoneStatusBarPolicy 屏幕镜像图标
 - ![其他进程,状态栏图标](\res\statubar\其他进程,状态栏图标.png)
 - ![其他进程,状态栏图标](\res\statubar\systemicon1.png)
 获取系统图标
@@ -3420,7 +3420,11 @@ signatureOrSystem
 /product/etc/permissions/com.android.provision.xml
 
  /product/etc/permissions/platform.xml 具有优先权
+
+
 ```
+
+[安卓预置应用的特权适配]( https://www.jianshu.com/p/5d6b7a0bf515)
 ### SystemUI
 window type
 TYPE_SYSTEM_ERROR 遮盖状态栏
@@ -3439,57 +3443,7 @@ AAPT: error: unescaped apostrophe in string；Multiple substitutions
 
 #### 进程通讯
 ```java
-CommandQueue extends IStatusBar.Stub 状态栏
- @Deprecated
-    public static final int SYSTEM_UI_FLAG_VISIBLE = 0;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_LOW_PROFILE = 0x00000001;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_HIDE_NAVIGATION = 0x00000002;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_FULLSCREEN = 0x00000004;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_LAYOUT_STABLE = 0x00000100;
-    public static final int SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION = 0x00000200;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN = 0x00000400;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_IMMERSIVE = 0x00000800;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_IMMERSIVE_STICKY = 0x00001000;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_LIGHT_STATUS_BAR = 0x00002000;
-    private static final int SYSTEM_UI_RESERVED_LEGACY1 = 0x00004000;
-    private static final int SYSTEM_UI_RESERVED_LEGACY2 = 0x00010000;
-    @Deprecated
-    public static final int SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR = 0x00000010;
-    @Deprecated
-    public static final int STATUS_BAR_HIDDEN = SYSTEM_UI_FLAG_LOW_PROFILE;
-    @Deprecated
-    public static final int STATUS_BAR_VISIBLE = SYSTEM_UI_FLAG_VISIBLE;
-    @UnsupportedAppUsage
-    public static final int STATUS_BAR_DISABLE_EXPAND = 0x00010000;
-    public static final int STATUS_BAR_DISABLE_NOTIFICATION_ICONS = 0x00020000;
-    public static final int STATUS_BAR_DISABLE_NOTIFICATION_ALERTS = 0x00040000;
-    public static final int STATUS_BAR_DISABLE_NOTIFICATION_TICKER = 0x00080000;
-    public static final int STATUS_BAR_DISABLE_SYSTEM_INFO = 0x00100000;
-    @UnsupportedAppUsage
-    public static final int STATUS_BAR_DISABLE_HOME = 0x00200000;
-    @UnsupportedAppUsage
-    public static final int STATUS_BAR_DISABLE_BACK = 0x00400000;
-    public static final int STATUS_BAR_DISABLE_CLOCK = 0x00800000;
-    @UnsupportedAppUsage
-    public static final int STATUS_BAR_DISABLE_RECENT = 0x01000000;
-    public static final int STATUS_BAR_DISABLE_SEARCH = 0x02000000;
-    public static final int STATUS_BAR_TRANSIENT = 0x04000000;
-    @UnsupportedAppUsage
-    public static final int NAVIGATION_BAR_TRANSIENT = 0x08000000;
-    public static final int STATUS_BAR_UNHIDE = 0x10000000;
-    public static final int NAVIGATION_BAR_UNHIDE = 0x20000000;
-    public static final int STATUS_BAR_TRANSLUCENT = 0x40000000;
-    public static final int NAVIGATION_BAR_TRANSLUCENT = 0x80000000;
-    public static final int NAVIGATION_BAR_TRANSPARENT = 0x00008000;
-    public static final int STATUS_BAR_TRANSPARENT = 0x00000008;
+CommandQueue extends IStatusBar.Stub 状态栏 
 
 IKeyguardService.Stub 锁屏
   setOccluded //true时表示当前keyguard被遮挡了，也就是说当前即使手机还未解锁也不显示keyguard，即不显示NotificationShade窗口。例如锁屏相机、音乐app锁屏显示等。锁屏显示的方法是在AndroidManifest.xml中的Activity标签中加上：android:showWhenLocked="true"即可
@@ -3548,7 +3502,10 @@ Android 7.0
   控制管理分屏 StackDivider
   画中画模式管理  PipUI
 网络，usb...
+### InputMethodManager
+```
 
+```
 ### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
 ##### WIFI
  

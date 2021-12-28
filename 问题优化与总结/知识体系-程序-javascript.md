@@ -225,6 +225,7 @@ $$	直接量符号。
 |               |                                             |              |     with the given flags i d m s u x on - off           |
 |               |                                             | Constructs   |                                                         |
 |               |                                             |              +---------------------------------------------------------+
+|               |                                             |              |     no capture :                                        |
 |               |                                             |              |     (?=X)   via zero-width positive look ahead          |
 |               |                                             |              |     (?!X)   via zero-width negative lookahead           |
 |               |                                             |              |     (?<=X)  via zero-width positive lookbehind          |
