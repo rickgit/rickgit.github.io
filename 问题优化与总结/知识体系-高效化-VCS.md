@@ -322,6 +322,9 @@ Please move or remove them before you can switch branches.
 git reset --hard HASH
 git reset --soft HASH
 
+get clean -fd //删除reset 不能删除的文件
+get clean -x //ignore 的文件也会被删除
+get clean -n //先看看会删掉哪些文件
 
 # git checkout -f -b <branch>    
 ```
