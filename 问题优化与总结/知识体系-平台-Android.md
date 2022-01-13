@@ -117,7 +117,7 @@ root      232   1     46892  3400     ep_poll b746dca5 S /system/bin/surfaceflin
 | zygote Process   |  <----+                     |      |                           |
 |                  |       |                     |      |                           |
 |   Dvm instance   |       |  +---------------+  |      |                           |
-|                  |       |  |Service Manager|  |      |                           |
+|                  |       |  |ServiceManager |  |      |                           |
 |                  |       |  +---------------+  |      |                           |
 | +--------------+ |       |                     |      |                           |
 | |system_server | |       |  +---------------+  |      |                           |
