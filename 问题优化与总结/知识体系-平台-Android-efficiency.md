@@ -48,6 +48,9 @@ sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3
 [Android api level](https://developer.android.google.cn/guide/topics/manifest/uses-sdk-element?hl=zh-cn#top_of_page)
 
 https://zwc365.com/2020/08/30/android10-baiduwangpan
+
+#### Android 12 API level 31
+Material You
 #### Android 11 API level 30
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 

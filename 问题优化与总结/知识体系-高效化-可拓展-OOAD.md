@@ -3,16 +3,18 @@
 <<Design Patterns>> <<Enterprise Integration Patterns>> <<Code Complete>> <<POSA>>
 
 1. 三大通用原则
-KISS
+KISS （高效化）
 YAGNI 
   (关注分离，面向维护者代码，避免过早优化）
-DRY   
 
 [Boy-Scout Rule（童子军规则）:何一个成员都有义务去改善代码](《Bad Code, Craftsmanship, Engineering, and Certification》)
 
+DRY
+
 2. 模块内部与模块间
 低耦合（模块间）高内聚（模块内）
-LoD（模块间，有依赖关系的类之间，尽量只依赖必要的接口），IoC（模块间，配置大于反射），良性依赖原则（dagger/rxjava 《拥抱变化：敏捷设计从理论到实践》）， 命令-查询分离原则
+LoD（迪米特法则 模块间，有依赖关系的类之间，尽量只依赖必要的接口）
+IoC（模块间，配置大于反射），良性依赖原则（dagger/rxjava 《拥抱变化：敏捷设计从理论到实践》）， 命令-查询分离原则
 SOLID（模块内，属OOAD），CARP（模块间，属OOAD，合成/聚合）
 
 # 模式
@@ -664,3 +666,8 @@ AAC是一套MVVM架构组件
 
 
 ```
+
+
+## Android 设计模式
+工厂方法 AppComponentFactory 创建Application，Activity等
+C/S模式 binder
