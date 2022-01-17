@@ -218,6 +218,26 @@ https://design.tutsplus.com/articles/the-ultimate-guide-to-basic-typography--cms
 
 
 #### opencv
+## 绘制
+两个实现类
+/frameworks/base/libs/hwui/SkiaCanvas.cpp
+/frameworks/base/libs/hwui/RecordingCanvas.cpp 
+/external/skia/src/core/SkCanvas.cpp
+/hardware/libhardware/modules/gralloc/framebuffer.cpp#fb_post
+      图形内存送显卡代码 ioctl(m->framebuffer->fd, FBIOPAN_DISPLAY, &m->info)
+      另一种送显卡方式 Overlay（hwcomposer的硬件合成）
+framebuffer_device_t#setUpdateRect
+ 
+
+ https://www.cnblogs.com/blogs-of-lxl/p/11272756.html
+
+ /system/lib/libui.so 含gralloc模块，非厂商定制
+ /system/lib/libgui.so 封装连接SF客户端和服务端的BufferQueue，非厂商定制
+ /system/lib/libsurfaceflinger.so 非厂商定制
+ Skia、Hwui和OpenGL ES是BufferQueue的生产方，SurfaceFlinger是BufferQueue的消费方
+
+https://developer.aliyun.com/article/57394
+https://juejin.cn/post/6844904025851166734
  
 ## 遍历快（测量，布局，绘制）
 ### ViewTreeObserver 
