@@ -618,6 +618,8 @@ adb shell "dumpsys cpuinfo | grep com.android.systemui"
 adb shell dumpsys meminfo --package com.android.settings
 adb shell "dumpsys dbinfo com.android.launcher3"
  
+ adb shell dumpsys SurfaceFlinger //绘制申请
+
 dbinfo, sensorservice,fingerprint,batterystats,usagestats,imms  input input_method, 
 statusbar,
 ```

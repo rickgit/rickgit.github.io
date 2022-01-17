@@ -1065,7 +1065,32 @@ GT 工具
 
 
 ## 美观（每秒25帧，限时20毫秒内执行完）-界面开发系统
+### 主题
+@style/Theme.MaterialComponents.DayNight.DarkActionBar 
+Base.V7.Theme.AppCompat.Light -> Platform.AppCompat.Light ->android:Theme.Holo.Light
 
+#### 系统主题
+/frameworks/base/core/res/res/values/ 
+attrs.xml
+attrs_manifest.xml
+themes.xml
+themes_device_defaults.xml 默认主题，最新Android 11 继承themes_material
+themes_holo.xml        Android3.0（API级别11）holographic 主题 
+themes_leanback.xml   电视机主题
+themes_material.xml
+
+
+attrs.xml <declare-styleable name="Theme"> item属性定义
+
+ 
+/frameworks/base/core/res/res/values/themes_device_defaults.xml
+Theme.DeviceDefault.QuickSettings  --> android:Theme.DeviceDefault 
+文字，按钮，窗口属性，对话框属性，Alert对话框属性，Presentation属性，选中文本，复杂控件属性，配置界面样式，
+actionbar,toolbar,日期时间对话框，颜色采样
+#### material主题（依赖appcompat主题，appcompat依赖android:Theme.Holo主题）
+implementation "androidx.appcompat:appcompat:1.1.0"
+implementation "com.google.android.material:material:1.1.0"
+context.obtainStyledAttributes(attrs, R.styleable.MyApp, 0, 0); 获取getTheme，再获取Resource#mTypedArrayPool:SynchronizedPool 缓存获取数组对象
 
 ### 图片闪动
 滑动停止才进行显示图片
