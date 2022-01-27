@@ -203,7 +203,16 @@ repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-12.0.0_
 error.GitError: manifests rev-list ('^HEAD', 'e0a1ee6450c817d46067ddc7574819044a2169e9', '--'): fatal: bad revision '^HEAD'
 解决方法
  拷贝tags到refs/heads/android-12.0.0_r1 并且执行修复命令git symbolic-ref HEAD refs/heads/android-12.0.0_r1
- 
+
+Git error "non-monotonic index" 执行下面命令
+> rm .git/objects/pack/pack-29a18084cf61cd0322a6e9cfd485ce0977348c53.idx
+> git index-pack .git/objects/pack/pack-29a18084cf61cd0322a6e9cfd485ce0977348c53.pack 
+> git gc --prune=now
+
+error: refs/tags/android-wear-9.0.0_r32 does not point to a valid object! 解决方法
+rm .git/refs/tags/android-wear-9.0.0_r32 .git/logs/refs/tags/android-wear-9.0.0_r32
+
+
 步骤三：
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
