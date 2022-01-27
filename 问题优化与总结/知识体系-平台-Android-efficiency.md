@@ -198,18 +198,23 @@ fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable
 https://mirrors.ustc.edu.cn/help/aosp.html
 步骤一： repo命令
 步骤二： [manifest版本号旋转](https://source.android.google.cn/setup/start/build-numbers?hl=zh-cn)
-repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-10.0.0_r1	
+repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-12.0.0_r1 //	android-10.0.0_r1	
 
-
+error.GitError: manifests rev-list ('^HEAD', 'e0a1ee6450c817d46067ddc7574819044a2169e9', '--'): fatal: bad revision '^HEAD'
+解决方法
+ 拷贝tags到refs/heads/android-12.0.0_r1 并且执行修复命令git symbolic-ref HEAD refs/heads/android-12.0.0_r1
+ 
 步骤三：
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
+
+
 
 error： cannot initialize work tree的报错
 处理方法：
 执行repo sync -cdf输出sync的详细信息 
 error.GitError: cannot initialize work tree
-找到报错的仓库路径
+找到报错的仓库路径packages/apps/DocumentsUI
 然后分别删除根目录下 
 .repo/projects/packages/apps/DocumentsUI.git和
 .repo/project-objects/packages/apps/DocumentsUI.git
@@ -241,12 +246,19 @@ dex2oat did not finish after 2850 seconds
 编译后emulator aosp\out\target\product\generic_x86\system 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
 并修改 xxx-qemu.img 替换原来的xxx.img，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
 
+这种可行⭐编译后emulator aosp\out\target\product\generic_x86\里面的非文件夹 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
+并修改 xxx-qemu.img 替换原来的xxx.img，⭐这点很重要，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
+
 模块编译
 find  frameworks -name Android.mk
 cat   frameworks/base/packages/SystemUI/Android.mk | grep LOCAL_MODULE
 1.  make  SystemUI //LOCAL_MODULE:= SystemUI
-2. 相对目录编译 mmm packages/apps/phone
-3. 模块根目录编译 mm  //当前目录 packages/apps/phone
+2. 模块根目录编译 mm  //当前目录 packages/apps/phone
+mm： 编译当前目录下的模块，当前目录下要有Android.mk/Android.bp文件，不构建依赖
+mma：编译当前目录下的模块，构建依赖 mm出现ninja: error: 'xxx', needed by 'xxx', missing and no known rule to make it
+3. 相对目录编译 mmm packages/apps/phone
+mmm：编译指定路径下的模块，指定路径下要有Android.mk/Android.bp文件，不构建依赖
+mmma：编译指定路径下的模块，构建依赖
 
  make systemimage //重现编译system.img，包含systemui.apk；#make bootimage 编译boot.img； make userdataimage-nodeps 快速编译userdata.img；
 

@@ -310,7 +310,7 @@ api(name: 'lib', ext: 'aar')
 
 资源 依赖 资源
 
-## android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
+### android-gradle-plugin( /platform/tools/build/ 0.9以前;/platform/tools/base/build-system  0.9以后)
 [编译](https://fucknmb.com/2017/06/01/Android-Gradle-Plugin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E7%BC%96%E8%AF%91/)
 Gradle Transform API 在2.x加入
 #### 插件
@@ -488,7 +488,60 @@ ObjectGraph替代DependencyGraph；Injector換爲Module，由入口含義改爲�
 
 
 ```
+### ⭐ 优化
+gradle 依赖优化， 
+//1 不使用缓存，使用仓库中最新的包
+    configurations.all {
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds' // 动态版本 x.x.+
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'//  变化版本 x.x.x
+    }
 
+--refresh-dependencies
+//2 使用exclude、force解决冲突
+configurations.all {
+  resolutionStrategy {
+    force 'org.hamcrest:hamcrest-core:1.3'
+  }
+}
+//3 maven android BasePlugin 默认task
+apply plugin: 'maven'
+android.uploadArchives {
+      repositories.mavenDeployer {//gradle mavenDeployer
+          repository(url: LOCAL_REPO_URL)
+          pom.groupId = PROJ_GROUP
+          pom.artifactId = PROJ_ARTIFACTID
+          pom.version = PROJ_VERSION     
+      }   
+  }
+
+
+//4 product 动态生成
+android.productFlavors{
+  register(['flavor'])
+}
+
+//5 版本
+android.compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+}
+kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_1_8.toString()
+}
+
+//6 打包
+android.packageOptions{
+  //exclude、pickFirst、doNotStrip、merge
+}
+//7 重命名
+android.applicationVariants.output.all {
+    outputFileName ="the_file_name_that_i_want.apk"
+}
+
+//6 lint 异常
+android.lintOptions{
+  abortOnError false
+}
 ## 持续集成 Jenkins
 [持续集成、持续交付与持续部署](https://blog.csdn.net/shi_chang_zhi/article/details/80724801)
 
