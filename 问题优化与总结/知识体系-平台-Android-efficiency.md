@@ -188,26 +188,68 @@ Art正式替代Dalvik VM
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 ### 科大源编译
-Failed to listen for path logs: listen unix out/.path_interposer_log: bind: invalid argument 需要升级wsl2 ：
+#### Android编译
+http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
+wsl路径：
+C:\Users\anshu\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
+
+cannot execute binary file: Exec format error
+https://www.cnblogs.com/JiuHuan/p/10073632.html
+
+https://mirrors.ustc.edu.cn/help/aosp.html
+
+ ⭐创建大小写敏感的文件夹，在编译的时候会提示 
+ fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
+fsutil.exe file queryCaseSensitiveInfo 
+⭐Failed to listen for path logs: listen unix out/.path_interposer_log: bind: invalid argument  
+移动到/home/user 目录下编译//https://www.jianshu.com/p/c9ef830d5e21 在wsl2中，是无法直接访问Linux的文件的，但是可以网络的方式进行访问。通过Windows Terminal访问
 wsl -l -v #查看版本和名称
+//先更新适用于 x64 计算机的 WSL2 Linux 内核更新包
 wsl --set-version Ubuntu 2 #升级到WSL2
 
-wsl文件夹大小写敏感设置，编译的时候会提示
-fsutil.exe file SetCaseSensitiveInfo D:\workspace\ws-androidbuild\source enable 
-参考 
-https://mirrors.ustc.edu.cn/help/aosp.html
-步骤一： repo命令
+步骤一： repo命令下载配置，.repo/manifests.git/config改为科大源同步地址
 步骤二： [manifest版本号旋转](https://source.android.google.cn/setup/start/build-numbers?hl=zh-cn)
-repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-12.0.0_r1 //	android-10.0.0_r1	
+repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-10.0.0_r1	android-12.0.0_r1 //	android-10.0.0_r1	
+⭐repo init --depth=1 -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b  android-12.0.0_r3 android-11.0.0_r17 android-10.0.0_r42 android-9.0.0_r30//只下载当前代码 
+git_command.py 增加日志输出，然后就能看到过程中使用的git指令
+
 
 error.GitError: manifests rev-list ('^HEAD', 'e0a1ee6450c817d46067ddc7574819044a2169e9', '--'): fatal: bad revision '^HEAD'
-解决方法
- 拷贝tags到refs/heads/android-12.0.0_r1 并且执行修复命令git symbolic-ref HEAD refs/heads/android-12.0.0_r1
- 
-步骤三：
-\.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
-https://www.cnblogs.com/kobe8/p/3990297.html
+解决方法，用的是2020年的tar包，.repo\manifests.git\refs\tags没有android 12导致的，也是各种错误
+cd .repo/manifests ;git reset --hard remotes/origin/android-10.0.0_r1
 
+
+error: Exited sync due to gc errors
+查找问题，打印异常 E:\aosp\.repo\repo\subcmds\sync.py
+异常为：platform/external/scapy gc: fatal:not a git repository: 'mnt/e/aosp/.repo/projects/external/scapy.git'
+
+步骤三：⭐repo sync -c -f --no-tags --no-clone-bundle -j`nproc` //注释掉repo的subcommand/sync.py 的_GCProjects方法加快编译
+
+
+Fetching: 100% (782/782), done in 1h7m59.765s
+Garbage collecting: 100% (782/782), done in 11.066s
+Checking out: 100% (781/781), done in 1h41m27.600s
+repo sync has finished successfully.
+
+error: external/openssh/: Cannot checkout platform/external/openssh due to missing network sync; Run `repo sync -n platform/external/openssh` first.
+⭐repo sync -n platform/external/openssh //需要projects-object有bare项目才能执行，会修改project-object的.git/config配置
+repo sync --force-sync prebuilts/rust frameworks/libs/modules-utils external/openssh //需要project-object有非bare项目才能执行，测试工作目录是否能正常fetch和checkout，git_command.py 增加日志输出
+
+gc: fatal: not a git repository: '/mnt/e/aosp/.repo/projects/external/openssh.git' 确实没有文件夹
+git clone --bare -b android-10.0.0_r1 --depth=1 git://mirrors.ustc.edu.cn/aosp/platform/external/openssh.git .repo/project-objects/platform/external/openssh.git
+git clone --bare git://mirrors.ustc.edu.cn/aosp/platform/external/openssh.git .repo/projects/external/openssh.git projects的不能是bare，需要config去掉bare
+以上的问题没有解决，将会出现下面问题
+
+
+
+⭐error: .repo/repo/: contains uncommitted changes
+info: A new version of repo is available
+warning: repo is not tracking a remote branch, so it will not receive updates
+repo reset: error: Entry 'SUBMITTING_PATCHES.md' not uptodate. Cannot merge.
+fatal: Could not reset index file to revision 'v2.20^0'.
+
+git stash和git clean -df 还是无效可能是文件权限修改导致的，可用以下命令修改
+git config core.filemode false
 
 
 error： cannot initialize work tree的报错
@@ -243,11 +285,35 @@ dex2oat did not finish after 2850 seconds
             -j1 \
             --runtime-arg -Xms$(DEX2OAT_XMS) --runtime-arg -Xmx$(DEX2OAT_XMX) \
 
+⭐步骤四 ：编译
+//如果是编译 10
+export _JAVA_OPTIONS="-Xmx4g"
+//如果是编译 11
+export _JAVA_OPTIONS="-Xmx8g"
+//java -XX:+PrintFlagsFinal -version | grep -iE 'HeapSize' 查看设置的大小
+
+free -m 
+//查看内存，
+//Android 10 ，8G 内存，8G swap
+//Android 11 ，内存使用 4G 无法编译，编译应用层时候，飙到12GB，%UserProfile%\.wslconfig 调整 memory=12GB swap=16G
+
+
+source build/envsetup.sh
+lunch aosp_x86_64-eng //android 11（8.0不支持） aosp_x86_64-eng可以运行arm；其他名称https://source.android.google.cn/setup/build/running
+make -j`nproc` //如果卡住可能是内存不够用，可以用mma单独编译模块，看下错误
+
 编译后emulator aosp\out\target\product\generic_x86\system 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
 并修改 xxx-qemu.img 替换原来的xxx.img，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
 
 这种可行⭐编译后emulator aosp\out\target\product\generic_x86\里面的非文件夹 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
 并修改 xxx-qemu.img 替换原来的xxx.img，⭐这点很重要，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
+
+关于x86运行arm，参考
+https://www.android-x86.org/
+https://gitlab.com/android-generic/android_vendor_google_emu-x86
+https://github.com/newbit1/libndk_translation_Module
+https://www.dazhuanlan.com/zty9301/topics/1331077
+
 
 模块编译
 find  frameworks -name Android.mk
@@ -262,8 +328,40 @@ mmma：编译指定路径下的模块，构建依赖
 
  make systemimage //重现编译system.img，包含systemui.apk；#make bootimage 编译boot.img； make userdataimage-nodeps 快速编译userdata.img；
 
-.\sdk-ndk\emulator\emulator.exe -avd Nexus_5_API_28 -writable-system  //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
 
+
+//要先用x86_64GooglePlay镜像sdk_gphone_x86_64-user创建，自定义-sysdir，不然会使用默认x86_64目录。用编译出的文件，放在system-imges；启动模拟器就会加载编译的文件
+//运行后，修改/system/build.prop 相关的，让x64支持arm
+//default.prop -> system/etc/prop.default
+ro.product.cpu.abilist=x86_64,x86,arm64-v8a,armeabi-v7a,armeabi
+ro.product.cpu.abilist32=x86,armeabi-v7a,armeabi
+ro.product.cpu.abilist64=x86_64,arm64-v8a
+//  /vendor/build.prop
+ro.vendor.product.cpu.abilist=x86_64,x86,arm64-v8a,armeabi-v7a,armeabi
+ro.vendor.product.cpu.abilist32=x86,armeabi-v7a,armeabi
+ro.vendor.product.cpu.abilist64=x86_64,arm64-v8a
+
+//  vender.img : /default.prop  system.img/super.img: /system/etc/prop.default
+ro.dalvik.vm.native.bridge=libndk_translation.so
+ro.enable.native.bridge.exec=1
+
+
+//用Nexus_4_模拟器默认可以root，是userdebug模式，但不支持GooglePlay镜像；要使用使用，Nexus_5_才有GooglePlay镜像；
+//PIXEL模拟器需要注意 先替换system-images，判断是否模式正确**getprop | grep product.build.type 是否是eng模式**
+//超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
+
+
+⭐.\sdk-ndk\emulator\emulator.exe -avd Nexus_5_API_28 -writable-system  
+
+
+user	                                              userdebug	                       eng
+仅安装标签为 user 的模块	               安装标签为 user、debug 的模块	          安装标签为 user、debug、eng 的模块
+设定属性 ro.secure=1，打开安全检查功能	    设定属性 ro.secure=1，打开安全检查功能	   设定属性 ro.secure=0，关闭安全检查功能
+设定属性 ro.debuggable=0，关闭应用调试功能	设定属性 ro.debuggable=1，启用应用调试功能	设定属性 ro.debuggable=1，启用应用调试功能
+ 	 	                                                                            设定属性 ro.kernel.android.checkjni=1，启用 JNI 调用检查
+默认关闭 adb 功能	                              默认打开 adb 功能	                 默认打开 adb 功能
+打开 Proguard 混淆器	                          打开 Proguard 混淆器            	 关闭 Proguard 混淆器
+打开 DEXPREOPT 预先编译优化	                      打开 DEXPREOPT 预先编译优化	      关闭 DEXPREOPT 预先编译优化
 
 ### 系统签名
 1. 编译signapk.jar ,**make signapk**
@@ -271,16 +369,7 @@ mmma：编译指定路径下的模块，构建依赖
 3. 执行系统签名 **java -jar signapk.jar  platform.x509.pem platform.pk8　old.apk new.apk**
 
 
-#### Android编译
-http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
-wsl路径：
-C:\Users\anshu\AppData\Local\Packages\CanonicalGroupLimited.UbuntuonWindows_79rhkp1fndgsc\LocalState\rootfs
 
-cannot execute binary file: Exec format error
-https://www.cnblogs.com/JiuHuan/p/10073632.html
-
-fsutil.exe file queryCaseSensitiveInfo 
-(Get-ChildItem -Recurse -Directory).FullName | ForEach-Object {fsutil.exe file setCaseSensitiveInfo $_ enable}
 
 ### 烧录
 [烧录内核](https://www.cnblogs.com/hixin/p/6892206.html)

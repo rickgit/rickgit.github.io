@@ -490,6 +490,16 @@ ObjectGraph替代DependencyGraph；Injector換爲Module，由入口含義改爲�
 ```
 ### ⭐ 优化
 gradle 依赖优化， 
+//https://zwc365.com/2021/09/04/%E4%B8%87%E8%83%BD%E9%95%9C%E5%83%8F%E5%B7%A5%E5%85%B7
+allprojects {
+    repositories {
+        maven { url 'https://pd.zwc365.com/cfworker/https://dl.google.com/dl/android/maven2/' }
+        maven { url 'https://pd.zwc365.com/cfworker/https://jcenter.bintray.com' }
+ 
+//        google()
+//        jcenter()
+    }
+}
 //1 不使用缓存，使用仓库中最新的包
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds' // 动态版本 x.x.+

@@ -35,6 +35,8 @@ https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/
 
  [chrome webview 介绍](https://developer.chrome.com/multidevice/webview/overview)
  ## chromium for webview
+[chromium编译中国区](https://wiki.codeaurora.org/xwiki/bin/Support/CodeAuroraMirrors)
+ 
  [chromium for android](https://chromium.googlesource.com/chromium/src/+/master/docs/android_build_instructions.md)
 
  [chromium for webview](https://www.chromium.org/developers/how-tos/build-instructions-android-webview)
