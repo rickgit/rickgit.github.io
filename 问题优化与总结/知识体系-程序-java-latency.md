@@ -1372,7 +1372,7 @@ https://cgit.freedesktop.org/libreoffice/core/
 
 #### comic
 rar,7z,zip,tar
-
+##### 压缩方式deflate,gzip,snappy,xz,lz4,bzip2
 
 #### 重排
 https://github.com/koreader/libk2pdfopt

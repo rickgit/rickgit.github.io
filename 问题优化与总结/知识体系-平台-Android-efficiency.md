@@ -188,6 +188,11 @@ Art正式替代Dalvik VM
 Commit 审阅 if，系统版本，模块管理
 Push   代码重用,多次提交Review
 ### 科大源编译
+https://android.googlesource.com https://aosp.tuna.tsinghua.edu.cn
+https://gerrit-googlesource.lug.ustc.edu.cn https://gerrit-googlesource.lug.ustc.edu.cn
+#### Android 11 内核编译
+https://source.android.google.cn/devices/architecture/kernel/android-common?hl=zh-cn
+https://sidneygod.github.io/posts/c64b5633/
 #### Android编译
 http://iso.mirrors.ustc.edu.cn/aosp-monthly/aosp-latest.tar
 wsl路径：
@@ -210,7 +215,7 @@ wsl --set-version Ubuntu 2 #升级到WSL2
 步骤一： repo命令下载配置，.repo/manifests.git/config改为科大源同步地址
 步骤二： [manifest版本号旋转](https://source.android.google.cn/setup/start/build-numbers?hl=zh-cn)
 repo init -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-10.0.0_r1	android-12.0.0_r1 //	android-10.0.0_r1	
-⭐repo init --depth=1 -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b  android-12.0.0_r3 android-11.0.0_r17 android-10.0.0_r42 android-9.0.0_r30//只下载当前代码 
+⭐repo init --depth=1 -u git://mirrors.ustc.edu.cn/aosp/platform/manifest -b android-11.0.0_r9 android-11.0.0_r17  android-12.0.0_r3  android-10.0.0_r42 android-9.0.0_r30//只下载当前代码 
 git_command.py 增加日志输出，然后就能看到过程中使用的git指令
 
 
@@ -254,7 +259,6 @@ error: refs/tags/android-wear-9.0.0_r32 does not point to a valid object! 解决
 rm .git/refs/tags/android-wear-9.0.0_r32 .git/logs/refs/tags/android-wear-9.0.0_r32
 
 
-步骤三：
 \.repo\manifests\default.xml 修改地址 git://Android.git.linaro.org/ git://git.omapzoom.org 
 https://www.cnblogs.com/kobe8/p/3990297.html
 
@@ -312,8 +316,9 @@ free -m
 //查看内存，
 //Android 10 ，8G 内存，8G swap
 //Android 11 ，内存使用 4G 无法编译，编译应用层时候，飙到12GB，%UserProfile%\.wslconfig 调整 memory=12GB swap=16G
+ df -h //查看磁盘使用情况
 
-
+ make clobber
 source build/envsetup.sh
 lunch aosp_x86_64-eng //android 11（8.0不支持） aosp_x86_64-eng可以运行arm；其他名称https://source.android.google.cn/setup/build/running
 make -j`nproc` //如果卡住可能是内存不够用，可以用mma单独编译模块，看下错误
@@ -324,12 +329,82 @@ make -j`nproc` //如果卡住可能是内存不够用，可以用mma单独编译
 这种可行⭐编译后emulator aosp\out\target\product\generic_x86\里面的非文件夹 移动到 sdk\system-images\android-28\google_apis_playstore\x86；
 并修改 xxx-qemu.img 替换原来的xxx.img，⭐这点很重要，拷贝aosp\out\target\product\generic_x86\system\build.prop到generic_x86目录，创建启动
 
-关于x86运行arm，参考
+
+
+x86_64支持arm
+查找image
+https://github.com/eagletmt/android-repository-history/blob/master/repository/sys-img/google_apis_playstore/sys-img2-1.xml
+下载zip
+https://dl.google.com/android/repository/sys-img/google_apis_playstore/x86_64-30_r09-linux.zip
+https://dl.google.com/android/repository/sys-img/google_apis_playstore/x86_64-31_r02.zip
+解压system.img的super.img system文件夹，并执行以下命令，打包资源
+find system \( -name 'libndk_translation*' -o -name '*arm*' -o -name 'ndk_translation*' \) | tar -cf native-bridge.tar -T -
+
+关于x86运行arm，参考houdini(Android 9之前) 和 libndk_translation (android 11专有模块) 
 https://www.android-x86.org/
 https://gitlab.com/android-generic/android_vendor_google_emu-x86
 https://github.com/newbit1/libndk_translation_Module
 https://www.dazhuanlan.com/zty9301/topics/1331077
+https://dl.google.com/android/repository/ 镜像地址
+https://gerrit-googlesource.proxy.ustclug.org/
+https://chgans.design.blog/2021/05/23/adding-arm-native-bridge-to-the-aosp11-x86-emulator/
+https://android-developers.googleblog.com/2020/03/run-arm-apps-on-android-emulator.html?m=1
+https://github.com/geeks-r-us/anbox-playstore-installer
+https://developers.google.cn/android/images#oriole
+https://github.com/geeks-r-us/anbox-playstore-installer
+```makefile
 
+BUILD_ARM_FOR_X86 := true
+WITH_NATIVE_BRIDGE := true
+NDK_TRANSLATION_PREINSTALL := true
+
+TARGET_SUPPORTS_32_BIT_APPS := true
+TARGET_SUPPORTS_64_BIT_APPS := true
+# If native bridge is bundled with the system, indicate support for ARM ABIs
+ifeq ($(WITH_NATIVE_BRIDGE), true)
+    NATIVE_BRIDGE_ABI_LIST_32_BIT := armeabi-v7a armeabi
+    NATIVE_BRIDGE_ABI_LIST_64_BIT := arm64-v8a
+endif
+
+# Add ARM to supported ABIs
+ifeq ($(TARGET_ARCH),x86_64)
+    TARGET_2ND_CPU_ABI2 := armeabi-v7a
+    TARGET_CPU_ABI_LIST_32_BIT := $(TARGET_2ND_CPU_ABI) $(NATIVE_BRIDGE_ABI_LIST_32_BIT)
+else
+    TARGET_CPU_ABI2 := armeabi-v7a
+    TARGET_CPU_ABI_LIST_32_BIT := $(TARGET_CPU_ABI) $(NATIVE_BRIDGE_ABI_LIST_32_BIT)
+endif
+
+ifneq ($(WITH_NATIVE_BRIDGE), true)
+    PRODUCT_BUILD_PROP_OVERRIDES += TARGET_CPU_ABI2=
+endif
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.dalvik.vm.isa.arm=x86 \
+    ro.dalvik.vm.isa.arm64=x86_64 \
+    ro.enable.native.bridge.exec=1 \
+    ro.dalvik.vm.native.bridge=libndk_translation.so
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES := \
+    ro.dalvik.vm.native.bridge=libndk_translation.so
+
+PRODUCT_COPY_FILES += \
+	$(call find-copy-subdir-files,*,$(LOCAL_PATH)/google-ndk-translation,$(TARGET_COPY_OUT_SYSTEM))
+```
+编译自定义属性
+ ：
+``` makefile
+
+2) build/tools/buildinfo.sh;
+3) $(TARGET_DEVICE_DIR)/system.prop的内容追加到build.prop;
+4) 在build/target/product/core.mk
+ADDITIONAL_BUILD_PROPERTIES或PRODUCT_PROPERTY_OVERRIDES
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.dalvik.vm.isa.arm=x86 \
+    ro.dalvik.vm.isa.arm64=x86_64 \
+    ro.enable.native.bridge.exec=1 \
+    ro.dalvik.vm.native.bridge=libndk_translation.so
+```
 
 模块编译
 find  frameworks -name Android.mk
@@ -368,7 +443,7 @@ ro.enable.native.bridge.exec=1
 
 
 ⭐.\sdk-ndk\emulator\emulator.exe -avd Nexus_5_API_28 -writable-system  
-
+D:\Program\Android\sdk-ndk\emulator\qemu\windows-x86_64\qemu-system-x86_64.exe: WHPX: Unexpected VP exit code 4 需要使用system-qemu.img镜像
 
 user	                                              userdebug	                       eng
 仅安装标签为 user 的模块	               安装标签为 user、debug 的模块	          安装标签为 user、debug、eng 的模块

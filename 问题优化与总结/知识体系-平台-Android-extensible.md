@@ -647,8 +647,9 @@ Provider装饰工厂类，管理生成的类
 
 ## 可维护性/通讯 - 架构之模块化（插件化及组件化）
 
-模块化 maven  复用，解耦，协同；代码，业务，团队
-组件化 gradle lib独立运行，提升了编译速度
+模块化 maven  复用，解耦，协同；代码，业务，团队；baseLib,businessLib,ResLib
+组件化 gradle lib 独立运行，提升了编译速度
+插件化 resource classloader/
 
 
 插件化（反射；接口；HOOK IActivityManager/Instrumentation+动态代理）
@@ -673,3 +674,9 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 https://github.com/6thsolution/EasyMVP
 
  https://github.com/jdqm/GradleTansform.git 
+
+
+ ## Android App Bundle模块化
+
+ [层级](https://cloud.tencent.com/developer/article/1159830)
+ [Android App Bundle实现 Qigsaw](https://github.com/iqiyi/Qigsaw)

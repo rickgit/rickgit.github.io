@@ -1,9 +1,10 @@
 echo "sdk.dir=D\\:\\\\Program\\\\Android\\\\sdk-ndk
-ndk.dir=D\\:\\\\Program\\\\Android\\\\sdk-ndk\\\\ndk-bundle
+
 " > local.properties
 echo 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
 android.useAndroidX=true
-android.enableJetifier=true' > gradle.properties
+android.enableJetifier=true
+kotlin.code.style=official' > gradle.properties
 echo 'buildscript {
     repositories {
 //        mavenCentral	https://maven.aliyun.com/repository/central
@@ -24,8 +25,8 @@ echo 'buildscript {
         jcenter()
     }
     dependencies {
-      classpath "com.android.tools.build:gradle:4.1.3"
-	   classpath "com.dorongold.plugins:task-tree:2.1.0"
+      classpath "com.android.tools.build:gradle:7.1.1"
+      classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10"
     }
 }
 allprojects {
@@ -45,6 +46,9 @@ allprojects {
         //maven { url "http://maven.aliyun.com/nexus/content/repositories/gradle-plugin" }
         google()
         jcenter()
+        maven {
+            url "file://./file/repos"
+        }
     }
 }
 
@@ -60,29 +64,31 @@ mkdir  -p 'app/src/main/'
 
 echo 'apply plugin: "com.android.application"
 android{
-      compileSdkVersion 30
-      buildToolsVersion "30.0.3"
-      defaultConfig {
-            applicationId "edu.ptu.java.javaproj"
-            minSdkVersion 16
-            targetSdkVersion 30
-            versionCode 1
-            versionName "1.0"
-            flavorDimensions "default"
-            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+    defaultConfig {
+        applicationId "edu.ptu.java.javaproj"
+        minSdkVersion 16
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+        flavorDimensions "default"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-            externalNativeBuild {
-                cmake {
-                    cppFlags ""
-                }
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
             }
-      }
-      externalNativeBuild {
+        }
+    }
+    externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"
             version "3.10.2"
         }
     }
+    ndkPath "D:/Program/Android/sdk-ndk/ndk-bundle"
+    ndkVersion "23.1.7779620"
 }
 dependencies {
   implementation "androidx.appcompat:appcompat:1.1.0"
@@ -184,22 +190,114 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }' > 'app/src/main/cpp/native-lib.cpp'
 
+
+mkdir  -p 'KotlinAarLib/src/main/java'
+echo 'plugins {
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
+}
+
+android {
+    compileSdkVersion 31
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 31
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            //proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+configurations.all {
+    resolutionStrategy {
+        force "androidx.core:core:1.6.0"
+    }
+}
+dependencies {
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation "androidx.appcompat:appcompat:1.3.0"
+    implementation "com.google.android.material:material:1.4.0"
+}
+'> 'KotlinAarLib/build.gradle'
+echo '<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="edu.ptu.java.kotlinaarlib">
+</manifest>' > 'KotlinAarLib/src/main/AndroidManifest.xml'
+
 mkdir -p 'lib/src/main/java'
 echo 'plugins {
     id "java-library"
+    id "maven-publish"
 }
 dependencies {
-    implementation("com.android.tools.build:gradle:4.1.3")
+    implementation("com.android.tools.build:gradle:7.1.1")
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
+// uploadArchivesToLocal {
+//     repositories {
+//         mavenDeployer {
+//             //提交到远程服务器：
+//             // repository(url: "http://www.xxx.com/repos") {
+//             //    authentication(userName: "admin", password: "admin")
+//             // }
+//             //本地的Maven地址设置为D:/repos
+//             pom.groupId = "edu.ptu.java.gradleplugin"
+//             pom.artifactId = "appt2-fix"
+//             pom.version = "1.0.0"
+//             repository(url: uri("../file/repos"))
+//         }
+//     }
+// }
+
+publishing  {
+    repositories {
+        maven {
+            url = file("../file/repos")
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = "edu.ptu.java.gradleplugin"
+            artifactId = "appt2-fix"
+            version = "1.0.0"
+        }
+    }
+}
 ' > 'lib/build.gradle'
 
 
+mkdir -p 'kotlinLib/src/main/java'
+echo 'plugins {
+    id "java-library"
+    id "org.jetbrains.kotlin.jvm"
+}
+dependencies {
+    implementation("com.android.tools.build:gradle:7.1.1")
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+' > 'kotlinLib/build.gradle'
+
 echo 'include ":app"
 include ":lib"
+include ":kotlinLib"
 ' > settings.gradle
 
 gradle wrapper

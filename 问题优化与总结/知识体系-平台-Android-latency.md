@@ -2852,6 +2852,11 @@ public class LocationManagerService extends ILocationManager.Stub {
  
 
 ##### SystemUI通讯
+
+从显示数据阅读：
+WindowManager.LayoutParams.TYPE_
+
+
 ```java
 1. 
 com.android.systemui.statusbar.policy.BatteryControllerImpl
@@ -3872,7 +3877,7 @@ dx --dex --output=Hello.dex Hello.class
 ```
 
 #### NDK
-
+[android ndk模块](https://www.cnblogs.com/sjjg/p/14617031.html)
 ```md
 GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
 
