@@ -1927,7 +1927,7 @@ View 白板：
          1. 
             setARGB，Shader着色器（位图，渐变，。。。），颜色过滤器，遮罩，setShadowLayer阴影，
             setShader（BitmapShader，LinearGradient，RadialGradient，SweepGradient，ComposeShader）着色器
-            setColorFilter 颜色过滤（LightingColorFilter、PorterDuffColorFilter ， ColorMatrixColorFilter）
+            setColorFilter 颜色过滤（LightingColorFilter、PorterDuffColorFilter ， ColorMatrixColorFilter,BlendModeColorFilter）
             setBlendMode 颜色混合模式（CLEAR，SRC，DST，SRC_OVER，DST_OVER，SRC_IN，DST_IN，SRC_OUT，DST_OUT，SRC_ATOP，。。）
             setDither 颜色抗抖动/
             setMaskFilter（BlurMaskFilter模糊，EmbossMaskFilter浮雕）遮罩
