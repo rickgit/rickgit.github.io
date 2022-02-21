@@ -3,8 +3,8 @@
 <<Design Patterns>> <<Enterprise Integration Patterns>> <<Code Complete>> <<POSA>>
 
 1. 三大通用原则
-KISS （高效化）
 DRY 不要写重复的代码
+KISS （高效化）
 
 YAGNI 
   (关注分离，面向维护者代码，避免过早优化）
@@ -20,7 +20,7 @@ YAGNI
   分层
     MVC MVP（依赖抽象view方法接口，变异移植） MVI（回调用状态表示，view只负责更新）
     LoD（迪米特法则 模块间，尽量只依赖必要的接口，不同项目平台有多种实现）
-      IoC（模块间，OOAD控制反转[依赖注入 ， “依赖查找”]，配置大于反射） 
+      IoC（模块间，OOAD控制反转[依赖注入 ， “依赖查找”]，配置大于反射）
       CARP（模块间，属OOAD，合成/聚合）
   非对称分层
     CQRS  命令-查询分离原则（content provider）

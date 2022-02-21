@@ -454,11 +454,54 @@ user	                                              userdebug	                   
 打开 Proguard 混淆器	                          打开 Proguard 混淆器            	 关闭 Proguard 混淆器
 打开 DEXPREOPT 预先编译优化	                      打开 DEXPREOPT 预先编译优化	      关闭 DEXPREOPT 预先编译优化
 
+
+
+
+https://github.com/remote-android/redroid-doc
+sudo modprobe binfmt_misc
+
+
+ro.product.cpu.abilist=x86_64,arm64-v8a,x86,armeabi-v7a,armeabi
+ro.product.cpu.abilist64=x86_64,arm64-v8a
+ro.product.cpu.abilist32=x86,armeabi-v7a,armeabi
+ro.dalvik.vm.isa.arm=x86
+ro.dalvik.vm.isa.arm64=x86_64
+ro.enable.native.bridge.exec=1
+ro.dalvik.vm.native.bridge=libndk_translation.so
+ro.ndk_translation.version=0.2.2
+[genymotion_arm_translation](https://gitcode.net/mirrors/m9rco/genymotion_arm_translation)
 ### 系统签名
 1. 编译signapk.jar ,**make signapk**
 2. 拷贝/build/target/product/security/中，**platform.pk8 platform.x509.pem**
-3. 执行系统签名 **java -jar signapk.jar  platform.x509.pem platform.pk8　old.apk new.apk**
+3. 执行系统签名 **java -Djava.library.path=. java -jar signapk.jar  platform.x509.pem platform.pk8　old.apk new.apk** 
+    //-Djava.library.path=. 放out/host/linux-x86/lib64/libconscrypt_openjdk_jni.so
+    //out/host/linux-x86/framework/signapk.jar
+    //build/target/product/security/platform.x509.pem 或者 https://github.com/aosp-mirror/platform_build/tree/master/target/product/security
+    //build/target/product/security/platform.pk8 
+4. 转化签名文件后，签名不一样，未能成功安装
 
+
+```java
+//window wsl下， /bin/bash^M: bad interpreter: No such file or directory
+sed -i -e 's/\r$//' keytool-importkeypair
+./keytool-importkeypair -k sign-system11.keystore -p android（密钥密码） -pk8 platform.pk8 -cert platform.x509.pem -alias platform（密钥别名） // 生成 sign-system11.keystore
+keyAlias 'platform'
+keyPassword 'android'
+storePassword 'android'
+
+或者下面三条命令
+1.openssl pkcs8 -inform DER -nocrypt -in platform.pk8 -out platform.pem
+2.sudo openssl pkcs12 -export -in platform.x509.pem -out platform.p12 -inkey platform.pem -password pass:key密码 -name key别名
+3.keytool -importkeystore -deststorepass key密码 -destkeystore keystore名称 -srckeystore ./platform.p12 -srcstoretype PKCS12 -srcstorepass key密码
+```
+
+keytool -list -v -keystore sign-system11.keystore（密钥文件） -storepass android（密码）//检查签名
+
+//v1 签名
+java -jar jarsigner.jar -verbose -keystore sign-system11.keystore（密钥文件） -storepass android（密码） -signedjar %1_signed（生成文件） -digestalg SHA1（摘要算法） -sigalg MD5withRSA（签名算法） %1（输入文件） platform（别名） //v1签名
+
+//v3 签名
+D:\program\Android\android-sdk\build-tools\30.0.3\apksigner.bat sign -verbose --ks sign-system11.keystore --v1-signing-enabled false --v2-signing-enabled false --v3-signing-enabled true --ks-pass pass:android --ks-key-alias platform --key-pass pass:android --out systemui.apk_signed --in systemui.apk
 
 
 
