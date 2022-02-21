@@ -2855,6 +2855,7 @@ public class LocationManagerService extends ILocationManager.Stub {
 
 从显示数据阅读：
 WindowManager.LayoutParams.TYPE_
+.setTitle("
 
 
 ```java
@@ -3877,6 +3878,39 @@ dx --dex --output=Hello.dex Hello.class
 ```
 
 #### NDK
+libc/libm/libdl	C 库	-	 
+libc++_shared.so/libc++_static.a	c++库，前者动态，后者静态。支持c++17	- 	C++ 库支持
+liblog	android 日志	3	日志记录
+libz	Zlib 压缩库。	3	 Zlib 压缩库
+libGLESv1_CM/libGLESv2/libGLESv3/	OpenGL ES	  
+libEGL	 	9	EGL 原生平台接口
+libvulkan	高性能三维图形渲染库，低开销、跨平台 	24 
+libjnigraphics	访问 Java Bitmap 库	8	位图 API 参考文档
+libsync	同步api	26	同步 API 参考文档
+libcamera2ndk	原生相机 API	24	相机 API 参考文档
+libmediandk	媒体 API	 -	媒体 API 参考文档
+libOpenMAXAL	基于 Khronos Group OpenMAX AL 1.0.1 API	14	 
+libandroid	 android平台api，支持的操作如下：
+    资源
+    Choreographer
+    配置
+    输入
+    Looper
+    原生 Activity
+    原生硬件缓冲区
+    原生窗口
+    内存
+    网络
+    传感器
+    存储
+    SurfaceTexture
+libnativewindow	原生窗口功能 
+<android/hardware_buffer.h>	硬件缓冲区 API	-	 
+libaaudio	原生音频 API	26	AAudio API 指南
+libOpenSLES	另一个原生音频库,从api9开始支持pcm	9	面向 Android 的 OpenSL ES 指南
+libneuralnetworks	设备端机器学习库 	27 	神经网络指南
+ android/sdk/ndk/22.1.7171670/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/
+
 [android ndk模块](https://www.cnblogs.com/sjjg/p/14617031.html)
 ```md
 GCC 就是把内核的源代码输出成二进制代码而已。生成的二进制代码不存在 GCC 的内容。GCC 只是根据程序源代码计算出来二进制代码。新 GCC ，可能会有新的语法检查，导致旧版本的内核无法符合“新规范”而报错，有的时候新 GCC 也会引入新的编译参数，新内核用新的参数，会导致旧的 GCC 无法识别对应的参数来进行编译。
@@ -3962,6 +3996,8 @@ GC Root :
 栈：ActivityThread的activitys，Handler使用WeakReference持有activity引用
 本地方法栈：File，Cursor，WebView
 
+
+https://github.com/KwaiAppTeam/KOOM
 #### GC
 Reference
 Lrucache,Bitmap

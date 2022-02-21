@@ -1901,6 +1901,25 @@ Median-cut
 量化
     ColorCutQuantizer，ColorCutQuantizer#approximateToRgb888(int)量化argb值，分块获取到值
 ### 多媒体控件
+View/SurfaceView/TexureView/GLSurfaceView
+    [圆角](https://github.com/zladnrms/RoundableLayout)
+    饼状图，柱状图，雷达图,折线图
+TextView  moreText/富文本
+    https://github.com/noowenz/ShowMoreLess
+    [手写文字](https://github.com/sarnavakonar/TextWriter)
+    [数学](https://github.com/gregcockroft/AndroidMath)
+ImageView 圆角
+EditText 格式化文本，tip
+ScrollView 滑动效率低
+ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载，可固定/可展开，divider，cache，编辑/删除/
+GridView match_parent
+    [可拖动](https://github.com/huxq17/HandyGridView)
+dialog/alertDialog/popwindow 
+    加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
+viewpager 
+    画廊
+progressbar
+
 图表：走势图，圆盘刻度
 多媒体：颜色，文本，图片，音视频；
 #### Bitmap

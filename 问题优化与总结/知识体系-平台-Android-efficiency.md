@@ -331,7 +331,7 @@ make -j`nproc` //如果卡住可能是内存不够用，可以用mma单独编译
 
 
 
-x86_64支持arm
+### x86_64支持arm
 查找image
 https://github.com/eagletmt/android-repository-history/blob/master/repository/sys-img/google_apis_playstore/sys-img2-1.xml
 下载zip
@@ -404,6 +404,23 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.dalvik.vm.isa.arm64=x86_64 \
     ro.enable.native.bridge.exec=1 \
     ro.dalvik.vm.native.bridge=libndk_translation.so
+```
+
+
+
+
+#### 一定要使用 google api镜像，才能root
+```
+https://github.com/newbit1/rootAVD
+ emulator -avd Pixel_2_API_30_x86_64_api -writable-system
+
+ adb root
+ adb shell avbctl disable-verification
+ adb disable-verity
+ adb reboot
+ adb root
+ adb remount
+ adb shell
 ```
 
 模块编译

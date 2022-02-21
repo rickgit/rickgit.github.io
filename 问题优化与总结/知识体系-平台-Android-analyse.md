@@ -1,7 +1,15 @@
 # 可分析
 https://developer.android.google.cn/studio/debug/am-logcat?hl=el
 https://developer.android.google.cn/topic/performance/vitals/launch-time?hl=zh-cn
+
+## 界面调试
+
+uetool/
+布局分析 https://github.com/Grigory-Rylov/android-layout-inspector
+投屏工具——scrcpy
 ## 调试工具
+java 二进制修改 https://github.com/Col-E/Recaf
+
 
 adb shell input keyevent   
 ```java
