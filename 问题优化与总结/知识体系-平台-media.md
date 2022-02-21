@@ -1964,7 +1964,7 @@ View 白板：
             文本测量，文本截断，
          4. 
             setFilterBitmap 图片滤波/图片放大防止马赛克
-            setXfermode （❌AvoidXfermode, ❌PixelXorXfermode和PorterDuffXfermode）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
+            setXfermode （❌AvoidXfermode, ❌PixelXorXfermode 和 PorterDuffXfermode ）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
 TextView,ImageView
 SurfaceView,GlSurfaceView,TextureView,SurfaceTexture,VideoView
 
