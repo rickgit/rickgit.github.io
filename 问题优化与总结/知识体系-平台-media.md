@@ -1916,6 +1916,7 @@ GridView match_parent
     [可拖动](https://github.com/huxq17/HandyGridView)
 dialog/alertDialog/popwindow 
     加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
+    选择器（日期，时间，单选/文件，颜色，城市多级联动）
 viewpager 
     画廊
 progressbar

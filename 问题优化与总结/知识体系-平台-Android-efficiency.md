@@ -458,7 +458,7 @@ ro.enable.native.bridge.exec=1
 //PIXEL模拟器需要注意 先替换system-images，判断是否模式正确**getprop | grep product.build.type 是否是eng模式**
 //超级权限，adb root;adb remount后，可以push SystemUI.apk到 /system/priv-app/SystemUI/SystemUI.apk
 
-
+.\avdmanager.bat create avd -n Pixel_2_API_30_api  -k "system-images;android-30;google_apis;x86_64"
 ⭐.\sdk-ndk\emulator\emulator.exe -avd Nexus_5_API_28 -writable-system  
 D:\Program\Android\sdk-ndk\emulator\qemu\windows-x86_64\qemu-system-x86_64.exe: WHPX: Unexpected VP exit code 4 需要使用system-qemu.img镜像
 
@@ -469,7 +469,7 @@ user	                                              userdebug	                   
  	 	                                                                            设定属性 ro.kernel.android.checkjni=1，启用 JNI 调用检查
 默认关闭 adb 功能	                              默认打开 adb 功能	                 默认打开 adb 功能
 打开 Proguard 混淆器	                          打开 Proguard 混淆器            	 关闭 Proguard 混淆器
-打开 DEXPREOPT 预先编译优化	                      打开 DEXPREOPT 预先编译优化	      关闭 DEXPREOPT 预先编译优化
+打开 DEXPREOPT 预先编译优化	                       打开 DEXPREOPT 预先编译优化	      关闭 DEXPREOPT 预先编译优化
 
 
 
