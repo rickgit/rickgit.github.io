@@ -1908,18 +1908,28 @@ TextView  moreText/富文本
     https://github.com/noowenz/ShowMoreLess
     [手写文字](https://github.com/sarnavakonar/TextWriter)
     [数学](https://github.com/gregcockroft/AndroidMath)
+    两端对齐，文字竖排
 ImageView 圆角
 EditText 格式化文本，tip
+    禁用emoji
 ScrollView 滑动效率低
-ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载，可固定/可展开，divider，cache，编辑/删除/
+    [边缘滚动](https://github.com/woxingxiao/BounceScrollView)
+ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载，分组/可固定/可展开，divider，cache，编辑/删除/
+
+recyclerlayout
+    [循环](https://github.com/BeksOmega/looping-layout)
 GridView match_parent
     [可拖动](https://github.com/huxq17/HandyGridView)
 dialog/alertDialog/popwindow 
     加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
     选择器（日期，时间，单选/文件，颜色，城市多级联动）
+    底部对话框
 viewpager 
     画廊
 progressbar
+
+录音
+    https://github.com/shaoshuai904/RecordWav
 
 图表：走势图，圆盘刻度
 多媒体：颜色，文本，图片，音视频；
