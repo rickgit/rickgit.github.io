@@ -338,7 +338,7 @@ https://github.com/eagletmt/android-repository-history/blob/master/repository/sy
 https://dl.google.com/android/repository/sys-img/google_apis_playstore/x86_64-30_r09-linux.zip
 https://dl.google.com/android/repository/sys-img/google_apis_playstore/x86_64-31_r02.zip
 解压system.img的super.img system文件夹，并执行以下命令，打包资源
-find system \( -name 'libndk_translation*' -o -name '*arm*' -o -name 'ndk_translation*' \) | tar -cf native-bridge.tar -T -
+find /system \( -name 'libndk_translation*' -o -name '*arm*' -o -name 'ndk_translation*' \) | tar -cf native-bridge.tar -T -
 
 关于x86运行arm，参考houdini(Android 9之前) 和 libndk_translation (android 11专有模块) 
 https://www.android-x86.org/

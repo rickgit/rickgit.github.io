@@ -1651,6 +1651,8 @@ xml传输，二进制需要转化Base64
 
 ## 本地存储
 网络,SQLite数据库,方式文件存储,SharedPreferences/MMKV,内容提供器（Content provider）
+
+[FastSharedPreferences](https://github.com/JeremyLiao/FastSharedPreferences)
 ContentProvider->保存和获取数据，并使其对所有应用程序可见
 ## Sqlite
 ``` sql
