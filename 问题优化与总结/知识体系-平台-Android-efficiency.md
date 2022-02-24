@@ -352,6 +352,8 @@ https://android-developers.googleblog.com/2020/03/run-arm-apps-on-android-emulat
 https://github.com/geeks-r-us/anbox-playstore-installer
 https://developers.google.cn/android/images#oriole
 https://github.com/geeks-r-us/anbox-playstore-installer
+
+[Enable libndk_translation in waydroid.](https://purplepalmdash.github.io/page/5/)
 ```makefile
 
 BUILD_ARM_FOR_X86 := true
@@ -543,9 +545,9 @@ fastboot flashall -w
 #### adb root 模拟器
 adbd cannot run as root in production builds
 不能root
-    Pixel_2_API_28(**Google Play**) 
+    Pixel_2_API_28(**Google Play use**) 
 可以root
-    Pixel_2_API_28(**Google APIs**)
+    Pixel_2_API_28(**Google APIs userdebug**)
 emulator.exe -avd Pixel_2_API_28  -writable-system  -selinux disabled
 ### 包内精简 - APK打包 （编译，打包，优化，签名，安装）
 [包大小](https://mp.weixin.qq.com/s/_gnT2kjqpfMFs0kqAg4Qig?utm_source=androidweekly.io&utm_medium=website)
@@ -669,21 +671,21 @@ afterEvaluate {
 制造商，CPU型号，品牌及型号，编译标识	，系统版本号，系统SDK版本
 adb shell getprop | grep product
 ```
-[ro.build.product]: [aud8112s801s]
-[ro.product.board]: [SR801S]
-[ro.product.brand]: [iReader]
+[ro.build.product]: []
+[ro.product.board]: []
+[ro.product.brand]: []
 [ro.product.cpu.abi]: [armeabi-v7a] CPU型号
-[ro.product.device]: [SR801S]
+[ro.product.device]: []
 [ro.product.first_api_level]: [28]
 [ro.product.locale]: [zh-CN]
 [ro.product.manufacturer]: [alps] 硬件/主板制造商
-[ro.product.model]: [Smart Xs] 型号
-[ro.product.name]: [SR801S]
-[ro.product.vendor.brand]: [ireader] 品牌
-[ro.product.vendor.device]: [aud8112s801s]
+[ro.product.model]: [] 型号
+[ro.product.name]: []
+[ro.product.vendor.brand]: [] 品牌
+[ro.product.vendor.device]: []
 [ro.product.vendor.manufacturer]: [alps] 
-[ro.product.vendor.model]: [aud8112s801s]
-[ro.product.vendor.name]: [full_aud8112s801s]
+[ro.product.vendor.model]: []
+[ro.product.vendor.name]: []
 [ro.build.id]: [PQ2A.190405.003] 编译版本号
 [ro.build.version.release]: [9]  系统版本号
 [ro.build.version.sdk]: [28]     系统版本值
