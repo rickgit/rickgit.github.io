@@ -1902,6 +1902,8 @@ Median-cut
     ColorCutQuantizer，ColorCutQuantizer#approximateToRgb888(int)量化argb值，分块获取到值
 ### 多媒体控件
 View/SurfaceView/TexureView/GLSurfaceView
+    view 
+        background,padding,scroller/阴影,焦点/按压/按键/滚动
     [圆角](https://github.com/zladnrms/RoundableLayout)
     饼状图，柱状图，雷达图,折线图
     解锁
@@ -1995,6 +1997,8 @@ View 白板：
          4. 
             setFilterBitmap 图片滤波/图片放大防止马赛克
             setXfermode （❌AvoidXfermode, ❌PixelXorXfermode 和 PorterDuffXfermode ）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
+canvas
+    quickReject 判断是否相交
 TextView,ImageView
 SurfaceView,GlSurfaceView,TextureView,SurfaceTexture,VideoView
 
