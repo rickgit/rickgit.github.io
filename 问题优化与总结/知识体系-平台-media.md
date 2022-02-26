@@ -1904,32 +1904,51 @@ Median-cut
 View/SurfaceView/TexureView/GLSurfaceView
     [圆角](https://github.com/zladnrms/RoundableLayout)
     饼状图，柱状图，雷达图,折线图
+    解锁
+    OCR/myscript
 TextView  moreText/富文本
     https://github.com/noowenz/ShowMoreLess
     [手写文字](https://github.com/sarnavakonar/TextWriter)
     [数学](https://github.com/gregcockroft/AndroidMath)
     两端对齐，文字竖排
+    滚动文本
 ImageView 圆角
+    图片预览 https://github.com/yangchaojiang/ZoomPreviewPicture-
+    二维码识别生成
 EditText 格式化文本，tip
     禁用emoji
 ScrollView 滑动效率低
     [边缘滚动](https://github.com/woxingxiao/BounceScrollView)
 ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载，分组/可固定/可展开，divider，cache，编辑/删除/
-
+    多选项卡/多类型界面/选择模式/拖拽侧滑/头脚布局/伸缩/下拉刷新上拉加载/分页刷新/缺省页
+    下拉刷新、加载更多、item点击/长按、头布局/尾布局/状态布局、万能分割线、粘性Header、
+    上下拉刷新、越界回弹、二级刷新、横向刷新、拉伸回弹、平滑滚动、嵌套滚动
 recyclerlayout
     [循环](https://github.com/BeksOmega/looping-layout)
 GridView match_parent
     [可拖动](https://github.com/huxq17/HandyGridView)
+    [table](https://github.com/RmondJone/LockTableView)
 dialog/alertDialog/popwindow 
     加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
     选择器（日期，时间，单选/文件，颜色，城市多级联动）
     底部对话框
+    [悬浮球](https://github.com/yhaolpz/FloatWindow)
+    [弹幕](https://github.com/hpdx/DanmukuLight)
 viewpager 
-    画廊
+    画廊，指示器
 progressbar
+
+动画
+    飘心https://github.com/kaisengao/KsgLikeView
 
 录音
     https://github.com/shaoshuai904/RecordWav
+    https://github.com/Jay-Goo/WaveLineView 录音波浪线
+
+https://github.com/CainKernel/CainCamera
+实时美颜、动态滤镜、动态贴纸、彩妆、拍照、短视频分段录制与回删、图片编辑、短时频编辑与合成
+https://github.com/byteflap/BPShortVideoSample
+https://github.com/HamidrezaAmz/MagicalExoPlayer
 
 图表：走势图，圆盘刻度
 多媒体：颜色，文本，图片，音视频；

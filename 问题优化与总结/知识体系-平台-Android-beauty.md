@@ -22,13 +22,21 @@ am_crash
 [参考](./知识体系-平台-Android-latency.md)
 
 ## 设备适配
+
+### 刘海屏
+https://github.com/zhangzhun132/NotchTools
 ### 屏幕适配
 
 adb shell uiautomator dump /sdcard/ui.xml
 
+
+通过Theme实现(attrs.xml+styles.xml+Activity.setTheme())
 ### 屏幕旋转 
 adb shell settings put system accelerometer_rotation 0  #disable auto-rotate
 adb shell settings put system user_rotation 3  #270° clockwise
+
+
+https://github.com/akexorcist/ScreenOrientationHelper
 ### 屏幕参数
 > 屏幕尺寸：手机对角线的物理大小，单位为英寸（inch），1英寸=2.54cm，Android手机常见的尺寸有5寸、5.5寸、6寸等等
 

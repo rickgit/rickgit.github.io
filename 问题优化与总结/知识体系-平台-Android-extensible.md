@@ -669,7 +669,11 @@ Activity校验，生命周期，Service优先级，资源访问，so插件化
 3. 路由 （ARouter）
    Dagger2 依赖注入控制反转，Dagger 2 是 Java 和 Android 下的一个完全静态、编译时生成代码的依赖注入框架
 
+组件化方案
+支持组件的代码资源隔离、单独调试、集成调试、组件交互、UI跳转、生命周期等完整功能。
+https://github.com/mqzhangw/JIMU
 
+[](https://github.com/darryrzhong/Android-MvvmComponent-App)
 ### 
 https://github.com/6thsolution/EasyMVP
 
