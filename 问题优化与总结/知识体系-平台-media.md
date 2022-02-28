@@ -1949,10 +1949,11 @@ progressbar
 录音
     https://github.com/shaoshuai904/RecordWav
     https://github.com/Jay-Goo/WaveLineView 录音波浪线
-视频
+VideoView
     https://github.com/ddssingsong/webrtc_android
 
     视频拼接，转码，压缩，裁剪，片头片尾，分离音视频，变速，添加静态贴纸和gif动态贴纸，添加字幕，添加滤镜，添加背景音乐，加速减速视频，倒放音视频，音频裁剪，变声，混音，图片合成视频，视频解码图片
+    [ijkplayer-java](https://github.com/Slice1129/ijkplayer-java)
 https://github.com/CainKernel/CainCamera
 实时美颜、动态滤镜、动态贴纸、彩妆、拍照、短视频分段录制与回删、图片编辑、短时频编辑与合成
 https://github.com/byteflap/BPShortVideoSample
