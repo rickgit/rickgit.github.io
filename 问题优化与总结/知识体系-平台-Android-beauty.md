@@ -215,6 +215,8 @@ https://kikakurui.com/x4/X4051-2004-02.html
 图文混排，背景处理，段落布局，文本两端对齐，文本两端对齐，查看图集，左右切换，黑夜/白天模式切换，文本复制，多栏布局，等很多和文字排版相关的内容
 
 八种视觉组织系统为：轴线式、放射式、涟漪式、随机式、网格式、行进式、模组式、双边对称式
+
+https://mp.weixin.qq.com/s/2Z1yhgwTXQWNfNMKAL8a1w
 #### 字体排印学
 https://design.tutsplus.com/articles/the-ultimate-guide-to-basic-typography--cms-33460
 字体样式，粗体，斜体

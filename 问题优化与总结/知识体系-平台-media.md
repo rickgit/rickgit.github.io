@@ -1915,8 +1915,9 @@ TextView  moreText/富文本
     两端对齐，文字竖排
     滚动文本
 ImageView 圆角
-    图片预览 https://github.com/yangchaojiang/ZoomPreviewPicture-
+    图片选择，预览，裁剪 https://github.com/yangchaojiang/ZoomPreviewPicture-
     二维码识别生成
+    个人中心
 EditText 格式化文本，tip
     禁用emoji
 ScrollView 滑动效率低
@@ -1925,6 +1926,7 @@ ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载
     多选项卡/多类型界面/选择模式/拖拽侧滑/头脚布局/伸缩/下拉刷新上拉加载/分页刷新/缺省页
     下拉刷新、加载更多、item点击/长按、头布局/尾布局/状态布局、万能分割线、粘性Header、
     上下拉刷新、越界回弹、二级刷新、横向刷新、拉伸回弹、平滑滚动、嵌套滚动
+    多状态布局，[视差效果](https://github.com/NanBox/ParallaxRecyclerView)
 recyclerlayout
     [循环](https://github.com/BeksOmega/looping-layout)
 GridView match_parent
@@ -1934,6 +1936,7 @@ dialog/alertDialog/popwindow
     加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
     选择器（日期，时间，单选/文件，颜色，城市多级联动）
     底部对话框
+    popwindow尖角偏移量
     [悬浮球](https://github.com/yhaolpz/FloatWindow)
     [弹幕](https://github.com/hpdx/DanmukuLight)
 viewpager 
@@ -1946,7 +1949,10 @@ progressbar
 录音
     https://github.com/shaoshuai904/RecordWav
     https://github.com/Jay-Goo/WaveLineView 录音波浪线
+视频
+    https://github.com/ddssingsong/webrtc_android
 
+    视频拼接，转码，压缩，裁剪，片头片尾，分离音视频，变速，添加静态贴纸和gif动态贴纸，添加字幕，添加滤镜，添加背景音乐，加速减速视频，倒放音视频，音频裁剪，变声，混音，图片合成视频，视频解码图片
 https://github.com/CainKernel/CainCamera
 实时美颜、动态滤镜、动态贴纸、彩妆、拍照、短视频分段录制与回删、图片编辑、短时频编辑与合成
 https://github.com/byteflap/BPShortVideoSample
