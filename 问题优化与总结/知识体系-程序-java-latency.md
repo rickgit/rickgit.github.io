@@ -1344,7 +1344,7 @@ MP3、M4A、WAV、AAC、FLAC、
 DOC、PPT、XLS、DOCX、XLSX、PPTX、DJVU、ZIP、AZW3
 JPG、JPEG、PNG、
 
-
+[PDF, EPUB, MOBI, DjVu, FB2, TXT, RTF, AZW, AZW3, HTML, CBZ, CBR, and OPDS](https://github.com/foobnix/LibreraReader)
 #### PDF
 
 https://github.com/PDFium/PDFium.git

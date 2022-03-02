@@ -190,3 +190,7 @@ jeb 调试反编译app
 ```
 [tinker](https://github.com/Tencent/tinker)
 
+
+
+[Systrace](https://www.androidperformance.com/2019/12/21/Android-Systrace-CPU/)
+[耗时方法统计](https://github.com/zhengcx/MethodTraceMan)

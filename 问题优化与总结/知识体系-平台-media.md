@@ -1908,6 +1908,10 @@ View/SurfaceView/TexureView/GLSurfaceView
     饼状图，柱状图，雷达图,折线图
     解锁
     OCR/myscript
+    [动画](https://github.com/MartinRGB/Animer)
+    [日历](https://github.com/Etar-Group/Etar-Calendar)
+    [图表](https://github.com/AnyChart/AnyChart-Android)
+    [Canvas.drawTextOnPath](https://github.com/kirill-grouchnikov/artemis)
 TextView  moreText/富文本
     https://github.com/noowenz/ShowMoreLess
     [手写文字](https://github.com/sarnavakonar/TextWriter)
@@ -1927,21 +1931,28 @@ ListView 界面缓存，viewHold缓存，header/footer 下拉刷新/上拉加载
     下拉刷新、加载更多、item点击/长按、头布局/尾布局/状态布局、万能分割线、粘性Header、
     上下拉刷新、越界回弹、二级刷新、横向刷新、拉伸回弹、平滑滚动、嵌套滚动
     多状态布局，[视差效果](https://github.com/NanBox/ParallaxRecyclerView)
+    [PageRecyclerView](https:/PageRecyclerView/github.com/ckrgithub/)
 recyclerlayout
     [循环](https://github.com/BeksOmega/looping-layout)
 GridView match_parent
     [可拖动](https://github.com/huxq17/HandyGridView)
     [table](https://github.com/RmondJone/LockTableView)
+    [可拖动](https://github.com/LightSun/android-drag-FlowLayout)
 dialog/alertDialog/popwindow 
-    加载中，提示框，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
+    加载中，提示框，分享，输入框, [键盘遮挡](https://github.com/yoyoyaobin/PreventKeyboardBlockUtil)
     选择器（日期，时间，单选/文件，颜色，城市多级联动）
     底部对话框
     popwindow尖角偏移量
     [悬浮球](https://github.com/yhaolpz/FloatWindow)
+    [FloatBall](https://github.com/huxq17/FloatBall)
     [弹幕](https://github.com/hpdx/DanmukuLight)
+    [](https://github.com/fenggit/FloatWindow)
 viewpager 
     画廊，指示器
 progressbar
+
+webview
+    监听异常error状态、支持视频播放并且可以全屏、支持加载word，xls，ppt，pdf，txt等文件文档、发短信、打电话、发邮件、打开文件操作上传图片、唤起原生App、x5库为最新版本
 
 动画
     飘心https://github.com/kaisengao/KsgLikeView
