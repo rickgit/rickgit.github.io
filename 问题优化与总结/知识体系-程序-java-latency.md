@@ -1345,6 +1345,8 @@ DOC、PPT、XLS、DOCX、XLSX、PPTX、DJVU、ZIP、AZW3
 JPG、JPEG、PNG、
 
 [PDF, EPUB, MOBI, DjVu, FB2, TXT, RTF, AZW, AZW3, HTML, CBZ, CBR, and OPDS](https://github.com/foobnix/LibreraReader)
+[txt,chm,htm,epub/opub,pdb,ebk2,ebk3,pdf/djvu,mobi,doc/xls/ppt,comic/picture/CBZ/CBR,azw3,umd]()
+[kobo-ereader](https://github.com/topics/kobo-ereader)
 #### PDF
 
 https://github.com/PDFium/PDFium.git

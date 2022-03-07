@@ -452,6 +452,9 @@ C++中提出了命名空间的概念：
 ```
 ### 交叉编译（cross compiler）
 
+[ 交叉编译 ](https://blog.csdn.net/LEON1741/article/details/81537529)
+
+
  [GCC Compilation Process（Build）](https://www3.ntu.edu.sg/home/ehchua/programming/cpp/gcc_make.html)
 ```
                          +
@@ -905,6 +908,12 @@ clang+llvm
 
 ## Linux 内核
 
+``` js
+
+nm XXX.a //函数，全局变量
+readelf -h XXX.a //OS，ABI，架构信息，类别（32/64位）等等
+
+```
 ### 系统调用定义
 声明：
 linux\include\asm-arm\unistd.h
