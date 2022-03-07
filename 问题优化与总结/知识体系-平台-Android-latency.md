@@ -3515,6 +3515,11 @@ Android 7.0
 
 ```
 ### Settings(/aosp/packages/app/settings，/aosp/frameworks/base/packages/SettingsLib)
+ 
+ android 11:
+ 数据：mWifiManager.getScanResults();
+ 界面 fragment/item: WifiSettings2 , LongPressWifiEntryPreference
+ BluetoothPairingDetail
 ##### WIFI
  
 adb shell am start -a android.net.wifi.PICK_WIFI_NETWORK --es "Message" "hello!"
