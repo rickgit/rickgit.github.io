@@ -3994,6 +3994,11 @@ Operation not permitted
 虽然是警告，但是可能导致文件不能拷贝。
 使用sudo ndk-build
 
+
+
+$(info  "打印日志")
+
+
 ```
 
 

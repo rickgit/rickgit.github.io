@@ -1359,6 +1359,14 @@ https://github.com/KnIfER/LibPDFium
 
 https://resources.infosecinstitute.com/topic/pdf-file-format-basic-structure/
 
+``` 
+pdfium:
+    Document(open close)
+        Page(load pagecount close  widthpixel heightpixel widthpoint heightpoint renderpage renderpagePitmap)
+            link(uri rect)
+        Metatext
+        Bookmark(firstchildBookmark title )
+```
 #### DjVuLibre
 http://djvu.sourceforge.net/
 https://github.com/barak/djvulibre
@@ -1386,3 +1394,13 @@ https://hub.fastgit.org/geometer/FBReader-Android-2/tree/master/fbreader/text-fo
 
 ⭐https://github.com/kkspeed/orion-mod
 
+```
+CPU架构	ABI	
+ARMv5	armeabi	32位，从2010年
+ARMv7	armeabi-v7a	32位，从2010年
+x86	x86	32位，从2011年
+MIPS	mips	32位，从2012年
+ARMv8	arm64-v8a	64位，从2014年
+MIPS64	mips64	64位，从2014年
+x86_64	x86_64	64位，从2014年
+```
