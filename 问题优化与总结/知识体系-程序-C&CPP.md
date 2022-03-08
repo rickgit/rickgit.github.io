@@ -501,9 +501,9 @@ CMake的是构建系统的生成器，CMake代表跨平台Make。
 |          |      GNU Debugger (GDB)                                                                     |
 |          +---------------------------------------------------------------------------------------------+
 |   GNU    |   GNU Binutils:                                                                             |
-|          |       GNU profiler  gprof    addr2line   dlltool   nlmconv   objdump   size	  windmc     |
+|          |       GNU profiler  gprof    addr2line   dlltool   nlmconv   objdump   size	  windmc       |
 |          |       linking         ld     ar          gold      nm        ranlib    strings   windres    |
-|toolchain |       GNU Assembler(as)      c++filt               objcopy   readelf   strip	             |
+|toolchain |       GNU Assembler(as)      c++filt               objcopy   readelf   strip	               |
 |          +---------------------------------------------------------------------------------------------+
 |          |    GNU Compiler Collection (GCC)                                                            |
 |          +-------------+-------------------------------------------------------------------------------+
@@ -643,7 +643,14 @@ struct  CTest
 };
 ```
  const char * 、char const *、 char * const 三者的区别
+ * 隔开声明
+  const char * 、char const * 一致，引用常量区字符串，可以修改指针不可修改数据
+  char * const 不可修改指针，可以修改数据
 
+  char s1[] 常量池栈中备份，地址不能变，数据可以变
+  char* s2  引用常量区，引用可变，数据不能变
+
+![](.\res\cppstr.png)
 存储类的关键字（如auto、extern、mutable、static、register等一样）
 
 
@@ -742,16 +749,16 @@ shared_ptr
 +---------------------------------+-------------------------+
 |                    |class type  | base type|   other      |
 +-----------------------------------------------------------+
-|  static_cast       |   √        |     √    |              |
+|  static_cast       |   √        |     √    |              |编译期间转换，会抛出一个编译错误
 |                    |            |          |              |
 +-----------------------------------------------------------+
-|  dynamic_cast      |   √        |          |              |
+|  dynamic_cast      |   √        |          |              |类继承层次间的类型安全的向下转型，运行时类型识别(RTTI)
 +-----------------------------------------------------------+
-|  reinterpert_cast  |            |          |  any pointer |
+|  reinterpert_cast  |            |          |  any pointer |高度危险的转换
 +-----------------------------------------------------------+
 |  const_cast        |            |          |  const       |
-|                    |            |          |  volatile    |
-|                    |            |          |  __unaligned |
+|                    |            |          |  volatile    | 字符串，用于 const 与非 const
+|                    |            |          |  __unaligned |volatile 与非 volatile 之间的转换
 |                    |            |          |              |
 +--------------------+------------+----------+--------------+
 
