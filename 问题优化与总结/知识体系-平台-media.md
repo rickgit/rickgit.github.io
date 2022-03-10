@@ -1918,10 +1918,12 @@ TextView  moreText/富文本
     [数学](https://github.com/gregcockroft/AndroidMath)
     两端对齐，文字竖排
     滚动文本
+    状态
 ImageView 圆角
     图片选择，预览，裁剪 https://github.com/yangchaojiang/ZoomPreviewPicture-
     二维码识别生成
     个人中心
+    状态标签
 EditText 格式化文本，tip
     禁用emoji
 ScrollView 滑动效率低
