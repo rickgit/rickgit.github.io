@@ -21,6 +21,16 @@
 操作：
     增改查，索引遍历，找排序，删销毁
 
+暴力枚举法
+分治法
+    减治法
+    变治法
+    分支限界法
+深度优先/广度优先
+贪婪法
+动态规划
+
+
 ### 可视化
 [](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html)
 《Intruduce arthrigsim》

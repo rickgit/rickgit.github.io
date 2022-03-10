@@ -1918,10 +1918,12 @@ TextView  moreText/富文本
     [数学](https://github.com/gregcockroft/AndroidMath)
     两端对齐，文字竖排
     滚动文本
+    状态
 ImageView 圆角
     图片选择，预览，裁剪 https://github.com/yangchaojiang/ZoomPreviewPicture-
     二维码识别生成
     个人中心
+    状态标签
 EditText 格式化文本，tip
     禁用emoji
 ScrollView 滑动效率低
@@ -2438,6 +2440,18 @@ openGL定义的是协议，暴露给开发者使用，其实现是显卡生产�
     Z
 ```
 ### OpenGL ES
+[API level](https://www.khronos.org/registry/OpenGL-Refpages/)
+``` js
+OpenGL ES版本	android:glEsVersion	ro.opengles.version
+OpenGL ES 1.0	0x00010000	65536
+OpenGL ES 1.1	0x00010001	65537
+OpenGL ES 2.0	0x00020000	131072
+OpenGL ES 3.0	0x00030000	196608
+OpenGL ES 3.1	0x00030001	196609
+OpenGL ES 3.2	0x00030002	196610
+
+https://developer.android.google.cn/guide/topics/graphics/opengl?hl=zh-cn
+```
 没有double类型
 删除了低效绘制图元的函数glBegin/glEnd/glVertex2f，只能用gldrawarray，gldrawelements绘图
 没有实时非压缩图片转化为贴图
@@ -2448,9 +2462,18 @@ gles没有glDrawBuffer和glReadBuffer接口，没法直接操纵前后缓冲区�
                 Android 1.6支持（核心是窗口库，gl还是显卡驱动实现），Pixelflinger是Android系统中为OpenGL ES引擎提供的一套软件渲染器（renderer）。
                 通过glTexSubImage2D函数直接将图像数据更新到颜色缓冲区中，功能跟glDrawPixels完全一致，避免走OpenGL流水线。
                 着色器语言有着两套标准：CM和CL，其中CL只支持定点数，而CM既支持定点数又支持浮点数
+                 删除了glBegin/glEnd、glArrayElement，
+                 使用 glDrawArrays 和 glDrawElements 两个接口绘制图元。顶点数组数据首先保存在 CPU 内存，进行绘制时，从 CPU 内存拷贝到显存
 2007年3月   OpenGl ES 2.0 可编程渲染管线，移除了很多固定管线的渲染流程，固定管线里那些材质参数、灯光参数都被shader所替代。
               由OpenGL 2.0裁剪，支持vertex,pixel shader。Android 2.2 底层渲染均由OpenGL负责
-2012年8月   OpenGL ES 3.0 Android 4.3 ，WebGL2.0就是基于OpenGLES3.0
+              ⭐VBO 和 EBO 的作用是在显存中提前开辟好一块内存，用于缓存顶点数据或者图元索引数据
+                    GL_ARRAY_BUFFER 标志指定的缓冲区对象用于保存顶点数组，
+                    GL_ELEMENT_ARRAY_BUFFER 标志指定的缓存区对象用于保存图元索引 
+                ⭐FBO glBindFramebuffer             
+2012年8月   OpenGL ES 3.0 ⭐Android 4.3 ，WebGL2.0就是基于OpenGLES3.0
+               新增了 glDrawRangeElements 、glDrawElementsInstanced 和 glDrawArraysInstanced
+               ⭐VAO 的主要作用是用于管理 VBO 或 EBO
+                    通过 glBindVertexArray 绑定VAO，减少 glBindBuffer、glEnableVertexAttribArray、 glVertexAttribPointer 调用
 2014年3月   OpenGL ES 3.1 Android 5
 2018年3月   Vulkan 1.1 正式版本，取代OpenGL和ES。Android 7.0。预编译Shaders
 
