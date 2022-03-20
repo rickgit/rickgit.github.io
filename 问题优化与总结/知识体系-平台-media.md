@@ -2013,12 +2013,14 @@ View 白板：
             setPathEffect（CornerPathEffect，DiscretePathEffect，DashPathEffect，PathDashPathEffect，ComposePathEffect，SumPathEffect）路径特效，
          3. 文本大小，缩放，倾斜度，对齐字体，
             setStrikeThruText删除线，下划线，setFakeBoldText粗体，
-            文本测量，文本截断，
+            文本测量，
+            breakText 文本截断，
          4. 
             setFilterBitmap 图片滤波/图片放大防止马赛克
             setXfermode （❌AvoidXfermode, ❌PixelXorXfermode 和 PorterDuffXfermode ）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
 canvas
     quickReject 判断是否相交
+    字幕 绘制字体，填充 setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
 TextView,ImageView
 SurfaceView,GlSurfaceView,TextureView,SurfaceTexture,VideoView
 

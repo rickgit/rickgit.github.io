@@ -181,7 +181,7 @@ UNTREEIFY_THRESHOLD = 6
     扩容，拆分红黑树，节点小于等于6
     remove，当前红黑树满足一定条件 (root.right == null  || root.left == null,|| root.left.left == null )
 
-取消树化：table小于64
+树化： 表大于64，和桶超过8个元素
 
 
 

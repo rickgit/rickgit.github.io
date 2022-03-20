@@ -44,7 +44,13 @@ Jit thread pool worker thread 0          	 RUNNABLE 	 5 	 Daemon
 
 
 ## Looper 封装线程
+Handler
+     Looper
+          MessageQueue
+     Callback
+     mAsynchronous
 
+ MessageQueue, Message（享元模式）
 
 简单工厂  Looper.prepare()
 单例      sThreadLocal每个线程一个单例

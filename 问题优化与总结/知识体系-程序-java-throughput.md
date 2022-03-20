@@ -2,6 +2,8 @@
 [芯片硬件手册](https://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-software-developer-vol-3a-part-1-manual.html)
 [](https://www.intel.cn/content/www/cn/zh/products/docs/processors/core/core-technical-resources.html)
 
+
+⭐Synchronized， CAS和volatile，AQS, Lock, Semphorare
 ### 缓存一致性问题
 1. 总线加锁（性能低）
 2. MESI 缓存一致性协议 和总线嗅探机制
