@@ -176,35 +176,35 @@ Android release模式（Flutter使用Core JIT 模式编译）
 
 ### 界面系统
 ```
-                                         +> Center
+                                         +- Center
                                          |
-                     +---> InlineSpan +--+
-                     |                   +->TextSpan
+                     +--- InlineSpan <--+
+                     |                   +- TextSpan
                      |
                      |
-DiagnosticableTree +-+----> Widget ++--> PreferredSizeWidget +-+->  AppBar
+DiagnosticableTree <+-+---- Widget ++--  PreferredSizeWidget <-+--  AppBar
                                     |                          |
-                                    |                          +->  TabBar
+                                    |                          +--  TabBar
                                     |
-                                    +--> ProxyWidget+---------+-->  ParentDataWidget
+                                    +--  ProxyWidget <--------+---  ParentDataWidget
                                     |                         |
-                                    |                         +-->  Positioned
+                                    |                         +---  Positioned
                                     |
-                                    +--> RenderObjectWidget +-+---> SliverWithKeepAliveWidget  +---> SliverMultiBoxAdaptorWidget  +-> SliverGrid
+                                    +--  RenderObjectWidget <-+---  SliverWithKeepAliveWidget  <---  SliverMultiBoxAdaptorWidget  +-  SliverGrid
                                     |                         |                                                                        SliverList
                                     |                         |
-                                    |                         +-->  SingleChildRenderObjectWidget++> DecoratedBox
-                                    |                         |                                   |                                   Center
-                                    |                         |                                   +>  Align +---------------------->  ClipRect
+                                    |                         +---  SingleChildRenderObjectWidget<-+- DecoratedBox
+                                    |                         |                                    |                                   Center
+                                    |                         |                                    +-  Align +----------------------   ClipRect
                                     |                         |                                                                       AspectRatio
                                     |                         |                                                                       SizedBox
-                                    |                         +-->  MultiChildRenderObjectWidget +->  RichText                        ColorFiltered
-                                    |                                                            |
-                                    |                                                            +-> Stack
-                                    |                                                            |
-                                    |                                                            +-> Flex  +----------------+------>  Row
-                                    +-->  StatefulWidget +----+-->  PageView                                                |
-                                    |                         |                                                             +------>  Column
+                                    |                         +---  MultiChildRenderObjectWidget<-+--  RichText                        ColorFiltered
+                                    |                                                             |
+                                    |                                                             +-- Stack
+                                    |                                                             |
+                                    |                                                             +-- Flex +----------------+-------  Row
+                                    +---  StatefulWidget <----+---  PageView                                                |
+                                    |                         |                                                             +-------  Column
                                     |                         |     MaterialApp
                                     |                         |     Scaffold
                                     |                         |     UserAccountsDrawerHeader
@@ -220,14 +220,14 @@ DiagnosticableTree +-+----> Widget ++--> PreferredSizeWidget +-+->  AppBar
                                     |                         |
                                     |                         |     TextField
                                     |                         |     Navigator
-                                    |                         +->   StreamBuilderBase  +-------->  StreamBuilder
+                                    |                         +--   StreamBuilderBase  +---------  StreamBuilder
                                     |
                                     |
-                                    +-->  StatelessWidget +--+---->  ScrollView   +------+-------> CustomScrollView
+                                    +---  StatelessWidget <--+-----  ScrollView   <------+-------- CustomScrollView
                                                              |                           |
-                                                             |                           +-------> BoxScrollView +---+---->  ListView
+                                                             |                           +-------- BoxScrollView <---+-----  ListView
                                                              |      IconButton                                       |
-                                                             |      Icon                                             +---->  GridView
+                                                             |      Icon                                             +-----  GridView
                                                              |      IconButton
                                                              |      CircleAvatar
                                                              |      FloatingActionButton
@@ -239,11 +239,13 @@ DiagnosticableTree +-+----> Widget ++--> PreferredSizeWidget +-+->  AppBar
                                                              |      ListTile
                                                              |      Tab
                                                              |
-                                                             +---> InkResponse   +--------------->  InkWell
+                                                             +---- InkResponse   <----------------  InkWell
 
 ```
 #### 控件与容器对比
 ```
+Flutter                          Android                          IOS
+————————————————————————————————————————————————————————————————————————————————
 AppBar                           ActionBar/ToolBar
 
 
