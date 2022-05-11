@@ -250,7 +250,21 @@ AppBar                           ActionBar/ToolBar
 
 
 Text                             TextView
-RaisedButton/Button              Button
+TextField                        EditText
+
+RaisedButton、FlatButton、        Button
+OutlineButton、IconButton
+(RawMaterialButton、
+PopupMenuButton、
+DropdownButton、BackButton、
+CloseButton、ButtonBar、
+ToggleButtons)
+
+Radio                            RadioButton
+Checkbox                         多选
+Slider                           progressbar
+Switch                           开关
+
 DecorationImage/Image/BoxFit     ImageView
 FloatingActionButton             FloatingActionButton
 BottomNavigationBar              BottomNavigation
@@ -260,7 +274,7 @@ Container/CustomMultiChildLayout RecyclerView
 
 Column/Row                       LinearLayout 
 
-Stack                            FrameLayout/RelativeLayout
+Stack/IndexedStack               FrameLayout/RelativeLayout
 
 SingleChildScrollView            ScrollView
 
@@ -268,6 +282,8 @@ ListView                         ListView/RecyclerView
 
 CustomScrollerView               RecyclerView
 
+Wrap                             Constraint#flow
+装饰权重组件SizedBox/AspectRatio  Constraint
 ```
 
 ##### webview 建议用原生
@@ -325,8 +341,10 @@ Navigator.of(context).pop("");
 #### GPS geolocator
 #### 相机 image_picker
 #### 通知：firebase_messaging插件
+#### path_provider插件
 #### Shared_Preferences插件/SQFlite插件
 
+#### 图片 cached_network_image
 
 
 
