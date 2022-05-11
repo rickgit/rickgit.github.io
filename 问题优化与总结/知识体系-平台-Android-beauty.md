@@ -759,12 +759,21 @@ RecyclerView，ConstraintLayout（约束布局）
    3. Weighted：约束方向0dp，并设置权重 layout_constraintHorizontal_weight，两侧无空隙（|--____| ）
    4. packed：居中紧凑布局                    （|  ---  | ）
 3. Guidelines（作为**定位线**作用于全局，orientation="vertical" startToStart，endToEnd）
+``` java
+ <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guide_v"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5"/>
+                一条竖线
+```
 4. Placeholder 配合TransitionManager，移动选中控件
 5. Helper（referenced_ids控件操作）
    1. Barrier （v1.1 一对多控件的屏障约束，控件位于两个内容长度可变控件的end ，避免嵌套）
       1. barrierDirection 屏障约束的方向 start,end,top,bottom
       2. app:constraint_referenced_ids="btn1,btn3" 共用屏障的控件
-   2. Group v1.1 分组方便隐藏，referenced_ids 添加控件到分组
+   2. Group v1.1 分组**方便隐藏**，referenced_ids 添加控件到分组
    3. Layer v2.0 referenced_ids的控件添加背景（背景根据绘制顺序，layer代码需要放在控件前）或动画
    4. VirtualLayout/Flow 三种flow_wrapMode模式，对referenced_ids内的控件快速横向/纵向布局
       1. wrap none 线性链，即使控件不够
@@ -776,6 +785,26 @@ RecyclerView，ConstraintLayout（约束布局）
       2. Autoconnect to parent 。自动为每个视图创建两个或多个约束条件
 
 ```java
+
+
+``` 
+<androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/flow"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_gen_line"
+                android:layout_marginTop="@dimen/qb_px_16"
+                app:flow_verticalGap="0dp"
+                app:flow_horizontalGap="0dp"
+                app:flow_wrapMode="none"
+                app:constraint_referenced_ids="tv_place_1,tv_place_2,tv_place_3" />
+
+
+
+```
+
 public class CoordinatorLayout extends ViewGroup implements NestedScrollingParent2 {
 
     private final List<View> mDependencySortedChildren = new ArrayList<>();
