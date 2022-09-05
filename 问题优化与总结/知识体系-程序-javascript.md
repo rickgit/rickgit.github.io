@@ -229,7 +229,7 @@ $$	直接量符号。
 |               |                                             |              |     (?=X)   via zero-width positive look ahead          |
 |               |                                             |              |     (?!X)   via zero-width negative lookahead           |
 |               |                                             |              |     (?<=X)  via zero-width positive lookbehind          |
-|               |                                             |              |     (?<!X)  via zero-width negative lookbehind          |
+|               |                                             |              |     (?<!X)  via zero-width negative lookbehind          |逻辑操作
 |               |                                             |              |     (?>X)   as an independent, non-capturing group      |
 |               +                                             +------------------------------------------------------------------------+
 |  Logical      | XY                          X|Y             |  (X)                                                                   |
@@ -239,16 +239,16 @@ $$	直接量符号。
 |               |  X?   X, once or not at all     X{n}     X, exactly n times       |                     |                            |
 |  Quantifiers  |  X*   X, zero or more times     X{n,}    X, at least n times      |                     |                            | 
 |               |  X+   X,mone or more times      X{n,m}   X, at least n            |       ?             |                 +          |
-|               |                                         but not more than m times |                     |                            |
+|               |                                         but not more than m times |                     |                            |量词
 |               +----------------------------------------------------------------------------------------------------------------------+
 |               |        /g                                                         |     Reluctant       |              Possessive    |
 |               |      Greedy (matches entire input,then backtrack)                 | (matches as little) | (Greedy, doesn't backtrack)|
 +--------------------------------------------------------------------------------------------------------------------------------------+
-| Boundary      | ^ The beginning of a line          \b   A word boundary         \A   The beginning of the input                      |
+| Boundary      | ^ The beginning of a line          \b   A word boundary         \A   The beginning of the input                      |Anchors 锚点
 | Matchers      | $  The end of a line               \B   A non-word boundary     \z   The end of the input                            |
 |               | \G  The end of the previous match                     \Z  The end of the input but for the final terminator, if any  |
 +---------------+-------------------------------------------------------+-------------------------------+------------------------------+
-|               | \p{Lower}              \p{Upper}                      |   \p{javaLowerCase}           | \p{IsLatin}                  |
+|               | \p{Lower}              \p{Upper}                      |   \p{javaLowerCase}           | \p{IsLatin}                  |Unicode point Named class
 |               | char:[a+z].            char:[A+Z]                     |   Character.isLowerCase()     | A Latin script char          |
 |               |                                                       |                               |                              |
 |               |                                                       |                               | \p{InGreek}                  |
@@ -277,11 +277,11 @@ $$	直接量符号。
 |               +-------------------------------------------------------+-------------------------------+------------------------------+
 |               |       POSIX                                           |              JAVA             |              Unicode         |
 +--------------------------------------------------------------------------------------------------------------------------------------+
-|               |     .         \d              \D            \s                 \S                     \w            \W               |
+|               |     .         \d              \D            \s                 \S                     \w            \W               |常用数字字符集合及其集合操作
 | Metacharacter |     Any char  A digit: [0-9]  A non-digit:  A whitespace char: A non-whitespace char: A word char:  A non-word char: |
 |               |                               [^0-9]        [ \t\n\x0B\f\r]    [^\s].                 [a-zA-Z_0-9]. [^\w]            |
 +--------------------------------------------------------------------------------------------------------------------------------------+
-|  Grouping     |                                                                                                                      |
+|  Grouping     |                                                                                                                      |群及其集合操作
 |               |     [abc]           [^abc]       [a-zA-Z]      [a-d[m-p]]      [a-z&&[def]]    [a-z&&[^bc]]    [a-z&&[^m-p]]         |
 |  char classes |     a, b, or c      (negation)   (range)       (union)         (intersection)  (subtraction)   (subtraction)         |
 |               |                                                                                                                      |
@@ -299,7 +299,16 @@ $$	直接量符号。
 |               |     ('\u0009')   ('\u000A')           ('\u000D')              ('\u000C')                                             |
 +---------------+----------------------------------------------------------------------------------------------------------------------+
 
+字，群，集合，Unicode点集，
+锚点，量词，捕获组及逻辑操作，
 
+ 需要特殊处理:
+      . * ? +
+      $ ^
+      [ ] { } ( ) | 
+      \ /
+
+ 需要特殊处理(方括号内): - 等等
 ```
 
 ## 数据并发 
