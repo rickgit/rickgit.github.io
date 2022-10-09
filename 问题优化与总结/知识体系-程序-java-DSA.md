@@ -19,8 +19,17 @@
     散列存储结构：顺序存储+散列（HashMap）
 
 操作：
-    增改查，索引遍历，找排序，删销毁
-
+    初始化，销毁。增删改查
+高级操作：
+    查找（搜索遍历）排序、过滤、转换
+    写（增删改）
+    查单（ elementAt first contains random）
+    转换（映射map，合拢zip，关联 associateWith，打平flatten，字符串joinTo）
+    过滤（过滤filter，划分partition,检验any,none,all）、
+    分组（groupBy）、展平、关联、
+    分片（slice,take,drop,chunked,windowed）
+    
+    聚合（min max average sum count fold/reduce）
 暴力枚举法
 分治法
     减治法

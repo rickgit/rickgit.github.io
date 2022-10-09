@@ -1,0 +1,21 @@
+%%  E:\Program\Android\jdk8u322-b06\bin\java -jar C:\ProgramData\chocolatey\lib\plantuml\tools\plantuml.jar   -charset UTF-8 知.puml
+@startmindmap
+<style>
+mindmapDiagram {
+  .green {
+    BackgroundColor lightgreen
+  }
+  .rose {
+    BackgroundColor #FFBBCC
+  }
+  .your_style_name {
+    BackgroundColor lightblue
+  }
+}
+</style>
++ 顶级
+++ 文史哲艺<<green>>
+++ 经管法教<<green>>
+++ 理工农医<<green>>
+
+@endmindmap
