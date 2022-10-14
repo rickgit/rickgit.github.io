@@ -1992,16 +1992,17 @@ Options
 8. 分屏滤镜
 #### View,Canvas,Paint
 View 白板：
-            绘制 点(颜色)，线(路径)，面（图形<弧，圆>，文本，图像）；
+            ✨绘制 点(颜色)，线(路径)，面（图形<弧，圆>，文本，图像）；
             saveLayer 创建新的画纸，savetocount时，绘制到画板
      画笔：
          1. 
-            setARGB，Shader着色器（位图，渐变，。。。），颜色过滤器，遮罩，setShadowLayer阴影，
+            ✨setARGB，Shader着色器/上色（位图，渐变，。。。），颜色过滤器(colorFilter r,g,b 颜色倍加处理)，遮罩(MaskFilter<模糊,浮雕>)，setShadowLayer阴影，
             setShader（BitmapShader，LinearGradient，RadialGradient，SweepGradient，ComposeShader）着色器
             setColorFilter 颜色过滤（LightingColorFilter、PorterDuffColorFilter ， ColorMatrixColorFilter,BlendModeColorFilter）
+            setMaskFilter（BlurMaskFilter模糊，EmbossMaskFilter浮雕）遮罩
+
             setBlendMode 颜色混合模式（CLEAR，SRC，DST，SRC_OVER，DST_OVER，SRC_IN，DST_IN，SRC_OUT，DST_OUT，SRC_ATOP，。。）
             setDither 颜色抗抖动/
-            setMaskFilter（BlurMaskFilter模糊，EmbossMaskFilter浮雕）遮罩
             setShadowLayer（）/clearShadowLayer 阴影
 
          2. 
@@ -2020,7 +2021,7 @@ View 白板：
             setXfermode （❌AvoidXfermode, ❌PixelXorXfermode 和 PorterDuffXfermode ）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
 canvas
     quickReject 判断是否相交
-    字幕 绘制字体，填充 setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
+    字幕 创建bitmap,canvas绘制字体，填充 setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
 TextView,ImageView
 SurfaceView,GlSurfaceView,TextureView,SurfaceTexture,VideoView
 
