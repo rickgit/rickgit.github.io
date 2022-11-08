@@ -1259,3 +1259,50 @@ https://libraries.io/github/koreader/koreader
 https://www.unisystem-displays.com/en/news/interactive-epaper.html
 http://www.xjishu.com/zhuanli/55/201510450954.html
 [重排功能依赖另一个开源软件项目K2pdfopt](重排功能依赖另一个开源软件项目K2pdfopt)
+
+
+
+## 体验书籍
+可用性设计 
+用户体验的基础/UX基础
+交互设计
+设计使用性
+UX设计方法和过程
+UX草图和原型设计
+用户体验研究
+用户体验心理学
+可用性测试
+情感设计
+用户体验技能
+用户研究
+用户体验沟通设计
+设计方法
+设计技能
+服务设计
+用户体验策略
+UI模式
+
+https://www.smashingmagazine.com/
+
+https://usabilitygeek.com
+
+smartdraw.com
+
+www.usability.gov
+
+User experience design  https://www.invespcro.com/
+
+https://zhuanlan.zhihu.com/p/145859014
+ 1. 《点石成金：访客至上的网页设计秘笈》 Don t Make Me Think 
+ 作者：史蒂夫·克鲁格
+ 类别：可用性设计
+ 2. 《设计心理学》
+ 作者：Don Norman
+类别：可用性设计
+ 3. 《写给大家看的设计书》
+ 作者：罗宾·威廉姆斯
+类别：用户体验的基础
+
+4. 《用户体验入门:100个短Lesso的速成课程》
+作者：Jesse James Garrett
+类别：用户体验的基础
