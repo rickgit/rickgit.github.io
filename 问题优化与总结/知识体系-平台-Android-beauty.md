@@ -1286,11 +1286,16 @@ UX草图和原型设计
 用户体验策略
 UI模式
 https://app.uxcel.com/courses/design-foundations
-
+https://zhuanlan.zhihu.com/p/343565788
 https://uxcam.com/blog/mobile-ux/
 https://www.smashingmagazine.com/
-
+https://www.interaction-design.org/literature/article/the-7-factors-that-influence-user-experience
+https://www.usability.gov/what-and-why/user-experience.html
+https://tenten.co/learning/ux-testing-tools/
+https://zhuanlan.zhihu.com/p/164623875
 https://usabilitygeek.com
+https://uxplanet.org/mobile-design-in-2022-2023-586008007bce
+https://www.goodreads.com/genres/computer-science
 
 smartdraw.com
 
@@ -1312,3 +1317,36 @@ https://zhuanlan.zhihu.com/p/145859014
 4. 《用户体验入门:100个短Lesso的速成课程》
 作者：Jesse James Garrett
 类别：用户体验的基础
+
+
+### 基础
+思维
+共情-定义-设计-原型-测试(usabilityHub,hotjar,usertesting)
+
+负责
+用户调研（optimal workshop,lookback）
+竞品分析
+用户角色
+线框
+信息架构(balsamiq,wireframe.cc)
+原型(justinmind,framer,proto.io)
+
+
+信息架构核心元素 内容，用户，上下文
+
+
+### 设计原则
+可用（useful），能用（usable），可取（desirable），可访问（accessible），
+导航（findable），credible（可信），valuable（有价值）
+
+
+### 组件
+字体设计（typography），阴影，正负空间（space），动画（motion），布局（layout），微内容（Microcontent）
+颜色，图片，组件（按钮，输入框，卡片，选择，日期时间，列表，模态，toast，导航条，选项卡。。。）
+
+Design Guidelines
+https://m3.material.io/
+https://experience.sap.com/fiori-design-android/explore/#
+https://www.lightningdesignsystem.com/guidelines/overview/
+
+https://www.goodreads.com/search?q=ux&qid=
