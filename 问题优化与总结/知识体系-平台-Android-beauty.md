@@ -1319,20 +1319,34 @@ https://zhuanlan.zhihu.com/p/145859014
 类别：用户体验的基础
 
 
+(The Lean Series) O'Reilly Media._Gothelf, Jeff_Seiden, Josh - Lean UX_ applying lean principles to improve user experience-O'Reilly (2016)
+学习剩余成长，结果大于输出，（Permission to Fail 孰能无过）
+
+
+https://lawsofux.com/
+
+https://www.woshipm.com/ucd/650353.html
+
 ### 基础
-思维
+思维：
 共情-定义-设计-原型-测试(usabilityHub,hotjar,usertesting)
 
-负责
+负责：
 用户调研（optimal workshop,lookback）
-竞品分析
-用户角色
+竞品分析(competitor)
+      https://www.social-searcher.com/
+      https://www.semrush.com
+      https://www.spyfu.com
+      https://www.similarweb.com/
+      5.外链分析
+用户画像(personas)
+      https://qubstudio.com/blog/4-examples-of-ux-personas/
 线框
 信息架构(balsamiq,wireframe.cc)
 原型(justinmind,framer,proto.io)
 
 
-信息架构核心元素 内容，用户，上下文
+信息架构核心元素：内容，用户，上下文
 
 
 ### 设计原则
