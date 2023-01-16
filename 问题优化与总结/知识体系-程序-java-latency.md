@@ -124,7 +124,7 @@ JNI_END
 ### 编译
  常量传播(constant propagation) 常量折叠(constant folding)
 
-
+[class 编译版本](https://docs.oracle.com/javase/specs/jvms/se19/html/jvms-4.html#jvms-4.1-200-B.2)
 [《Compilers-Principles, Techniques, & Tools》, Second Edition  # 9.4 Constant Propagation ](https://www.slideshare.net/kitocheng/ss-42438227)
 
 静态编译：在编译时确定类型，绑定对象

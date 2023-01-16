@@ -1,11 +1,16 @@
-## 美观 总览
+## 美 总览
 [](https://juejin.im/post/6844903974294781965#heading-61)
 
       存储或交换应用时精简，使用上稳定，视觉上流畅美观，省电
+      UI UE UX
 
 ## 目标
  beauty art/craft
 从4.0开始，Android系统一直以“run fast, smooth, and responsively”为目标对UI进行优化
+2014  Google I/O 上着重展示的Material Design
+2018  Material 2 (Material Theme) 圆角
+2021  Material 3, also known as Material You ，动态颜色
+
 
 ### 4S (smooth，Stability，saving，streamline)快稳省简
 稳定（编码/io问题），精简/包大小，续航/CPU占用率，流程/内存占用率-刷新率，
@@ -1267,24 +1272,28 @@ http://www.xjishu.com/zhuanli/55/201510450954.html
 唐纳德·诺曼 提出了***用户体验***
 [教程](https://app.uxcel.com/courses/design-foundations/what-is-ux-design-317/play)
 
-可用性设计 
+用户体验策略
+用户体验技能
+用户体验沟通设计
 用户体验的基础/UX基础
-交互设计
-设计使用性
-UX设计方法和过程
-UX草图和原型设计
 用户体验研究
 用户体验心理学
-可用性测试
-情感设计
-用户体验技能
 用户研究
-用户体验沟通设计
+情感设计
+
+可用性测试
+可用性设计 
+设计使用性
+
+UX设计方法和过程
+UX草图和原型设计
+UI模式
+交互设计
 设计方法
 设计技能
 服务设计
-用户体验策略
-UI模式
+
+
 https://app.uxcel.com/courses/design-foundations
 https://zhuanlan.zhihu.com/p/343565788
 https://uxcam.com/blog/mobile-ux/

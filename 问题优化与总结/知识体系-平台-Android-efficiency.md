@@ -4,6 +4,26 @@
 稳定（单元测试）自动化（代码管理，编译打包），可分析（日志调试）可拓展（设计原则与模式）
 
 
+adb 命令 
+    install 
+    adb logcat -c & adb logcat -e {\"
+    [bugreport](https://bathist.ef.lc/)
+adb shell 命令
+    查看信息 getprop，dumpsys
+    调用指令 am pm wm monkey
+    
+studio命令
+    set JAVA_HOME=E:\Program\Android\jdk8u322-b06 \sdk-windows\tools\bin\uiautomatorviewer.bat
+
+    set JAVA_HOME=E:\Program\Android\jdk8u322-b06
+    set PATH=%PATH%;%JAVA_HOME%\bin
+    sdk-windows\tools\lib\monitor-x86_64\monitor
+
+    set JAVA_HOME=E:\Program\Android\jdk8u322-b06
+    set PATH=%PATH%;%JAVA_HOME%\bin
+    sdk-windows\emulator\emulator.exe -avd Pixel_2_API_30 -writable-system
+
+
 ## 稳定
 Crash 和 ANR
 
