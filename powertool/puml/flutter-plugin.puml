@@ -1,0 +1,25 @@
+@startmindmap
+<style>
+mindmapDiagram {
+  .green {
+    BackgroundColor lightgreen
+  }
+  .rose {
+    BackgroundColor #FFBBCC
+  }
+  .your_style_name {
+    BackgroundColor lightblue
+  }
+}
+</style>
++ Flutter
+++ Flutter<<green>>
+++ 扩展<<green>>
++++ getit <<rose>>
++++ 轻量级依赖检索容器—Dartin <<rose>>
++++ 多语言 flutter_localizations
++++ 事件 StreamSubscription 
++++ 生命周期管理 WidgetsBinding.instance.addPostFrameCallback
++++ 架构 https://github.com/18824863285/BaseFlutter
+
+@endmindmap

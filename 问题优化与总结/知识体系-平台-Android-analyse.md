@@ -6,9 +6,8 @@ https://developer.android.google.cn/topic/performance/vitals/launch-time?hl=zh-c
 
 uetool/
 布局分析 https://github.com/Grigory-Rylov/android-layout-inspector
-投屏工具——scrcpy
+投屏工具——qtscrcpy
 ## 调试工具
-java 二进制修改 https://github.com/Col-E/Recaf
 
 
 adb shell input keyevent   
@@ -41,12 +40,15 @@ https://source.codeaurora.cn/quic/la/platform/prebuilts/runtime/tree/appcompat/v
 
 注意：至少有两种早期版本的格式已在广泛提供的公开软件版本中使用。例如，009 版本已用于 M3 版 Android 平台（2007 年 11 月至 12 月），013 版本已用于 M5 版 Android 平台（2008 年 2 月至 3 月）。在有些方面，这些早期版本的格式与本文档中所述的版本存在很大差异。
 ```
+[java 二进制修改](https://github.com/Col-E/Recaf)
 
-[dex2jar 废弃 支持 dex 035,036; enjarify 支持35 ](https://github.com/pxb1988/dex2jar)
-[jad（不维护）](http://www.kpdus.com/jad.html)
+
 [⭐jadx 支持dex 039](https://github.com/skylot/jadx.git)
 [jd-gui](https://github.com/java-decompiler/jd-gui)
 [Apktool](https://github.com/iBotPeaches/Apktool)
+[dex2jar 废弃 支持 dex 035,036; enjarify 支持35 ](https://github.com/pxb1988/dex2jar)
+[jad（不维护）](http://www.kpdus.com/jad.html)
+[javaparser,Java 1.0 - Java 15 Parser](https://github.com/javaparser/javaparser)
 
 jeb 调试反编译app
 

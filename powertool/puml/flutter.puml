@@ -1,0 +1,70 @@
+'  E:\Program\Android\jdk8u322-b06\bin\java -jar C:\ProgramData\chocolatey\lib\plantuml\tools\plantuml.jar   -charset UTF-8  .\Flutter.puml
+@startmindmap
+<style>
+mindmapDiagram {
+  .green {
+    BackgroundColor lightgreen
+  }
+  .rose {
+    BackgroundColor #FFBBCC
+  }
+  .your_style_name {
+    BackgroundColor lightblue
+  }
+}
+</style>
++ Flutter
+++ Dart<<green>>
+++ Widget<<green>>
++++ RenderObjectWidget <<rose>>
+++++ 颜色 <<rose>>
+++++ 表单相关 <<rose>>
++++++_ Icons/Image <<rose>>
++++++_ Text/TextField/TextFormField <<rose>>
++++++_ 单选，多选，开关，Chip（Radio,CheckBox,Switch） <<rose>>
++++++_ 下拉选项（RadioListTile,CheckBoxListTile,SwitchListTile,DropdownButton） <<rose>>
++++++_ 范围选择Slider <<rose>>
++++++_ 按钮 TextButton,ElevatedButton,OutlineButton,IconButton <<rose>>
++++++_ 事件 GestureDetector/InkWell/Focus/PositionedTapDetector<<rose>>
++++++_ 事件 AbsorbPointer/IgnorePointer/Listener/behavior<<rose>>
++++++_ 动画 Offstage/Transform/Padding/Align...<<rose>>
++++++_ 反馈（动画和特效）补间动画 AnimationController/Tween/Curve <<rose>>
++++++_ 反馈（动画和特效）物理动画 Simulation <<rose>>
++++++_ 转场  Hero/OpenContainer<<rose>>
+ 
+++++ 布局 <<rose>>
++++++_ 单个容器（container,SizedBox,Align,Padding...） <<rose>>
++++++_ 线性布局（Row/IntrinsicHeight,Column/InstrinsicWidth,Wrap/Flow） <<rose>>
++++++_ 层叠布局 （Stack,IndexStack）<<rose>>
++++++_ 可滚动布局（SingleChildScrollView,ListView,GridView,PageView+TabBar,CustomScrollView...） <<rose>>
++++++_ 自定义（CustomPaint/CustomPainter/Paragraph/TextPainter...） <<rose>>
+
+
++++ StatefullWidget/StatelessWidget <<rose>>
+++++_ WidgetsApp 、MaterialApp <<rose>>
+++++_ Navigator/Route <<rose>>
+++++_ 生命周期AppLifecycleState/SystemChannels.lifecycle/WidgetsBindingObserver <<rose>>
+++++_ view生命周期addPostFrameCallback /addPersistentFrameCallback <<rose>>
+
++++ InheritedWidget <<rose>>
+++++ 状态管理 <<rose>>
++++++_ provide
+
+
+
+-- 弹窗<<green>>
+-- 屏幕适配<<green>>
+---_ MediaQuery.of(context).size
+-- 插件<<green>>
+---_ methodchannel/eventChannel
+---_ SystemChannels
+-- 国际化<<green>>
+--- Intl<<rose>>
+-- 高效<<green>>
+---_ 应用内调试flutter_ume <<rose>>
+--- 拓展 <<rose>>
+----_ 路由 flutter_boost <<rose>>
+----_ 通信 pigeon <<rose>>
+-- 流畅<<green>>
+---_ 数据库hive<<green>>
+@endmindmap
