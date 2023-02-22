@@ -216,6 +216,7 @@ git cat-file //object对象
 git log
 
 ⭐ git config --global alias.adog "log --all --decorate --oneline --graph"
+配置快捷方式
 git adog
 
 git show
