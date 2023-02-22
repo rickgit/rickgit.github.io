@@ -204,6 +204,9 @@ git ls-files --u //冲突文件
 git status // （绿色文件）查看暂存区中差异信息
 git checkout -- <file> //恢复索引区修改到工作区
 git commit //添加到仓库
+⭐ git config --global commit.template "template = C:/Users/username/.git_commit_template.txt"
+
+
 
 //工作区差异
 git diff --cached //对比stage和branch之间的差异
@@ -211,6 +214,10 @@ git ls-files --stage //object文件
 git cat-file //object对象
 3 仓库记录管理
 git log
+
+⭐ git config --global alias.adog "log --all --decorate --oneline --graph"
+git adog
+
 git show
 
 3.1 仓库记录的文件恢复
@@ -239,6 +246,9 @@ git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d"
 git log --all --reverse --grep='搜索关键字'
 
 3.4 仓库记录操作
+
+git rebase 
+git rebase --onto 
 git rebase -i hash
 
 
