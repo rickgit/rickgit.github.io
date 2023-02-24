@@ -188,9 +188,87 @@ remote            +              tag
 ```
 
 ### ⭐ Git 仓库仓用命令
-```shell
-1.工作区
-git status //（红色文件）管理本地修改状态
+
+#### 配置作者，邮箱；提交模板；快捷键；代理
+⭐ git config --global commit.template "template = C:/Users/username/.git_commit_template.txt"
+⭐ git config --global alias.adog "log --all --decorate --oneline --graph"
+配置快捷方式
+git adog
+git config --global http.proxy 'socks://127.0.0.1:8580'
+git config --global --unset http.proxy
+
+
+配置git上代理地址 
+git config --global http.proxy "127.0.0.1:8580"
+git config --global http.proxy "127.0.0.1:9666"
+
+git config --list --show-origin
+``` js
+git config --system
+D:\Program\Git/etc/gitconfig
+
+git config --global 
+C:\Users\Administrator\.gitconfig
+
+git config
+G:\workspace\ws-github\.git\config
+```
+git config --global http.sslVerify "false"
+
+
+#### 仓库，分支及协同
+##### 仓库
+git init //初始化仓库
+git clone //初始化仓库&checkout
+git remote -v
+
+##### 记录分支管理
+git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
+//显示tag
+ git tag -n --sort=taggerdate
+
+
+删除远程分支
+ git branch -D  -r origin/dev_10.6.1
+ git push  origin :refs/heads/dev_10.6.1
+
+
+登录方式一：账号密码
+登录方式二：
+Personal access tokens : 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 
+登录方式三：
+  到 ~/.ssh目录：ssh-keygen -t rsa -C "my email" ，生成私钥id_rsa和公钥id_rsa.pub
+  添加私约：ssh-add ~/.ssh/id_rsa
+  GitHub添加公钥内容
+  测试：ssh -T git@github.com:sshGitRepoUrl
+
+[反向ip查询，临时提交](https://site.ip138.com/github.com/)
+
+2.23.0中引入了两个新的命令switch和restore用来取代checkout,分支操作和文件恢复的部分功能
+git 版本                            2.23.0
+查看分支         git branch        git branch
+创建分支         git checkout      git switch
+创建分支并切换    git checkout -b   git switch -c
+切换记录         git checkout      git checkout
+ 
+##### 协同/工作流
+
+git push //添加记录到远程仓库
+git push -v origin tag_v10.6.0
+git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
+git push origin --delete develop_AA //删除远程分支
+
+git fetch //拉取记录到本地分支
+git pull //fetch &merge 拉取记录到本地仓库并工作区
+git merge --ff/⭐--no-ff/--ff-only/--squash 三种选项参数的区别
+git rebase   /--onto/ -i
+ 
+git cherry-pick 
+
+#### 工作区，暂存区，贮藏区
+git status //（红色文件）管理本地修改状态（绿色文件）查看暂存区中差异信息
+2.23.0中引入了restore用来取代checkout文件恢复的部分功能
+##### 工作区
 git add //添加到index/暂存区
 git clean -f//删除的是未跟踪的文件，-d 文件夹 ；-x .gitignore文件也可以删除；
 git restore <file>... //丢弃修改
@@ -200,27 +278,38 @@ git mv //重命名
 git diff //对比工作区和stage文件的差异
 git ls-files --u //冲突文件
 
-2.暂存区
-git status // （绿色文件）查看暂存区中差异信息
+##### 暂存区
 git checkout -- <file> //恢复索引区修改到工作区
 git commit //添加到仓库
-⭐ git config --global commit.template "template = C:/Users/username/.git_commit_template.txt"
-
-
 
 //工作区差异
 git diff --cached //对比stage和branch之间的差异
 git ls-files --stage //object文件
 git cat-file //object对象
-3 仓库记录管理
+##### 贮藏区
+git stash list //管理贮藏
+git stash show //显示stash区的文件
+
+git stash save <message>//添加到stash贮藏区
+git stash pop //取出最近贮藏区修改
+git stash apply stash@{message} //取出最近贮藏区修改，并删除记录
+git stash drop stash@{message} //管理删除
+#### 提交记录管理
+
+##### 记录查看
 git log
-
-⭐ git config --global alias.adog "log --all --decorate --oneline --graph"
-配置快捷方式
-git adog
-
 git show
+git log --grep='' --author="anshu.wang"
+git log -- <filepath>    //某个文件的修改
+git bisect
 
+git log --reverse
+git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
+git log --all --reverse --grep='搜索关键字'
+
+git log --author=anshu.wang --pretty=oneline/short/full/fuller/format --after="2021-03-21" –no-merges	
+git log --author=anshu.wang --oneline --after="2021-11-23" --no-merges
+##### 记录回退
 3.1 仓库记录的文件恢复
 git reset -- <file>                     //恢复仓库修改到索引区，索引区unstage到工作区
 git restore --staged <file>             //恢复仓库修改到索引区
@@ -236,95 +325,6 @@ git reset --hard // 未提交删除，要撤销的记录文件删除，提交记
 git checkout     // 未提交需要提交，不删除已经commit 记录
 git checkout  -f // 未提交删除，不删除已经commit 记录
 git switch (2.23)// 未提交删除，不删除已经commit 记录，不能切换commit id
-
-3.3 仓库记录搜索
-git log --grep='' --author="anshu.wang"
-git log -- <filepath>    //某个文件的修改
-git bisect
-
-git log --reverse
-git log --reverse --tags --simplify-by-decoration --pretty="format:%ai %d" 
-git log --all --reverse --grep='搜索关键字'
-
-3.4 仓库记录操作
-
-git rebase 
-git rebase --onto 
-git rebase -i hash
-
-
-
-4.贮藏区
-git stash list //管理贮藏
-git stash show //显示stash区的文件
-
-git stash save <message>//添加到stash贮藏区
-git stash pop //取出最近贮藏区修改
-git stash apply stash@{message} //取出最近贮藏区修改，并删除记录
-git stash drop stash@{message} //管理删除
-
-5. 协同/工作流
-git init //初始化仓库
-git clone //初始化仓库&checkout
-git remote -v
-git push //添加记录到远程仓库
-git fetch //拉取记录到本地分支
-git pull //fetch &merge 拉取记录到本地仓库并工作区
-
-5.1 记录分支管理
-git branch  //git branch -v  --abbrev=40 //打印详情，hash值长度40
-git merge
-git rebase
-//显示tag
- git tag -n --sort=taggerdate
-git push -v origin tag_v10.6.0
-
- git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
-git push origin --delete develop_AA //删除远程分支
-
-删除远程分支
- git branch -D  -r origin/dev_10.6.1
- git push  origin :refs/heads/dev_10.6.1
-
-登录方式一：账号密码
-登录方式二：
-Personal access tokens : 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 
-登录方式三：
-  到 ~/.ssh目录：ssh-keygen -t rsa -C "my email" ，生成私钥id_rsa和公钥id_rsa.pub
-  添加私约：ssh-add ~/.ssh/id_rsa
-  GitHub添加公钥内容
-  测试：ssh -T git@github.com:sshGitRepoUrl
-
-6 配置
-
-git config --global http.proxy 'socks://127.0.0.1:8580'
-git config --global --unset http.proxy
-
-
-配置git上代理地址 
-git config --global http.proxy "127.0.0.1:8580"
-git config --global http.proxy "127.0.0.1:9666"
-
-git config --list --show-origin
-```js
-git config --system
-D:\Program\Git/etc/gitconfig
-
-git config --global 
-C:\Users\Administrator\.gitconfig
-
-git config
-G:\workspace\ws-github\.git\config
-```
-
-git config --global http.sslVerify "false"
-
-[反向ip查询，临时提交](https://site.ip138.com/github.com/)
-### 同步个人代码
-
-git log --author=anshu.wang --pretty=oneline/short/full/fuller/format --after="2021-03-21" –no-merges	
-git log --author=anshu.wang --oneline --after="2021-11-23" --no-merges
-git cherry-pick 
 
 ### 常见问题
 ```shell
