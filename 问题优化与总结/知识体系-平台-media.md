@@ -2260,6 +2260,8 @@ TEMPLATE_VIDEO_SNAPSHOT 在录制视频时创建适合静态图像捕获的请�
 3. 录视频：MediaRecorder+Camera
 
 
+[mlkit 扫描二维码](git@github.com:maning0303/MNMLKitScanner.git)
+[mlkit oneplus 手机解析问题](https://github.com/search?q=OnePlus++camerax+YUV_420_888&type=code)
 
 #### 播放视频及视频渲染
 
