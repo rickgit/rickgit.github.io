@@ -331,9 +331,10 @@ Navigator.of(context).pop("");
 
 
 ### 国际化 intl库
+flutter.bat --no-color pub global list
+flutter.bat --no-color pub global run intl_utils:generate
 
-
-
+[Flutter Intl插件](https://juejin.cn/post/6996872498738364447)
 
 
 ### 硬件等耗时操作
