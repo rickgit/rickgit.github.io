@@ -261,9 +261,12 @@ git push origin --delete develop_AA //删除远程分支
 git fetch //拉取记录到本地分支
 git pull //fetch &merge 拉取记录到本地仓库并工作区
 git merge --ff/⭐--no-ff/--ff-only/--squash 三种选项参数的区别
-git rebase   /--onto/ -i
+git rebase   普通，--onto（）或  -i（交互式）
  
 git cherry-pick 
+
+##### 仓库迁移
+https://blog.95id.com/git-multi-repo-combine.html
 
 #### 工作区，暂存区，贮藏区
 git status //（红色文件）管理本地修改状态（绿色文件）查看暂存区中差异信息

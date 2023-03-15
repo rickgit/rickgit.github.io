@@ -350,4 +350,10 @@ flutter.bat --no-color pub global run intl_utils:generate
 
 
 ### 依赖管理 Pub包管理
+
+
+## 编译出错
+[Gradle sync failed: Could not create task ](https://www.jianshu.com/p/9901c359cb19)
+
+
  

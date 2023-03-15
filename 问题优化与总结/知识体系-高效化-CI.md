@@ -407,15 +407,19 @@ gradlew build --refresh-dependencies
 [Beginning with Android Studio 3.2, AAPT2 moved to Google's Maven repository](https://developer.android.com/studio/releases)
 
 
-[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
 
-[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
+
 #### Android gradle
 
 ```gradle
     gradle -q dependencies your-app-project:dependencies
 ```
+[android gradl dsl com.android.tools](https://source.codeaurora.cn/quic/la/platform/prebuilts/gradle-plugin)
 
+[android gradle-plugin relsease notes （插件版本	所需的 Gradle 版本）](https://developer.android.google.cn/studio/releases/gradle-plugin)
+[gradle 版本](https://gradle.org/releases/)
+
+Studio 依赖 gradle 最低版本和 android_gradle_build 版本范围 ，android_gradle_build 依赖 gradle 最低版本
 
 ### kotlin-gradle-plugin
 
