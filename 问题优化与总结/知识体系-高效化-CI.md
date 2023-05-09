@@ -421,6 +421,10 @@ gradlew build --refresh-dependencies
 
 Studio 依赖 gradle 最低版本和 android_gradle_build 版本范围 ，android_gradle_build 依赖 gradle 最低版本
 
+
+
+
+android.viewBinding.enabled android.dataBinding.enabled 5.0将被移除，使用 android.buildFeatures.viewBinding android.buildFeatures.dataBinding 替换
 ### kotlin-gradle-plugin
 
 

@@ -244,19 +244,28 @@ Personal access tokens : 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
 
 [反向ip查询，临时提交](https://site.ip138.com/github.com/)
 
+
+分支的创建、删除、切换、查看、重命名、创建+切换
 2.23.0中引入了两个新的命令switch和restore用来取代checkout,分支操作和文件恢复的部分功能
 git 版本                            2.23.0
 查看分支         git branch        git branch
-创建分支         git checkout      git switch
+创建分支         git checkout      git branch  newBranch nodeid
 创建分支并切换    git checkout -b   git switch -c
-切换记录         git checkout      git checkout
- 
+切换记录         git checkout      git switch
+删除分支                           git branch -d
+删除远程分支                        git push -f :branchName
+重命名                             git branch -m
+
+跟踪远程分支                       git branch -u 
+
+
 ##### 协同/工作流
 
 git push //添加记录到远程仓库
 git push -v origin tag_v10.6.0
 git for-each-ref --sort=taggerdate --format '%(refname) %(taggerdate)' refs/tags
 git push origin --delete develop_AA //删除远程分支
+git branch --set-upstream-to=origin/master master //关联分支
 
 git fetch //拉取记录到本地分支
 git pull //fetch &merge 拉取记录到本地仓库并工作区
@@ -276,6 +285,7 @@ git add //添加到index/暂存区
 git clean -f//删除的是未跟踪的文件，-d 文件夹 ；-x .gitignore文件也可以删除；
 git restore <file>... //丢弃修改
 git mv //重命名
+git rm //删除文件
 
 //工作区差异
 git diff //对比工作区和stage文件的差异
@@ -283,6 +293,7 @@ git ls-files --u //冲突文件
 
 ##### 暂存区
 git checkout -- <file> //恢复索引区修改到工作区
+git rm --cached //暂存区移除到工作区
 git commit //添加到仓库
 
 //工作区差异

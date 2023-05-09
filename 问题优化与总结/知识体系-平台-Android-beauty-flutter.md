@@ -323,7 +323,7 @@ Navigator.of(context).pop("");
 
 
 #### 异步 async/await
-使用async/await执行网络请求，而不会引起UI线程挂起
+使用 async/await 执行网络请求，而不会引起UI线程挂起
 
 #### NDK
 不支持，先调用Java 访问jni方法
@@ -356,4 +356,12 @@ flutter.bat --no-color pub global run intl_utils:generate
 [Gradle sync failed: Could not create task ](https://www.jianshu.com/p/9901c359cb19)
 
 
- 
+## ⭐lint项目
+flutter pub get
+flutter analyze
+
+
+## dart 源码
+https://github.com/dart-lang/sdk/blob/master/runtime/lib
+https://github.com/dart-lang/sdk/blob/main/sdk/lib/_internal/vm/lib/array.dart
+https://github.com/dart-lang/sdk/tree/main/sdk/lib/collection
