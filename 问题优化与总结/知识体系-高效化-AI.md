@@ -409,5 +409,10 @@ k均值法
 [quickstart](https://tensorflow.google.cn/tutorials/quickstart/beginner)
 ```
 
-
 ```
+
+
+### LLM
+
+https://www.aihub.cn/tools/chatbot/
+https://www.perplexity.ai
