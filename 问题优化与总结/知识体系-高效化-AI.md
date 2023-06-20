@@ -417,6 +417,11 @@ https://www.explainthis.io/zh-hans/ai-toolkit
 https://www.aihub.cn/tools/chatbot/
 https://www.askopenai.co/
 
-https://wrtn.ai/
-https://www.perplexity.ai
+
+[wrtn](https://wrtn.ai/)
+[perplexity](https://www.perplexity.ai)
+
+https://poe.com/ChatGPT
+https://unlimitedgpt.co/
+
 
