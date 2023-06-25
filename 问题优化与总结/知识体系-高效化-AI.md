@@ -428,7 +428,24 @@ k均值法
 4.《GPT Explained: A Complete Guide to OpenAI's Language Model》（GPT 解析：OpenAI 语言模型完全指南）：这是一篇关于 GPT 模型的详细解析文章，介绍了 GPT 模型的原理、训练和应用等内容。这篇文章可以帮助您全面了解 GPT 模型，并了解如何在实际应用中使用 GPT 模型。
 5.《Hands-On Machine Learning with Scikit-Learn and TensorFlow》
 6. "神经网络方法在自然语言处理中的应用" 作者：Yoav Goldberg - 这本书提供了自然语言处理技术的概述，包括GPT中使用的Transformer模型。
-7. "BERT：深度双向变压器的语言理解预训练" 作者：Devlin 等人 - 尽管这篇论文主要关注BERT模型，但它解释了预训练transformer的概念，这也适用于GPT。 
+7. "BERT：深度双向变压器的语言理解预训练" 作者：Devlin 等人 - 尽管这篇论文主要关注BERT模型，但它解释了预训练transformer的概念，这也适用于GPT。
+
+https://github.com/Kensuke-Hinata/statistic/blob/master/AI/books/
+科普类：
+人工智能简史 第2版 作者：[美] 尼克
+黑客与画家 作者：[美]保罗·格雷厄姆（Paul Graham）
+
+技术入门：
+图解人工智能 作者：[日]多田智史
+深度学习入门 ：基于Python的理论与实现 作者：斋藤康毅
+用Python动手学机器学习 作者：[日]伊藤真
+自然语言处理入门 作者：何晗
+
+03 技术进阶:
+Python深度学习（第2版）作者：[美] 弗朗索瓦·肖莱（François Chollet）
+机器学习 公式推导与代码实现 作者：鲁伟
+深度强化学习 作者：王树森 黎彧君 张志华
+BERT基础教程：Transformer大模型实战 [印] 苏达哈尔桑·拉维昌迪兰（Sudharsan Ravichandiran）
 ```
 
 #### LLM
