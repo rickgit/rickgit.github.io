@@ -416,6 +416,7 @@ k均值法
 
 ### GPT
 #### 数据推荐
+```
 《人工智能简史》《深度学习入门》
 《深入浅出神经网络与深度学习》OpenAI 总裁兼董事长 Greg Brockman 的 AI 入门读物
 
@@ -428,17 +429,21 @@ k均值法
 5.《Hands-On Machine Learning with Scikit-Learn and TensorFlow》
 6. "神经网络方法在自然语言处理中的应用" 作者：Yoav Goldberg - 这本书提供了自然语言处理技术的概述，包括GPT中使用的Transformer模型。
 7. "BERT：深度双向变压器的语言理解预训练" 作者：Devlin 等人 - 尽管这篇论文主要关注BERT模型，但它解释了预训练transformer的概念，这也适用于GPT。 
-
+```
 
 #### LLM
+```
 https://www.explainthis.io/zh-hans/ai-toolkit
 https://www.aihub.cn/tools/chatbot/
 https://www.askopenai.co/
+```
 #### ChatGpt
+```
 [wrtn](https://wrtn.ai/)
 [perplexity](https://www.perplexity.ai)
 
 https://poe.com/ChatGPT
 https://unlimitedgpt.co/
+```
 
 
