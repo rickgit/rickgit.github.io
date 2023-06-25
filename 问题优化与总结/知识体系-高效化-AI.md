@@ -412,12 +412,29 @@ k均值法
 ```
 
 
-### LLM
+
+
+### GPT
+#### 数据推荐
+《人工智能简史》《深度学习入门》
+《深入浅出神经网络与深度学习》OpenAI 总裁兼董事长 Greg Brockman 的 AI 入门读物
+
+
+问GPT结果
+1.《Deep Learning》（深度学习）：这是一本经典的深度学习入门书籍，介绍了深度学习的基本概念、算法和应用，并详细介绍了神经网络、卷积神经网络和循环神经网络等基础模型。这本书可以帮助您建立深度学习的基础知识，为理解 GPT 模型打下基础。
+2.《Attention Is All You Need》（注意力机制全文翻译）：这是一篇经典的论文，提出了使用纯注意力机制实现序列到序列学习的 Transformer 模型。GPT 模型就是基于 Transformer 模型进行改进而来的，因此了解 Transformer 模型的原理和基础知识对于理解 GPT 模型非常重要。
+3.《The Illustrated Transformer》（可视化 Transformer 模型）：这是一篇可视化的 Transformer 模型教程，用图表和动画的方式解释了 Transformer 模型的原理和工作流程。这篇教程可以帮助您更直观地理解 Transformer 模型，为理解 GPT 模型提供帮助。
+4.《GPT Explained: A Complete Guide to OpenAI's Language Model》（GPT 解析：OpenAI 语言模型完全指南）：这是一篇关于 GPT 模型的详细解析文章，介绍了 GPT 模型的原理、训练和应用等内容。这篇文章可以帮助您全面了解 GPT 模型，并了解如何在实际应用中使用 GPT 模型。
+5.《Hands-On Machine Learning with Scikit-Learn and TensorFlow》
+6. "神经网络方法在自然语言处理中的应用" 作者：Yoav Goldberg - 这本书提供了自然语言处理技术的概述，包括GPT中使用的Transformer模型。
+7. "BERT：深度双向变压器的语言理解预训练" 作者：Devlin 等人 - 尽管这篇论文主要关注BERT模型，但它解释了预训练transformer的概念，这也适用于GPT。 
+
+
+#### LLM
 https://www.explainthis.io/zh-hans/ai-toolkit
 https://www.aihub.cn/tools/chatbot/
 https://www.askopenai.co/
-
-
+#### ChatGpt
 [wrtn](https://wrtn.ai/)
 [perplexity](https://www.perplexity.ai)
 
