@@ -21,6 +21,10 @@ Standard.kt
 去掉if-else除了 Elvis 操作符 ?: 
 如果需要其他操作，还可以用let、also;
 如果判断条件复杂，可以用takeIf，takeUnless;
+        if (mAdapter != null && context != null) {
+            mAdapter.notifyDataSetChanged()
+        }
+mAdapter.takeIf { context != null }?.notifyDataSetChanged()
 
 避免重复引用对象
  with(person) { name = "John"; age = 30 }
