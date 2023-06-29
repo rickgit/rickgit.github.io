@@ -24,7 +24,63 @@ Standard.kt
         if (mAdapter != null && context != null) {
             mAdapter.notifyDataSetChanged()
         }
-mAdapter.takeIf { context != null }?.notifyDataSetChanged()
+        优化后：
+        mAdapter.takeIf { context != null }?.notifyDataSetChanged()
+
+ 
+
+            val networkInterface = NetworkInterface.getByInetAddress(inetAddress)
+            networkInterface.interfaceAddresses.forEach { interfaceAddress ->
+                if (!interfaceAddress.address.isLoopbackAddress) {
+                    if (interfaceAddress.broadcast != null) {
+                        broadcastIP = interfaceAddress.broadcast.hostAddress
+                    }
+                }
+            }
+                优化后：
+        broadcastIP = networkInterface.interfaceAddresses.asSequence()
+            .filter { !it.address.isLoopbackAddress }
+            .mapNotNull { it.broadcast?.hostAddress }
+            .firstOrNull() ?: broadcastIP
+
+
+        if (intent == null) {
+            result.success(false)
+            return true
+        }
+        activity.startActivity(intent)
+        result.success(true)
+        return true
+        优化后：
+             return intent?.let {
+                    activity.startActivity(it)
+                    true
+                } ?: run {
+                    result.success(false)
+                    true
+                }
+
+        if (Type.A == a  || Type.B == a  ) {
+            setTitle(getString(R.string.gs))
+            if (!Type.B == a)
+                mViewModel.id = C.e()
+            mViewModel.r = R()
+        
+        } else {
+            setTitle(getString(R.string.g))
+            mViewModel.id = G.g()
+            mViewModel.r = U()
+        }
+        优化后：
+        val (titleResId, viewModelR, viewModelId) = when (a) {
+            Type.A, Type.B -> Triple(R.string.gs, R(), if (Type.B != a) C.e() else null)
+            else -> Triple(R.string.g, U(), G.g())
+        }
+        
+        setTitle(getString(titleResId))
+        mViewModel.r = viewModelR
+        viewModelId?.let { mViewModel.id = it }
+
 
 避免重复引用对象
  with(person) { name = "John"; age = 30 }
