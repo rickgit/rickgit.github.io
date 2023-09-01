@@ -1329,19 +1329,20 @@ https://zhuanlan.zhihu.com/p/145859014
 
 
 (The Lean Series) O'Reilly Media._Gothelf, Jeff_Seiden, Josh - Lean UX_ applying lean principles to improve user experience-O'Reilly (2016)
-学习剩余成长，结果大于输出，（Permission to Fail 孰能无过）
-
-
-https://lawsofux.com/
-
-https://www.woshipm.com/ucd/650353.html
+学习胜于成长，结果大于输出，（Permission to Fail 孰能无过）
 
 Giles Colborne 在《简约至上：交互式设计四策略》合理删除、分层组织、适时隐藏和巧妙转移
+
 Dan Saffer  《微交互：细节设计成就卓越产品》 构成微交互的几个要素：触发器、规则、反馈、循环与模式。
 
 数据驱动
 smart(nps)
 okr
+
+
+https://lawsofux.com/
+
+https://www.woshipm.com/ucd/650353.html
 
 ### 基础
 思维：
