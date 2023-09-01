@@ -1336,6 +1336,13 @@ https://lawsofux.com/
 
 https://www.woshipm.com/ucd/650353.html
 
+Giles Colborne 在《简约至上：交互式设计四策略》合理删除、分层组织、适时隐藏和巧妙转移
+Dan Saffer  《微交互：细节设计成就卓越产品》 构成微交互的几个要素：触发器、规则、反馈、循环与模式。
+
+数据驱动
+smart(nps)
+okr
+
 ### 基础
 思维：
 共情-定义-设计-原型-测试(usabilityHub,hotjar,usertesting)
