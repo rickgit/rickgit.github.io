@@ -1329,7 +1329,9 @@ https://zhuanlan.zhihu.com/p/145859014
 
 
 (The Lean Series) O'Reilly Media._Gothelf, Jeff_Seiden, Josh - Lean UX_ applying lean principles to improve user experience-O'Reilly (2016)
-学习胜于成长，结果大于输出，（Permission to Fail 孰能无过）
+“我们的目标不是创造一个可交付的东西，而是改变世界上的某件事情——创造一个结果。”
+“学习胜于遵循，结果大于输出。”
+（Permission to Fail 孰能无过）
 
 Giles Colborne 在《简约至上：交互式设计四策略》合理删除、分层组织、适时隐藏和巧妙转移
 
