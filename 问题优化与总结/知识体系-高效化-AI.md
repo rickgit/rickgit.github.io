@@ -414,8 +414,10 @@ k均值法
 
 
 
+
 ## GPT
 #### 书籍推荐
+
 ```
 《人工智能简史》《深度学习入门》
 《深入浅出神经网络与深度学习》OpenAI 总裁兼董事长 Greg Brockman 的 AI 入门读物
@@ -463,7 +465,6 @@ https://www.askopenai.co/
 https://poe.com/ChatGPT
 https://unlimitedgpt.co/
 ```
-
 
 
 
