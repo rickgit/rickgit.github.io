@@ -16,49 +16,84 @@ kotlin 封装Java，减少开发成本，提高开发效率
 
 #### 作用域扩展函数
 ```
-+---------+----------------+-------------------+-----------------+
-|         | object as param|  object as return |  extension fun  |
-+----------------------------------------------------------------+
-|  also   |  √             |  √                |  √              |
-+----------------------------------------------------------------+
-|  apply  |  x             |  √                |  √              |
-+----------------------------------------------------------------+
-|  let    |  √             |  x                |  √              |
-+----------------------------------------------------------------+
-|  run    |  x             |  x                |  √              |
-+----------------------------------------------------------------+
-|  with   |  x             |  x                |  x              |
-+---------+----------------+-------------------+-----------------+
-+----------------------------------------------------------------+
-|  use    |                |                   |                 |
-+---------+----------------+-------------------+-----------------+
+Standard.kt
+
+去掉if-else除了 Elvis 操作符 ?: 
+如果需要其他操作，还可以用let、also;
+如果判断条件复杂，可以用takeIf，takeUnless;
+        if (mAdapter != null && context != null) {
+            mAdapter.notifyDataSetChanged()
+        }
+        优化后：
+        mAdapter.takeIf { context != null }?.notifyDataSetChanged()
+
+ 
+
+            val networkInterface = NetworkInterface.getByInetAddress(inetAddress)
+            networkInterface.interfaceAddresses.forEach { interfaceAddress ->
+                if (!interfaceAddress.address.isLoopbackAddress) {
+                    if (interfaceAddress.broadcast != null) {
+                        broadcastIP = interfaceAddress.broadcast.hostAddress
+                    }
+                }
+            }
+                优化后：
+        broadcastIP = networkInterface.interfaceAddresses.asSequence()
+            .filter { !it.address.isLoopbackAddress }
+            .mapNotNull { it.broadcast?.hostAddress }
+            .firstOrNull() ?: broadcastIP
 
 
-```
+        if (intent == null) {
+            result.success(false)
+            return true
+        }
+        activity.startActivity(intent)
+        result.success(true)
+        return true
+        优化后：
+             return intent?.let {
+                    activity.startActivity(it)
+                    true
+                } ?: run {
+                    result.success(false)
+                    true
+                }
 
-```java
-@kotlin.internal.InlineOnly public inline fun TODO(): kotlin.Nothing { /* compiled code */ }
+        if (Type.A == a  || Type.B == a  ) {
+            setTitle(getString(R.string.gs))
+            if (!Type.B == a)
+                mViewModel.id = C.e()
+            mViewModel.r = R()
+        
+        } else {
+            setTitle(getString(R.string.g))
+            mViewModel.id = G.g()
+            mViewModel.r = U()
+        }
+        优化后：
+        val (titleResId, viewModelR, viewModelId) = when (a) {
+            Type.A, Type.B -> Triple(R.string.gs, R(), if (Type.B != a) C.e() else null)
+            else -> Triple(R.string.g, U(), G.g())
+        }
+        
+        setTitle(getString(titleResId))
+        mViewModel.r = viewModelR
+        viewModelId?.let { mViewModel.id = it }
 
-@kotlin.internal.InlineOnly public inline fun TODO(reason: kotlin.String): kotlin.Nothing { /* compiled code */ }
 
-@kotlin.internal.InlineOnly public inline fun repeat(times: kotlin.Int, action: (kotlin.Int) -> kotlin.Unit): kotlin.Unit { /* compiled code */ }
+避免重复引用对象
+ with(person) { name = "John"; age = 30 }
+如需返回结果，使用run；
+ person.run { "Name: $name, Age: $age" }
+如需返回对象本身，使用apply
+ Person().apply { name = "John"; age = 30 }
 
-@kotlin.internal.InlineOnly public inline fun <R> run(block: () -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> with(receiver: T, block: T.() -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.also(block: (T) -> kotlin.Unit): T { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T> T.apply(block: T.() -> kotlin.Unit): T { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> T.let(block: (T) -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly public inline fun <T, R> T.run(block: T.() -> R): R { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeIf(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
-
-@kotlin.internal.InlineOnly @kotlin.SinceKotlin public inline fun <T> T.takeUnless(predicate: (T) -> kotlin.Boolean): T? { /* compiled code */ }
-
+closable接口的拓展方法
+val stream = File("file.txt").inputStream()
+stream.use {
+    // 使用 stream 的代码块
+}
 ```
 #### 伴生对象
 
@@ -319,7 +354,73 @@ Any?可空类型。Any?是Any的超集，Any?是整个类型体系的顶部，No
 ## 数据集合
 Collections: List, Set, Map
 
+```
+_Collections.kt
+转换函数，过滤函数，排序函数，分组函数，聚合函数
+元素操作,集合操作
 
+
+转换函数
+
+map(transform: (T) -> R)：返回一个包含每个元素转换后结果的新列表。
+flatMap(transform: (T) -> Iterable<R>)：返回一个包含每个元素转换后结果的新列表，但是转换函数的结果是一个集合。
+toSet()：返回一个包含集合中所有元素的新 Set。
+toMutableSet()：返回一个包含集合中所有元素的新可变 Set。
+toMap(keySelector: (T) -> K, valueTransform: (T) -> V)：返回一个根据指定键和值转换后的新 Map。
+associate(transform: (T) -> Pair<K, V>)：返回一个根据元素转换成键值对后的新 Map。
+zip(other: Iterable<R>)：返回一个每个元素都是 Pair 的新列表，每个 Pair 包含两个集合中相同索引处的元素。
+
+过滤函数
+
+filter(predicate: (T) -> Boolean)：返回一个包含符合条件的元素的新列表。
+filterNot(predicate: (T) -> Boolean)：返回一个不符合条件的元素的新列表。
+take(n: Int)：返回一个包含前 n 个元素的新列表。
+takeWhile(predicate: (T) -> Boolean)：返回一个包含前面符合条件的元素的新列表。
+drop(n: Int)：返回一个删除前 n 个元素后的新列表。
+dropWhile(predicate: (T) -> Boolean)：返回一个删除前面符合条件的元素后的新列表。
+distinct()：返回一个去重后的新列表。
+distinctBy(selector: (T) -> K)：返回一个根据指定键去重后的新列表。
+
+排序函数
+
+sorted()：返回一个按升序排列的新列表。
+sortedBy(selector: (T) -> R)：返回一个按指定属性升序排列后的新列表。
+sortedDescending()：返回一个按降序排列的新列表。
+sortedByDescending(selector: (T) -> R)：返回一个按指定属性降序排列后的新列表。
+
+分组函数
+
+groupBy(keySelector: (T) -> K)：返回一个根据指定键分组后的新 Map。
+partition(predicate: (T) -> Boolean)：返回一个符合条件和不符合条件的元素的新 Pair。
+
+聚合函数
+
+fold(initial: R, operation: (acc: R, T) -> R)：从左到右遍历集合，依次将元素和累加器传入指定的操作函数，并返回最终的累加器结果。
+reduce(operation: (T, T) -> T)：从左到右遍历集合，依次将元素和累加器传入指定的操作函数，并返回最终的结果。
+
+元素操作函数
+
+indexOf(element: T)：返回第一个匹配元素的索引，如果没有找到则返回 -1。
+lastIndexOf(element: T)：返回最后一个匹配元素的索引，如果没有找到则返回 -1。
+elementAt(index: Int)：返回指定索引处的元素。
+distinct()：返回一个去重后的新列表。
+distinctBy(selector: (T) -> K)：返回一个根据指定键去重后的新列表。
+associateBy(keySelector: (T) -> K)：返回一个根据指定键转换后的新 Map。
+associateWith(valueSelector: (T) -> V)：返回一个根据指定值转换后的新 Map。
+plus(element: T)：返回一个包含指定元素的新列表。
+
+集合操作函数
+
+all(predicate: (T) -> Boolean)：检查集合中的所有元素是否符合指定条件。
+any(predicate: (T) -> Boolean)：检查集合中是否存在符合指定条件的元素。
+count(predicate: (T) -> Boolean)：返回符合条件的元素的数量。
+max()：返回集合中最大的元素。
+min()：返回集合中最小的元素。
+none()：检查集合中是否不存在元素。
+sumBy(selector: (T) -> Int)：返回集合中所有元素按指定条件计算后的总和。
+average()：返回集合中所有元素的平均值。
+
+```
 ## 异步
 
 Threading
