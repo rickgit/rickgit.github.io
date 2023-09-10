@@ -1363,13 +1363,16 @@ https://www.woshipm.com/ucd/650353.html
 导航（findable），credible（可信），valuable（有价值）
 
 
+
 ### 组件
 字体设计（typography），阴影，正负空间（space），动画（motion），布局（layout），微内容（Microcontent）
 颜色，图片，组件（按钮，输入框，卡片，选择，日期时间，列表，模态，toast，导航条，选项卡。。。）
 
+[设计规则](https://github.com/alexpate/awesome-design-systems)
 Design Guidelines
 https://m3.material.io/
 https://experience.sap.com/fiori-design-android/explore/#
 https://www.lightningdesignsystem.com/guidelines/overview/
 
 https://www.goodreads.com/search?q=ux&qid=
+

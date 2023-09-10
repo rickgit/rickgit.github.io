@@ -411,3 +411,101 @@ k均值法
 
 
 ```
+
+## ChatGpt
+
+## Stable Diffusion
+[在线使用](https://github.com/camenduru/stable-diffusion-webui-colab)
+
+### 插件
+修改avaliable url:
+https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui-extensions/master/index.json
+改为
+https://gitee.com/akegarasu/sd-webui-extensions/blob/master/index.json
+#### Civitai-helper
+自动补全触发词
+模型预览图
+civital.com
+huggingface.co
+#### Dynamic Prompts
+生成多张指定提示语图片
+
+#### maple-from-fall-and-flower
+提示语
+
+#### 自动补全
+git@github.com:DominikDoom/a1111-sd-webui-tagcomplete.git
+
+
+#### 图片生成优化插件
+图生图面部修复 Face Editor
+多人图片生成：
+[Latent couple 分区渲染](git@github.com:opparco/stable-diffusion-webui-two-shot.git)
+division 生成坐标，position 类excel格式（Y1-Y2:X1-X2）表示绘制范围
+注：[辅助工具](https://github.com/Zuntan03/LatentCoupleHelper)
+[composable-lora防止多个LoRA相互影响](git@github.com:opparco/stable-diffusion-webui-two-shot.git)
+
+[cutof 改善颜色串掉]()
+[m2m mov2mov]()
+[骨架 ]
+openpose-editor基于controlnet,需要下载其[模型](https://huggingface.co/lllyasviel/ControlNet-v1-1)，[anotators](https://huggingface.co/lllyasviel/ControlNet/tree/main)
+posex,depth lib
+### 算法及模型
+#### 放大算法：
+BSRGAN: 真实图像退化的模型
+ESRGAN_4X
+Lanczos: 基于差值算法
+R-ESRGAN+Anime6B: 腾讯发布的，比较平滑，针对动漫
+R-ESRGAN 4X+
+SwinIR 4X： 基于transfomer，平滑
+最邻近整数缩放：效果不好
+LDSR：生成图片慢，吃显存
+#### 其他
+Embedings（Textual Inversion 反推提示词）模型 ：
+pt后缀名，几十kb，识别指定角色
+
+Hypernetworks 画风模型：
+
+美化模型：
+VAE
+ 
+DreamBooth 训练模型：
+可训练角色，画风，物件
+
+
+LoRA 模型：
+
+
+### 模型
+
+### 提示词/Promts
+#### 提示词/Promts
+1. 【WebUI图片信息】 查看AI图片信息
+2. spell.novelai.dev
+3. dev.kanotype.net:8003 ai识别提示词
+4. 元素法典
+5. tags.novelai.dev
+   
+#### 内容
+质量，风格（CG/素描..），物体，场景，其他（视觉）
+
+物体
+全貌/部分，数量，性别，
+五官（眼睛，头发颜色，发型，发饰）
+体（年龄，身高，形体围度） 态（表情肢体动作）
+服饰（衣服，袜子，鞋子，手脚装饰品）
+
+#### 规则
+1. 权重
+   增加增加1.1：()，减小1.1：[]，比例增加或减少:{}
+2. 混合：
+   [A | B]
+   融合：
+   同样权重 [A AND B]
+   不同权重 [A:0.3 AND B:1.6 ]
+   先后 [A:B:比例或步数]
+
+
+### 训练
+角色(Textual Inversion)，画风（vae），
+[批量修改尺寸](birme.net)
