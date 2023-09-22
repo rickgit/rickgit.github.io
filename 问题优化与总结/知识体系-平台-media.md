@@ -1527,6 +1527,12 @@ Skype是由Kazaa于2003年发明的基于P2P技术的VoIP客户端，用户可�
 #### 编译
 ./configure --prefix=host --enable-shared --disable-static --disable-doc --disable-everything
 
+配置选项：
+帮助选项 ，标准选项（--prefix）， 证书选项， 配置选项（--enable-shared，--enable-small），程序选项， 文档选项，
+组件选项，独立组件选项（--disable-everything），拓展库选项（--enable-jni，--disable-sdl2，--enable-gnutls）
+工具链选项（--arch，--target-os，--sysroot，--enable-cross-compile，--cc，--cxx，--extra-cflags， --extra-ldflags）
+高级选项（--disable-symver），优化选项（--disable-asm），开发者选项（）
+
 ldd ffmpeg //缺失的依赖
 
 export LD_LIBRARY_PATH=/share/ffmpeg-4.2.3/host/lib //添加缺失依赖
