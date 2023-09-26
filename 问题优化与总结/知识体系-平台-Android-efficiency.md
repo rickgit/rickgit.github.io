@@ -92,8 +92,21 @@ sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3
 
 https://zwc365.com/2020/08/30/android10-baiduwangpan
 
-#### Android 12 API level 31
+#### Android 14 API level 33 
+Android 13 为管理设备与周围 Wi-Fi 热点连接的应用添加 NEARBY_WIFI_DEVICES 运行时权限 (属于 NEARBY_DEVICES权限组)，从而在不需要 ACCESS_FINE_LOCATION 权限的情况下
+应用自撤销权限
+相册权限
+
+
+#### Android 12 API level 31/32
 Material You
+应用启动页
+Notification通知栏
+蓝牙权限： 申请蓝牙相关权限时，不再需要申请设备位置信息相关权限
+精确位置，需同时请求 ACCESS_FINE_LOCATION 和 ACCESS_COARSE_LOCATION 权限，参考ios
+禁止从后台启动前台服务
+声明 android:exported
+
 #### Android 11 API level 30
 [行为变更：以 Android 11 为目标平台的应用](https://developer.android.google.cn/preview/behavior-changes-11?hl=zh-cn)
 
