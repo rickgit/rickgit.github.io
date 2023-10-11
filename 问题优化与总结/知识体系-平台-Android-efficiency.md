@@ -40,24 +40,30 @@ android 相关，Google要求tartgetSdkVersion要保持最新：
 compileSdkVersion>=targetSdkVersion>=minSdkVersion
 ndk所支持API级别可以通过NDK解压缩包中platforms目录查看
 
-[jdk版本](https://www.oracle.com/java/technologies/downloads/archive/)支持Java8可以，开发使用kotlin：
+支持Java8可以，开发使用kotlin：
+```
 sourceCompatibility JavaVersion.VERSION_1_8
 targetCompatibility JavaVersion.VERSION_1_8
+```
 使用高版本，android 会使用D8 R8脱糖处理，使低版本手机支持
 
 Kotlin版本，最新的 Android 平台功能建议最新版本：
-[kotlin/KSP](https://plugins.gradle.org/search?term=org.jetbrains.kotlin)：
-[Kotlin Gradle plugin](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)
-[Kotlin 版本所需的 D8 和 R8 编译器版本](https://developer.android.com/studio/write/kotlin-support?hl=zh-cn)
+- [kotlin/KSP](https://plugins.gradle.org/search?term=org.jetbrains.kotlin)：
+- [Kotlin Gradle plugin](https://kotlinlang.org/docs/gradle-configure-project.html#apply-the-plugin)
+- [Kotlin 版本所需的 D8 和 R8 编译器版本](https://developer.android.com/studio/write/kotlin-support?hl=zh-cn)
 
 android studio 版本保持最新，核心用到AGP要保持最新，需要gradle支持：
-[AGP版本号建议](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn#versioning-update) 
-[flutter AGP版本号建议](packages/flutter_tools/lib/src/android/gradle_utils.dart)
-[AGP maven仓库](https://maven.google.com/web/index.html?#com.android.application)
-[Gradle版本](https://services.gradle.org/distributions/)
+- [AGP版本号建议](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn#versioning-update) 
+- [flutter AGP版本号建议](https://github.com/flutter/flutter/blob/master/packages/flutter_tools/lib/src/android/gradle_utils.dart)
+- [Gradle 版本兼容](https://docs.gradle.org/8.4/userguide/compatibility.html)
 
+- [AGP maven仓库](https://maven.google.com/web/index.html?#com.android.application)
+- [Gradle版本](https://services.gradle.org/distributions/),
 
-
+其他：
+- [dex格式版本](https://android.googlesource.com/platform/dalvik/+/master/dx/src/com/android/dex/DexFormat.java)
+- [class file version](https://javaalmanac.io/bytecode/versions/)
+- [jdk版本](https://www.oracle.com/java/technologies/downloads/archive/)
 ### studio
 [JetBrains intellij android](https://github.com/JetBrains/android.git)
 
