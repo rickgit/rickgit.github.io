@@ -105,7 +105,7 @@ https://zwc365.com/2020/08/30/android10-baiduwangpan
 Android 13 为管理设备与周围 Wi-Fi 热点连接的应用添加 NEARBY_WIFI_DEVICES 运行时权限 (属于 NEARBY_DEVICES权限组)，从而在不需要 ACCESS_FINE_LOCATION 权限的情况下
 应用自撤销权限
 相册权限
-Activity Embedding平行视界
+Activity Embedding平行视界/Letterboxing 
 
 #### Android 12 API level 31
 Material You

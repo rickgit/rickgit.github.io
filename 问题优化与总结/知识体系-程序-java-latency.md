@@ -889,6 +889,11 @@ GC Roots 的对象包括下面几种：
  
 
 #### 引用数据类型回收
+打印可选垃圾回收
+java -XX:+PrintFlagsFinal -version | grep -iE 'Use\w+GC'
+打印内存分布
+java -Xlog:gc*
+
 ##### 垃圾收集器
 [Java版本歷史](https://zh.wikipedia.org/wiki/Java%E7%89%88%E6%9C%AC%E6%AD%B7%E5%8F%B2)
 2009年05月28日，Java SE 6 Update 14发布。G1（Garbage First）低暂停的垃圾回收器的支持。Java 9 成为默认的垃圾回收器
@@ -896,11 +901,12 @@ GC Roots 的对象包括下面几种：
 2020年05月17日 ，移除CMS垃圾回收器
 
     新生代
-        Serial，ParNew, Paralle Scavenge
+        Serial(复制算法)，Paralle Scavenge(复制算法),ParNew
     老年代
-        Serial Old，Paralle Old，CMS(这三个都是老年代)
-    G1
-
+        Serial Old(标记 - 清除 - 压缩算法)，Paralle Old(标记 - 清除 - 压缩算法)，CMS 
+    G1（分区，每个区可以作为新生代或老年代）
+    ZGC(不再区分年轻代和老年代，染色指针)
+    Shenandoah(存在分代概念，转发指针)
 ##### 垃圾回收算法
    标记-清除算法(mark-sweep), dalvikvm；标记可达对象，线性扫描堆，回收不可达对象
         x遍历两遍，效率不高；STW 体验不好；碎片化。
