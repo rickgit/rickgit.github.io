@@ -89,7 +89,22 @@ wsl 安装sdk
 sdkmanager "platform-tools" "build-tools;28.0.3" "platforms;android-28" "cmake;3.6.4111459" "ndk;22.0.7026061"  "ndk-bundle"
 
 ```
-
+#### Gradle 8.0.2
+allprojects{
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile.class) {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+    afterEvaluate {
+        tasks.withType(org.gradle.api.tasks.compile.JavaCompile.class) {
+            sourceCompatibility = JavaVersion.VERSION_1_8.toString()
+            targetCompatibility = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+}
+不建议打开
+#kotlin.jvm.target.validation.mode=IGNORE
 #### Gradle 5.3  支持kotlin
 ### 版本特性
 [Android 版本与API level](https://developer.android.google.cn/studio/releases/platforms?hl=zh-cn)
