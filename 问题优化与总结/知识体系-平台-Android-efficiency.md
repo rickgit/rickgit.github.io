@@ -60,6 +60,7 @@ android studio 版本保持最新，核心用到AGP要保持最新，需要gradl
 
 - [AGP maven仓库](https://maven.google.com/web/index.html?#com.android.application)
 - [Gradle版本](https://services.gradle.org/distributions/),
+- [Gradle各个版本号文档](https://gradle.org/releases/),
 
 其他：
 - [dex格式版本](https://android.googlesource.com/platform/dalvik/+/master/dx/src/com/android/dex/DexFormat.java)
