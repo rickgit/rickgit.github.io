@@ -294,6 +294,9 @@ pubspec.yaml文件 定义
 #### 装饰边框
 InputDecoration
 
+#### 绘制
+毛玻璃 DrawIndicator widget
+绘制模糊,光影流动  paint.maskFilter = MaskFilter.blur(BlurStyle.outer, 20.0);
 #### 手势检测和触摸事件处理
 
 
