@@ -53,7 +53,8 @@ Kotlin版本，最新的 Android 平台功能建议最新版本：
 - [Kotlin 版本所需的 D8 和 R8 编译器版本](https://developer.android.com/studio/write/kotlin-support?hl=zh-cn)
 
 android studio 版本保持最新，核心用到AGP要保持最新，需要gradle支持：
-- [AGP版本号建议](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn#versioning-update) 
+- [AGP版本号建议](https://developer.android.google.cn/studio/releases/gradle-plugin?hl=zh-cn#versioning-update)
+- [AGP版本号各个版本号及gradle要求](https://developer.android.google.cn/build/releases/past-releases?hl=en)
 - [flutter AGP版本号建议](https://github.com/flutter/flutter/blob/master/packages/flutter_tools/lib/src/android/gradle_utils.dart)
 - [Gradle 版本兼容](https://docs.gradle.org/8.4/userguide/compatibility.html)
 
