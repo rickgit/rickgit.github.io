@@ -2007,7 +2007,7 @@ View 白板：
             setColorFilter 颜色过滤（LightingColorFilter、PorterDuffColorFilter ， ColorMatrixColorFilter,BlendModeColorFilter）
             setMaskFilter（BlurMaskFilter模糊，EmbossMaskFilter浮雕）遮罩
 
-            setBlendMode 颜色混合模式（CLEAR，SRC，DST，SRC_OVER，DST_OVER，SRC_IN，DST_IN，SRC_OUT，DST_OUT，SRC_ATOP，。。）
+            setBlendMode 颜色混合模式,saveLayer与restore之间生效。（CLEAR，SRC，DST，SRC_OVER，DST_OVER，SRC_IN，DST_IN，SRC_OUT，DST_OUT，SRC_ATOP，。。）
             setDither 颜色抗抖动/
             setShadowLayer（）/clearShadowLayer 阴影
 
