@@ -368,3 +368,6 @@ flutter analyze
 https://github.com/dart-lang/sdk/blob/master/runtime/lib
 https://github.com/dart-lang/sdk/blob/main/sdk/lib/_internal/vm/lib/array.dart
 https://github.com/dart-lang/sdk/tree/main/sdk/lib/collection
+
+FlutterFragmentActivity 源码位置
+https://github.com/flutter/engine/tree/main/shell/platform/android/io/flutter
