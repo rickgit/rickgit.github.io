@@ -369,5 +369,19 @@ https://github.com/dart-lang/sdk/blob/master/runtime/lib
 https://github.com/dart-lang/sdk/blob/main/sdk/lib/_internal/vm/lib/array.dart
 https://github.com/dart-lang/sdk/tree/main/sdk/lib/collection
 
+
+dart 入口
+https://github.com/dart-lang/sdk/blob/main/runtime/bin/main.cc
+
+flutter不直接调用dart，flutter入口
+https://github.com/flutter/engine/blob/main/runtime/dart_vm.cc
+
+flutter 调用gradle 源码位置
+https://github.com/flutter/flutter/blob/master/packages/flutter_tools/lib/src/android/gradle.dart#buildGradleApp
+
 FlutterFragmentActivity 源码位置
 https://github.com/flutter/engine/tree/main/shell/platform/android/io/flutter
+
+
+
+
