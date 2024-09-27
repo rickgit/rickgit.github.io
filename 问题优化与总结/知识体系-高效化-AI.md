@@ -563,3 +563,47 @@ LoRA 模型：
 ### 训练
 角色(Textual Inversion)，画风（vae），
 [批量修改尺寸](birme.net)
+
+
+## Flux1.
+### 介绍
+原先Stable Diffusion 团队开发，可理解 SD 3.0
+### 安装
+项目
+https://github.com/comfyanonymous/ComfyUI
+
+汉化包
+https://github.com/AIGODLIKE/AIGODLIKE-ComfyUI-Translation
+
+### 模型
+[dev模型](https://github.com/black-forest-labs/flux): 24G 显存
+[dev fp8](https://huggingface.co/Kijai/flux-fp8/blob/main/flux1-dev-fp8.safetensors) : 最低 12G 显存
+schnell: 大多数显卡
+schnell fp8: 低端显卡
+
+放在/models/unet 文件夹下
+
+### clip 和 t5模型（32G显存可以选择p16）
+https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main
+两文件放在 /models/clip 文件夹
+
+
+### vae模型
+https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors
+/models/vae 文件夹下
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
