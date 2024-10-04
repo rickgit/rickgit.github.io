@@ -586,6 +586,9 @@ schnell fp8: 低端显卡
 ### clip 和 t5模型（32G显存可以选择p16）
 https://huggingface.co/comfyanonymous/flux_text_encoders/tree/main
 两文件放在 /models/clip 文件夹
+clip_l.safetensors
+t5xxl_fp8_e4m3fn.safetensors
+
 
 
 ### vae模型
@@ -593,15 +596,42 @@ https://huggingface.co/black-forest-labs/FLUX.1-schnell/blob/main/ae.safetensors
 /models/vae 文件夹下
 
 
+## ComfyUI 工作流
+
+### 换脸
+
+Instant ID 控制面部比较好
+PULID 面部控制比较不好
+DZ-FaceDetailer
+
+### fluxgym LoRA训练
+
+
+### 生产高清人像
+Kolors
+
+
+### 图生视频
+CogVideoi2v ComfyUI-CogVideoXWrapper 标准模型
+ComfyUI-CogVideoX-MZ GGUF量化模型
+
+### 手部优化
+MeshGraphormer Hand Refiner
+
+### 修复背景模糊
+LoRa Anti Blur
+
+
+### controlnet
+ 
+Mistoline 模型
+
+### 其他工作流
+![插件推荐](https://github.com/user-attachments/assets/43393be0-c629-462b-908d-df93c1f58764)
 
 
 
-
-
-
-
-
-
+![模型讲解](https://github.com/user-attachments/assets/838ea18c-4490-450e-a3e5-8aa959f02abd)
 
 
 
