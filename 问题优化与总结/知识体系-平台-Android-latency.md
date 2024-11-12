@@ -3891,6 +3891,8 @@ dx --dex --output=Hello.dex Hello.class
 ```
 
 #### NDK
+[ndk最低支持Android版本](https://github.com/android/ndk/wiki/Compatibility)
+
 libc/libm/libdl	C 库	-	 
 libc++_shared.so/libc++_static.a	c++库，前者动态，后者静态。支持c++17	- 	C++ 库支持
 liblog	android 日志	3	日志记录
