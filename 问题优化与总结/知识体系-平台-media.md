@@ -2025,6 +2025,9 @@ View 白板：
          4. 
             setFilterBitmap 图片滤波/图片放大防止马赛克
             setXfermode （❌AvoidXfermode, ❌PixelXorXfermode 和 PorterDuffXfermode ）图形混合模式/绘制重叠 DST（已经绘制），SRC（后绘制）； 16种
+路径
+            PathMetrics#getTangentForOffset 获取路径的旋转角度
+            RadialGradient 如果没有椭圆形，可以scale y坐标，使圆形渐变形成椭圆
 canvas
     quickReject 判断是否相交
     字幕 创建bitmap,canvas绘制字体，填充 setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
