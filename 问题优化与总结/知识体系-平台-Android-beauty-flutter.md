@@ -286,6 +286,18 @@ Wrap                             Constraint#flow
 装饰权重组件SizedBox/AspectRatio  Constraint
 ```
 
+一种状态loading
+CircularProgressIndicator ![image](https://github.com/user-attachments/assets/2d8c7848-58c8-44f4-bac1-27864d318139)
+CupertinoActivityIndicator ![image](https://github.com/user-attachments/assets/b0205cd6-c62e-438d-8ef9-4a6e87abfd27)
+
+两种状态
+CupertinoSwitch ![image](https://github.com/user-attachments/assets/89b18228-e398-4dba-9237-2e44b8885418)
+
+
+
+
+
+
 ##### webview 建议用原生
 
 ####  当数据集比较大或列表动态加载时，需要使用更高效的方式ListView.Builder。这种方式基本上相当于Android的RecycleView
