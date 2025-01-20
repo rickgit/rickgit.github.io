@@ -168,6 +168,14 @@ https://dart.dev/guides/language/language-tour
 Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(Physics-based animation) 
 
 physics，scheduler,sematics,services
+
+AnimationController/Animation 
+Tween/Animatable
+
+AnimatedOpacity/AnimatedCrossFade
+
+AnimatedSwitcher
+
 ### 包大小与编译
 
 Android debug模式（Flutter使用Kernel Snapshot 模式编译）
