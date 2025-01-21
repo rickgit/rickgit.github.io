@@ -168,7 +168,7 @@ https://dart.dev/guides/language/language-tour
 Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(Physics-based animation) 
 
 physics，scheduler,sematics,services
-
+```
 Animation
    AnimationController 控制动画
    Curve 动画曲线
@@ -176,11 +176,17 @@ Animation
    AnimatedBuilder 关联widget
  
 封装动画
-   FadeTransition
-   AnimatedOpacity/AnimatedCrossFade
- 
-AnimatedSwitcher
-   child 需要指定 key，才会认为不同 widget，才会执行动画
+   隐式动画（自身有AnimationController，不用开发者自己dispose()）
+         AnimatedOpacity/AnimatedCrossFade
+         TweenAnimatedBuilder
+   显示动画
+      FadeTransition
+      AnimatedWidget
+      AnimatedBuilder
+      AnimatedSwitcher
+         child 需要指定 key，才会认为不同 widget，才会执行动画
+```
+
 
 ### 包大小与编译
 
