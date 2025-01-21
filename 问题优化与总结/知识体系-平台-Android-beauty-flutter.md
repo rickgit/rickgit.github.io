@@ -169,12 +169,18 @@ Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(P
 
 physics，scheduler,sematics,services
 
-AnimationController/Animation 
-Tween/Animatable
-
-AnimatedOpacity/AnimatedCrossFade
-
+Animation
+   AnimationController 控制动画
+   Curve 动画曲线
+   Animatable/Tween.animate() 非归一化动画
+   AnimatedBuilder 关联widget
+ 
+封装动画
+   FadeTransition
+   AnimatedOpacity/AnimatedCrossFade
+ 
 AnimatedSwitcher
+   child 需要指定 key，才会认为不同 widget，才会执行动画
 
 ### 包大小与编译
 
