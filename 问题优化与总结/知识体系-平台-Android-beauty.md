@@ -1129,6 +1129,10 @@ GT 工具
 
 
 ## 美观（每秒25帧，限时20毫秒内执行完）-界面开发系统
+### 颜色空间
+
+![hsv_hsl](https://github.com/user-attachments/assets/a89fa827-9daf-4dc6-8cec-92a41b89f534)
+
 ### 主题
 @style/Theme.MaterialComponents.DayNight.DarkActionBar 
 Base.V7.Theme.AppCompat.Light -> Platform.AppCompat.Light ->android:Theme.Holo.Light
