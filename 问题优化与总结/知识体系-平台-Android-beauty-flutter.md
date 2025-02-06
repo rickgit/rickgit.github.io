@@ -164,7 +164,7 @@ https://dart.dev/guides/language/language-tour
 
 
 ```
-
+![](https://docs.flutter.dev/assets/images/docs/ui/animations/animation-decision-tree.png)
 Flutter动画分为两类: 补间动画(Tween Animation) 基于物理的动画(Physics-based animation) 
 
 physics，scheduler,sematics,services
