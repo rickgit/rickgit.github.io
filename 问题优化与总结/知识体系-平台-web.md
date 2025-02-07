@@ -55,5 +55,11 @@ npm install hexo-deployer-git --save
 rsbuild  （小型使用vite）
 ### 包管理器
 pnpm  （不推荐 npm/yarn）
+```
+设置环境变量
+PNPM_HOME C:\Users\account\AppData\Local\pnpm
 
+初始化项目
+pnpm install
+```
 
