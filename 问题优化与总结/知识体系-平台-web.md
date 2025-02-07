@@ -23,3 +23,32 @@
 +-----------------------------------------------------------------+
 
 ```
+
+
+[hexo 博客搭建](https://hexo.io/zh-cn/)
+```
+npm install hexo-cli -g
+hexo init blog
+cd blog
+npm install
+hexo server
+```
+
+Hexo-Next 主题
+```
+cd blog
+git clone https://github.com/next-theme/hexo-theme-next
+
+blog/_config.yml 配置文件的主题改为hexo-theme-next
+theme: hexo-theme-next
+
+刷新配置
+hexo clean && hexo g && hexo d && hexo s
+
+```
+[Hexo 部署到github](https://hexo.io/zh-cn/docs/github-pages)
+```
+npm install hexo-deployer-git --save
+
+```
+
