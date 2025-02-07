@@ -24,8 +24,8 @@
 
 ```
 
-
-[hexo 博客搭建](https://hexo.io/zh-cn/)
+## hexo 博客搭建
+### [hexo 博客搭建](https://hexo.io/zh-cn/)
 ```
 npm install hexo-cli -g
 hexo init blog
@@ -34,7 +34,7 @@ npm install
 hexo server
 ```
 
-Hexo-Next 主题
+### Hexo-Next 主题
 ```
 cd blog
 git clone https://github.com/next-theme/hexo-theme-next
@@ -46,9 +46,13 @@ theme: hexo-theme-next
 hexo clean && hexo g && hexo d && hexo s
 
 ```
-[Hexo 部署到github](https://hexo.io/zh-cn/docs/github-pages)
+### [Hexo 部署到github](https://hexo.io/zh-cn/docs/github-pages)
 ```
 npm install hexo-deployer-git --save
 
 ```
+
+## 包管理器
+pnpm  不推荐 npm/yarn
+
 
