@@ -51,8 +51,9 @@ hexo clean && hexo g && hexo d && hexo s
 npm install hexo-deployer-git --save
 
 ```
-
-## 包管理器
-pnpm  不推荐 npm/yarn
+### 构建工具
+rsbuild  （小型使用vite）
+### 包管理器
+pnpm  （不推荐 npm/yarn）
 
 
