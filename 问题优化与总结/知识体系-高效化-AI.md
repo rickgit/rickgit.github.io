@@ -469,6 +469,8 @@ https://unlimitedgpt.co/
 
 
 ## Stable Diffusion
+
+[原理](http://shiyanjun.cn/archives/2212.html)
 [在线使用](https://github.com/camenduru/stable-diffusion-webui-colab)
 
 ### 插件
