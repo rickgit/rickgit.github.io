@@ -281,6 +281,7 @@ k均值法
 
 ```
 封装数据类型 narray
+## torch 张量和构建神经网络标准化方式
 
 ## pandas
 [getting_started（install）](https://pandas.pydata.org/getting_started.html) 
