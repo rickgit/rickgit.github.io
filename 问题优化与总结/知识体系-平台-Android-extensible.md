@@ -691,10 +691,12 @@ Android presenter 只有 IView 接口，用于更新界面
 #### MVVM
 Activity 观察 ViewModel 的LiveData 的数据状态变化更新界面。
 全局的LiveData 会存在**粘性事件**，使用EventLiveData解决
+使用依赖导致，避免 ViewModel 直接关联 IView
 #### MVI  
 ![image](https://github.com/user-attachments/assets/4ea358af-0e07-40c7-ba90-6a97a4659e03)
 避免了MVVM 的 ViewModel  写了太多的 LiveData。
-Kotlin Flow/ MutableStateFlow
+Kotlin combine操作符将这两个流组合成一个新的流。
+将intent分为 state(viewmodel->view), event(oneshot no cache data viewmodel->view)  , action(view -> viewmodel)
 全局的StateFlow 会存在**粘性事件**，使用SharedFlow解决
 
 #### Compose MVVM
