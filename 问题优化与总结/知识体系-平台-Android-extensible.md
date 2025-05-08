@@ -678,9 +678,27 @@ https://github.com/mqzhangw/JIMU
 https://github.com/6thsolution/EasyMVP
 
  https://github.com/jdqm/GradleTansform.git 
+## 架构
+### MVC MVP MVVM MVI
+https://bytebytego.com/guides/mvc-mvp-mvvm-viper-patterns/
+#### MVC
+![image](https://github.com/user-attachments/assets/9657d21a-2507-4f94-840f-e7eb8d5cee6c)
+Android MVC 简单抽象view为 XML，本质上Activity 充当 view/controller角色
 
+#### MVP
+![image](https://github.com/user-attachments/assets/2b93bdf5-dbe1-442b-98dc-57c619f7ad51)
+Android presenter 只有 IView 接口，用于更新界面
 
- ## Android App Bundle模块化
+#### MVVM
+![image](https://github.com/user-attachments/assets/37d72aa6-7b12-45c7-833b-963b255caa9a)
+Activity 观察 ViewModel 的LiveData 的数据状态变化更新界面。
+
+#### MVI  
+![image](https://github.com/user-attachments/assets/4ea358af-0e07-40c7-ba90-6a97a4659e03)
+避免了MVVM 的 ViewModel  写了太多的 LiveData。
+MutableStateFlow
+
+## Android App Bundle模块化
 
  [层级](https://cloud.tencent.com/developer/article/1159830)
  [Android App Bundle实现 Qigsaw](https://github.com/iqiyi/Qigsaw)
