@@ -681,22 +681,25 @@ https://github.com/6thsolution/EasyMVP
 ## 架构
 ### MVC MVP MVVM MVI
 https://bytebytego.com/guides/mvc-mvp-mvvm-viper-patterns/
-#### MVC
 ![image](https://github.com/user-attachments/assets/9657d21a-2507-4f94-840f-e7eb8d5cee6c)
+#### MVC
 Android MVC 简单抽象view为 XML，本质上Activity 充当 view/controller角色
 
 #### MVP
-![image](https://github.com/user-attachments/assets/2b93bdf5-dbe1-442b-98dc-57c619f7ad51)
 Android presenter 只有 IView 接口，用于更新界面
 
 #### MVVM
-![image](https://github.com/user-attachments/assets/37d72aa6-7b12-45c7-833b-963b255caa9a)
 Activity 观察 ViewModel 的LiveData 的数据状态变化更新界面。
-
+全局的LiveData 会存在**粘性事件**，使用EventLiveData解决
 #### MVI  
 ![image](https://github.com/user-attachments/assets/4ea358af-0e07-40c7-ba90-6a97a4659e03)
 避免了MVVM 的 ViewModel  写了太多的 LiveData。
-MutableStateFlow
+Kotlin Flow/ MutableStateFlow
+全局的StateFlow 会存在**粘性事件**，使用SharedFlow解决
+
+#### Compose MVVM
+ Compose mutableStateOf 数据变化重组组件
+remember{} 包裹state才会重绘界面
 
 ## Android App Bundle模块化
 
