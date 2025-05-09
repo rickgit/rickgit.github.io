@@ -693,12 +693,16 @@ Activity 观察 ViewModel 的LiveData 的数据状态变化更新界面。
 全局的LiveData 会存在**粘性事件**，使用EventLiveData解决
 使用依赖导致，避免 ViewModel 直接关联 IView
 #### MVI  
+遵循 （Single Source of Truth）
 ![image](https://github.com/user-attachments/assets/4ea358af-0e07-40c7-ba90-6a97a4659e03)
 避免了MVVM 的 ViewModel  写了太多的 LiveData。
 Kotlin combine操作符将这两个流组合成一个新的流。
 将intent分为 state(viewmodel->view), event(oneshot no cache data viewmodel->view)  , action(view -> viewmodel)
 全局的StateFlow 会存在**粘性事件**，使用SharedFlow解决
 
+##### 第三方实现 mavericks/MvRx，Reductor
+Reductor 根据 State和 action 生成新的state
+ 
 #### Compose MVVM
  Compose mutableStateOf 数据变化重组组件
 remember{} 包裹state才会重绘界面
